@@ -7,3 +7,6 @@ dependencies:
 - pre-commit
 - pytest
 - pytest-cov
+- pytest-postgresql
+- sqlalchemy==1.4*
+- sqlalchemy-stubs
