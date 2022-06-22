@@ -13,16 +13,19 @@ BaseModel = declarative_base(metadata=metadata)
 
 class ResourceLicence(BaseModel):
     """many-to-many ORM model for resources-licences."""
+
     __tablename__ = "resources_licences"
 
-    resource_id = sa.Column(sa.String, sa.ForeignKey("resources.resource_id"), primary_key=True)
+    resource_id = sa.Column(
+        sa.String, sa.ForeignKey("resources.resource_id"), primary_key=True
+    )
     licence_id = sa.Column(sa.String, primary_key=True)
     revision = sa.Column(sa.String, primary_key=True)
 
     __table_args__ = (
         sa.ForeignKeyConstraint(
-            ['licence_id', 'revision'],
-            ['licences.licence_id', 'licences.revision'],
+            ["licence_id", "revision"],
+            ["licences.licence_id", "licences.revision"],
         ),
     )
 
@@ -54,12 +57,14 @@ class Resource(BaseModel):
     record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
     resource_update = sa.Column(sa.DATE)
 
-    licences = relationship("Licence", secondary="resources_licences",
-                            back_populates="resources")
+    licences = relationship(
+        "Licence", secondary="resources_licences", back_populates="resources"
+    )
 
 
 class Licence(BaseModel):
     """Licence ORM model."""
+
     __tablename__ = "licences"
 
     licence_id = sa.Column(sa.String, primary_key=True)
@@ -67,8 +72,9 @@ class Licence(BaseModel):
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
 
-    resources = relationship("Resource", secondary="resources_licences",
-                             back_populates="licences")
+    resources = relationship(
+        "Resource", secondary="resources_licences", back_populates="licences"
+    )
 
 
 def init_db(connection_string: str) -> sa.engine.Engine:

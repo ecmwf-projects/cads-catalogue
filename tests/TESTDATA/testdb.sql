@@ -207,4 +207,3 @@ ALTER TABLE ONLY public.resources_licences
 --
 -- PostgreSQL database dump complete
 --
-

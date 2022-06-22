@@ -42,9 +42,11 @@ def load_test_data(connection_string: str):
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     this_path = os.path.abspath(os.path.dirname(__file__))
-    dumped_db_path = os.path.abspath(os.path.join(this_path, '../tests/TESTDATA/testdb.sql'))
+    dumped_db_path = os.path.abspath(
+        os.path.join(this_path, "../tests/TESTDATA/testdb.sql")
+    )
     subprocess.call(["psql", connection_string, "-f", dumped_db_path])
-    print('test data loaded.')
+    print("test data loaded.")
 
 
 def main():
