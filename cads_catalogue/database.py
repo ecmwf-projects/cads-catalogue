@@ -15,10 +15,16 @@ class ResourceLicence(BaseModel):
     """many-to-many ORM model for resources-licences."""
     __tablename__ = "resources_licences"
 
-    resource_id = sa.Column(sa.ForeignKey("resources.resource_id"), primary_key=True)
-    licence_id = sa.Column(sa.ForeignKey("licences.licence_id"), primary_key=True)
-    licence = relationship("Licence", back_populates="resources")
-    resource = relationship("Resource", back_populates="licences")
+    resource_id = sa.Column(sa.String, sa.ForeignKey("resources.resource_id"), primary_key=True)
+    licence_id = sa.Column(sa.String, primary_key=True)
+    revision = sa.Column(sa.String, primary_key=True)
+
+    __table_args__ = (
+        sa.ForeignKeyConstraint(
+            ['licence_id', 'revision'],
+            ['licences.licence_id', 'licences.revision'],
+        ),
+    )
 
 
 class Resource(BaseModel):
@@ -29,35 +35,41 @@ class Resource(BaseModel):
     resource_id = sa.Column(sa.VARCHAR(1024), primary_key=True)
     stac_extensions = sa.Column(sa.ARRAY(sa.VARCHAR(300)), nullable=True)
     title = sa.Column(sa.VARCHAR(1024))
-    description = sa.Column(sa.VARCHAR(1024), nullable=False)
+    description = sa.Column(JSONB, nullable=False)
+    abstract = sa.Column(sa.TEXT, nullable=False)
     contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     form = sa.Column(JSONB)
+    citation = sa.Column(sa.TEXT)
     keywords = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     version = sa.Column(sa.VARCHAR(300))
-    # license = sa.Column(sa.VARCHAR(300), nullable=False)
+    variables = sa.Column(JSONB)
     providers = sa.Column(JSONB)
     summaries = sa.Column(JSONB, nullable=True)
     extent = sa.Column(JSONB)
     links = sa.Column(JSONB)
+    use_eqc = sa.Column(sa.Boolean)
+    documentation = sa.Column(JSONB)
     type = sa.Column(sa.VARCHAR(300), nullable=False)
-    previewimageurl = sa.Column(sa.TEXT)
-    last_modified = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
+    previewimage = sa.Column(JSONB)
+    publication_date = sa.Column(sa.DATE)
+    record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
+    resource_update = sa.Column(sa.DATE)
 
-    licences = relationship("ResourceLicence", back_populates="resource")
+    licences = relationship("Licence", secondary="resources_licences",
+                            back_populates="resources")
 
 
 class Licence(BaseModel):
     """Licence ORM model."""
     __tablename__ = "licences"
-    __table_args__ = (sa.UniqueConstraint('title', 'revision', name='uix_table_col1_col2_col3'),)
 
-    licence_id = sa.Column(sa.Integer, primary_key=True)
+    licence_id = sa.Column(sa.String, primary_key=True)
+    revision = sa.Column(sa.String, primary_key=True)
     title = sa.Column(sa.String, nullable=False)
-    revision = sa.Column(sa.String, nullable=False)
-    text = sa.Column(sa.Text, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
 
-    resources = relationship("ResourceLicence", back_populates="licences")
+    resources = relationship("Resource", secondary="resources_licences",
+                             back_populates="licences")
 
 
 def init_db(connection_string: str) -> sa.engine.Engine:
