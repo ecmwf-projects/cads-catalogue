@@ -1,4 +1,6 @@
 """module for entry points"""
+import os.path
+import subprocess
 
 import sqlalchemy as sa
 import typer
@@ -39,7 +41,9 @@ def load_test_data(connection_string: str) -> str:
 
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
-    raise NotImplementedError
+    this_path = os.path.abspath(os.path.dirname(__file__))
+    dumped_db_path = os.path.abspath(os.path.join(this_path, '../tests/TESTDATA/testdb.sql'))
+    subprocess.call(["psql", connection_string, "-f", dumped_db_path])
 
 
 def main():

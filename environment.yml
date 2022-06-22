@@ -9,6 +9,7 @@ dependencies:
 - pytest
 - pytest-cov
 - typer
+- postgresql
 - psycopg2
 - sqlalchemy==1.4*
 - sqlalchemy-stubs

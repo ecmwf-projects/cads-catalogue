@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 metadata = sa.MetaData()
 BaseModel = declarative_base(metadata=metadata)
 
-    
+
 class ResourceLicence(BaseModel):
     """many-to-many ORM model for resources-licences."""
     __tablename__ = "resources_licences"
@@ -47,10 +47,9 @@ class Resource(BaseModel):
     summaries = sa.Column(JSONB, nullable=True)
     extent = sa.Column(JSONB)
     links = sa.Column(JSONB)
-    use_eqc = sa.Column(sa.Boolean)
     documentation = sa.Column(JSONB)
     type = sa.Column(sa.VARCHAR(300), nullable=False)
-    previewimage = sa.Column(JSONB)
+    previewimage = sa.Column(sa.TEXT)
     publication_date = sa.Column(sa.DATE)
     record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
     resource_update = sa.Column(sa.DATE)
