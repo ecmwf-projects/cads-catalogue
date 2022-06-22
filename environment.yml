@@ -4,9 +4,12 @@ channels:
 dependencies:
 - make
 - mypy
+- pip
 - pre-commit
 - pytest
 - pytest-cov
-- pytest-postgresql
+- psycopg2
 - sqlalchemy==1.4*
 - sqlalchemy-stubs
+- pip:
+  - pytest-postgresql
