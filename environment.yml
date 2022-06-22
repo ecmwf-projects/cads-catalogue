@@ -13,5 +13,6 @@ dependencies:
 - psycopg2
 - sqlalchemy==1.4*
 - sqlalchemy-stubs
+- typer
 - pip:
   - pytest-postgresql
