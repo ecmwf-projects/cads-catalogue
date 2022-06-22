@@ -11,7 +11,7 @@ app = typer.Typer()
 
 
 @app.command()
-def info(connection_string: str) -> str:
+def info(connection_string: str):
     """
     Test connection to the database located at URI `connection_string`
 
@@ -24,7 +24,7 @@ def info(connection_string: str) -> str:
 
 
 @app.command()
-def init_db(connection_string: str) -> str:
+def init_db(connection_string: str):
     """
     Create the database structure
 
@@ -35,7 +35,7 @@ def init_db(connection_string: str) -> str:
 
 
 @app.command()
-def load_test_data(connection_string: str) -> str:
+def load_test_data(connection_string: str):
     """
     Fill the database with some test data.
 
