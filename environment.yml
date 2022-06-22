@@ -8,6 +8,7 @@ dependencies:
 - pre-commit
 - pytest
 - pytest-cov
+- typer
 - psycopg2
 - sqlalchemy==1.4*
 - sqlalchemy-stubs
