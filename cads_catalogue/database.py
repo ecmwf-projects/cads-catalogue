@@ -1,4 +1,3 @@
-# type: ignore
 """SQLAlchemy ORM model"""
 from datetime import datetime
 
