@@ -11,7 +11,7 @@ app = typer.Typer()
 
 
 @app.command()
-def info(connection_string: str):
+def info(connection_string: str) -> None:
     """
     Test connection to the database located at URI `connection_string`
 
@@ -24,7 +24,7 @@ def info(connection_string: str):
 
 
 @app.command()
-def init_db(connection_string: str):
+def init_db(connection_string: str) -> None:
     """
     Create the database structure
 
@@ -35,7 +35,7 @@ def init_db(connection_string: str):
 
 
 @app.command()
-def load_test_data(connection_string: str):
+def load_test_data(connection_string: str) -> None:
     """
     Fill the database with some test data.
 
@@ -49,6 +49,6 @@ def load_test_data(connection_string: str):
     print("test data loaded.")
 
 
-def main():
+def main() -> None:
     """run main catalogue entry points"""
     app()
