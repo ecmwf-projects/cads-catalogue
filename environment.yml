@@ -8,7 +8,6 @@ dependencies:
 - pre-commit
 - pytest
 - pytest-cov
-- typer
 - postgresql
 - psycopg
 - psycopg2
