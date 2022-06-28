@@ -1,0 +1,24 @@
+import sqlalchemy as sa
+from psycopg import Connection
+
+from cads_catalogue import database
+
+
+def test_init_db(postgresql: Connection[str]) -> None:
+    connection_string = (
+        f"postgresql+psycopg2://{postgresql.info.user}:"
+        f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
+    )
+    engine = sa.create_engine(connection_string)
+    conn = engine.connect()
+    query = (
+        "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
+    )
+    expected_tables_at_beginning = set()
+    expected_tables_complete = set(database.metadata.tables)
+
+    assert set(conn.execute(query).scalars()) == expected_tables_at_beginning
+
+    database.init_db(connection_string)
+
+    assert set(conn.execute(query).scalars()) == expected_tables_complete
