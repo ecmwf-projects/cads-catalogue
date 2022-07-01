@@ -1,10 +1,19 @@
 import os.path
 from datetime import date
+from typing import Any
 
-from cads_catalogue import manager
+from sqlalchemy import inspect
+from sqlalchemy.orm import sessionmaker
+
+from cads_catalogue import database, manager
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
+
+
+def object_as_dict(obj: Any) -> dict[str, Any]:
+    """convert a sqlalchemy object in a python dictionary"""
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
 def test_load_metadata_licences() -> None:
@@ -1062,3 +1071,17 @@ def test_load_resource_from_folder() -> None:
     resource = manager.load_resource_from_folder(resource_folder_path)
 
     assert resource == expected_resource
+
+
+def test_store_licences(session_obj: sessionmaker) -> None:
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences = manager.load_licences_from_folder(licences_folder_path)
+    session = session_obj()
+    res = session.query(database.Licence).all()
+    assert res == []
+
+    manager.store_licences(session_obj, licences)
+    res = session.query(database.Licence).all()
+    assert len(res) == len(licences)
+    assert object_as_dict(res[0]) == licences[0]
+    session.close()

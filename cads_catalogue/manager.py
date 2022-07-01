@@ -5,7 +5,10 @@ import os
 from typing import Any
 
 import yaml
+from sqlalchemy.orm import sessionmaker
 from yaml.loader import SafeLoader
+
+from cads_catalogue import database
 
 
 def load_licences_from_folder(folder_path: str) -> list[dict[str, Any]]:
@@ -83,3 +86,18 @@ def load_resource_from_folder(folder_path: str) -> dict[str, Any]:
     #         if content in file_names:
     #             metadata["citation"]['html'] = fp.read()
     return metadata
+
+
+def store_licences(session_obj: sessionmaker, licences: list[Any]) -> None:
+    """
+    Store a list of licences (as returned by `load_licences_from_folder`)
+    in a database
+
+    :param session_obj: Session sqlalchemy object
+    :param licences: list of licences (as returned by `load_licences_from_folder`)
+    """
+    with session_obj() as session:
+        for licence_md in licences:
+            licence_obj = database.Licence(**licence_md)
+            session.add(licence_obj)
+        session.commit()
