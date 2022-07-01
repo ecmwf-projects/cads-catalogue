@@ -16,3 +16,4 @@ dependencies:
 - typer
 - pip:
   - pytest-postgresql
+  - types-PyYAML

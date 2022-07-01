@@ -43,7 +43,7 @@ def load_test_data(connection_string: str) -> None:
     """
     this_path = os.path.abspath(os.path.dirname(__file__))
     dumped_db_path = os.path.abspath(
-        os.path.join(this_path, "../tests/TESTDATA/testdb.sql")
+        os.path.join(this_path, "../tests/data/testdb.sql")
     )
     subprocess.call(["psql", connection_string, "-f", dumped_db_path])
     print("test data loaded.")
