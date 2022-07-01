@@ -101,3 +101,24 @@ def store_licences(session_obj: sessionmaker, licences: list[Any]) -> None:
             licence_obj = database.Licence(**licence_md)
             session.add(licence_obj)
         session.commit()
+
+
+def store_dataset(session_obj: sessionmaker, dataset: dict[str, Any]) -> None:
+    """
+    Store a list of licences (as returned by `load_resource_from_folder`)
+    in a database
+
+    :param session_obj: Session sqlalchemy object
+    :param dataset: resource dictionary (as returned by `load_resource_from_folder`)
+    """
+    with session_obj() as session:
+        licence_ids = dataset.pop("licence_ids", [])
+        dataset_obj = database.Resource(**dataset)
+        session.add(dataset_obj)
+        for licence_id in licence_ids:
+            licence_obj = (
+                session.query(database.Licence).filter_by(licence_id=licence_id).first()
+            )
+            if licence_obj:
+                dataset_obj.licences.append(licence_obj)  # type: ignore
+        session.commit()

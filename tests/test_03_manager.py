@@ -1077,6 +1077,7 @@ def test_store_licences(session_obj: sessionmaker) -> None:
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
     session = session_obj()
+
     res = session.query(database.Licence).all()
     assert res == []
 
@@ -1084,4 +1085,39 @@ def test_store_licences(session_obj: sessionmaker) -> None:
     res = session.query(database.Licence).all()
     assert len(res) == len(licences)
     assert object_as_dict(res[0]) == licences[0]
+
+    session.close()
+
+
+def test_store_dataset(session_obj: sessionmaker) -> None:
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences = manager.load_licences_from_folder(licences_folder_path)
+    manager.store_licences(session_obj, licences)
+    resource_folder_path = os.path.join(
+        TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
+    )
+    resource = manager.load_resource_from_folder(resource_folder_path)
+    session = session_obj()
+    assert resource["licence_ids"] == [licences[0]["licence_id"]]
+
+    res = session.query(database.Resource).all()
+    assert res == []
+
+    manager.store_dataset(session_obj, resource)
+    res = session.query(database.Resource).all()
+    assert len(res) == 1
+    for column, value in object_as_dict(res[0]).items():
+        if column not in ["record_update"]:
+            assert resource.get(column) == value
+
+    expected_many2many_record = {
+        "resource_id": "reanalysis-era5-land-monthly-means",
+        "licence_id": "licence-to-use-copernicus-products",
+        "revision": 12,
+    }
+    assert (
+        object_as_dict(session.query(database.ResourceLicence).first())
+        == expected_many2many_record
+    )
+
     session.close()
