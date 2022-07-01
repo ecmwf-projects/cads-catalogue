@@ -1121,3 +1121,20 @@ def test_store_dataset(session_obj: sessionmaker) -> None:
     )
 
     session.close()
+
+
+# def test_load_test_data(session_obj):
+#     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+#     licences = manager.load_licences_from_folder(licences_folder_path)
+#     manager.store_licences(session_obj, licences)
+#     datasets = [
+#         "reanalysis-era5-land-monthly-means",
+#         "reanalysis-era5-pressure-levels",
+#     ]
+#     session = session_obj()
+#     for dataset in datasets:
+#         resource_folder_path = os.path.join(TESTDATA_PATH, dataset)
+#         resource = manager.load_resource_from_folder(resource_folder_path)
+#         manager.store_dataset(session_obj, resource)
+#
+#     session.close()
