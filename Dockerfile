@@ -1,9 +1,12 @@
 FROM continuumio/miniconda3
 
-COPY . /srv
+WORKDIR /src/cads-catalogue
 
-WORKDIR /srv
+COPY environment.yml /src/cads-catalogue/
 
-RUN conda install -c conda-forge make gcc python=3.10 \
-    && make conda-env-update CONDAFLAGS="-n base" \
-    && pip install -e .
+RUN conda install -c conda-forge gcc python=3.10 \
+    && conda env update -n base -f environment.yml
+
+COPY . /src/cads-catalogue
+
+RUN pip install --no-deps -e .
