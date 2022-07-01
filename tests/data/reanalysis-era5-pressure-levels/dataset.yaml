@@ -1,0 +1,15 @@
+---
+title: ERA5 hourly data on pressure levels from 1959 to present
+
+
+licences: [licence-to-use-copernicus-products]
+adaptor: adaptor.mars.internal
+status: production
+
+eqc: true
+
+toolbox: true
+selection_limit: 120000
+selection_limit_ignore: ['area', 'grid']
+
+update_date: 2022-06-09

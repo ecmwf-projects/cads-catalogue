@@ -1,20 +1,17 @@
-from typing import Iterator
-
 import pytest
 from psycopg import Connection
-from sqlalchemy.engine.base import Connection as sa_connection
+from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import database
 
 
 @pytest.fixture()
-def conn(postgresql: Connection[str]) -> Iterator[sa_connection]:
+def session_obj(postgresql: Connection[str]) -> sessionmaker:
     """Init the test database and return a connection object"""
     connection_string = (
-        f"postgresql+psycopg://{postgresql.info.user}:"
+        f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
     engine = database.init_db(connection_string)
-    connection = engine.connect()
-    yield connection
-    connection.close()
+    session_obj = sessionmaker(engine)
+    return session_obj

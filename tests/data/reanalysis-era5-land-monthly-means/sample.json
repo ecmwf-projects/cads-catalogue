@@ -1,0 +1,20 @@
+{
+    "format": "grib",
+    "month": [
+        "09",
+        "02"
+    ],
+    "product_type": "monthly_averaged_reanalysis_by_hour_of_day",
+    "time": [
+        "02:00",
+        "12:00"
+    ],
+    "variable": [
+        "soil_temperature_level_2",
+        "lake_bottom_temperature"
+    ],
+    "year": [
+        "1953",
+        "2007"
+    ]
+}

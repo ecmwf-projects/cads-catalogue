@@ -19,7 +19,7 @@ class ResourceLicence(BaseModel):
         sa.String, sa.ForeignKey("resources.resource_id"), primary_key=True
     )
     licence_id = sa.Column(sa.String, primary_key=True)
-    revision = sa.Column(sa.String, primary_key=True)
+    revision = sa.Column(sa.Integer, primary_key=True)
 
     __table_args__ = (
         sa.ForeignKeyConstraint(
@@ -67,7 +67,7 @@ class Licence(BaseModel):
     __tablename__ = "licences"
 
     licence_id = sa.Column(sa.String, primary_key=True)
-    revision = sa.Column(sa.String, primary_key=True)
+    revision = sa.Column(sa.Integer, primary_key=True)
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
 

@@ -1,0 +1,10 @@
+---
+references:
+   - id: Citation
+     content: citation.html
+     title: Citation
+#     filename: citation.pdf
+     copy: true
+   - id: acknowledgement
+     content: acknowledgement.html
+     title: Acknowledgement

@@ -1,0 +1,16 @@
+# DO NOT EDIT: File is automatically generated
+format_conversion:
+  netcdf_cdm:
+    split_on:
+    - origin
+    - type
+    - dataset
+    system_call:
+    - cdscdm-translate
+    - -o
+    - '{{outfile}}'
+    - --product
+    - '{{product}}'
+    - --merge_datasets
+    - 'true'
+    - '{{infile}}'

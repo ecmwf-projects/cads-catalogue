@@ -1,0 +1,170 @@
+---
+mars: ../scripts/mars-monthly-land-on-cds.sh
+import:
+  - area-selector-mars
+  - netcdf_cdm_convertor
+
+
+rename:
+   dataset: product_type
+
+helps:
+  product_type: >-
+      Monthly averaged reanalysis data are produced by averaging all daily data. Monthly averages by hour of day constitute the average over all data within the calendar month for every hour (UTC) of the day.
+  time: >-
+      UTC time standard. UTC stands for Universal Time Coordinated as well as for Coordinated Universal Time.
+
+columns:
+  product_type: 2
+
+labels:
+  product_type:
+    reanalysis-monthly-means-of-daily-means: Monthly averaged reanalysis
+    reanalysis-synoptic-monthly-means: Monthly averaged reanalysis by hour of day
+  variable:
+    '129': Orography
+    '141': Snow depth water equivalent
+    '182': Total evaporation
+  type:
+    an: Analysis
+    fc: Forecast
+  step:
+   "-": "0 hours"
+   "1": "1 hour"
+   "2": "2 hours"
+   "3": "3 hours"
+   "4": "4 hours"
+   "5": "5 hours"
+   "6": "6 hours"
+   "7": "7 hours"
+   "8": "8 hours"
+   "9": "9 hours"
+   "10": "10 hours"
+   "11": "11 hours"
+   "12": "12 hours"
+   "13": "13 hours"
+   "14": "14 hours"
+   "15": "15 hours"
+   "16": "16 hours"
+   "17": "17 hours"
+   "18": "18 hours"
+   "19": "19 hours"
+   "20": "20 hours"
+   "21": "21 hours"
+   "22": "22 hours"
+   "23": "23 hours"
+   "24": "24 hours"
+   "25": "25 hours"
+   "26": "26 hours"
+   "27": "27 hours"
+   "28": "28 hours"
+   "29": "29 hours"
+   "30": "30 hours"
+   "31": "31 hours"
+   "32": "32 hours"
+   "33": "33 hours"
+
+widget_order:
+  - product_type
+  - variable
+  - year
+  - month
+  - day
+  - time
+  - area_group
+  - global
+  - area
+  - format
+  - step
+  - type
+
+groups:
+   variable:
+   - label: Temperature
+     open: true
+     values:
+          - soil_temperature_level_1
+          - soil_temperature_level_2
+          - soil_temperature_level_3
+          - soil_temperature_level_4
+          - skin_temperature
+          - 2m_dewpoint_temperature
+          - 2m_temperature
+   - label: Lakes
+     open: true
+     values:
+          - lake_bottom_temperature
+          - lake_ice_depth
+          - lake_ice_temperature
+          - lake_mix_layer_depth
+          - lake_mix_layer_temperature
+          - lake_shape_factor
+          - lake_total_layer_temperature
+   - label: Snow
+     open: true
+     values:
+          - snow_albedo
+          - snow_cover
+          - snow_density
+          - snow_depth
+          - snow_depth_water_equivalent
+          - temperature_of_snow_layer
+          - snowfall
+          - snowmelt
+   - label: Soil Water
+     open: true
+     values:
+          - volumetric_soil_water_layer_1
+          - volumetric_soil_water_layer_2
+          - volumetric_soil_water_layer_3
+          - volumetric_soil_water_layer_4
+          - skin_reservoir_content
+   - label: Radiation and Heat
+     open: true
+     values:
+          - surface_sensible_heat_flux
+          - surface_latent_heat_flux
+          - surface_net_solar_radiation
+          - surface_net_thermal_radiation
+          - surface_solar_radiation_downwards
+          - surface_thermal_radiation_downwards
+          - forecast_albedo
+   - label: Evaporation and Runoff
+     open: true
+     values:
+          - total_evaporation
+          - evaporation_from_bare_soil
+          - evaporation_from_open_water_surfaces_excluding_oceans
+          - evaporation_from_the_top_of_canopy
+          - evaporation_from_vegetation_transpiration
+          - snow_evaporation
+          - potential_evaporation
+          - runoff
+          - surface_runoff
+          - sub_surface_runoff
+   - label: Wind, Pressure and Precipitation
+     open: true
+     values:
+          - 10m_u_component_of_wind
+          - 10m_v_component_of_wind
+          - surface_pressure
+          - total_precipitation
+   - label: Vegetation
+     open: true
+     values:
+          - leaf_area_index_high_vegetation
+          - leaf_area_index_low_vegetation
+   - label: Blacklisted
+     open: true
+     values:
+          - accumulated_carbon_dioxide_gross_primary_production
+          - accumulated_carbon_dioxide_net_ecosystem_exchange
+          - accumulated_carbon_dioxide_ecosystem_respiration
+
+###force:
+###    day: 1
+###    expect: any
+###    number: all
+###    class: ea
+###    levtype: sfc
+

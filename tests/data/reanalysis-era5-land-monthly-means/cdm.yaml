@@ -1,0 +1,11 @@
+default: {product: ECMWF-DAILY_ACCUMULATION}
+
+ECMWF-DAILY_ACCUMULATION: 
+  _rate_type:
+    - 'accumulation'
+
+ECMWF: 
+  product_type:
+    - 'monthly_averaged_reanalysis'
+
+

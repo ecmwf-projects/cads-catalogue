@@ -14,11 +14,9 @@ def test_init_db(postgresql: Connection[str]) -> None:
     query = (
         "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
     )
-    expected_tables_at_beginning = set()
+    expected_tables_at_beginning: set[str] = set()
     expected_tables_complete = set(database.metadata.tables)
-
-    assert set(conn.execute(query).scalars()) == expected_tables_at_beginning
+    assert set(conn.execute(query).scalars()) == expected_tables_at_beginning  # type: ignore
 
     database.init_db(connection_string)
-
-    assert set(conn.execute(query).scalars()) == expected_tables_complete
+    assert set(conn.execute(query).scalars()) == expected_tables_complete  # type: ignore
