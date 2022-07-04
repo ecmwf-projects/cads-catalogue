@@ -76,7 +76,7 @@ class Licence(BaseModel):
     )
 
 
-def init_db(connection_string: str) -> sa.engine.Engine:
+def init_database(connection_string: str) -> sa.engine.Engine:
     """
     Initialize the database located at URI `connection_string` and return the engine object.
 

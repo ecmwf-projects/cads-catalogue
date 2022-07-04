@@ -18,5 +18,5 @@ def test_init_db(postgresql: Connection[str]) -> None:
     expected_tables_complete = set(database.metadata.tables)
     assert set(conn.execute(query).scalars()) == expected_tables_at_beginning  # type: ignore
 
-    database.init_db(connection_string)
+    database.init_database(connection_string)
     assert set(conn.execute(query).scalars()) == expected_tables_complete  # type: ignore
