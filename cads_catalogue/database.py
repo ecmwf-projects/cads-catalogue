@@ -31,7 +31,6 @@ class Resource(BaseModel):
 
     resource_id = sa.Column(sa.Integer, primary_key=True)
     resource_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
-    stac_extensions = sa.Column(sa.ARRAY(sa.VARCHAR(300)), nullable=True)
     title = sa.Column(sa.String)
     description = sa.Column(JSONB, nullable=False)
     abstract = sa.Column(sa.TEXT, nullable=False)
