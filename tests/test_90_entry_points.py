@@ -19,7 +19,7 @@ def test_load_test_data(
     # load db from test data and dump loaded database in a file
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
-    manager.store_licences(session_obj, licences)
+    manager.store_licences(session_obj, licences, tmp_path)
     datasets = [
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
@@ -28,7 +28,7 @@ def test_load_test_data(
     for dataset in datasets:
         resource_folder_path = os.path.join(TESTDATA_PATH, dataset)
         resource = manager.load_resource_from_folder(resource_folder_path)
-        manager.store_dataset(session_obj, resource)
+        manager.store_dataset(session_obj, resource, tmp_path)
     session.close()
     connection_string = (
         f"postgresql://{postgresql.info.user}:"

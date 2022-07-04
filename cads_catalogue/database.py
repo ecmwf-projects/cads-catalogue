@@ -5,6 +5,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import UniqueConstraint
 
 metadata = sa.MetaData()
 BaseModel = declarative_base(metadata=metadata)
@@ -16,16 +17,10 @@ class ResourceLicence(BaseModel):
     __tablename__ = "resources_licences"
 
     resource_id = sa.Column(
-        sa.String, sa.ForeignKey("resources.resource_id"), primary_key=True
+        sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
     )
-    licence_id = sa.Column(sa.String, primary_key=True)
-    revision = sa.Column(sa.Integer, primary_key=True)
-
-    __table_args__ = (
-        sa.ForeignKeyConstraint(
-            ["licence_id", "revision"],
-            ["licences.licence_id", "licences.revision"],
-        ),
+    licence_id = sa.Column(
+        sa.Integer, sa.ForeignKey("licences.licence_id"), primary_key=True
     )
 
 
@@ -34,13 +29,13 @@ class Resource(BaseModel):
 
     __tablename__ = "resources"
 
-    resource_id = sa.Column(sa.VARCHAR(1024), primary_key=True)
-    stac_extensions = sa.Column(sa.ARRAY(sa.VARCHAR(300)), nullable=True)
-    title = sa.Column(sa.VARCHAR(1024))
+    resource_id = sa.Column(sa.Integer, primary_key=True)
+    resource_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
+    title = sa.Column(sa.String)
     description = sa.Column(JSONB, nullable=False)
     abstract = sa.Column(sa.TEXT, nullable=False)
     contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
-    form = sa.Column(JSONB)
+    form = sa.Column(sa.String)
     citation = sa.Column(sa.TEXT)
     keywords = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     version = sa.Column(sa.VARCHAR(300))
@@ -51,7 +46,7 @@ class Resource(BaseModel):
     links = sa.Column(JSONB)
     documentation = sa.Column(JSONB)
     type = sa.Column(sa.VARCHAR(300), nullable=False)
-    previewimage = sa.Column(sa.TEXT)
+    previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
     record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
     resource_update = sa.Column(sa.DATE)
@@ -66,13 +61,18 @@ class Licence(BaseModel):
 
     __tablename__ = "licences"
 
-    licence_id = sa.Column(sa.String, primary_key=True)
-    revision = sa.Column(sa.Integer, primary_key=True)
+    licence_id = sa.Column(sa.Integer, primary_key=True)
+    licence_uid = sa.Column(sa.String, index=True, nullable=False)
+    revision = sa.Column(sa.Integer, index=True, nullable=False)
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
 
     resources = relationship(
         "Resource", secondary="resources_licences", back_populates="licences"
+    )
+
+    __table_args__ = (
+        UniqueConstraint("licence_uid", "revision", name="licence_uid_revision_uc"),
     )
 
 
