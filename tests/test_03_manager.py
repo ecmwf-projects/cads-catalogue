@@ -1,5 +1,6 @@
 import os.path
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import inspect
@@ -21,7 +22,9 @@ def test_load_metadata_licences() -> None:
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     expected_licences = [
         {
-            "download_filename": "licence-to-use-copernicus-products.pdf",
+            "download_filename": os.path.join(
+                licences_folder_path, "licence-to-use-copernicus-products.pdf"
+            ),
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
@@ -82,607 +85,7 @@ def test_load_resource_from_folder() -> None:
         '"title": "ERA5-Land online documentation", "description": "Further '
         "and more detailed information relating to the ERA5-Land dataset can "
         'be found in the Copernicus Knowledge Base web link above."}]',
-        "form": "[\n"
-        "    {\n"
-        '        "css": "todo",\n'
-        '        "details": {\n'
-        '            "columns": 2,\n'
-        '            "id": 0,\n'
-        '            "labels": {\n'
-        '                "monthly_averaged_reanalysis": "Monthly averaged reanalysis",\n'
-        '                "monthly_averaged_reanalysis_by_hour_of_day": "Monthly '
-        'averaged reanalysis by hour of day"\n'
-        "            },\n"
-        '            "values": [\n'
-        '                "monthly_averaged_reanalysis",\n'
-        '                "monthly_averaged_reanalysis_by_hour_of_day"\n'
-        "            ]\n"
-        "        },\n"
-        '        "help": "Monthly averaged reanalysis data are produced by averaging '
-        "all daily data. Monthly averages by hour of day constitute the average over "
-        'all data within the calendar month for every hour (UTC) of the day.",\n'
-        '        "label": "Product type",\n'
-        '        "name": "product_type",\n'
-        '        "required": true,\n'
-        '        "type": "StringListWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "css": "todo",\n'
-        '        "details": {\n'
-        '            "accordionGroups": true,\n'
-        '            "accordionOptions": {\n'
-        '                "openGroups": [\n'
-        '                    "Temperature",\n'
-        '                    "Lakes",\n'
-        '                    "Snow",\n'
-        '                    "Soil Water",\n'
-        '                    "Radiation and Heat",\n'
-        '                    "Evaporation and Runoff",\n'
-        '                    "Wind, Pressure and Precipitation",\n'
-        '                    "Vegetation",\n'
-        '                    "Blacklisted"\n'
-        "                ],\n"
-        '                "searchable": false\n'
-        "            },\n"
-        '            "displayaslist": false,\n'
-        '            "groups": [\n'
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Temperature",\n'
-        '                    "labels": {\n'
-        '                        "2m_dewpoint_temperature": "2m dewpoint temperature",\n'
-        '                        "2m_temperature": "2m temperature",\n'
-        '                        "skin_temperature": "Skin temperature",\n'
-        '                        "soil_temperature_level_1": "Soil temperature level '
-        '1",\n'
-        '                        "soil_temperature_level_2": "Soil temperature level '
-        '2",\n'
-        '                        "soil_temperature_level_3": "Soil temperature level '
-        '3",\n'
-        '                        "soil_temperature_level_4": "Soil temperature level '
-        '4"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "2m_dewpoint_temperature",\n'
-        '                        "2m_temperature",\n'
-        '                        "skin_temperature",\n'
-        '                        "soil_temperature_level_1",\n'
-        '                        "soil_temperature_level_2",\n'
-        '                        "soil_temperature_level_3",\n'
-        '                        "soil_temperature_level_4"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Lakes",\n'
-        '                    "labels": {\n'
-        '                        "lake_bottom_temperature": "Lake bottom temperature",\n'
-        '                        "lake_ice_depth": "Lake ice depth",\n'
-        '                        "lake_ice_temperature": "Lake ice temperature",\n'
-        '                        "lake_mix_layer_depth": "Lake mix-layer depth",\n'
-        '                        "lake_mix_layer_temperature": "Lake mix-layer '
-        'temperature",\n'
-        '                        "lake_shape_factor": "Lake shape factor",\n'
-        '                        "lake_total_layer_temperature": "Lake total layer '
-        'temperature"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "lake_bottom_temperature",\n'
-        '                        "lake_ice_depth",\n'
-        '                        "lake_ice_temperature",\n'
-        '                        "lake_mix_layer_depth",\n'
-        '                        "lake_mix_layer_temperature",\n'
-        '                        "lake_shape_factor",\n'
-        '                        "lake_total_layer_temperature"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Snow",\n'
-        '                    "labels": {\n'
-        '                        "snow_albedo": "Snow albedo",\n'
-        '                        "snow_cover": "Snow cover",\n'
-        '                        "snow_density": "Snow density",\n'
-        '                        "snow_depth": "Snow depth",\n'
-        '                        "snow_depth_water_equivalent": "Snow depth water '
-        'equivalent",\n'
-        '                        "snowfall": "Snowfall",\n'
-        '                        "snowmelt": "Snowmelt",\n'
-        '                        "temperature_of_snow_layer": "Temperature of snow '
-        'layer"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "snow_albedo",\n'
-        '                        "snow_cover",\n'
-        '                        "snow_density",\n'
-        '                        "snow_depth",\n'
-        '                        "snow_depth_water_equivalent",\n'
-        '                        "snowfall",\n'
-        '                        "snowmelt",\n'
-        '                        "temperature_of_snow_layer"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Soil Water",\n'
-        '                    "labels": {\n'
-        '                        "skin_reservoir_content": "Skin reservoir content",\n'
-        '                        "volumetric_soil_water_layer_1": "Volumetric soil '
-        'water layer 1",\n'
-        '                        "volumetric_soil_water_layer_2": "Volumetric soil '
-        'water layer 2",\n'
-        '                        "volumetric_soil_water_layer_3": "Volumetric soil '
-        'water layer 3",\n'
-        '                        "volumetric_soil_water_layer_4": "Volumetric soil '
-        'water layer 4"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "skin_reservoir_content",\n'
-        '                        "volumetric_soil_water_layer_1",\n'
-        '                        "volumetric_soil_water_layer_2",\n'
-        '                        "volumetric_soil_water_layer_3",\n'
-        '                        "volumetric_soil_water_layer_4"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Radiation and Heat",\n'
-        '                    "labels": {\n'
-        '                        "forecast_albedo": "Forecast albedo",\n'
-        '                        "surface_latent_heat_flux": "Surface latent heat '
-        'flux",\n'
-        '                        "surface_net_solar_radiation": "Surface net solar '
-        'radiation",\n'
-        '                        "surface_net_thermal_radiation": "Surface net thermal '
-        'radiation",\n'
-        '                        "surface_sensible_heat_flux": "Surface sensible heat '
-        'flux",\n'
-        '                        "surface_solar_radiation_downwards": "Surface solar '
-        'radiation downwards",\n'
-        '                        "surface_thermal_radiation_downwards": "Surface '
-        'thermal radiation downwards"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "forecast_albedo",\n'
-        '                        "surface_latent_heat_flux",\n'
-        '                        "surface_net_solar_radiation",\n'
-        '                        "surface_net_thermal_radiation",\n'
-        '                        "surface_sensible_heat_flux",\n'
-        '                        "surface_solar_radiation_downwards",\n'
-        '                        "surface_thermal_radiation_downwards"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Evaporation and Runoff",\n'
-        '                    "labels": {\n'
-        '                        "evaporation_from_bare_soil": "Evaporation from bare '
-        'soil",\n'
-        "                        "
-        '"evaporation_from_open_water_surfaces_excluding_oceans": "Evaporation from '
-        'open water surfaces excluding oceans",\n'
-        '                        "evaporation_from_the_top_of_canopy": "Evaporation '
-        'from the top of canopy",\n'
-        '                        "evaporation_from_vegetation_transpiration": '
-        '"Evaporation from vegetation transpiration",\n'
-        '                        "potential_evaporation": "Potential evaporation",\n'
-        '                        "runoff": "Runoff",\n'
-        '                        "snow_evaporation": "Snow evaporation",\n'
-        '                        "sub_surface_runoff": "Sub-surface runoff",\n'
-        '                        "surface_runoff": "Surface runoff",\n'
-        '                        "total_evaporation": "Total evaporation"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "evaporation_from_bare_soil",\n'
-        "                        "
-        '"evaporation_from_open_water_surfaces_excluding_oceans",\n'
-        '                        "evaporation_from_the_top_of_canopy",\n'
-        '                        "evaporation_from_vegetation_transpiration",\n'
-        '                        "potential_evaporation",\n'
-        '                        "runoff",\n'
-        '                        "snow_evaporation",\n'
-        '                        "sub_surface_runoff",\n'
-        '                        "surface_runoff",\n'
-        '                        "total_evaporation"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Wind, Pressure and Precipitation",\n'
-        '                    "labels": {\n'
-        '                        "10m_u_component_of_wind": "10m u-component of wind",\n'
-        '                        "10m_v_component_of_wind": "10m v-component of wind",\n'
-        '                        "surface_pressure": "Surface pressure",\n'
-        '                        "total_precipitation": "Total precipitation"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "10m_u_component_of_wind",\n'
-        '                        "10m_v_component_of_wind",\n'
-        '                        "surface_pressure",\n'
-        '                        "total_precipitation"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Vegetation",\n'
-        '                    "labels": {\n'
-        '                        "leaf_area_index_high_vegetation": "Leaf area index, '
-        'high vegetation",\n'
-        '                        "leaf_area_index_low_vegetation": "Leaf area index, '
-        'low vegetation"\n'
-        "                    },\n"
-        '                    "values": [\n'
-        '                        "leaf_area_index_high_vegetation",\n'
-        '                        "leaf_area_index_low_vegetation"\n'
-        "                    ]\n"
-        "                },\n"
-        "                {\n"
-        '                    "columns": 2,\n'
-        '                    "label": "Blacklisted",\n'
-        '                    "labels": {},\n'
-        '                    "values": []\n'
-        "                }\n"
-        "            ],\n"
-        '            "id": 1\n'
-        "        },\n"
-        '        "help": "Please, consult the product user guide in the documentation '
-        'section for more information on these variables.",\n'
-        '        "label": "Variable",\n'
-        '        "name": "variable",\n'
-        '        "required": true,\n'
-        '        "type": "StringListArrayWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "css": "todo",\n'
-        '        "details": {\n'
-        '            "columns": 8,\n'
-        '            "id": 2,\n'
-        '            "labels": {\n'
-        '                "1950": "1950",\n'
-        '                "1951": "1951",\n'
-        '                "1952": "1952",\n'
-        '                "1953": "1953",\n'
-        '                "1954": "1954",\n'
-        '                "1955": "1955",\n'
-        '                "1956": "1956",\n'
-        '                "1957": "1957",\n'
-        '                "1958": "1958",\n'
-        '                "1959": "1959",\n'
-        '                "1960": "1960",\n'
-        '                "1961": "1961",\n'
-        '                "1962": "1962",\n'
-        '                "1963": "1963",\n'
-        '                "1964": "1964",\n'
-        '                "1965": "1965",\n'
-        '                "1966": "1966",\n'
-        '                "1967": "1967",\n'
-        '                "1968": "1968",\n'
-        '                "1969": "1969",\n'
-        '                "1970": "1970",\n'
-        '                "1971": "1971",\n'
-        '                "1972": "1972",\n'
-        '                "1973": "1973",\n'
-        '                "1974": "1974",\n'
-        '                "1975": "1975",\n'
-        '                "1976": "1976",\n'
-        '                "1977": "1977",\n'
-        '                "1978": "1978",\n'
-        '                "1979": "1979",\n'
-        '                "1980": "1980",\n'
-        '                "1981": "1981",\n'
-        '                "1982": "1982",\n'
-        '                "1983": "1983",\n'
-        '                "1984": "1984",\n'
-        '                "1985": "1985",\n'
-        '                "1986": "1986",\n'
-        '                "1987": "1987",\n'
-        '                "1988": "1988",\n'
-        '                "1989": "1989",\n'
-        '                "1990": "1990",\n'
-        '                "1991": "1991",\n'
-        '                "1992": "1992",\n'
-        '                "1993": "1993",\n'
-        '                "1994": "1994",\n'
-        '                "1995": "1995",\n'
-        '                "1996": "1996",\n'
-        '                "1997": "1997",\n'
-        '                "1998": "1998",\n'
-        '                "1999": "1999",\n'
-        '                "2000": "2000",\n'
-        '                "2001": "2001",\n'
-        '                "2002": "2002",\n'
-        '                "2003": "2003",\n'
-        '                "2004": "2004",\n'
-        '                "2005": "2005",\n'
-        '                "2006": "2006",\n'
-        '                "2007": "2007",\n'
-        '                "2008": "2008",\n'
-        '                "2009": "2009",\n'
-        '                "2010": "2010",\n'
-        '                "2011": "2011",\n'
-        '                "2012": "2012",\n'
-        '                "2013": "2013",\n'
-        '                "2014": "2014",\n'
-        '                "2015": "2015",\n'
-        '                "2016": "2016",\n'
-        '                "2017": "2017",\n'
-        '                "2018": "2018",\n'
-        '                "2019": "2019",\n'
-        '                "2020": "2020",\n'
-        '                "2021": "2021",\n'
-        '                "2022": "2022"\n'
-        "            },\n"
-        '            "values": [\n'
-        '                "1950",\n'
-        '                "1951",\n'
-        '                "1952",\n'
-        '                "1953",\n'
-        '                "1954",\n'
-        '                "1955",\n'
-        '                "1956",\n'
-        '                "1957",\n'
-        '                "1958",\n'
-        '                "1959",\n'
-        '                "1960",\n'
-        '                "1961",\n'
-        '                "1962",\n'
-        '                "1963",\n'
-        '                "1964",\n'
-        '                "1965",\n'
-        '                "1966",\n'
-        '                "1967",\n'
-        '                "1968",\n'
-        '                "1969",\n'
-        '                "1970",\n'
-        '                "1971",\n'
-        '                "1972",\n'
-        '                "1973",\n'
-        '                "1974",\n'
-        '                "1975",\n'
-        '                "1976",\n'
-        '                "1977",\n'
-        '                "1978",\n'
-        '                "1979",\n'
-        '                "1980",\n'
-        '                "1981",\n'
-        '                "1982",\n'
-        '                "1983",\n'
-        '                "1984",\n'
-        '                "1985",\n'
-        '                "1986",\n'
-        '                "1987",\n'
-        '                "1988",\n'
-        '                "1989",\n'
-        '                "1990",\n'
-        '                "1991",\n'
-        '                "1992",\n'
-        '                "1993",\n'
-        '                "1994",\n'
-        '                "1995",\n'
-        '                "1996",\n'
-        '                "1997",\n'
-        '                "1998",\n'
-        '                "1999",\n'
-        '                "2000",\n'
-        '                "2001",\n'
-        '                "2002",\n'
-        '                "2003",\n'
-        '                "2004",\n'
-        '                "2005",\n'
-        '                "2006",\n'
-        '                "2007",\n'
-        '                "2008",\n'
-        '                "2009",\n'
-        '                "2010",\n'
-        '                "2011",\n'
-        '                "2012",\n'
-        '                "2013",\n'
-        '                "2014",\n'
-        '                "2015",\n'
-        '                "2016",\n'
-        '                "2017",\n'
-        '                "2018",\n'
-        '                "2019",\n'
-        '                "2020",\n'
-        '                "2021",\n'
-        '                "2022"\n'
-        "            ]\n"
-        "        },\n"
-        '        "help": null,\n'
-        '        "label": "Year",\n'
-        '        "name": "year",\n'
-        '        "required": true,\n'
-        '        "type": "StringListWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "css": "todo",\n'
-        '        "details": {\n'
-        '            "columns": 6,\n'
-        '            "id": 3,\n'
-        '            "labels": {\n'
-        '                "01": "January",\n'
-        '                "02": "February",\n'
-        '                "03": "March",\n'
-        '                "04": "April",\n'
-        '                "05": "May",\n'
-        '                "06": "June",\n'
-        '                "07": "July",\n'
-        '                "08": "August",\n'
-        '                "09": "September",\n'
-        '                "10": "October",\n'
-        '                "11": "November",\n'
-        '                "12": "December"\n'
-        "            },\n"
-        '            "values": [\n'
-        '                "01",\n'
-        '                "02",\n'
-        '                "03",\n'
-        '                "04",\n'
-        '                "05",\n'
-        '                "06",\n'
-        '                "07",\n'
-        '                "08",\n'
-        '                "09",\n'
-        '                "10",\n'
-        '                "11",\n'
-        '                "12"\n'
-        "            ]\n"
-        "        },\n"
-        '        "help": null,\n'
-        '        "label": "Month",\n'
-        '        "name": "month",\n'
-        '        "required": true,\n'
-        '        "type": "StringListWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "css": "todo",\n'
-        '        "details": {\n'
-        '            "columns": 6,\n'
-        '            "id": 4,\n'
-        '            "labels": {\n'
-        '                "00:00": "00:00",\n'
-        '                "01:00": "01:00",\n'
-        '                "02:00": "02:00",\n'
-        '                "03:00": "03:00",\n'
-        '                "04:00": "04:00",\n'
-        '                "05:00": "05:00",\n'
-        '                "06:00": "06:00",\n'
-        '                "07:00": "07:00",\n'
-        '                "08:00": "08:00",\n'
-        '                "09:00": "09:00",\n'
-        '                "10:00": "10:00",\n'
-        '                "11:00": "11:00",\n'
-        '                "12:00": "12:00",\n'
-        '                "13:00": "13:00",\n'
-        '                "14:00": "14:00",\n'
-        '                "15:00": "15:00",\n'
-        '                "16:00": "16:00",\n'
-        '                "17:00": "17:00",\n'
-        '                "18:00": "18:00",\n'
-        '                "19:00": "19:00",\n'
-        '                "20:00": "20:00",\n'
-        '                "21:00": "21:00",\n'
-        '                "22:00": "22:00",\n'
-        '                "23:00": "23:00"\n'
-        "            },\n"
-        '            "values": [\n'
-        '                "00:00",\n'
-        '                "01:00",\n'
-        '                "02:00",\n'
-        '                "03:00",\n'
-        '                "04:00",\n'
-        '                "05:00",\n'
-        '                "06:00",\n'
-        '                "07:00",\n'
-        '                "08:00",\n'
-        '                "09:00",\n'
-        '                "10:00",\n'
-        '                "11:00",\n'
-        '                "12:00",\n'
-        '                "13:00",\n'
-        '                "14:00",\n'
-        '                "15:00",\n'
-        '                "16:00",\n'
-        '                "17:00",\n'
-        '                "18:00",\n'
-        '                "19:00",\n'
-        '                "20:00",\n'
-        '                "21:00",\n'
-        '                "22:00",\n'
-        '                "23:00"\n'
-        "            ]\n"
-        "        },\n"
-        '        "help": "UTC time standard. UTC stands for Universal Time Coordinated '
-        'as well as for Coordinated Universal Time.",\n'
-        '        "label": "Time",\n'
-        '        "name": "time",\n'
-        '        "required": true,\n'
-        '        "type": "StringListWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "css": "variable",\n'
-        '        "details": {\n'
-        '            "id": 5\n'
-        "        },\n"
-        '        "help": "Select one widget from the choice below",\n'
-        '        "label": "Geographical area",\n'
-        '        "name": "area_group",\n'
-        '        "required": true,\n'
-        '        "type": "ExclusiveFrameWidget",\n'
-        '        "widgets": [\n'
-        '            "global",\n'
-        '            "area"\n'
-        "        ]\n"
-        "    },\n"
-        "    {\n"
-        '        "details": {\n'
-        '            "accordion": false,\n'
-        '            "id": 6,\n'
-        '            "information": "With this option selected the entire available '
-        'area will be provided"\n'
-        "        },\n"
-        '        "label": "Whole available region",\n'
-        '        "name": "global",\n'
-        '        "required": true,\n'
-        '        "type": "LabelWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "details": {\n'
-        '            "accordion": true,\n'
-        '            "default": [\n'
-        "                90,\n"
-        "                -180,\n"
-        "                -90,\n"
-        "                180\n"
-        "            ],\n"
-        '            "extentlabels": [\n'
-        '                "North",\n'
-        '                "West",\n'
-        '                "South",\n'
-        '                "East"\n'
-        "            ],\n"
-        '            "fullheight": true,\n'
-        '            "id": 7,\n'
-        '            "precision": 2,\n'
-        '            "range": {\n'
-        '                "e": 180,\n'
-        '                "n": 90,\n'
-        '                "s": -90,\n'
-        '                "w": -180\n'
-        "            },\n"
-        '            "withmap": false,\n'
-        '            "wrapping": true\n'
-        "        },\n"
-        '        "help": "Select a sub-region of the available area by providing its '
-        'limits on latitude and longitude",\n'
-        '        "label": "Sub-region extraction",\n'
-        '        "name": "area",\n'
-        '        "type": "GeographicExtentMapWidget"\n'
-        "    },\n"
-        "    {\n"
-        '        "css": "todo",\n'
-        '        "details": {\n'
-        '            "columns": 2,\n'
-        '            "default": [\n'
-        '                "grib"\n'
-        "            ],\n"
-        '            "id": 8,\n'
-        '            "labels": {\n'
-        '                "grib": "GRIB",\n'
-        '                "netcdf": "NetCDF (experimental)"\n'
-        "            },\n"
-        '            "values": [\n'
-        '                "grib",\n'
-        '                "netcdf"\n'
-        "            ]\n"
-        "        },\n"
-        '        "help": null,\n'
-        '        "label": "Format",\n'
-        '        "name": "format",\n'
-        '        "required": true,\n'
-        '        "type": "StringChoiceWidget"\n'
-        "    }\n"
-        "]\n",
+        "form": os.path.join(resource_folder_path, "form.json"),
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -693,7 +96,7 @@ def test_load_resource_from_folder() -> None:
             "Provider: Copernicus C3S",
         ],
         "licence_uids": ["licence-to-use-copernicus-products"],
-        "previewimage": "overview.png",
+        "previewimage": os.path.join(resource_folder_path, "overview.png"),
         "publication_date": date(2019, 6, 23),
         "resource_uid": "reanalysis-era5-land-monthly-means",
         "resource_update": date(2022, 3, 2),
@@ -1073,7 +476,35 @@ def test_load_resource_from_folder() -> None:
     assert resource == expected_resource
 
 
-def test_store_licences(session_obj: sessionmaker) -> None:
+def test_save_in_document_storage(tmp_path: Path) -> None:
+    doc_storage_path = tmp_path
+    file_path = os.path.join(
+        TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
+    )
+    assert os.path.exists(file_path)
+    destination = os.path.join(
+        doc_storage_path, "licence-to-use-copernicus-products.pdf"
+    )
+    assert not os.path.exists(destination)
+
+    res = manager.save_in_document_storage(doc_storage_path, file_path)
+
+    assert res == "licence-to-use-copernicus-products.pdf"
+    assert os.path.exists(destination)
+
+    subpath = "licences/mypath"
+    destination = os.path.join(
+        doc_storage_path, subpath, "licence-to-use-copernicus-products.pdf"
+    )
+    assert not os.path.exists(destination)
+
+    res = manager.save_in_document_storage(doc_storage_path, file_path, subpath)
+
+    assert res == "licences/mypath/licence-to-use-copernicus-products.pdf"
+    assert os.path.exists(destination)
+
+
+def test_store_licences(session_obj: sessionmaker, tmp_path: Path) -> None:
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
     session = session_obj()
@@ -1081,20 +512,25 @@ def test_store_licences(session_obj: sessionmaker) -> None:
     res = session.query(database.Licence).all()
     assert res == []
 
-    manager.store_licences(session_obj, licences)
+    manager.store_licences(session_obj, licences, tmp_path)
     res = session.query(database.Licence).all()
     assert len(res) == len(licences)
     db_obj_as_dict = object_as_dict(res[0])
     assert 1 == db_obj_as_dict.pop("licence_id")
     assert db_obj_as_dict == licences[0]
-
+    assert db_obj_as_dict["download_filename"] == os.path.join(
+        "licences",
+        db_obj_as_dict["licence_uid"],
+        "licence-to-use-copernicus-products.pdf",
+    )
+    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["download_filename"]))
     session.close()
 
 
-def test_store_dataset(session_obj: sessionmaker) -> None:
+def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
-    manager.store_licences(session_obj, licences)
+    manager.store_licences(session_obj, licences, tmp_path)
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
@@ -1105,7 +541,7 @@ def test_store_dataset(session_obj: sessionmaker) -> None:
     res = session.query(database.Resource).all()
     assert res == []
 
-    manager.store_dataset(session_obj, resource)
+    manager.store_dataset(session_obj, resource, tmp_path)
     res = session.query(database.Resource).all()
     assert len(res) == 1
     db_obj_as_dict = object_as_dict(res[0])
@@ -1113,6 +549,13 @@ def test_store_dataset(session_obj: sessionmaker) -> None:
     for column, value in db_obj_as_dict.items():
         if column not in ["record_update"]:
             assert resource.get(column) == value
+    assert db_obj_as_dict["form"] == os.path.join(
+        "resources", db_obj_as_dict["resource_uid"], "form.json"
+    )
+    assert db_obj_as_dict["previewimage"] == os.path.join(
+        "resources", db_obj_as_dict["resource_uid"], "overview.png"
+    )
+    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["form"]))
 
     expected_many2many_record = {
         "resource_id": 1,
