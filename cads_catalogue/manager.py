@@ -27,7 +27,7 @@ def load_licences_from_folder(folder_path: str) -> list[dict[str, Any]]:
             json_data = json.load(fp)
             try:
                 licence = {
-                    "licence_id": json_data["id"],
+                    "licence_uid": json_data["id"],
                     "revision": json_data["revision"],
                     "title": json_data["title"],
                     "download_filename": json_data["downloadableFilename"],
@@ -47,7 +47,7 @@ def load_resource_from_folder(folder_path: str) -> dict[str, Any]:
     """
     file_names = os.listdir(folder_path)
     metadata: dict[str, Any] = dict()
-    metadata["resource_id"] = os.path.basename(folder_path)
+    metadata["resource_uid"] = os.path.basename(folder_path)
     metadata["type"] = "dataset"
     if "abstract.md" in file_names:
         with open(os.path.join(folder_path, "abstract.md")) as fp:
@@ -63,7 +63,7 @@ def load_resource_from_folder(folder_path: str) -> dict[str, Any]:
             data = yaml.load(fp, Loader=SafeLoader)
             metadata["title"] = data.get("title")
             # NOTE: licence_ids is for relationship, not a db field
-            metadata["licence_ids"] = data.get("licences")
+            metadata["licence_uids"] = data.get("licences")
             metadata["publication_date"] = data.get("publication_date")
             metadata["resource_update"] = data.get("update_date")
             # metadata["use_eqc"] = data.get('eqc') == 'true'
@@ -112,12 +112,15 @@ def store_dataset(session_obj: sessionmaker, dataset: dict[str, Any]) -> None:
     :param dataset: resource dictionary (as returned by `load_resource_from_folder`)
     """
     with session_obj() as session:
-        licence_ids = dataset.pop("licence_ids", [])
+        licence_uids = dataset.pop("licence_uids", [])
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
-        for licence_id in licence_ids:
+        for licence_uid in licence_uids:
             licence_obj = (
-                session.query(database.Licence).filter_by(licence_id=licence_id).first()
+                session.query(database.Licence)
+                .filter_by(licence_uid=licence_uid)
+                .order_by(database.Licence.revision.desc())
+                .first()
             )
             if licence_obj:
                 dataset_obj.licences.append(licence_obj)  # type: ignore

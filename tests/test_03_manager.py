@@ -22,7 +22,7 @@ def test_load_metadata_licences() -> None:
     expected_licences = [
         {
             "download_filename": "licence-to-use-copernicus-products.pdf",
-            "licence_id": "licence-to-use-copernicus-products",
+            "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
         }
@@ -692,10 +692,10 @@ def test_load_resource_from_folder() -> None:
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S",
         ],
-        "licence_ids": ["licence-to-use-copernicus-products"],
+        "licence_uids": ["licence-to-use-copernicus-products"],
         "previewimage": "overview.png",
         "publication_date": date(2019, 6, 23),
-        "resource_id": "reanalysis-era5-land-monthly-means",
+        "resource_uid": "reanalysis-era5-land-monthly-means",
         "resource_update": date(2022, 3, 2),
         "title": "ERA5-Land monthly averaged data from 1950 to present",
         "type": "dataset",
@@ -1084,7 +1084,9 @@ def test_store_licences(session_obj: sessionmaker) -> None:
     manager.store_licences(session_obj, licences)
     res = session.query(database.Licence).all()
     assert len(res) == len(licences)
-    assert object_as_dict(res[0]) == licences[0]
+    db_obj_as_dict = object_as_dict(res[0])
+    assert 1 == db_obj_as_dict.pop("licence_id")
+    assert db_obj_as_dict == licences[0]
 
     session.close()
 
@@ -1098,7 +1100,7 @@ def test_store_dataset(session_obj: sessionmaker) -> None:
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
     session = session_obj()
-    assert resource["licence_ids"] == [licences[0]["licence_id"]]
+    assert resource["licence_uids"] == [licences[0]["licence_uid"]]
 
     res = session.query(database.Resource).all()
     assert res == []
@@ -1106,14 +1108,15 @@ def test_store_dataset(session_obj: sessionmaker) -> None:
     manager.store_dataset(session_obj, resource)
     res = session.query(database.Resource).all()
     assert len(res) == 1
-    for column, value in object_as_dict(res[0]).items():
+    db_obj_as_dict = object_as_dict(res[0])
+    assert 1 == db_obj_as_dict.pop("resource_id")
+    for column, value in db_obj_as_dict.items():
         if column not in ["record_update"]:
             assert resource.get(column) == value
 
     expected_many2many_record = {
-        "resource_id": "reanalysis-era5-land-monthly-means",
-        "licence_id": "licence-to-use-copernicus-products",
-        "revision": 12,
+        "resource_id": 1,
+        "licence_id": 1,
     }
     assert (
         object_as_dict(session.query(database.ResourceLicence).first())
