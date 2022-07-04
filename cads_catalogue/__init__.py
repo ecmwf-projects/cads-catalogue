@@ -20,4 +20,26 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
-__all__ = ["__version__"]
+from .database import Licence, Resource, ResourceLicence, init_database
+from .entry_points import info, load_test_data, main
+from .manager import (
+    load_licences_from_folder,
+    load_resource_from_folder,
+    store_dataset,
+    store_licences,
+)
+
+__all__ = [
+    "__version__",
+    "ResourceLicence",
+    "Resource",
+    "Licence",
+    "init_database",
+    "load_licences_from_folder",
+    "load_resource_from_folder",
+    "store_licences",
+    "store_dataset",
+    "info",
+    "load_test_data",
+    "main",
+]

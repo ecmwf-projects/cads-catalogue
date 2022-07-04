@@ -30,7 +30,7 @@ def init_db(connection_string: str) -> None:
 
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
-    database.init_db(connection_string)
+    database.init_database(connection_string)
     print("successfully created the catalogue database structure.")
 
 

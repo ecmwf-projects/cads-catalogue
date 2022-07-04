@@ -12,6 +12,6 @@ def session_obj(postgresql: Connection[str]) -> sessionmaker:
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
-    engine = database.init_db(connection_string)
+    engine = database.init_database(connection_string)
     session_obj = sessionmaker(engine)
     return session_obj
