@@ -14,20 +14,24 @@ from cads_catalogue import database
 
 
 def save_in_document_storage(
-    doc_storage_path: str | Path, file_path: str | Path, subpath: str = ""
+    file_path: str | Path, doc_storage_path: str | Path | None = None, subpath: str = ""
 ) -> str | None:
     """
     Store a file at `file_path` in the document storage, in the path
     <doc_storage_path>/<subpath>/<file_name>
-    Return the relative path <subpath>/<file_name> of the file stored.
+    Return the relative path <subpath>/<file_name> of the file stored. or None if not stored.
 
-    :param doc_storage_path: base folder path where to store the file
     :param file_path: absolute path to the file to store
+    :param doc_storage_path: base folder path where to store the file
     :param subpath: optional folder path inside the document storage (created if not existing)
     :return the relative path <subpath>/<file_name> of the file stored.
     """
     if not file_path or not os.path.isabs(file_path) or not os.path.exists(file_path):
         print("warning: not found referenced file %r" % file_path)
+        return None
+    doc_storage_path = doc_storage_path or os.environ.get("DOCUMENT_STORAGE")
+    if not doc_storage_path:
+        print("warning: DOCUMENT STORAGE not set")
         return None
     file_name = os.path.basename(file_path)
     storage_rel_path = os.path.join(subpath, file_name)
@@ -140,7 +144,7 @@ def store_licences(
             file_path = licence["download_filename"]
             subpath = os.path.join("licences", licence["licence_uid"])
             licence["download_filename"] = save_in_document_storage(
-                doc_storage_path, file_path, subpath
+                file_path, doc_storage_path, subpath
             )
             licence_obj = database.Licence(**licence)
             session.add(licence_obj)
@@ -165,7 +169,7 @@ def store_dataset(
             file_path = dataset[field]
             subpath = os.path.join("resources", dataset["resource_uid"])
             dataset[field] = save_in_document_storage(
-                doc_storage_path, file_path, subpath
+                file_path, doc_storage_path, subpath
             )
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)

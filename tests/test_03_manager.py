@@ -488,7 +488,7 @@ def test_save_in_document_storage(tmp_path: Path) -> None:
     )
     assert not os.path.exists(destination)
 
-    res = manager.save_in_document_storage(doc_storage_path, file_path)
+    res = manager.save_in_document_storage(file_path, doc_storage_path)
 
     assert res == "licence-to-use-copernicus-products.pdf"
     assert os.path.exists(destination)
@@ -499,7 +499,7 @@ def test_save_in_document_storage(tmp_path: Path) -> None:
     )
     assert not os.path.exists(destination)
 
-    res = manager.save_in_document_storage(doc_storage_path, file_path, subpath)
+    res = manager.save_in_document_storage(file_path, doc_storage_path, subpath)
 
     assert res == "licences/mypath/licence-to-use-copernicus-products.pdf"
     assert os.path.exists(destination)
