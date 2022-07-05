@@ -86,6 +86,7 @@ def test_load_resource_from_folder() -> None:
         "and more detailed information relating to the ERA5-Land dataset can "
         'be found in the Copernicus Knowledge Base web link above."}]',
         "form": os.path.join(resource_folder_path, "form.json"),
+        "constraints": os.path.join(resource_folder_path, "constraints.json"),
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -552,10 +553,15 @@ def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
     assert db_obj_as_dict["form"] == os.path.join(
         "resources", db_obj_as_dict["resource_uid"], "form.json"
     )
+    assert db_obj_as_dict["constraints"] == os.path.join(
+        "resources", db_obj_as_dict["resource_uid"], "constraints.json"
+    )
     assert db_obj_as_dict["previewimage"] == os.path.join(
         "resources", db_obj_as_dict["resource_uid"], "overview.png"
     )
+    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["previewimage"]))
     assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["form"]))
+    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["constraints"]))
 
     expected_many2many_record = {
         "resource_id": 1,

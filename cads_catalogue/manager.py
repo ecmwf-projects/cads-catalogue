@@ -104,8 +104,14 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
             metadata["previewimage"] = os.path.abspath(
                 os.path.join(folder_path, candidate_name)
             )
-    if "form.json" in file_names:
-        metadata["form"] = os.path.abspath(os.path.join(folder_path, "form.json"))
+    for file_name, db_field_name in [
+        ("form.json", "form"),
+        ("constraints.json", "constraints"),
+    ]:
+        if file_name in file_names:
+            metadata[db_field_name] = os.path.abspath(
+                os.path.join(folder_path, file_name)
+            )
     # if 'references.yaml' in file_names:
     #     with open(os.path.join(folder_path, 'references.yaml')) as fp:
     #         data = yaml.load(fp, Loader=SafeLoader)
@@ -154,7 +160,8 @@ def store_dataset(
     """
     with session_obj() as session:
         licence_uids = dataset.pop("licence_uids", [])
-        for field in ["form", "previewimage"]:
+        doc_storage_fields = ["form", "previewimage", "constraints"]
+        for field in doc_storage_fields:
             file_path = dataset[field]
             subpath = os.path.join("resources", dataset["resource_uid"])
             dataset[field] = save_in_document_storage(
