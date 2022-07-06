@@ -43,7 +43,11 @@ def test_load_test_data(
     # run the script to load test data, dump again and check the dumped file
     runner.invoke(entry_points.app, ["init_db", connection_string])
     effective_dump_path = tmp_path / "effective_dump.sql"
-    result = runner.invoke(entry_points.app, ["load-test-data", connection_string])
+    result = runner.invoke(
+        entry_points.app,
+        ["load-test-data", connection_string],
+        env={"DOCUMENT_STORAGE": str(tmp_path)},
+    )
     assert result.exit_code == 0
     with open(effective_dump_path, "w") as dumped_file:
         ret = subprocess.call(["pg_dump", connection_string], stdout=dumped_file)
@@ -55,6 +59,23 @@ def test_load_test_data(
     with open(effective_dump_path) as expected_file:
         expected_dump_text = expected_file.read()
     assert expected_dump_text == effective_dump_text
+
+    assert os.path.exists(
+        os.path.join(
+            tmp_path,
+            "licences",
+            "licence-to-use-copernicus-products",
+            "licence-to-use-copernicus-products.pdf",
+        )
+    )
+    for dataset in [
+        "reanalysis-era5-land-monthly-means",
+        "reanalysis-era5-pressure-levels",
+    ]:
+        for filename in ["constraints.json", "form.json"]:
+            assert os.path.exists(
+                os.path.join(tmp_path, "resources", dataset, filename)
+            )
 
     # import shutil
     # shutil.copy(effective_dump_path, os.path.join(TESTDATA_PATH, "testdb.sql"))

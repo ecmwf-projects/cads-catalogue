@@ -99,10 +99,39 @@ def test_load_resource_from_folder() -> None:
         "licence_uids": ["licence-to-use-copernicus-products"],
         "previewimage": os.path.join(resource_folder_path, "overview.png"),
         "publication_date": date(2019, 6, 23),
+        "references": [
+            {
+                "title": "Citation",
+                "content": '<div class="content-wrapper">\n<p class="title"><strong>'
+                "How to cite this dataset:</strong></p>\n<br>\n<p>\n"
+                "All users of data uploaded on the Climate Data Store (CDS) must provide "
+                "clear and visible attribution to the Copernicus programme and are asked "
+                "to cite and reference the dataset provider. Please refer to "
+                '<a href="https://confluence.ecmwf.int/display/CKB/How+to+acknowledge%2C+'
+                'cite+and+reference+data+published+on+the+Climate+Data+Store">'
+                "How to acknowledge, cite and reference data published on the Climate "
+                "Data Store</a> for complete details.\n\n<br>\n<br>\n(1) Acknowledge "
+                "according to the licence to use Copernicus Products.\n\n<br>\n<br>\n(2) "
+                "Cite each dataset version used:\n<br>\n<br>\n<ul>\nMuñoz Sabater, J., "
+                "(2019): ERA5-Land monthly averaged data from 1981 to present. Copernicus "
+                "Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on "
+                "&lt DD-MMM-YYYY &gt), 10.24381/cds.68d2bb3\n</ul>\n<ul>\nMuñoz Sabater, "
+                "J., (2021): ERA5-Land monthly averaged data from 1950 to 1980. "
+                "Copernicus Climate Change Service (C3S) Climate Data Store (CDS). "
+                "(Accessed on < DD-MMM-YYYY >), 10.24381/cds.68d2bb3\n</ul>\n<p>"
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                '&nbsp;&nbsp;&nbsp;&nbsp;</p>\n<table style="border-color: #000000; '
+                'float: left;">\n<tbody>\n<tr>\n<td>\n<div class="confluence-'
+                'information-macro-body">\n\n<br></br>\n</div>\n</td>\n</tr>\n</tbody>'
+                "\n</table>\n</div>\n",
+            }
+        ],
         "resource_uid": "reanalysis-era5-land-monthly-means",
         "resource_update": date(2022, 3, 2),
         "title": "ERA5-Land monthly averaged data from 1950 to present",
         "type": "dataset",
+        "use_eqc": True,
         "variables": '{"10m u-component of wind": {"description": "Eastward component of the '
         "10m wind. It is the horizontal speed of air moving towards the east, at a "
         "height of ten metres above the surface of the Earth, in metres per "

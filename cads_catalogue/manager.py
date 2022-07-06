@@ -5,6 +5,7 @@ import os
 import shutil
 from pathlib import Path
 from typing import Any
+from urllib.parse import urljoin
 
 import yaml
 from sqlalchemy.orm import sessionmaker
@@ -35,7 +36,7 @@ def save_in_document_storage(
         return None
     file_name = os.path.basename(file_path)
     storage_rel_path = os.path.join(subpath, file_name)
-    storage_abs_path = os.path.join(doc_storage_path, storage_rel_path)
+    storage_abs_path = os.path.join(doc_storage_path, subpath)
     os.makedirs(storage_abs_path, exist_ok=True)
     shutil.copy(file_path, storage_abs_path)
     return storage_rel_path
@@ -98,7 +99,8 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
             metadata["licence_uids"] = data.get("licences")
             metadata["publication_date"] = data.get("publication_date")
             metadata["resource_update"] = data.get("update_date")
-            # metadata["use_eqc"] = data.get('eqc') == 'true'
+            if "eqc" in data:
+                metadata["use_eqc"] = data["eqc"]
     if "documentation.yaml" in file_names:
         with open(os.path.join(folder_path, "documentation.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
@@ -116,20 +118,35 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
             metadata[db_field_name] = os.path.abspath(
                 os.path.join(folder_path, file_name)
             )
-    # if 'references.yaml' in file_names:
-    #     with open(os.path.join(folder_path, 'references.yaml')) as fp:
-    #         data = yaml.load(fp, Loader=SafeLoader)
-    #         metadata["citation"] = {
-    #             'title': data.get('title')
-    #         }
-    #         content = data.get('content')
-    #         if content in file_names:
-    #             metadata["citation"]['html'] = fp.read()
+    metadata["references"] = []
+    if "references.yaml" in file_names:
+        with open(os.path.join(folder_path, "references.yaml")) as fp:
+            data = yaml.load(fp, Loader=SafeLoader)
+            for data_item in data.get("references", []):
+                reference_item = {"title": data_item.get("title")}
+                content_file_name = data_item.get("content")
+                if content_file_name and content_file_name in file_names:
+                    with open(
+                        os.path.join(folder_path, content_file_name)
+                    ) as content_file:
+                        reference_item["content"] = content_file.read()
+                metadata["references"].append(reference_item)
+    if "metadata.yaml" in file_names:
+        with open(os.path.join(folder_path, "references.yaml")) as fp:
+            data = yaml.load(fp, Loader=SafeLoader)
+            if "doi" in data:
+                reference_item = {
+                    "title": data["doi"],
+                    "content": urljoin("https://doy.org", data["doi"]),
+                }
+                metadata["references"].append(reference_item)
     return metadata
 
 
 def store_licences(
-    session_obj: sessionmaker, licences: list[Any], doc_storage_path: str | Path
+    session_obj: sessionmaker,
+    licences: list[Any],
+    doc_storage_path: str | Path | None = None,
 ) -> None:
     """
     Store a list of licences (as returned by `load_licences_from_folder`)
@@ -152,7 +169,9 @@ def store_licences(
 
 
 def store_dataset(
-    session_obj: sessionmaker, dataset: dict[str, Any], doc_storage_path: str | Path
+    session_obj: sessionmaker,
+    dataset: dict[str, Any],
+    doc_storage_path: str | Path | None = None,
 ) -> None:
     """
     Store a list of licences (as returned by `load_resource_from_folder`)

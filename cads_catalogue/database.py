@@ -37,7 +37,6 @@ class Resource(BaseModel):
     contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     form = sa.Column(sa.String)
     constraints = sa.Column(sa.String)
-    citation = sa.Column(sa.TEXT)
     keywords = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     version = sa.Column(sa.VARCHAR(300))
     variables = sa.Column(JSONB)
@@ -49,7 +48,9 @@ class Resource(BaseModel):
     previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
     record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
+    references = sa.Column(sa.ARRAY(JSONB))
     resource_update = sa.Column(sa.DATE)
+    use_eqc = sa.Column(sa.Boolean)
 
     licences = relationship(
         "Licence", secondary="resources_licences", back_populates="resources"

@@ -1,11 +1,11 @@
 """module for entry points"""
 import os.path
-import subprocess
 
 import sqlalchemy as sa
 import typer
+from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import database
+from cads_catalogue import database, manager
 
 app = typer.Typer()
 
@@ -42,11 +42,26 @@ def load_test_data(connection_string: str) -> None:
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     this_path = os.path.abspath(os.path.dirname(__file__))
-    dumped_db_path = os.path.abspath(
-        os.path.join(this_path, "../tests/data/testdb.sql")
+    licences_folder_path = os.path.abspath(
+        os.path.join(this_path, "../tests/data/cds-licences")
     )
-    subprocess.call(["psql", connection_string, "-f", dumped_db_path])
-    print("test data loaded.")
+    licences = manager.load_licences_from_folder(licences_folder_path)
+    engine = database.init_database(connection_string)
+    session_obj = sessionmaker(engine)
+
+    manager.store_licences(session_obj, licences)
+    datasets = [
+        "reanalysis-era5-land-monthly-means",
+        "reanalysis-era5-pressure-levels",
+    ]
+    session = session_obj()
+    for dataset in datasets:
+        resource_folder_path = os.path.abspath(
+            os.path.join(this_path, "../tests/data", dataset)
+        )
+        resource = manager.load_resource_from_folder(resource_folder_path)
+        manager.store_dataset(session_obj, resource)
+    session.close()
 
 
 def main() -> None:
