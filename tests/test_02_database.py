@@ -4,7 +4,7 @@ from psycopg import Connection
 from cads_catalogue import database
 
 
-def test_init_db(postgresql: Connection[str]) -> None:
+def test_init_database(postgresql: Connection[str]) -> None:
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
