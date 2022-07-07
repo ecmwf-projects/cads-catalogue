@@ -1246,6 +1246,7 @@ def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
     session.close()
 
     # uncomment to update testdb.sql
+    # import subprocess
     # dump_path = os.path.join(TESTDATA_PATH, "testdb.sql")
     # with open(dump_path, "w") as dumped_file:
     #     ret = subprocess.call(["pg_dump", connection_string], stdout=dumped_file)
