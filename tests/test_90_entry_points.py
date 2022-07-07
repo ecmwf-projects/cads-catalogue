@@ -1,23 +1,17 @@
 import datetime
 import os.path
 from pathlib import Path
-from typing import Any
 
 import sqlalchemy as sa
 from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
 from typer.testing import CliRunner
 
-from cads_catalogue import database, entry_points
+from cads_catalogue import database, entry_points, manager
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 runner = CliRunner()
-
-
-def object_as_dict(obj: Any) -> dict[str, Any]:
-    """convert a sqlalchemy object in a python dictionary"""
-    return {c.key: getattr(obj, c.key) for c in sa.inspect(obj).mapper.column_attrs}
 
 
 def test_init_db(postgresql: Connection[str]) -> None:
@@ -149,14 +143,19 @@ def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
             ),
             "references": [
                 {
-                    "url": None,
-                    "copy": True,
                     "title": "Citation",
-                    "content": (
-                        "resources/reanalysis-era5-land-monthly-means/citation.html"
-                    ),
+                    "content": "resources/reanalysis-era5-land-monthly-means/citation.html",
+                    "copy": True,
+                    "url": None,
                     "download_file": None,
-                }
+                },
+                {
+                    "title": "10.24381/cds.68d2bb30",
+                    "content": None,
+                    "copy": False,
+                    "url": "https://doy.org/10.24381/cds.68d2bb30",
+                    "download_file": None,
+                },
             ],
             "resource_id": 1,
             "resource_uid": "reanalysis-era5-land-monthly-means",
@@ -942,21 +941,24 @@ def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
             ),
             "references": [
                 {
-                    "url": None,
-                    "copy": True,
                     "title": "Citation",
-                    "content": (
-                        "resources/reanalysis-era5-pressure-levels/citation.html"
-                    ),
+                    "content": "resources/reanalysis-era5-pressure-levels/citation.html",
+                    "copy": True,
+                    "url": None,
                     "download_file": None,
                 },
                 {
-                    "url": None,
-                    "copy": None,
                     "title": "Acknowledgement",
-                    "content": (
-                        "resources/reanalysis-era5-pressure-levels/acknowledgement.html"
-                    ),
+                    "content": "resources/reanalysis-era5-pressure-levels/acknowledgement.html",
+                    "copy": None,
+                    "url": None,
+                    "download_file": None,
+                },
+                {
+                    "title": "10.24381/cds.bd0915c6",
+                    "content": None,
+                    "copy": False,
+                    "url": "https://doy.org/10.24381/cds.bd0915c6",
                     "download_file": None,
                 },
             ],
@@ -1230,19 +1232,21 @@ def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
     # check db content
     session = session_obj()
     resources = [
-        object_as_dict(r)
+        manager.object_as_dict(r)
         for r in session.query(database.Resource).order_by(
             database.Resource.resource_uid
         )
     ]
-    licences = [object_as_dict(ll) for ll in session.query(database.Licence).all()]
+    licences = [
+        manager.object_as_dict(ll) for ll in session.query(database.Licence).all()
+    ]
 
     assert licences == expected_licences
     for i, resource in enumerate(resources):
         for key in resource:
             if key == "record_update":
                 continue
-            assert resource[key] == expected_resources[i][key]  # type: ignore
+            assert resource[key] == expected_resources[i][key]
     session.close()
 
     # uncomment to update testdb.sql

@@ -1,5 +1,6 @@
 """utility module to load and store data in the catalogue database"""
 import glob
+import itertools
 import json
 import os
 import shutil
@@ -8,10 +9,16 @@ from typing import Any
 from urllib.parse import urljoin
 
 import yaml
+from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 from yaml.loader import SafeLoader
 
 from cads_catalogue import database
+
+
+def object_as_dict(obj: Any) -> dict[str, Any]:
+    """convert a sqlalchemy object in a python dictionary"""
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
 def save_in_document_storage(
@@ -81,7 +88,6 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
     file_names = os.listdir(folder_path)
     metadata: dict[str, Any] = dict()
     metadata["resource_uid"] = os.path.basename(folder_path)
-    metadata["type"] = "dataset"
     if "abstract.md" in file_names:
         with open(os.path.join(folder_path, "abstract.md")) as fp:
             metadata["abstract"] = fp.read()
@@ -91,6 +97,10 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
             metadata["description"] = data.get("description")
             metadata["keywords"] = data.get("keywords")
             metadata["variables"] = data.get("variables")
+            # NOTE: related_resources_keywords is for self-relationship, not a db field
+            metadata["related_resources_keywords"] = data.get(
+                "related_resources_keywords", []
+            )
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
@@ -145,8 +155,9 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
                     )
                 metadata["references"].append(reference_item)
     if "metadata.yaml" in file_names:
-        with open(os.path.join(folder_path, "references.yaml")) as fp:
+        with open(os.path.join(folder_path, "metadata.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
+            metadata["type"] = data.get("resource_type")
             if "doi" in data:
                 reference_item = {
                     "title": data["doi"],
@@ -186,17 +197,18 @@ def store_licences(
 
 def store_dataset(
     session_obj: sessionmaker,
-    dataset: dict[str, Any],
+    dataset_md: dict[str, Any],
     doc_storage_path: str | Path | None = None,
-) -> None:
+) -> dict[str, Any]:
     """
     Store a list of licences (as returned by `load_resource_from_folder`)
-    in a database
+    in a database and return a dictionary version of record stored.
 
     :param session_obj: Session sqlalchemy object
-    :param dataset: resource dictionary (as returned by `load_resource_from_folder`)
+    :param dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
     :param doc_storage_path: base folder path of the document storage
     """
+    dataset = dataset_md.copy()
     with session_obj() as session:
         licence_uids = dataset.pop("licence_uids", [])
         subpath = os.path.join("resources", dataset["resource_uid"])
@@ -214,6 +226,7 @@ def store_dataset(
                     reference[subfield] = save_in_document_storage(
                         file_path, doc_storage_path, subpath
                     )
+        dataset.pop("related_resources_keywords")
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
         for licence_uid in licence_uids:
@@ -225,4 +238,28 @@ def store_dataset(
             )
             if licence_obj:
                 dataset_obj.licences.append(licence_obj)  # type: ignore
+        stored_as_dict = object_as_dict(dataset_obj)
         session.commit()
+    return stored_as_dict
+
+
+def find_related_resources(
+    resources: list[dict[str, Any]]
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """
+    Return couples of resources related each other.
+
+    :param resources:  list of loaded resources
+    """
+    relationships_found = []
+    all_possible_relationships = itertools.combinations(resources, 2)
+    for (res1, res2) in all_possible_relationships:
+        res1_keywords = res1.get("keywords", [])
+        res2_keywords = res2.get("keywords", [])
+        if set(res1_keywords) == set(res2_keywords) and len(res1_keywords) > 0:
+            relationships_found.append((res1, res2))
+        res1_rel_res_kws = res1.get("related_resources_keywords", [])
+        res2_rel_res_kws = res2.get("related_resources_keywords", [])
+        if set(res1_rel_res_kws) & set(res2_rel_res_kws):
+            relationships_found.append((res1, res2))
+    return relationships_found

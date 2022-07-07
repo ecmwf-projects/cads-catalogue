@@ -50,17 +50,35 @@ def load_test_data(connection_string: str) -> None:
     session_obj = sessionmaker(engine)
 
     manager.store_licences(session_obj, licences)
+
     datasets = [
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
     ]
-    session = session_obj()
+    resources = []
     for dataset in datasets:
         resource_folder_path = os.path.abspath(
             os.path.join(this_path, "../tests/data", dataset)
         )
         resource = manager.load_resource_from_folder(resource_folder_path)
+        resources.append(resource)
+    related_resources = manager.find_related_resources(resources)
+    session = session_obj()
+    for resource in resources:
         manager.store_dataset(session_obj, resource)
+    for res1, res2 in related_resources:
+        res1_obj = (
+            session.query(database.Resource)
+            .filter_by(resource_id=res1["resource_id"])
+            .one()
+        )
+        res2_obj = (
+            session.query(database.Resource)
+            .filter_by(resource_id=res2["resource_id"])
+            .one()
+        )
+        res1_obj.related_resources.append(res2_obj)
+        res2_obj.related_resources.append(res1_obj)
     session.close()
 
 
