@@ -2,7 +2,6 @@
 from datetime import datetime
 
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import UniqueConstraint
@@ -32,23 +31,23 @@ class Resource(BaseModel):
     resource_id = sa.Column(sa.Integer, primary_key=True)
     resource_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     title = sa.Column(sa.String)
-    description = sa.Column(JSONB, nullable=False)
+    description = sa.Column(sa.JSON, nullable=False)
     abstract = sa.Column(sa.TEXT, nullable=False)
     contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     form = sa.Column(sa.String)
     constraints = sa.Column(sa.String)
     keywords = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     version = sa.Column(sa.VARCHAR(300))
-    variables = sa.Column(JSONB)
-    providers = sa.Column(JSONB)
-    summaries = sa.Column(JSONB, nullable=True)
-    extent = sa.Column(JSONB)
-    documentation = sa.Column(JSONB)
+    variables = sa.Column(sa.JSON)
+    providers = sa.Column(sa.JSON)
+    summaries = sa.Column(sa.JSON, nullable=True)
+    extent = sa.Column(sa.JSON)
+    documentation = sa.Column(sa.JSON)
     type = sa.Column(sa.VARCHAR(300), nullable=False)
     previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
     record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
-    references = sa.Column(JSONB)
+    references = sa.Column(sa.JSON)
     resource_update = sa.Column(sa.DATE)
     use_eqc = sa.Column(sa.Boolean)
 

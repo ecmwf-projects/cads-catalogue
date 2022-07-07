@@ -1242,7 +1242,7 @@ def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
         for key in resource:
             if key == "record_update":
                 continue
-            assert resource[key] == expected_resources[i][key]
+            assert resource[key] == expected_resources[i][key]  # type: ignore
     session.close()
 
     # uncomment to update testdb.sql
