@@ -88,9 +88,9 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
     if "abstract.yaml" in file_names:
         with open(os.path.join(folder_path, "abstract.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
-            metadata["description"] = json.dumps(data.get("description"))
+            metadata["description"] = data.get("description")
             metadata["keywords"] = data.get("keywords")
-            metadata["variables"] = json.dumps(data.get("variables"))
+            metadata["variables"] = data.get("variables")
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
@@ -104,7 +104,7 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
     if "documentation.yaml" in file_names:
         with open(os.path.join(folder_path, "documentation.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
-            metadata["documentation"] = json.dumps(data.get("documentation"))
+            metadata["documentation"] = data.get("documentation")
     for candidate_name in ["overview.png", "overview.jpg"]:
         if candidate_name in file_names:
             metadata["previewimage"] = os.path.abspath(
@@ -123,13 +123,26 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
         with open(os.path.join(folder_path, "references.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
             for data_item in data.get("references", []):
-                reference_item = {"title": data_item.get("title")}
-                content_file_name = data_item.get("content")
+                reference_item = {
+                    "title": data_item["title"],
+                    "content": None,
+                    "copy": data_item.get("copy"),
+                    "url": None,
+                    "download_file": None,
+                }
+                content_file_name = data_item["content"]
                 if content_file_name and content_file_name in file_names:
-                    with open(
+                    reference_item["content"] = os.path.abspath(
                         os.path.join(folder_path, content_file_name)
-                    ) as content_file:
-                        reference_item["content"] = content_file.read()
+                    )
+                else:
+                    print("warning: reference to item %r not found" % content_file_name)
+                    continue
+                download_file_name = data_item.get("filename")
+                if download_file_name and download_file_name in file_names:
+                    reference_item["download_file"] = os.path.abspath(
+                        os.path.join(folder_path, download_file_name)
+                    )
                 metadata["references"].append(reference_item)
     if "metadata.yaml" in file_names:
         with open(os.path.join(folder_path, "references.yaml")) as fp:
@@ -137,7 +150,10 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
             if "doi" in data:
                 reference_item = {
                     "title": data["doi"],
-                    "content": urljoin("https://doy.org", data["doi"]),
+                    "content": None,
+                    "copy": False,
+                    "url": urljoin("https://doy.org", data["doi"]),
+                    "download_file": None,
                 }
                 metadata["references"].append(reference_item)
     return metadata
@@ -183,13 +199,21 @@ def store_dataset(
     """
     with session_obj() as session:
         licence_uids = dataset.pop("licence_uids", [])
+        subpath = os.path.join("resources", dataset["resource_uid"])
         doc_storage_fields = ["form", "previewimage", "constraints"]
         for field in doc_storage_fields:
             file_path = dataset[field]
-            subpath = os.path.join("resources", dataset["resource_uid"])
             dataset[field] = save_in_document_storage(
                 file_path, doc_storage_path, subpath
             )
+        # some fields to storage are inside references
+        for reference in dataset["references"]:
+            for subfield in ["content", "download_file"]:
+                if reference.get(subfield):
+                    file_path = reference[subfield]
+                    reference[subfield] = save_in_document_storage(
+                        file_path, doc_storage_path, subpath
+                    )
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
         for licence_uid in licence_uids:

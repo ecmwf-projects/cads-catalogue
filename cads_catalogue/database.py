@@ -48,7 +48,7 @@ class Resource(BaseModel):
     previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
     record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
-    references = sa.Column(sa.ARRAY(JSONB))
+    references = sa.Column(JSONB)
     resource_update = sa.Column(sa.DATE)
     use_eqc = sa.Column(sa.Boolean)
 
