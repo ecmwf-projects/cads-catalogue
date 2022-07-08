@@ -174,7 +174,7 @@ def store_licences(
     session_obj: sessionmaker,
     licences: list[Any],
     doc_storage_path: str | Path | None = None,
-) -> None:
+) -> list[dict[str, Any]]:
     """
     Store a list of licences (as returned by `load_licences_from_folder`)
     in a database and in the document storage path.
@@ -183,6 +183,7 @@ def store_licences(
     :param licences: list of licences (as returned by `load_licences_from_folder`)
     :param doc_storage_path: base folder path of the document storage
     """
+    all_stored = []
     with session_obj() as session:
         for licence in licences:
             file_path = licence["download_filename"]
@@ -192,7 +193,10 @@ def store_licences(
             )
             licence_obj = database.Licence(**licence)
             session.add(licence_obj)
+            stored_as_dict = object_as_dict(licence_obj)
+            all_stored.append(stored_as_dict)
         session.commit()
+    return all_stored
 
 
 def store_dataset(

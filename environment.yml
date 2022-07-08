@@ -12,6 +12,7 @@ dependencies:
 - psycopg
 - psycopg2
 - sqlalchemy==1.4*
+- sqlalchemy-utils
 - sqlalchemy-stubs
 - typer
 - pip:

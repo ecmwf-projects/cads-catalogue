@@ -1,10 +1,12 @@
 """SQLAlchemy ORM model"""
+import os
 from datetime import datetime
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy_utils import create_database, database_exists
 
 metadata = sa.MetaData()
 BaseModel = declarative_base(metadata=metadata)
@@ -92,14 +94,34 @@ class Licence(BaseModel):
     )
 
 
+def env2postgresq_connection_string(env: dict[str, str] = None) -> str:
+    """
+    Extract postgresql connection string from environment variables.
+
+    :param env: environment to use
+    :return: connection string
+    """
+    if not env:
+        env = os.environ
+    port = env.get("PGPORT", "5432")
+    user = env.get("POSTGRES_USER", "")
+    psw = env.get("POSTGRES_PASSWORD", "")
+    host = env.get("POSTGRES_HOST", "localhost")
+    dbname = env.get(" PGDATABASE", user)
+    conn_string = f"postgresql://{user}:{psw}@{host}:{port}/{dbname}"
+    return conn_string
+
+
 def init_database(connection_string: str) -> sa.engine.Engine:
     """
-    Initialize the database located at URI `connection_string` and return the engine object.
+    Create the database (if not existing) and inizialize the structure.
+    Return the engine object.
 
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     engine = sa.create_engine(connection_string)
-
+    if not database_exists(engine.url):
+        create_database(engine.url)
     # cleanup and create the schema
     metadata.drop_all(engine)
     metadata.create_all(engine)

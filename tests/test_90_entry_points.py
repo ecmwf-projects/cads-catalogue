@@ -24,14 +24,15 @@ def test_init_db(postgresql: Connection[str]) -> None:
     query = (
         "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
     )
-
-    result = runner.invoke(entry_points.app, ["init-db", connection_string])
+    result = runner.invoke(
+        entry_points.app, ["init-db", "--connection-string", connection_string]
+    )
 
     assert result.exit_code == 0
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
-def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
+def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> None:
     connection_string = (
         f"postgresql://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
@@ -1207,7 +1208,7 @@ def test_load_test_data(postgresql: Connection[str], tmp_path: Path) -> None:
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
-        ["load-test-data", connection_string],
+        ["setup-test-database", "--connection-string", connection_string],
         env={"DOCUMENT_STORAGE": str(tmp_path)},
     )
     # check no errors

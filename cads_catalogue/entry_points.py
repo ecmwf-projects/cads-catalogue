@@ -4,6 +4,7 @@ import os.path
 import sqlalchemy as sa
 import typer
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists
 
 from cads_catalogue import database, manager
 
@@ -11,12 +12,14 @@ app = typer.Typer()
 
 
 @app.command()
-def info(connection_string: str) -> None:
+def info(connection_string: str | None = None) -> None:
     """
     Test connection to the database located at URI `connection_string`
 
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
+    if not connection_string:
+        connection_string = database.env2postgresq_connection_string()
     engine = sa.create_engine(connection_string)
     connection = engine.connect()
     connection.close()
@@ -24,23 +27,43 @@ def info(connection_string: str) -> None:
 
 
 @app.command()
-def init_db(connection_string: str) -> None:
+def init_db(connection_string: str | None = None) -> None:
     """
     Create the database structure
 
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
+    if not connection_string:
+        connection_string = database.env2postgresq_connection_string()
     database.init_database(connection_string)
     print("successfully created the catalogue database structure.")
 
 
 @app.command()
-def load_test_data(connection_string: str) -> None:
+def setup_test_database(
+    connection_string: str | None = None, force: bool = False
+) -> None:
     """
     Fill the database with some test data.
 
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param force: if True, create db from scratch also if already existing
     """
+    if not connection_string:
+        connection_string = database.env2postgresq_connection_string()
+    engine = sa.create_engine(connection_string)
+    structure_exists = True
+    if not database_exists(engine.url):
+        init_db(connection_string)
+    else:
+        conn = engine.connect()
+        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
+        if set(conn.execute(query).scalars()) != set(database.metadata.tables):
+            structure_exists = False
+    if not structure_exists or force:
+        init_db(connection_string)
+
+    # load test data
     this_path = os.path.abspath(os.path.dirname(__file__))
     licences_folder_path = os.path.abspath(
         os.path.join(this_path, "../tests/data/cds-licences")
