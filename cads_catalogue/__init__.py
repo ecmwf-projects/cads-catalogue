@@ -1,3 +1,5 @@
+"""CADS catalogue manager."""
+
 # Copyright 2022, European Centre for Medium-Range Weather Forecasts (ECMWF).
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

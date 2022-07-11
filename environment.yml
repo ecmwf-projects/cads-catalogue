@@ -4,13 +4,17 @@ channels:
 dependencies:
 - make
 - mypy
+- myst-parser
 - pip
-- pre-commit
-- pytest
-- pytest-cov
 - postgresql
+- pre-commit
 - psycopg
 - psycopg2
+- pydata-sphinx-theme
+- pytest
+- pytest-cov
+- sphinx
+- sphinxcontrib-apidoc
 - sqlalchemy==1.4*
 - sqlalchemy-utils
 - sqlalchemy-stubs

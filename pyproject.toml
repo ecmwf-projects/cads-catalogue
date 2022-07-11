@@ -16,6 +16,10 @@ profile = "black"
 minversion = "6.0"
 postgresql_user = "catalogue"
 
+[tool.pydocstyle]
+convention = "numpy"
+add_ignore = "D1"
+
 [tool.setuptools_scm]
 write_to = "cads_catalogue/version.py"
 write_to_template = '''
