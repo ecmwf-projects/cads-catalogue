@@ -1,5 +1,7 @@
-"""SQLAlchemy ORM model"""
+"""SQLAlchemy ORM model."""
 import os
+import typing
+from collections import UserDict
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -94,12 +96,20 @@ class Licence(BaseModel):
     )
 
 
-def env2postgresq_connection_string(env: dict[str, str] = None) -> str:
-    """
-    Extract postgresql connection string from environment variables.
+@typing.no_type_check
+def env2postgresq_connection_string(
+    env: dict[str, str] | UserDict[str, str] = None
+) -> str:
+    """Extract postgresql connection string from environment variables.
 
-    :param env: environment to use
-    :return: connection string
+    Parameters
+    ----------
+    env: environment to use
+
+    Returns
+    -------
+    str
+        the database connection string
     """
     if not env:
         env = os.environ
@@ -113,11 +123,16 @@ def env2postgresq_connection_string(env: dict[str, str] = None) -> str:
 
 
 def init_database(connection_string: str) -> sa.engine.Engine:
-    """
-    Create the database (if not existing) and inizialize the structure.
-    Return the engine object.
+    """Create the database (if not existing) and inizialize the structure.
 
-    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    Parameters
+    ----------
+    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+
+    Returns
+    -------
+    Engine:
+        the sqlalchemy engine object
     """
     engine = sa.create_engine(connection_string)
     if not database_exists(engine.url):

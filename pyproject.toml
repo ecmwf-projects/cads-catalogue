@@ -12,13 +12,13 @@ branch = true
 [tool.isort]
 profile = "black"
 
-[tool.pytest.ini_options]
-minversion = "6.0"
-postgresql_user = "catalogue"
-
 [tool.pydocstyle]
 convention = "numpy"
 add_ignore = "D1"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+postgresql_user = "catalogue"
 
 [tool.setuptools_scm]
 write_to = "cads_catalogue/version.py"

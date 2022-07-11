@@ -1,4 +1,4 @@
-"""module for entry points"""
+"""module for entry points."""
 import os.path
 
 import sqlalchemy as sa
@@ -13,10 +13,11 @@ app = typer.Typer()
 
 @app.command()
 def info(connection_string: str | None = None) -> None:
-    """
-    Test connection to the database located at URI `connection_string`
+    """Test connection to the database located at URI `connection_string`.
 
-    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    Parameters
+    ----------
+    connection_string: something like 'postgresql://user:password@netloc:port/dbname'.
     """
     if not connection_string:
         connection_string = database.env2postgresq_connection_string()
@@ -28,14 +29,15 @@ def info(connection_string: str | None = None) -> None:
 
 @app.command()
 def init_db(connection_string: str | None = None) -> None:
-    """
-    Create the database structure
+    """Create the database structure.
 
-    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    Parameters
+    ----------
+    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     if not connection_string:
         connection_string = database.env2postgresq_connection_string()
-    database.init_database(connection_string)
+    database.init_database(connection_string)  # type: ignore
     print("successfully created the catalogue database structure.")
 
 
@@ -43,11 +45,16 @@ def init_db(connection_string: str | None = None) -> None:
 def setup_test_database(
     connection_string: str | None = None, force: bool = False
 ) -> None:
-    """
-    Fill the database with some test data.
+    """Fill the database with some test data.
 
-    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
-    :param force: if True, create db from scratch also if already existing
+    Before to fill with test data:
+      - if the database doesn't exist, it creates a new one;
+      - if the structure is not updated (or force=True), it builds up the structure from scratch
+
+    Parameters
+    ----------
+    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    force: if True, create db from scratch also if already existing (default False)
     """
     if not connection_string:
         connection_string = database.env2postgresq_connection_string()
@@ -58,7 +65,7 @@ def setup_test_database(
     else:
         conn = engine.connect()
         query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-        if set(conn.execute(query).scalars()) != set(database.metadata.tables):
+        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
             structure_exists = False
     if not structure_exists or force:
         init_db(connection_string)
@@ -69,7 +76,7 @@ def setup_test_database(
         os.path.join(this_path, "../tests/data/cds-licences")
     )
     licences = manager.load_licences_from_folder(licences_folder_path)
-    engine = database.init_database(connection_string)
+    engine = database.init_database(connection_string)  # type: ignore
     session_obj = sessionmaker(engine)
 
     manager.store_licences(session_obj, licences)
@@ -106,5 +113,5 @@ def setup_test_database(
 
 
 def main() -> None:
-    """run main catalogue entry points"""
+    """Run main catalogue entry points."""
     app()
