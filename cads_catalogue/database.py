@@ -1,13 +1,17 @@
-"""SQLAlchemy ORM model"""
+"""SQLAlchemy ORM model."""
 from datetime import datetime
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy.schema import UniqueConstraint
+from sqlalchemy_utils import create_database, database_exists
+
+from cads_catalogue import config
 
 metadata = sa.MetaData()
 BaseModel = declarative_base(metadata=metadata)
+dbsettings = config.SqlalchemySettings()
 
 
 class ResourceLicence(BaseModel):
@@ -21,6 +25,15 @@ class ResourceLicence(BaseModel):
     licence_id = sa.Column(
         sa.Integer, sa.ForeignKey("licences.licence_id"), primary_key=True
     )
+
+
+related_resources = sa.Table(
+    "related_resources",
+    metadata,
+    sa.Column("related_resource_id", sa.Integer, primary_key=True),
+    sa.Column("parent_resource_id", sa.Integer, sa.ForeignKey("resources.resource_id")),
+    sa.Column("child_resource_id", sa.Integer, sa.ForeignKey("resources.resource_id")),
+)
 
 
 class Resource(BaseModel):
@@ -54,6 +67,13 @@ class Resource(BaseModel):
     licences = relationship(
         "Licence", secondary="resources_licences", back_populates="resources"
     )
+    related_resources = relationship(
+        "Resource",
+        secondary=related_resources,
+        primaryjoin=resource_id == related_resources.c.child_resource_id,
+        secondaryjoin=resource_id == related_resources.c.parent_resource_id,
+        backref=backref("back_related_resources"),  # type: ignore
+    )
 
 
 class Licence(BaseModel):
@@ -76,14 +96,32 @@ class Licence(BaseModel):
     )
 
 
-def init_database(connection_string: str) -> sa.engine.Engine:
+def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessionmaker:
     """
-    Initialize the database located at URI `connection_string` and return the engine object.
+    If `session_obj` is None, create a new session object.
 
-    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param session_obj:
+    """
+    return session_obj or sa.orm.sessionmaker(
+        sa.create_engine(dbsettings.connection_string)
+    )
+
+
+def init_database(connection_string: str) -> sa.engine.Engine:
+    """Create the database (if not existing) and inizialize the structure.
+
+    Parameters
+    ----------
+    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+
+    Returns
+    -------
+    Engine:
+        the sqlalchemy engine object
     """
     engine = sa.create_engine(connection_string)
-
+    if not database_exists(engine.url):
+        create_database(engine.url)
     # cleanup and create the schema
     metadata.drop_all(engine)
     metadata.create_all(engine)

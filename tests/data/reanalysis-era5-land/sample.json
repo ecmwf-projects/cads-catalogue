@@ -1,0 +1,23 @@
+{
+    "day": [
+        "14",
+        "02"
+    ],
+    "format": "netcdf",
+    "month": [
+        "09",
+        "11"
+    ],
+    "time": [
+        "11:00",
+        "20:00"
+    ],
+    "variable": [
+        "evaporation_from_the_top_of_canopy",
+        "surface_net_thermal_radiation"
+    ],
+    "year": [
+        "1992",
+        "1951"
+    ]
+}

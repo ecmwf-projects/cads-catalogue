@@ -1,5 +1,6 @@
-"""utility module to load and store data in the catalogue database"""
+"""utility module to load and store data in the catalogue database."""
 import glob
+import itertools
 import json
 import os
 import shutil
@@ -8,24 +9,36 @@ from typing import Any
 from urllib.parse import urljoin
 
 import yaml
+from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 from yaml.loader import SafeLoader
 
 from cads_catalogue import database
 
 
+def object_as_dict(obj: Any) -> dict[str, Any]:
+    """Convert a sqlalchemy object in a python dictionary."""
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+
+
 def save_in_document_storage(
     file_path: str | Path, doc_storage_path: str | Path | None = None, subpath: str = ""
 ) -> str | None:
-    """
+    """Store a file in the document storage.
+
     Store a file at `file_path` in the document storage, in the path
-    <doc_storage_path>/<subpath>/<file_name>
+    <doc_storage_path>/<subpath>/<file_name>.
     Return the relative path <subpath>/<file_name> of the file stored. or None if not stored.
 
-    :param file_path: absolute path to the file to store
-    :param doc_storage_path: base folder path where to store the file
-    :param subpath: optional folder path inside the document storage (created if not existing)
-    :return the relative path <subpath>/<file_name> of the file stored.
+    Parameters
+    ----------
+    file_path: absolute path to the file to store
+    doc_storage_path: base folder path where to store the file
+    subpath: optional folder path inside the document storage (created if not existing)
+
+    Returns
+    -------
+    str | Path: the relative path <subpath>/<file_name> of the file stored.
     """
     if not file_path or not os.path.isabs(file_path) or not os.path.exists(file_path):
         print("warning: not found referenced file %r" % file_path)
@@ -43,11 +56,15 @@ def save_in_document_storage(
 
 
 def load_licences_from_folder(folder_path: str | Path) -> list[dict[str, Any]]:
-    """
-    Load licences metadata from json files in a folder.
+    """Load licences metadata from json files contained in a folder.
 
-    :param folder_path: the folder path where to look for json files
-    :return: list of dictionaries of metadata collected
+    Parameters
+    ----------
+    folder_path: the folder path where to look for json files
+
+    Returns
+    -------
+    list: list of dictionaries of metadata collected
     """
     licences = []
     json_filepaths = glob.glob(os.path.join(folder_path, "*.json"))
@@ -72,16 +89,19 @@ def load_licences_from_folder(folder_path: str | Path) -> list[dict[str, Any]]:
 
 
 def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
-    """
-    Load metadata of a resource from a folder.
+    """Load metadata of a resource from a folder.
 
-    :param folder_path: folder path where to collect metadata of a resource
-    :return: dictionary of metadata collected
+    Parameters
+    ----------
+    folder_path: folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
     """
     file_names = os.listdir(folder_path)
     metadata: dict[str, Any] = dict()
     metadata["resource_uid"] = os.path.basename(folder_path)
-    metadata["type"] = "dataset"
     if "abstract.md" in file_names:
         with open(os.path.join(folder_path, "abstract.md")) as fp:
             metadata["abstract"] = fp.read()
@@ -91,6 +111,10 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
             metadata["description"] = data.get("description")
             metadata["keywords"] = data.get("keywords")
             metadata["variables"] = data.get("variables")
+            # NOTE: related_resources_keywords is for self-relationship, not a db field
+            metadata["related_resources_keywords"] = data.get(
+                "related_resources_keywords", []
+            )
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
@@ -145,8 +169,9 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
                     )
                 metadata["references"].append(reference_item)
     if "metadata.yaml" in file_names:
-        with open(os.path.join(folder_path, "references.yaml")) as fp:
+        with open(os.path.join(folder_path, "metadata.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
+            metadata["type"] = data.get("resource_type")
             if "doi" in data:
                 reference_item = {
                     "title": data["doi"],
@@ -160,18 +185,28 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
 
 
 def store_licences(
-    session_obj: sessionmaker,
+    session_obj: sessionmaker | None,
     licences: list[Any],
     doc_storage_path: str | Path | None = None,
-) -> None:
-    """
+) -> list[dict[str, Any]]:
+    """Store a list of licences in a database and in the document storage path.
+
     Store a list of licences (as returned by `load_licences_from_folder`)
     in a database and in the document storage path.
+    If `doc_storage_path` is None, it will take DOCUMENT_STORAGE from the environment.
 
-    :param session_obj: Session sqlalchemy object
-    :param licences: list of licences (as returned by `load_licences_from_folder`)
-    :param doc_storage_path: base folder path of the document storage
+    Parameters
+    ----------
+    session_obj: Session sqlalchemy object
+    licences: list of licences (as returned by `load_licences_from_folder`)
+    doc_storage_path: base folder path of the document storage
+
+    Returns
+    -------
+    list: list of dictionaries of records inserted.
     """
+    all_stored = []
+    session_obj = database.ensure_session_obj(session_obj)
     with session_obj() as session:
         for licence in licences:
             file_path = licence["download_filename"]
@@ -181,22 +216,34 @@ def store_licences(
             )
             licence_obj = database.Licence(**licence)
             session.add(licence_obj)
+            stored_as_dict = object_as_dict(licence_obj)
+            all_stored.append(stored_as_dict)
         session.commit()
+    return all_stored
 
 
 def store_dataset(
-    session_obj: sessionmaker,
-    dataset: dict[str, Any],
+    session_obj: sessionmaker | None,
+    dataset_md: dict[str, Any],
     doc_storage_path: str | Path | None = None,
-) -> None:
-    """
-    Store a list of licences (as returned by `load_resource_from_folder`)
-    in a database
+) -> dict[str, Any]:
+    """Store a resource in a database and in the document storage path.
 
-    :param session_obj: Session sqlalchemy object
-    :param dataset: resource dictionary (as returned by `load_resource_from_folder`)
-    :param doc_storage_path: base folder path of the document storage
+    Store a resource (as returned by `load_resource_from_folder`) in a database  and in the
+    document storage path and return a dictionary of the record stored.
+
+    Parameters
+    ----------
+    session_obj: Session sqlalchemy object
+    dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
+    doc_storage_path: base folder path of the document storage
+
+    Returns
+    -------
+    dict: a dictionary of the record stored.
     """
+    dataset = dataset_md.copy()
+    session_obj = database.ensure_session_obj(session_obj)
     with session_obj() as session:
         licence_uids = dataset.pop("licence_uids", [])
         subpath = os.path.join("resources", dataset["resource_uid"])
@@ -214,6 +261,7 @@ def store_dataset(
                     reference[subfield] = save_in_document_storage(
                         file_path, doc_storage_path, subpath
                     )
+        dataset.pop("related_resources_keywords")
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
         for licence_uid in licence_uids:
@@ -225,4 +273,40 @@ def store_dataset(
             )
             if licence_obj:
                 dataset_obj.licences.append(licence_obj)  # type: ignore
+        stored_as_dict = object_as_dict(dataset_obj)
         session.commit()
+    return stored_as_dict
+
+
+def find_related_resources(
+    resources: list[dict[str, Any]]
+) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    """Return couples of resources related each other.
+
+    Each input resources is a python dictionary as returned by the function
+    load_resource_from_folder.
+    At the moment the current implementation filters input resources in this way:
+     - look for resources with the same (not empty) list of "keywords" metadata
+     - look for resources with at least one common element in the "related_resources_keywords"
+    It assumes that the relationship is commutative.
+
+    Parameters
+    ----------
+    resources: list of resources (i.e. python dictionaries of metadata)
+
+    Returns
+    -------
+    list: list of tuples (res1, res2), when res1 and res2 are related input resources.
+    """
+    relationships_found = []
+    all_possible_relationships = itertools.combinations(resources, 2)
+    for (res1, res2) in all_possible_relationships:
+        res1_keywords = res1.get("keywords", [])
+        res2_keywords = res2.get("keywords", [])
+        if set(res1_keywords) == set(res2_keywords) and len(res1_keywords) > 0:
+            relationships_found.append((res1, res2))
+        res1_rel_res_kws = res1.get("related_resources_keywords", [])
+        res2_rel_res_kws = res2.get("related_resources_keywords", [])
+        if set(res1_rel_res_kws) & set(res2_rel_res_kws):
+            relationships_found.append((res1, res2))
+    return relationships_found

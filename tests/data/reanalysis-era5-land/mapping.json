@@ -1,0 +1,112 @@
+{
+    "force": {
+        "class": [
+            "l5"
+        ],
+        "dataset": [
+            "reanalysis"
+        ],
+        "expect": [
+            "any"
+        ],
+        "levtype": [
+            "sfc"
+        ],
+        "number": [
+            "all"
+        ]
+    },
+    "options": {
+        "wants_dates": true
+    },
+    "remap": {
+        "time": {
+            "00:00": "00:00:00",
+            "01:00": "01:00:00",
+            "02:00": "02:00:00",
+            "03:00": "03:00:00",
+            "04:00": "04:00:00",
+            "05:00": "05:00:00",
+            "06:00": "06:00:00",
+            "07:00": "07:00:00",
+            "08:00": "08:00:00",
+            "09:00": "09:00:00",
+            "10:00": "10:00:00",
+            "11:00": "11:00:00",
+            "12:00": "12:00:00",
+            "13:00": "13:00:00",
+            "14:00": "14:00:00",
+            "15:00": "15:00:00",
+            "16:00": "16:00:00",
+            "17:00": "17:00:00",
+            "18:00": "18:00:00",
+            "19:00": "19:00:00",
+            "20:00": "20:00:00",
+            "21:00": "21:00:00",
+            "22:00": "22:00:00",
+            "23:00": "23:00:00"
+        },
+        "variable": {
+            "10m_u_component_of_wind": "165",
+            "10m_v_component_of_wind": "166",
+            "2m_dewpoint_temperature": "168",
+            "2m_temperature": "167",
+            "evaporation_from_bare_soil": "228101",
+            "evaporation_from_open_water_surfaces_excluding_oceans": "228102",
+            "evaporation_from_the_top_of_canopy": "228100",
+            "evaporation_from_vegetation_transpiration": "228103",
+            "forecast_albedo": "243",
+            "lake_bottom_temperature": "228010",
+            "lake_ice_depth": "228014",
+            "lake_ice_temperature": "228013",
+            "lake_mix_layer_depth": "228009",
+            "lake_mix_layer_temperature": "228008",
+            "lake_shape_factor": "228012",
+            "lake_total_layer_temperature": "228011",
+            "leaf_area_index_high_vegetation": "67",
+            "leaf_area_index_low_vegetation": "66",
+            "potential_evaporation": "228251",
+            "runoff": "205",
+            "skin_reservoir_content": "198",
+            "skin_temperature": "235",
+            "snow_albedo": "32",
+            "snow_cover": "260038",
+            "snow_density": "33",
+            "snow_depth": "3066",
+            "snow_depth_water_equivalent": "141",
+            "snow_evaporation": "44",
+            "snowfall": "144",
+            "snowmelt": "45",
+            "soil_temperature_level_1": "139",
+            "soil_temperature_level_2": "170",
+            "soil_temperature_level_3": "183",
+            "soil_temperature_level_4": "236",
+            "sub_surface_runoff": "9",
+            "surface_latent_heat_flux": "147",
+            "surface_net_solar_radiation": "176",
+            "surface_net_thermal_radiation": "177",
+            "surface_pressure": "134",
+            "surface_runoff": "8",
+            "surface_sensible_heat_flux": "146",
+            "surface_solar_radiation_downwards": "169",
+            "surface_thermal_radiation_downwards": "175",
+            "temperature_of_snow_layer": "238",
+            "total_evaporation": "182",
+            "total_precipitation": "228",
+            "volumetric_soil_water_layer_1": "39",
+            "volumetric_soil_water_layer_2": "40",
+            "volumetric_soil_water_layer_3": "41",
+            "volumetric_soil_water_layer_4": "42"
+        }
+    },
+    "rename": {
+        "pressure_level": "levelist",
+        "product_type": "dataset",
+        "variable": "param"
+    },
+    "selection_limit": 100000,
+    "selection_limit_ignore": [
+        "area",
+        "grid"
+    ]
+}

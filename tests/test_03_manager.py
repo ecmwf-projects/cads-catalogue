@@ -1,20 +1,13 @@
 import os.path
 from datetime import date
 from pathlib import Path
-from typing import Any
 
-from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import database, manager
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
-
-
-def object_as_dict(obj: Any) -> dict[str, Any]:
-    """convert a sqlalchemy object in a python dictionary"""
-    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
 def test_load_metadata_licences() -> None:
@@ -117,12 +110,20 @@ def test_load_resource_from_folder() -> None:
                 "url": None,
                 "download_file": None,
             },
+            {
+                "title": "10.24381/cds.68d2bb30",
+                "content": None,
+                "copy": False,
+                "url": "https://doy.org/10.24381/cds.68d2bb30",
+                "download_file": None,
+            },
         ],
         "resource_uid": "reanalysis-era5-land-monthly-means",
         "resource_update": date(2022, 3, 2),
         "title": "ERA5-Land monthly averaged data from 1950 to present",
         "type": "dataset",
         "use_eqc": True,
+        "related_resources_keywords": [],
         "variables": {
             "10m u-component of wind": {
                 "description": "Eastward component of the 10m "
@@ -1205,7 +1206,7 @@ def test_store_licences(session_obj: sessionmaker, tmp_path: Path) -> None:
     manager.store_licences(session_obj, licences, tmp_path)
     res = session.query(database.Licence).all()
     assert len(res) == len(licences)
-    db_obj_as_dict = object_as_dict(res[0])
+    db_obj_as_dict = manager.object_as_dict(res[0])
     assert 1 == db_obj_as_dict.pop("licence_id")
     assert db_obj_as_dict == licences[0]
     assert db_obj_as_dict["download_filename"] == os.path.join(
@@ -1231,28 +1232,25 @@ def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
     res = session.query(database.Resource).all()
     assert res == []
 
-    manager.store_dataset(session_obj, resource, tmp_path)
-    res = session.query(database.Resource).all()
-    assert len(res) == 1
-    db_obj_as_dict = object_as_dict(res[0])
-    assert 1 == db_obj_as_dict.pop("resource_id")
-    for column, value in db_obj_as_dict.items():
-        if column not in ["record_update"]:
+    stored_record = manager.store_dataset(session_obj, resource, tmp_path)
+    assert 1 == stored_record.pop("resource_id")
+    for column, value in stored_record.items():
+        if column not in ["record_update", "form", "constraints", "previewimage"]:
             assert resource.get(column) == value
-    assert db_obj_as_dict["form"] == os.path.join(
-        "resources", db_obj_as_dict["resource_uid"], "form.json"
+    assert stored_record["form"] == os.path.join(
+        "resources", stored_record["resource_uid"], "form.json"
     )
-    assert db_obj_as_dict["constraints"] == os.path.join(
-        "resources", db_obj_as_dict["resource_uid"], "constraints.json"
+    assert stored_record["constraints"] == os.path.join(
+        "resources", stored_record["resource_uid"], "constraints.json"
     )
-    assert db_obj_as_dict["previewimage"] == os.path.join(
-        "resources", db_obj_as_dict["resource_uid"], "overview.png"
+    assert stored_record["previewimage"] == os.path.join(
+        "resources", stored_record["resource_uid"], "overview.png"
     )
-    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["previewimage"]))
-    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["form"]))
-    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["constraints"]))
+    assert os.path.exists(os.path.join(tmp_path, stored_record["previewimage"]))
+    assert os.path.exists(os.path.join(tmp_path, stored_record["form"]))
+    assert os.path.exists(os.path.join(tmp_path, stored_record["constraints"]))
     assert os.path.exists(
-        os.path.join(tmp_path, db_obj_as_dict["references"][0]["content"])
+        os.path.join(tmp_path, stored_record["references"][0]["content"])
     )
 
     expected_many2many_record = {
@@ -1260,7 +1258,7 @@ def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
         "licence_id": 1,
     }
     assert (
-        object_as_dict(session.query(database.ResourceLicence).first())
+        manager.object_as_dict(session.query(database.ResourceLicence).first())
         == expected_many2many_record
     )
 

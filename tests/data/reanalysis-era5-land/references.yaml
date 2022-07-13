@@ -1,0 +1,6 @@
+---
+references:
+  - id: citation
+    content: citation.html
+    title: Citation
+    copy: true
