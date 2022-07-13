@@ -10,10 +10,10 @@ class SqlalchemySettings(pydantic.BaseSettings):
     - ``postgres_dbname``: database name.
     """
 
-    postgres_user: str = "broker"
+    postgres_user: str = "catalogue"
     postgres_password: str = "password"
-    postgres_host: str = "compute-db"
-    postgres_dbname: str = "broker"
+    postgres_host: str = "catalogue-db"
+    postgres_dbname: str = "catalogue"
 
     @property
     def connection_string(self) -> str:
