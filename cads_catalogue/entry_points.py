@@ -20,7 +20,7 @@ def info(connection_string: str | None = None) -> None:
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'.
     """
     if not connection_string:
-        connection_string = database.env2postgresq_connection_string()
+        connection_string = database.dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     connection = engine.connect()
     connection.close()
@@ -36,8 +36,8 @@ def init_db(connection_string: str | None = None) -> None:
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     if not connection_string:
-        connection_string = database.env2postgresq_connection_string()
-    database.init_database(connection_string)  # type: ignore
+        connection_string = database.dbsettings.connection_string
+    database.init_database(connection_string)
     print("successfully created the catalogue database structure.")
 
 
@@ -57,7 +57,7 @@ def setup_test_database(
     force: if True, create db from scratch also if already existing (default False)
     """
     if not connection_string:
-        connection_string = database.env2postgresq_connection_string()
+        connection_string = database.dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     structure_exists = True
     if not database_exists(engine.url):
@@ -76,7 +76,7 @@ def setup_test_database(
         os.path.join(this_path, "../tests/data/cds-licences")
     )
     licences = manager.load_licences_from_folder(licences_folder_path)
-    engine = database.init_database(connection_string)  # type: ignore
+    engine = database.init_database(connection_string)
     session_obj = sessionmaker(engine)
 
     manager.store_licences(session_obj, licences)

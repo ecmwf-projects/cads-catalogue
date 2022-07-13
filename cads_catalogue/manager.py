@@ -185,7 +185,7 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
 
 
 def store_licences(
-    session_obj: sessionmaker,
+    session_obj: sessionmaker | None,
     licences: list[Any],
     doc_storage_path: str | Path | None = None,
 ) -> list[dict[str, Any]]:
@@ -206,6 +206,7 @@ def store_licences(
     list: list of dictionaries of records inserted.
     """
     all_stored = []
+    session_obj = database.ensure_session_obj(session_obj)
     with session_obj() as session:
         for licence in licences:
             file_path = licence["download_filename"]
@@ -222,7 +223,7 @@ def store_licences(
 
 
 def store_dataset(
-    session_obj: sessionmaker,
+    session_obj: sessionmaker | None,
     dataset_md: dict[str, Any],
     doc_storage_path: str | Path | None = None,
 ) -> dict[str, Any]:
@@ -242,6 +243,7 @@ def store_dataset(
     dict: a dictionary of the record stored.
     """
     dataset = dataset_md.copy()
+    session_obj = database.ensure_session_obj(session_obj)
     with session_obj() as session:
         licence_uids = dataset.pop("licence_uids", [])
         subpath = os.path.join("resources", dataset["resource_uid"])

@@ -1,7 +1,4 @@
 """SQLAlchemy ORM model."""
-import os
-import typing
-from collections import UserDict
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -10,8 +7,11 @@ from sqlalchemy.orm import backref, relationship
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy_utils import create_database, database_exists
 
+from cads_catalogue import config
+
 metadata = sa.MetaData()
 BaseModel = declarative_base(metadata=metadata)
+dbsettings = config.SqlalchemySettings()
 
 
 class ResourceLicence(BaseModel):
@@ -96,30 +96,15 @@ class Licence(BaseModel):
     )
 
 
-@typing.no_type_check
-def env2postgresq_connection_string(
-    env: dict[str, str] | UserDict[str, str] = None
-) -> str:
-    """Extract postgresql connection string from environment variables.
-
-    Parameters
-    ----------
-    env: environment to use
-
-    Returns
-    -------
-    str
-        the database connection string
+def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessionmaker:
     """
-    if not env:
-        env = os.environ
-    port = env.get("PGPORT", "5432")
-    user = env.get("POSTGRES_USER", "")
-    psw = env.get("POSTGRES_PASSWORD", "")
-    host = env.get("POSTGRES_HOST", "localhost")
-    dbname = env.get(" PGDATABASE", user)
-    conn_string = f"postgresql://{user}:{psw}@{host}:{port}/{dbname}"
-    return conn_string
+    If `session_obj` is None, create a new session object.
+
+    :param session_obj:
+    """
+    return session_obj or sa.orm.sessionmaker(
+        sa.create_engine(dbsettings.connection_string)
+    )
 
 
 def init_database(connection_string: str) -> sa.engine.Engine:
