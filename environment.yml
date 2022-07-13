@@ -10,6 +10,7 @@ dependencies:
 - pre-commit
 - psycopg
 - psycopg2
+- pydantic
 - pydata-sphinx-theme
 - pytest
 - pytest-cov
