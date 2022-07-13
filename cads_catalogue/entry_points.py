@@ -84,6 +84,7 @@ def setup_test_database(
     datasets = [
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
+        "reanalysis-era5-land",
     ]
     resources = []
     for dataset in datasets:
@@ -99,12 +100,12 @@ def setup_test_database(
     for res1, res2 in related_resources:
         res1_obj = (
             session.query(database.Resource)
-            .filter_by(resource_id=res1["resource_id"])
+            .filter_by(resource_uid=res1["resource_uid"])
             .one()
         )
         res2_obj = (
             session.query(database.Resource)
-            .filter_by(resource_id=res2["resource_id"])
+            .filter_by(resource_uid=res2["resource_uid"])
             .one()
         )
         res1_obj.related_resources.append(res2_obj)
