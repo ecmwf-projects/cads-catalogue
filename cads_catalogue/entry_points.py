@@ -110,6 +110,7 @@ def setup_test_database(
         )
         res1_obj.related_resources.append(res2_obj)
         res2_obj.related_resources.append(res1_obj)
+    session.commit()
     session.close()
 
 
