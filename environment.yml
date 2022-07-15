@@ -14,7 +14,6 @@ dependencies:
 - pydata-sphinx-theme
 - pytest
 - pytest-cov
-- pytest-env
 - setuptools
 - sphinx
 - sphinxcontrib-apidoc
