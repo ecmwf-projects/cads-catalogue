@@ -120,10 +120,11 @@ def ensure_settings(
 
     :param settings:
     """
-    if not settings:
-        global dbsettings
-        dbsettings = config.SqlalchemySettings()
-    return dbsettings  # type: ignore
+    if settings:
+        return settings
+    global dbsettings
+    dbsettings = config.SqlalchemySettings()
+    return dbsettings
 
 
 def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessionmaker:
