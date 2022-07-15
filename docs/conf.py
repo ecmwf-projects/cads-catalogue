@@ -16,8 +16,8 @@ sys.path.insert(0, os.path.abspath("../"))
 # -- Project information -----------------------------------------------------
 
 project = "cads_catalogue"
-copyright = "2022, European Centre for Medium-Range Weather Forecasts (ECMWF)"
-author = "European Centre for Medium-Range Weather Forecasts (ECMWF)"
+copyright = "2022, European Union"
+author = "European Union"
 version = cads_catalogue.__version__
 release = cads_catalogue.__version__
 
