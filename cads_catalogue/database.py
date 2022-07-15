@@ -26,7 +26,7 @@ from cads_catalogue import config
 
 metadata = sa.MetaData()
 BaseModel = declarative_base(metadata=metadata)
-dbsettings = config.SqlalchemySettings()
+dbsettings = None
 
 
 class ResourceLicence(BaseModel):
@@ -111,15 +111,31 @@ class Licence(BaseModel):
     )
 
 
+def ensure_settings(
+    settings: config.SqlalchemySettings | None,
+) -> config.SqlalchemySettings:
+    """
+    If `settings` is None, create a new SqlalchemySettings object.
+
+    :param settings:
+    """
+    if not settings:
+        global dbsettings
+        dbsettings = config.SqlalchemySettings()
+    return dbsettings  # type: ignore
+
+
 def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessionmaker:
     """
     If `session_obj` is None, create a new session object.
 
-    :param session_obj:
+    :param session_obj: sqlalchemy Session object
     """
-    return session_obj or sa.orm.sessionmaker(
-        sa.create_engine(dbsettings.connection_string)
-    )
+    if session_obj:
+        return session_obj
+    settings = ensure_settings(dbsettings)
+    session_obj = sa.orm.sessionmaker(sa.create_engine(settings))
+    return session_obj
 
 
 def init_database(connection_string: str) -> sa.engine.Engine:
