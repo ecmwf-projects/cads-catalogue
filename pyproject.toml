@@ -19,6 +19,9 @@ add_ignore = "D1"
 [tool.pytest.ini_options]
 minversion = "6.0"
 postgresql_user = "catalogue"
+env = [
+    "postgres_password = password",
+]
 
 [tool.setuptools_scm]
 write_to = "cads_catalogue/version.py"

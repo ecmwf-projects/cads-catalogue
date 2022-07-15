@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pydantic
+from pydantic import BaseSettings, validator
 
 
-class SqlalchemySettings(pydantic.BaseSettings):
+class SqlalchemySettings(BaseSettings):
     """Postgres-specific API settings.
 
     - ``postgres_user``: postgres username.
@@ -25,9 +25,15 @@ class SqlalchemySettings(pydantic.BaseSettings):
     """
 
     postgres_user: str = "catalogue"
-    postgres_password: str = "password"
+    postgres_password: str | None = None
     postgres_host: str = "catalogue-db"
     postgres_dbname: str = "catalogue"
+
+    @validator("postgres_password")
+    def password_must_be_set(cls: BaseSettings, v: str | None) -> str | None:
+        if v is None:
+            raise ValueError("postgres_password must be set")
+        return v
 
     @property
     def connection_string(self) -> str:
