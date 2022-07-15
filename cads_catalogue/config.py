@@ -1,3 +1,4 @@
+"""configuration utilities."""
 # Copyright 2022, European Union.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydantic import BaseSettings, validator
+import pydantic
 
 
-class SqlalchemySettings(BaseSettings):
+class SqlalchemySettings(pydantic.BaseSettings):
     """Postgres-specific API settings.
 
     - ``postgres_user``: postgres username.
@@ -29,8 +30,8 @@ class SqlalchemySettings(BaseSettings):
     postgres_host: str = "catalogue-db"
     postgres_dbname: str = "catalogue"
 
-    @validator("postgres_password")
-    def password_must_be_set(cls: BaseSettings, v: str | None) -> str | None:
+    @pydantic.validator("postgres_password")
+    def password_must_be_set(cls: pydantic.BaseSettings, v: str | None) -> str | None:
         if v is None:
             raise ValueError("postgres_password must be set")
         return v

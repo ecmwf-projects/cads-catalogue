@@ -14,18 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from datetime import datetime
+import datetime
 
 import sqlalchemy as sa
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import backref, relationship
-from sqlalchemy.schema import UniqueConstraint
-from sqlalchemy_utils import create_database, database_exists
+import sqlalchemy_utils
 
 from cads_catalogue import config
 
 metadata = sa.MetaData()
-BaseModel = declarative_base(metadata=metadata)
+BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 dbsettings = None
 
 
@@ -74,20 +71,22 @@ class Resource(BaseModel):
     type = sa.Column(sa.VARCHAR(300), nullable=False)
     previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
-    record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.utcnow)
+    record_update = sa.Column(
+        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
+    )
     references = sa.Column(sa.JSON)
     resource_update = sa.Column(sa.DATE)
     use_eqc = sa.Column(sa.Boolean)
 
-    licences = relationship(
+    licences = sa.orm.relationship(
         "Licence", secondary="resources_licences", back_populates="resources"
     )
-    related_resources = relationship(
+    related_resources = sa.orm.relationship(
         "Resource",
         secondary=related_resources,
         primaryjoin=resource_id == related_resources.c.child_resource_id,
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
-        backref=backref("back_related_resources"),  # type: ignore
+        backref=sa.orm.backref("back_related_resources"),  # type: ignore
     )
 
 
@@ -102,12 +101,14 @@ class Licence(BaseModel):
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
 
-    resources = relationship(
+    resources = sa.orm.relationship(
         "Resource", secondary="resources_licences", back_populates="licences"
     )
 
     __table_args__ = (
-        UniqueConstraint("licence_uid", "revision", name="licence_uid_revision_uc"),
+        sa.schema.UniqueConstraint(
+            "licence_uid", "revision", name="licence_uid_revision_uc"
+        ),
     )
 
 
@@ -151,8 +152,8 @@ def init_database(connection_string: str) -> sa.engine.Engine:
         the sqlalchemy engine object
     """
     engine = sa.create_engine(connection_string)
-    if not database_exists(engine.url):
-        create_database(engine.url)
+    if not sqlalchemy_utils.database_exists(engine.url):
+        sqlalchemy_utils.create_database(engine.url)
     # cleanup and create the schema
     metadata.drop_all(engine)
     metadata.create_all(engine)
