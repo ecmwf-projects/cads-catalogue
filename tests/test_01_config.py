@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import pytest
@@ -14,7 +13,7 @@ def test_sqlalchemysettings(temp_environ: Any) -> None:
     assert "postgres_password" in str(excinfo.value)
 
     # also an empty password can be set
-    settings = config.SqlalchemySettings(postgres_password='')
+    settings = config.SqlalchemySettings(postgres_password="")
     assert settings.postgres_password == ""
 
     # also a not empty password can be set
