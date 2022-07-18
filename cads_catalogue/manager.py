@@ -18,8 +18,8 @@ import glob
 import itertools
 import json
 import os
+import pathlib
 import shutil
-from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin
 
@@ -37,7 +37,9 @@ def object_as_dict(obj: Any) -> dict[str, Any]:
 
 
 def save_in_document_storage(
-    file_path: str | Path, doc_storage_path: str | Path | None = None, subpath: str = ""
+    file_path: str | pathlib.Path,
+    doc_storage_path: str | pathlib.Path | None = None,
+    subpath: str = "",
 ) -> str | None:
     """Store a file in the document storage.
 
@@ -70,7 +72,7 @@ def save_in_document_storage(
     return storage_rel_path
 
 
-def load_licences_from_folder(folder_path: str | Path) -> list[dict[str, Any]]:
+def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
     """Load licences metadata from json files contained in a folder.
 
     Parameters
@@ -103,7 +105,7 @@ def load_licences_from_folder(folder_path: str | Path) -> list[dict[str, Any]]:
     return licences
 
 
-def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
+def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load metadata of a resource from a folder.
 
     Parameters
@@ -202,7 +204,7 @@ def load_resource_from_folder(folder_path: str | Path) -> dict[str, Any]:
 def store_licences(
     session_obj: sessionmaker | None,
     licences: list[Any],
-    doc_storage_path: str | Path | None = None,
+    doc_storage_path: str | pathlib.Path | None = None,
 ) -> list[dict[str, Any]]:
     """Store a list of licences in a database and in the document storage path.
 
@@ -240,7 +242,7 @@ def store_licences(
 def store_dataset(
     session_obj: sessionmaker | None,
     dataset_md: dict[str, Any],
-    doc_storage_path: str | Path | None = None,
+    doc_storage_path: str | pathlib.Path | None = None,
 ) -> dict[str, Any]:
     """Store a resource in a database and in the document storage path.
 

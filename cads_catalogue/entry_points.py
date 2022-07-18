@@ -17,9 +17,8 @@
 import os.path
 
 import sqlalchemy as sa
+import sqlalchemy_utils
 import typer
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import database_exists
 
 from cads_catalogue import database, manager
 
@@ -35,7 +34,8 @@ def info(connection_string: str | None = None) -> None:
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'.
     """
     if not connection_string:
-        connection_string = database.dbsettings.connection_string
+        dbsettings = database.ensure_settings(database.dbsettings)
+        connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     connection = engine.connect()
     connection.close()
@@ -51,7 +51,8 @@ def init_db(connection_string: str | None = None) -> None:
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     if not connection_string:
-        connection_string = database.dbsettings.connection_string
+        dbsettings = database.ensure_settings(database.dbsettings)
+        connection_string = dbsettings.connection_string
     database.init_database(connection_string)
     print("successfully created the catalogue database structure.")
 
@@ -72,10 +73,11 @@ def setup_test_database(
     force: if True, create db from scratch also if already existing (default False)
     """
     if not connection_string:
-        connection_string = database.dbsettings.connection_string
+        dbsettings = database.ensure_settings(database.dbsettings)
+        connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     structure_exists = True
-    if not database_exists(engine.url):
+    if not sqlalchemy_utils.database_exists(engine.url):
         init_db(connection_string)
     else:
         conn = engine.connect()
@@ -92,7 +94,7 @@ def setup_test_database(
     )
     licences = manager.load_licences_from_folder(licences_folder_path)
     engine = database.init_database(connection_string)
-    session_obj = sessionmaker(engine)
+    session_obj = sa.orm.sessionmaker(engine)
 
     manager.store_licences(session_obj, licences)
 
