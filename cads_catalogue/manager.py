@@ -189,15 +189,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
         with open(os.path.join(folder_path, "metadata.yaml")) as fp:
             data = yaml.load(fp, Loader=SafeLoader)
             metadata["type"] = data.get("resource_type")
-            if "doi" in data:
-                reference_item = {
-                    "title": data["doi"],
-                    "content": None,
-                    "copy": False,
-                    "url": urljoin("https://doy.org", data["doi"]),
-                    "download_file": None,
-                }
-                metadata["references"].append(reference_item)
+            metadata["doi"] = data.get("doi")
     return metadata
 
 

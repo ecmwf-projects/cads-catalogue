@@ -88,6 +88,7 @@ def test_load_resource_from_folder() -> None:
         ],
         "form": os.path.join(resource_folder_path, "form.json"),
         "constraints": os.path.join(resource_folder_path, "constraints.json"),
+        "doi": "10.24381/cds.68d2bb30",
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -108,13 +109,6 @@ def test_load_resource_from_folder() -> None:
                 ),
                 "copy": True,
                 "url": None,
-                "download_file": None,
-            },
-            {
-                "title": "10.24381/cds.68d2bb30",
-                "content": None,
-                "copy": False,
-                "url": "https://doy.org/10.24381/cds.68d2bb30",
                 "download_file": None,
             },
         ],

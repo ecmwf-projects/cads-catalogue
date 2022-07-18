@@ -59,6 +59,7 @@ class Resource(BaseModel):
     description = sa.Column(sa.JSON, nullable=False)
     abstract = sa.Column(sa.TEXT, nullable=False)
     contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
+    doi = sa.Column(sa.String)
     form = sa.Column(sa.String)
     constraints = sa.Column(sa.String)
     keywords = sa.Column(sa.ARRAY(sa.VARCHAR(300)))

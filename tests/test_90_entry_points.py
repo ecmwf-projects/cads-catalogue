@@ -127,6 +127,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "3A+data+documentation",
                 }
             ],
+            "doi": "10.24381/cds.e2161bac",
             "extent": None,
             "form": "resources/reanalysis-era5-land/form.json",
             "keywords": [
@@ -158,13 +159,6 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "download_file": None,
                     "title": "Citation",
                     "url": None,
-                },
-                {
-                    "content": None,
-                    "copy": False,
-                    "download_file": None,
-                    "title": "10.24381/cds.e2161bac",
-                    "url": "https://doy.org/10.24381/cds.e2161bac",
                 },
             ],
             "resource_id": 3,
@@ -1821,6 +1815,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     ),
                 }
             ],
+            "doi": "10.24381/cds.68d2bb30",
             "extent": None,
             "form": "resources/reanalysis-era5-land-monthly-means/form.json",
             "keywords": [
@@ -1851,13 +1846,6 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "content": "resources/reanalysis-era5-land-monthly-means/citation.html",
                     "copy": True,
                     "url": None,
-                    "download_file": None,
-                },
-                {
-                    "title": "10.24381/cds.68d2bb30",
-                    "content": None,
-                    "copy": False,
-                    "url": "https://doy.org/10.24381/cds.68d2bb30",
                     "download_file": None,
                 },
             ],
@@ -2620,6 +2608,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "description": "Journal article describing ERA5.",
                 },
             ],
+            "doi": "10.24381/cds.bd0915c6",
             "extent": None,
             "form": "resources/reanalysis-era5-pressure-levels/form.json",
             "keywords": [
@@ -2656,13 +2645,6 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "content": "resources/reanalysis-era5-pressure-levels/acknowledgement.html",
                     "copy": None,
                     "url": None,
-                    "download_file": None,
-                },
-                {
-                    "title": "10.24381/cds.bd0915c6",
-                    "content": None,
-                    "copy": False,
-                    "url": "https://doy.org/10.24381/cds.bd0915c6",
                     "download_file": None,
                 },
             ],
