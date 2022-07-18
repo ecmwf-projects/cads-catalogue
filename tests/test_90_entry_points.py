@@ -1,6 +1,7 @@
 import datetime
 import os.path
 from pathlib import Path
+from typing import Any
 
 import sqlalchemy as sa
 from psycopg import Connection
@@ -51,7 +52,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "title": "Licence to use Copernicus Products",
         }
     ]
-    expected_resources = [
+    expected_resources: list[dict[str, Any]] = [
         {
             "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of "
             "the evolution of land variables over several decades at an "
