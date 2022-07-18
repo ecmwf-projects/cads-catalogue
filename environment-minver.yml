@@ -4,16 +4,24 @@ channels:
 dependencies:
 - make
 - mypy
+- myst-parser
 - pip
-- pre-commit
-- pytest
-- pytest-cov
-- typer
 - postgresql
+- pre-commit
 - psycopg
 - psycopg2
+- pydantic
+- pydata-sphinx-theme
+- pytest
+- pytest-cov
+- setuptools
+- sphinx
+- sphinxcontrib-apidoc
 - sqlalchemy==1.4*
+- sqlalchemy-utils
 - sqlalchemy-stubs
 - typer
 - pip:
   - pytest-postgresql
+  - types-PyYAML
+  - types-sqlalchemy-utils
