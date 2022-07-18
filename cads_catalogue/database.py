@@ -113,17 +113,18 @@ class Licence(BaseModel):
 
 
 def ensure_settings(
-    settings: config.SqlalchemySettings | None,
+    settings: config.SqlalchemySettings | None = None,
 ) -> config.SqlalchemySettings:
     """
     If `settings` is None, create a new SqlalchemySettings object.
 
-    :param settings:
+    :param settings: an optional config.SqlalchemySettings to be set
     """
-    if settings:
-        return settings
     global dbsettings
-    dbsettings = config.SqlalchemySettings()
+    if settings and isinstance(settings, config.SqlalchemySettings):
+        dbsettings = settings
+    else:
+        dbsettings = config.SqlalchemySettings()
     return dbsettings
 
 
