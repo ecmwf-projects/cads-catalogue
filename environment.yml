@@ -5,18 +5,19 @@ dependencies:
 - make
 - mypy
 - myst-parser
-- pip
-- postgresql
 - pre-commit
-- psycopg
-- psycopg2
-- pydantic
 - pydata-sphinx-theme
 - pytest
 - pytest-cov
-- setuptools
 - sphinx
 - sphinxcontrib-apidoc
+# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
+- pip
+- postgresql
+- psycopg
+- psycopg2
+- pydantic
+- setuptools
 - sqlalchemy==1.4*
 - sqlalchemy-utils
 - sqlalchemy-stubs

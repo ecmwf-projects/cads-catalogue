@@ -3,6 +3,9 @@ channels:
 - nodefaults
 dependencies:
 - make
+- pytest
+- pytest-cov
+# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
 - mypy
 - myst-parser
 - pip
@@ -12,8 +15,6 @@ dependencies:
 - psycopg2
 - pydantic
 - pydata-sphinx-theme
-- pytest
-- pytest-cov
 - setuptools
 - sphinx
 - sphinxcontrib-apidoc
