@@ -20,7 +20,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 import typer
 
-from cads_catalogue import database, manager
+from cads_catalogue import config, database, manager
 
 app = typer.Typer()
 
@@ -34,7 +34,7 @@ def info(connection_string: str | None = None) -> None:
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'.
     """
     if not connection_string:
-        dbsettings = database.ensure_settings(database.dbsettings)
+        dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     connection = engine.connect()
@@ -51,7 +51,7 @@ def init_db(connection_string: str | None = None) -> None:
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
     if not connection_string:
-        dbsettings = database.ensure_settings(database.dbsettings)
+        dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     database.init_database(connection_string)
     print("successfully created the catalogue database structure.")
@@ -73,7 +73,7 @@ def setup_test_database(
     force: if True, create db from scratch also if already existing (default False)
     """
     if not connection_string:
-        dbsettings = database.ensure_settings(database.dbsettings)
+        dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     structure_exists = True

@@ -15,6 +15,8 @@
 
 import pydantic
 
+dbsettings = None
+
 
 class SqlalchemySettings(pydantic.BaseSettings):
     """Postgres-specific API settings.
@@ -32,6 +34,7 @@ class SqlalchemySettings(pydantic.BaseSettings):
 
     @pydantic.validator("postgres_password")
     def password_must_be_set(cls: pydantic.BaseSettings, v: str | None) -> str | None:
+        """Validate postgresql password."""
         if v is None:
             raise ValueError("postgres_password must be set")
         return v
@@ -44,3 +47,23 @@ class SqlalchemySettings(pydantic.BaseSettings):
             f":{self.postgres_password}@{self.postgres_host}"
             f"/{self.postgres_dbname}"
         )
+
+
+def ensure_settings(settings: SqlalchemySettings | None = None) -> SqlalchemySettings:
+    """If `settings` is None, create a new SqlalchemySettings object.
+
+    Parameters
+    ----------
+    settings: an optional config.SqlalchemySettings to be set
+
+    Returns
+    -------
+    sqlalchemysettings:
+        a SqlalchemySettings object
+    """
+    global dbsettings
+    if settings and isinstance(settings, SqlalchemySettings):
+        dbsettings = settings
+    else:
+        dbsettings = SqlalchemySettings()
+    return dbsettings
