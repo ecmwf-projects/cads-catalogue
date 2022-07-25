@@ -56,6 +56,7 @@ class Resource(BaseModel):
     resource_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     title = sa.Column(sa.String)
     description = sa.Column(sa.JSON, nullable=False)
+    adaptor_code = sa.Column(sa.TEXT)
     abstract = sa.Column(sa.TEXT, nullable=False)
     contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
     doi = sa.Column(sa.String)
