@@ -117,6 +117,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Some parameters are defined at 2 m "
                 "over the surface.\n",
             },
+            "adaptor_code": None,
             "documentation": [
                 {
                     "description": "Further and more detailed information "
@@ -1751,6 +1752,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             },
         },
         {
+            "adaptor_code": None,
             "abstract": (
                 "ERA5-Land is a reanalysis dataset providing a consistent view of the"
                 " evolution of land variables over several decades at an enhanced"
@@ -2515,6 +2517,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "version": None,
         },
         {
+            "adaptor_code": None,
             "abstract": (
                 "**ERA5** is the fifth generation ECMWF reanalysis for the global"
                 " climate and weather for the past 4 to 7 decades.\nCurrently data is"

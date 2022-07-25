@@ -1,6 +1,7 @@
 import os.path
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
@@ -33,7 +34,8 @@ def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
-    expected_resource = {
+    expected_resource: dict[str, Any] = {
+        "adaptor_code": None,
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the "
         "evolution of land variables over several decades at an enhanced resolution "
         "compared to ERA5. ERA5-Land has been produced by replaying the land "

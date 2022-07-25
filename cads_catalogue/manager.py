@@ -118,6 +118,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     file_names = os.listdir(folder_path)
     metadata: dict[str, Any] = dict()
     metadata["resource_uid"] = os.path.basename(folder_path)
+    metadata["adaptor_code"] = None
     if "abstract.md" in file_names:
         with open(os.path.join(folder_path, "abstract.md")) as fp:
             metadata["abstract"] = fp.read()
