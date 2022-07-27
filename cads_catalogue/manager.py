@@ -25,7 +25,6 @@ from typing import Any
 import yaml
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
-from yaml.loader import SafeLoader
 
 from cads_catalogue import database
 
@@ -123,7 +122,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             metadata["abstract"] = fp.read()
     if "abstract.yaml" in file_names:
         with open(os.path.join(folder_path, "abstract.yaml")) as fp:
-            data = yaml.load(fp, Loader=SafeLoader)
+            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["description"] = data.get("description")
             metadata["keywords"] = data.get("keywords")
             metadata["variables"] = data.get("variables")
@@ -133,7 +132,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             )
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
-            data = yaml.load(fp, Loader=SafeLoader)
+            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["title"] = data.get("title")
             # NOTE: licence_ids is for relationship, not a db field
             metadata["licence_uids"] = data.get("licences")
@@ -143,7 +142,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
                 metadata["use_eqc"] = data["eqc"]
     if "documentation.yaml" in file_names:
         with open(os.path.join(folder_path, "documentation.yaml")) as fp:
-            data = yaml.load(fp, Loader=SafeLoader)
+            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["documentation"] = data.get("documentation")
     for candidate_name in ["overview.png", "overview.jpg"]:
         if candidate_name in file_names:
@@ -161,7 +160,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     metadata["references"] = []
     if "references.yaml" in file_names:
         with open(os.path.join(folder_path, "references.yaml")) as fp:
-            data = yaml.load(fp, Loader=SafeLoader)
+            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             for data_item in data.get("references", []):
                 reference_item = {
                     "title": data_item["title"],
@@ -186,7 +185,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
                 metadata["references"].append(reference_item)
     if "metadata.yaml" in file_names:
         with open(os.path.join(folder_path, "metadata.yaml")) as fp:
-            data = yaml.load(fp, Loader=SafeLoader)
+            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["type"] = data.get("resource_type")
             metadata["doi"] = data.get("doi")
     return metadata
