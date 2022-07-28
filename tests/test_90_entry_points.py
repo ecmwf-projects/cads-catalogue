@@ -2904,7 +2904,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         ["setup-test-database", "--connection-string", connection_string],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
-            "STORAGE_USER": object_storage_kws["access_key"],
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
         },
     )

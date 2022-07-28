@@ -90,7 +90,7 @@ def setup_test_database(
     # get storage parameters from environment
     object_storage_url = os.environ["OBJECT_STORAGE_URL"]
     storage_kws: dict[str, Any] = {
-        "access_key": os.environ["STORAGE_USER"],
+        "access_key": os.environ["STORAGE_ADMIN"],
         "secret_key": os.environ["STORAGE_PASSWORD"],
         "secure": False,
     }
