@@ -2,9 +2,8 @@ from typing import Any
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy.orm import sessionmaker
-
 from psycopg import Connection
+from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import database
 
@@ -27,8 +26,9 @@ def test_init_database(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == expected_tables_complete  # type: ignore
 
 
-def test_ensure_session_obj(postgresql: Connection[str], session_obj: sessionmaker,
-                            temp_environ: Any) -> None:
+def test_ensure_session_obj(
+    postgresql: Connection[str], session_obj: sessionmaker, temp_environ: Any
+) -> None:
     # case of session is already set
     ret_value = database.ensure_session_obj(session_obj)
     assert ret_value is session_obj
