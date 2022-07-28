@@ -1,7 +1,10 @@
 import os.path
 from datetime import date
-from pathlib import Path
+from typing import Any
 
+import minio  # type: ignore
+import pytest
+from minio import commonconfig, versioningconfig
 from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import database, manager
@@ -1161,91 +1164,170 @@ def test_load_resource_from_folder() -> None:
     assert resource == expected_resource
 
 
-def test_save_in_document_storage(tmp_path: Path) -> None:
-    doc_storage_path = tmp_path
+@pytest.mark.filterwarnings("ignore:Exception ignored")
+def test_save_in_object_storage(mocker) -> None:
+    expected_url = "http://myobject-storage:myport/apath/to/a/file"
+    expected_version_id = "dfbd25b3-abec-4184-a4e8-5a35a5c1174d"
+    object_storage_url = "http://myobject-storage:myport/"
+    storage_kws: dict[str, Any] = {
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
     file_path = os.path.join(
         TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
     )
-    assert os.path.exists(file_path)
-    destination = os.path.join(
-        doc_storage_path, "licence-to-use-copernicus-products.pdf"
+    patch1 = mocker.patch.object(minio.Minio, "__init__", return_value=None)
+    patch2 = mocker.patch.object(minio.Minio, "bucket_exists", return_value=False)
+    patch3 = mocker.patch.object(minio.Minio, "make_bucket")
+    patch4 = mocker.patch.object(
+        minio.Minio, "get_bucket_versioning", return_value="disabled"
     )
-    assert not os.path.exists(destination)
+    patch5 = mocker.patch.object(minio.Minio, "set_bucket_versioning")
+    patch6 = mocker.patch("minio.Minio.fput_object")
+    patch6.return_value.version_id = expected_version_id
+    patch7 = mocker.patch.object(
+        minio.Minio, "presigned_get_object", return_value=expected_url
+    )
+    # run without bucket_name nor subpath
+    res = manager.save_in_object_storage(file_path, object_storage_url, **storage_kws)
 
-    res = manager.save_in_document_storage(file_path, doc_storage_path)
+    assert res == (
+        "http://myobject-storage:myport/apath/to/a/file",
+        "dfbd25b3-abec-4184-a4e8-5a35a5c1174d",
+    )
+    patch1.assert_called_once_with("myobject-storage:myport", **storage_kws)
+    patch2.assert_called_once()
+    patch3.assert_called_once_with("cads-catalogue-bucket")
+    patch4.assert_called_once_with("cads-catalogue-bucket")
+    assert patch5.call_args_list[0][0][0] == "cads-catalogue-bucket"
+    assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
+    assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
+    patch6.assert_called_once_with(
+        "cads-catalogue-bucket", "licence-to-use-copernicus-products.pdf", file_path
+    )
+    patch7.assert_called_once_with(
+        "cads-catalogue-bucket", "licence-to-use-copernicus-products.pdf"
+    )
 
-    assert res == "licence-to-use-copernicus-products.pdf"
-    assert os.path.exists(destination)
+    # reset mocks
+    for patch in [patch1, patch2, patch3, patch4, patch5, patch6, patch7]:
+        patch.reset_mock()
 
+    # calling with a subpath and a bucket
     subpath = "licences/mypath"
-    destination = os.path.join(
-        doc_storage_path, subpath, "licence-to-use-copernicus-products.pdf"
+    bucket_name = "mybucket"
+    res = manager.save_in_object_storage(
+        file_path, object_storage_url, bucket_name, subpath, **storage_kws
     )
-    assert not os.path.exists(destination)
 
-    res = manager.save_in_document_storage(file_path, doc_storage_path, subpath)
+    assert res == (
+        "http://myobject-storage:myport/apath/to/a/file",
+        "dfbd25b3-abec-4184-a4e8-5a35a5c1174d",
+    )
+    patch1.assert_called_once_with("myobject-storage:myport", **storage_kws)
+    patch2.assert_called_once()
+    patch3.assert_called_once_with("mybucket")
+    patch4.assert_called_once_with("mybucket")
+    assert patch5.call_args_list[0][0][0] == "mybucket"
+    assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
+    assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
+    patch6.assert_called_once_with(
+        "mybucket", "licences/mypath/licence-to-use-copernicus-products.pdf", file_path
+    )
+    patch7.assert_called_once_with(
+        "mybucket", "licences/mypath/licence-to-use-copernicus-products.pdf"
+    )
 
-    assert res == "licences/mypath/licence-to-use-copernicus-products.pdf"
-    assert os.path.exists(destination)
 
-
-def test_store_licences(session_obj: sessionmaker, tmp_path: Path) -> None:
+def test_store_licences(session_obj: sessionmaker, mocker) -> None:
+    object_storage_url = "http://myobject-storage:myport/"
+    storage_kws: dict[str, Any] = {
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
     session = session_obj()
-
     res = session.query(database.Licence).all()
     assert res == []
+    patch = mocker.patch(
+        "cads_catalogue.manager.save_in_object_storage",
+        return_value=("an url", "a version"),
+    )
 
-    manager.store_licences(session_obj, licences, tmp_path)
+    manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
+
+    assert patch.call_count == len(licences)
+    assert patch.mock_calls[0].args == (
+        os.path.join(licences_folder_path, "licence-to-use-copernicus-products.pdf"),
+        object_storage_url,
+    )
+    assert patch.mock_calls[0].kwargs == {
+        "subpath": "licences/licence-to-use-copernicus-products",
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
     res = session.query(database.Licence).all()
     assert len(res) == len(licences)
     db_obj_as_dict = manager.object_as_dict(res[0])
     assert 1 == db_obj_as_dict.pop("licence_id")
     assert db_obj_as_dict == licences[0]
-    assert db_obj_as_dict["download_filename"] == os.path.join(
-        "licences",
-        db_obj_as_dict["licence_uid"],
-        "licence-to-use-copernicus-products.pdf",
-    )
-    assert os.path.exists(os.path.join(tmp_path, db_obj_as_dict["download_filename"]))
+    assert db_obj_as_dict["download_filename"] == "an url"
     session.close()
 
 
-def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
+def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
+    object_storage_url = "http://myobject-storage:myport/"
+    storage_kws: dict[str, Any] = {
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
+
+    mocker.patch.object(
+        manager, "save_in_object_storage", return_value=("an url", "a version")
+    )
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
-    manager.store_licences(session_obj, licences, tmp_path)
+    manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
     session = session_obj()
     assert resource["licence_uids"] == [licences[0]["licence_uid"]]
-
     res = session.query(database.Resource).all()
     assert res == []
 
-    stored_record = manager.store_dataset(session_obj, resource, tmp_path)
+    patch = mocker.patch(
+        "cads_catalogue.manager.save_in_object_storage",
+        return_value=("an url", "a version"),
+    )
+    stored_record = manager.store_dataset(
+        session_obj, resource, object_storage_url, **storage_kws
+    )
+
+    assert patch.call_count == 4
+    kwargs = storage_kws.copy()
+    kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
+    for call_index, file_name in enumerate(
+        ["form.json", "overview.png", "constraints.json", "citation.html"]
+    ):
+        assert patch.mock_calls[call_index].args == (
+            os.path.join(resource_folder_path, file_name),
+            object_storage_url,
+        )
+        assert patch.mock_calls[0].kwargs == kwargs
     assert 1 == stored_record.pop("resource_id")
     for column, value in stored_record.items():
         if column not in ["record_update", "form", "constraints", "previewimage"]:
             assert resource.get(column) == value
-    assert stored_record["form"] == os.path.join(
-        "resources", stored_record["resource_uid"], "form.json"
-    )
-    assert stored_record["constraints"] == os.path.join(
-        "resources", stored_record["resource_uid"], "constraints.json"
-    )
-    assert stored_record["previewimage"] == os.path.join(
-        "resources", stored_record["resource_uid"], "overview.png"
-    )
-    assert os.path.exists(os.path.join(tmp_path, stored_record["previewimage"]))
-    assert os.path.exists(os.path.join(tmp_path, stored_record["form"]))
-    assert os.path.exists(os.path.join(tmp_path, stored_record["constraints"]))
-    assert os.path.exists(
-        os.path.join(tmp_path, stored_record["references"][0]["content"])
-    )
+    assert stored_record["form"] == "an url"
+    assert stored_record["constraints"] == "an url"
+    assert stored_record["previewimage"] == "an url"
 
     expected_many2many_record = {
         "resource_id": 1,

@@ -1,6 +1,6 @@
 import datetime
 import os.path
-from pathlib import Path
+import unittest.mock
 from typing import Any
 
 import sqlalchemy as sa
@@ -33,19 +33,25 @@ def test_init_db(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
-def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> None:
+def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     connection_string = (
         f"postgresql://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
     engine = sa.create_engine(connection_string)
     session_obj = sessionmaker(engine)
+    licence_path = os.path.join(
+        TESTDATA_PATH, "cds-licences/licence-to-use-copernicus-products.pdf"
+    )
+    object_storage_url = "http://myobject-storage:myport/"
+    object_storage_kws: dict[str, Any] = {
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
     expected_licences = [
         {
-            "download_filename": (
-                "licences/licence-to-use-copernicus-products/"
-                "licence-to-use-copernicus-products.pdf"
-            ),
+            "download_filename": "an url",
             "licence_id": 1,
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
@@ -96,7 +102,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "and use more accurate information on land states.\n"
             "\n"
             "\n",
-            "constraints": "resources/reanalysis-era5-land/constraints.json",
+            "constraints": "an url",
             "contact": None,
             "description": {
                 "data-type": "Gridded",
@@ -130,7 +136,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             ],
             "doi": "10.24381/cds.e2161bac",
             "extent": None,
-            "form": "resources/reanalysis-era5-land/form.json",
+            "form": "an url",
             "keywords": [
                 "Product type: Reanalysis",
                 "Spatial coverage: Global",
@@ -140,7 +146,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Variable domain: Land (biosphere)",
                 "Provider: Copernicus C3S",
             ],
-            "previewimage": "resources/reanalysis-era5-land/overview.png",
+            "previewimage": "an url",
             "providers": None,
             "publication_date": datetime.date(2019, 7, 12),
             "record_update": datetime.datetime(
@@ -155,7 +161,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             ),
             "references": [
                 {
-                    "content": "resources/reanalysis-era5-land/citation.html",
+                    "content": "an url",
                     "copy": True,
                     "download_file": None,
                     "title": "Citation",
@@ -1780,9 +1786,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "ERA5-Land+data+documentation"
                 ' "ERA5-Land data documentation").\n'
             ),
-            "constraints": (
-                "resources/reanalysis-era5-land-monthly-means/constraints.json"
-            ),
+            "constraints": "an url",
             "contact": None,
             "description": {
                 "data-type": "Gridded",
@@ -1818,7 +1822,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             ],
             "doi": "10.24381/cds.68d2bb30",
             "extent": None,
-            "form": "resources/reanalysis-era5-land-monthly-means/form.json",
+            "form": "an url",
             "keywords": [
                 "Product type: Reanalysis",
                 "Spatial coverage: Global",
@@ -1828,7 +1832,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Variable domain: Land (biosphere)",
                 "Provider: Copernicus C3S",
             ],
-            "previewimage": "resources/reanalysis-era5-land-monthly-means/overview.png",
+            "previewimage": "an url",
             "providers": None,
             "publication_date": datetime.date(2019, 6, 23),
             "record_update": datetime.datetime(
@@ -1844,7 +1848,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "references": [
                 {
                     "title": "Citation",
-                    "content": "resources/reanalysis-era5-land-monthly-means/citation.html",
+                    "content": "an url",
                     "copy": True,
                     "url": None,
                     "download_file": None,
@@ -2567,7 +2571,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 ' present entry is "ERA5 hourly data on pressure levels from 1959 to'
                 ' present".\n'
             ),
-            "constraints": "resources/reanalysis-era5-pressure-levels/constraints.json",
+            "constraints": "an url",
             "contact": None,
             "description": {
                 "data-type": "Gridded",
@@ -2611,7 +2615,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             ],
             "doi": "10.24381/cds.bd0915c6",
             "extent": None,
-            "form": "resources/reanalysis-era5-pressure-levels/form.json",
+            "form": "an url",
             "keywords": [
                 "Variable domain: Atmosphere (surface)",
                 "Variable domain: Atmosphere (upper air)",
@@ -2620,7 +2624,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Product type: Reanalysis",
                 "Provider: Copernicus C3S",
             ],
-            "previewimage": "resources/reanalysis-era5-pressure-levels/overview.jpg",
+            "previewimage": "an url",
             "providers": None,
             "publication_date": None,
             "record_update": datetime.datetime(
@@ -2636,14 +2640,14 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "references": [
                 {
                     "title": "Citation",
-                    "content": "resources/reanalysis-era5-pressure-levels/citation.html",
+                    "content": "an url",
                     "copy": True,
                     "url": None,
                     "download_file": None,
                 },
                 {
                     "title": "Acknowledgement",
-                    "content": "resources/reanalysis-era5-pressure-levels/acknowledgement.html",
+                    "content": "an url",
                     "copy": None,
                     "url": None,
                     "download_file": None,
@@ -2890,32 +2894,64 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "version": None,
         },
     ]
-
+    patch = mocker.patch(
+        "cads_catalogue.manager.save_in_object_storage",
+        return_value=("an url", "a version"),
+    )
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
         ["setup-test-database", "--connection-string", connection_string],
-        env={"DOCUMENT_STORAGE": str(tmp_path)},
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "STORAGE_USER": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+        },
     )
+    assert patch.call_count == 14
+    # store of pdf of licence
+    assert patch.mock_calls[0].args == (licence_path, object_storage_url)
+    assert patch.mock_calls[0].kwargs == {
+        "subpath": "licences/licence-to-use-copernicus-products",
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
+
     # check no errors
     assert result.exit_code == 0
-    # check document storage
+    # check object storage calls
     for dataset in [
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
+        "reanalysis-era5-land",
     ]:
-        for filename in ["constraints.json", "form.json"]:
-            assert os.path.exists(
-                os.path.join(tmp_path, "resources", dataset, filename)
-            )
-    assert os.path.exists(
+        for filename in [
+            "form.json",
+            "overview.png",
+            "constraints.json",
+            "citation.html",
+        ]:
+            file_path = os.path.join(TESTDATA_PATH, dataset, filename)
+            kwargs = object_storage_kws.copy()
+            kwargs["subpath"] = "resources/%s" % dataset
+            if (
+                dataset == "reanalysis-era5-pressure-levels"
+                and filename == "overview.png"
+            ):
+                file_path = os.path.join(TESTDATA_PATH, dataset, "overview.jpg")
+            expected_call = unittest.mock.call(file_path, object_storage_url, **kwargs)
+            assert expected_call in patch.mock_calls
+    kwargs["subpath"] = "resources/reanalysis-era5-pressure-levels"
+    expected_call = unittest.mock.call(
         os.path.join(
-            tmp_path,
-            "licences",
-            "licence-to-use-copernicus-products",
-            "licence-to-use-copernicus-products.pdf",
-        )
+            TESTDATA_PATH, "reanalysis-era5-pressure-levels", "acknowledgement.html"
+        ),
+        object_storage_url,
+        **kwargs,
     )
+    assert expected_call in patch.mock_calls
+
     # check db content
     session = session_obj()
     resources = [

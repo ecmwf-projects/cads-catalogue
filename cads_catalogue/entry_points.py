@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os.path
+from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -86,7 +87,13 @@ def setup_test_database(
             structure_exists = False
     if not structure_exists or force:
         init_db(connection_string)
-
+    # get storage parameters from environment
+    object_storage_url = os.environ["OBJECT_STORAGE_URL"]
+    storage_kws: dict[str, Any] = {
+        "access_key": os.environ["STORAGE_USER"],
+        "secret_key": os.environ["STORAGE_PASSWORD"],
+        "secure": False,
+    }
     # load test data
     this_path = os.path.abspath(os.path.dirname(__file__))
     licences_folder_path = os.path.abspath(
@@ -96,7 +103,7 @@ def setup_test_database(
     engine = database.init_database(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
 
-    manager.store_licences(session_obj, licences)
+    manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
 
     datasets = [
         "reanalysis-era5-land-monthly-means",
@@ -113,7 +120,7 @@ def setup_test_database(
     related_resources = manager.find_related_resources(resources)
     session = session_obj()
     for resource in resources:
-        manager.store_dataset(session_obj, resource)
+        manager.store_dataset(session_obj, resource, object_storage_url, **storage_kws)
     for res1, res2 in related_resources:
         res1_obj = (
             session.query(database.Resource)

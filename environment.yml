@@ -3,6 +3,7 @@ channels:
 - nodefaults
 dependencies:
 - make
+- minio
 - mypy
 - myst-parser
 - pre-commit
