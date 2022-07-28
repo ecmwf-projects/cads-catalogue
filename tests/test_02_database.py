@@ -1,6 +1,5 @@
 from typing import Any
 
-import pytest
 import sqlalchemy as sa
 from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
