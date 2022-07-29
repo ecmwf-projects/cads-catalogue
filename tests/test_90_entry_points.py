@@ -2895,7 +2895,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     ]
     patch = mocker.patch(
-        "cads_catalogue.manager.save_in_object_storage",
+        "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
     # run the script to load test data
@@ -2912,6 +2912,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
     assert patch.mock_calls[0].kwargs == {
+        "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -2940,9 +2941,10 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
                 and filename == "overview.png"
             ):
                 file_path = os.path.join(TESTDATA_PATH, dataset, "overview.jpg")
-            expected_call = unittest.mock.call(file_path, object_storage_url, **kwargs)
+            expected_call = unittest.mock.call(file_path, object_storage_url, force=True, **kwargs)
             assert expected_call in patch.mock_calls
     kwargs["subpath"] = "resources/reanalysis-era5-pressure-levels"
+    kwargs["force"] = True
     expected_call = unittest.mock.call(
         os.path.join(
             TESTDATA_PATH, "reanalysis-era5-pressure-levels", "acknowledgement.html"

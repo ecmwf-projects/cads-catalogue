@@ -2,12 +2,9 @@ import os.path
 from datetime import date
 from typing import Any
 
-import minio  # type: ignore
-import pytest
-from minio import commonconfig, versioningconfig
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import database, manager
+from cads_catalogue import database, manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -1164,82 +1161,6 @@ def test_load_resource_from_folder() -> None:
     assert resource == expected_resource
 
 
-@pytest.mark.filterwarnings("ignore:Exception ignored")
-def test_save_in_object_storage(mocker) -> None:
-    expected_url = "http://myobject-storage:myport/apath/to/a/file"
-    expected_version_id = "dfbd25b3-abec-4184-a4e8-5a35a5c1174d"
-    object_storage_url = "http://myobject-storage:myport/"
-    storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
-    }
-    file_path = os.path.join(
-        TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
-    )
-    patch1 = mocker.patch.object(minio.Minio, "__init__", return_value=None)
-    patch2 = mocker.patch.object(minio.Minio, "bucket_exists", return_value=False)
-    patch3 = mocker.patch.object(minio.Minio, "make_bucket")
-    patch4 = mocker.patch.object(
-        minio.Minio, "get_bucket_versioning", return_value="disabled"
-    )
-    patch5 = mocker.patch.object(minio.Minio, "set_bucket_versioning")
-    patch6 = mocker.patch("minio.Minio.fput_object")
-    patch6.return_value.version_id = expected_version_id
-    patch7 = mocker.patch.object(
-        minio.Minio, "presigned_get_object", return_value=expected_url
-    )
-    # run without bucket_name nor subpath
-    res = manager.save_in_object_storage(file_path, object_storage_url, **storage_kws)
-
-    assert res == (
-        "http://myobject-storage:myport/apath/to/a/file",
-        "dfbd25b3-abec-4184-a4e8-5a35a5c1174d",
-    )
-    patch1.assert_called_once_with("myobject-storage:myport", **storage_kws)
-    patch2.assert_called_once()
-    patch3.assert_called_once_with("cads-catalogue-bucket")
-    patch4.assert_called_once_with("cads-catalogue-bucket")
-    assert patch5.call_args_list[0][0][0] == "cads-catalogue-bucket"
-    assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
-    assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
-    patch6.assert_called_once_with(
-        "cads-catalogue-bucket", "licence-to-use-copernicus-products.pdf", file_path
-    )
-    patch7.assert_called_once_with(
-        "cads-catalogue-bucket", "licence-to-use-copernicus-products.pdf"
-    )
-
-    # reset mocks
-    for patch in [patch1, patch2, patch3, patch4, patch5, patch6, patch7]:
-        patch.reset_mock()
-
-    # calling with a subpath and a bucket
-    subpath = "licences/mypath"
-    bucket_name = "mybucket"
-    res = manager.save_in_object_storage(
-        file_path, object_storage_url, bucket_name, subpath, **storage_kws
-    )
-
-    assert res == (
-        "http://myobject-storage:myport/apath/to/a/file",
-        "dfbd25b3-abec-4184-a4e8-5a35a5c1174d",
-    )
-    patch1.assert_called_once_with("myobject-storage:myport", **storage_kws)
-    patch2.assert_called_once()
-    patch3.assert_called_once_with("mybucket")
-    patch4.assert_called_once_with("mybucket")
-    assert patch5.call_args_list[0][0][0] == "mybucket"
-    assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
-    assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
-    patch6.assert_called_once_with(
-        "mybucket", "licences/mypath/licence-to-use-copernicus-products.pdf", file_path
-    )
-    patch7.assert_called_once_with(
-        "mybucket", "licences/mypath/licence-to-use-copernicus-products.pdf"
-    )
-
-
 def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     object_storage_url = "http://myobject-storage:myport/"
     storage_kws: dict[str, Any] = {
@@ -1253,7 +1174,7 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     res = session.query(database.Licence).all()
     assert res == []
     patch = mocker.patch(
-        "cads_catalogue.manager.save_in_object_storage",
+        "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
 
@@ -1265,6 +1186,7 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
         object_storage_url,
     )
     assert patch.mock_calls[0].kwargs == {
+        "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -1288,7 +1210,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     }
 
     mocker.patch.object(
-        manager, "save_in_object_storage", return_value=("an url", "a version")
+        object_storage, "store_file", return_value=("an url", "a version")
     )
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
@@ -1303,7 +1225,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     assert res == []
 
     patch = mocker.patch(
-        "cads_catalogue.manager.save_in_object_storage",
+        "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
     stored_record = manager.store_dataset(
@@ -1313,6 +1235,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     assert patch.call_count == 4
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
+    kwargs["force"] = True
     for call_index, file_name in enumerate(
         ["form.json", "overview.png", "constraints.json", "citation.html"]
     ):

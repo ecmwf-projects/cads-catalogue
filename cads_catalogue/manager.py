@@ -19,69 +19,18 @@ import itertools
 import json
 import os
 import pathlib
-import urllib.parse
 from typing import Any
 
-import minio  # type: ignore
 import yaml
-from minio import commonconfig, versioningconfig
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import database
+from cads_catalogue import database, object_storage
 
 
 def object_as_dict(obj: Any) -> dict[str, Any]:
     """Convert a sqlalchemy object in a python dictionary."""
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
-
-
-def save_in_object_storage(
-    file_path: str | pathlib.Path,
-    object_storage_url: str,
-    bucket_name: str = "cads-catalogue-bucket",
-    subpath: str = "",
-    **storage_kws: Any,
-) -> tuple[str, str]:
-    """Store a file in the object storage.
-
-    Store a file at `file_path` in the object storage, in the path
-    <bucket_name>/<subpath>/<file_name>.
-    Note that the bucket is always set to use versioning.
-    Return the tuple (download url, version).
-
-    Parameters
-    ----------
-    file_path: absolute path to the file to store
-    object_storage_url: endpoint URL of the object storage
-    bucket_name: name of the bucket to use inside the object storage
-    subpath: optional folder path inside the bucket (created if not existing)
-    storage_kws: dictionary of parameters used to pass to the storage client
-
-    Returns
-    -------
-    tuple[str, str]: the tuple (download url, version)
-    """
-    if not file_path or not os.path.isabs(file_path) or not os.path.exists(file_path):
-        raise ValueError(
-            "file not found or not provided as absolute path: %r" % file_path
-        )
-    client = minio.Minio(
-        urllib.parse.urlparse(object_storage_url).netloc, **storage_kws
-    )
-    if not client.bucket_exists(bucket_name):
-        client.make_bucket(bucket_name)
-    if client.get_bucket_versioning(bucket_name) != commonconfig.ENABLED:
-        client.set_bucket_versioning(
-            bucket_name, versioningconfig.VersioningConfig(commonconfig.ENABLED)
-        )
-    file_name = os.path.basename(file_path)
-    object_name = os.path.join(subpath, file_name)
-    res = client.fput_object(bucket_name, object_name, file_path)
-    version_id = res.version_id
-    download_url = client.presigned_get_object(bucket_name, object_name)
-    ret_value = (download_url, version_id)
-    return ret_value
 
 
 def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
@@ -234,8 +183,12 @@ def store_licences(
         for licence in licences:
             file_path = licence["download_filename"]
             subpath = os.path.join("licences", licence["licence_uid"])
-            licence["download_filename"] = save_in_object_storage(
-                file_path, object_storage_url, subpath=subpath, **storage_kws
+            licence["download_filename"] = object_storage.store_file(
+                file_path,
+                object_storage_url,
+                subpath=subpath,
+                force=True,
+                **storage_kws,
             )[0]
             licence_obj = database.Licence(**licence)
             session.add(licence_obj)
@@ -275,16 +228,24 @@ def store_dataset(
         doc_storage_fields = ["form", "previewimage", "constraints"]
         for field in doc_storage_fields:
             file_path = dataset[field]
-            dataset[field] = save_in_object_storage(
-                file_path, object_storage_url, subpath=subpath, **storage_kws
+            dataset[field] = object_storage.store_file(
+                file_path,
+                object_storage_url,
+                subpath=subpath,
+                force=True,
+                **storage_kws,
             )[0]
         # some fields to storage are inside references
         for reference in dataset["references"]:
             for subfield in ["content", "download_file"]:
                 if reference.get(subfield):
                     file_path = reference[subfield]
-                    reference[subfield] = save_in_object_storage(
-                        file_path, object_storage_url, subpath=subpath, **storage_kws
+                    reference[subfield] = object_storage.store_file(
+                        file_path,
+                        object_storage_url,
+                        subpath=subpath,
+                        force=True,
+                        **storage_kws,
                     )[0]
         dataset.pop("related_resources_keywords")
         dataset_obj = database.Resource(**dataset)
