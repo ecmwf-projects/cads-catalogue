@@ -2941,7 +2941,9 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
                 and filename == "overview.png"
             ):
                 file_path = os.path.join(TESTDATA_PATH, dataset, "overview.jpg")
-            expected_call = unittest.mock.call(file_path, object_storage_url, force=True, **kwargs)
+            expected_call = unittest.mock.call(
+                file_path, object_storage_url, force=True, **kwargs
+            )
             assert expected_call in patch.mock_calls
     kwargs["subpath"] = "resources/reanalysis-era5-pressure-levels"
     kwargs["force"] = True

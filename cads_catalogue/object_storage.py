@@ -74,20 +74,20 @@ def set_readonly_bucket_policy(client, bucket_name):
     """
     version = datetime.date.today().isoformat()
     policy = {
-        'Version': version,
-        'Statement': [
+        "Version": version,
+        "Statement": [
             {
-                'Action': ['s3:GetBucketLocation', 's3:ListBucket'],
-                'Effect': 'Allow',
-                'Principal': {'AWS': '*'},
-                'Resource': ['arn:aws:s3:::%s' % bucket_name]
+                "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Resource": ["arn:aws:s3:::%s" % bucket_name],
             },
             {
-                'Action': ['s3:GetObject'],
-                'Effect': 'Allow',
-                'Principal': {'AWS': '*'},
-                'Resource': ['arn:aws:s3:::%s/*' % bucket_name]
-            }
+                "Action": ["s3:GetObject"],
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Resource": ["arn:aws:s3:::%s/*" % bucket_name],
+            },
         ],
     }
     client.set_bucket_policy(bucket_name, json.dumps(policy))

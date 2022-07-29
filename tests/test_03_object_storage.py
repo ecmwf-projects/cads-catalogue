@@ -1,12 +1,11 @@
-
 import datetime
 import json
 import os
 from typing import Any
 
 import minio  # type: ignore
-from minio import commonconfig, versioningconfig
 import pytest
+from minio import commonconfig, versioningconfig
 
 from cads_catalogue import object_storage
 
@@ -17,20 +16,20 @@ TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 def get_ro_policy_dict(bucket_name, version):
     """Get the read-only policy dictionary for a bucket"""
     policy = {
-        'Version': version,
-        'Statement': [
+        "Version": version,
+        "Statement": [
             {
-                'Action': ['s3:GetBucketLocation', 's3:ListBucket'],
-                'Effect': 'Allow',
-                'Principal': {'AWS': '*'},
-                'Resource': ['arn:aws:s3:::%s' % bucket_name]
+                "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Resource": ["arn:aws:s3:::%s" % bucket_name],
             },
             {
-                'Action': ['s3:GetObject'],
-                'Effect': 'Allow',
-                'Principal': {'AWS': '*'},
-                'Resource': ['arn:aws:s3:::%s/*' % bucket_name]
-            }
+                "Action": ["s3:GetObject"],
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Resource": ["arn:aws:s3:::%s/*" % bucket_name],
+            },
         ],
     }
     return policy
@@ -49,7 +48,8 @@ def test_store_file(mocker) -> None:
         "secure": False,
     }
     file_path = os.path.join(
-        TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf")
+        TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
+    )
     # patching the used Minio client APIs
     patch1 = mocker.patch.object(minio.Minio, "__init__", return_value=None)
     patch2 = mocker.patch.object(minio.Minio, "bucket_exists", return_value=False)
@@ -58,7 +58,10 @@ def test_store_file(mocker) -> None:
     patch6 = mocker.patch("minio.Minio.fput_object")
     patch6.return_value.version_id = expected_version_id
     patch7 = mocker.patch.object(
-        minio.Minio, "presigned_get_object", return_value=f"{object_storage_url}{expected_url}")
+        minio.Minio,
+        "presigned_get_object",
+        return_value=f"{object_storage_url}{expected_url}",
+    )
     patch8 = mocker.patch.object(minio.Minio, "set_bucket_policy")
 
     # run for a not existing file/not absolute path
@@ -72,7 +75,9 @@ def test_store_file(mocker) -> None:
     patch1.reset_mock()
     patch2.reset_mock()
 
-    res = object_storage.store_file(file_path, object_storage_url, force=True, **storage_kws)
+    res = object_storage.store_file(
+        file_path, object_storage_url, force=True, **storage_kws
+    )
 
     assert res == (expected_url, expected_version_id)
     patch1.assert_called_once_with("myobject-storage:myport", **storage_kws)
@@ -82,8 +87,11 @@ def test_store_file(mocker) -> None:
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
-        bucket_name, "licence-to-use-copernicus-products.pdf", file_path)
-    patch7.assert_called_once_with(bucket_name, "licence-to-use-copernicus-products.pdf")
+        bucket_name, "licence-to-use-copernicus-products.pdf", file_path
+    )
+    patch7.assert_called_once_with(
+        bucket_name, "licence-to-use-copernicus-products.pdf"
+    )
     patch8.assert_called_once_with(bucket_name, json.dumps(ro_policy))
 
     # reset mocks
@@ -106,7 +114,9 @@ def test_store_file(mocker) -> None:
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
-        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf", file_path)
+        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf", file_path
+    )
     patch7.assert_called_once_with(
-        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf")
+        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf"
+    )
     patch8.assert_called_once_with(bucket_name, json.dumps(ro_policy))
