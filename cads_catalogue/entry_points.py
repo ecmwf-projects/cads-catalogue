@@ -102,6 +102,7 @@ def setup_test_database(
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
         "reanalysis-era5-land",
+        "reanalysis-era5-single-levels",
     ]
     resources = []
     for dataset in datasets:
