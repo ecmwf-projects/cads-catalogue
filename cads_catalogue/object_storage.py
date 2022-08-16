@@ -1,4 +1,4 @@
-"""utility module to interface to the object storage"""
+"""utility module to interface to the object storage."""
 
 # Copyright 2022, European Union.
 #
@@ -14,11 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import json
 import os
 import pathlib
-import posixpath
 import urllib.parse
 from typing import Any
 
@@ -35,7 +33,7 @@ def set_readwrite_bucket_policy(client: minio.api.Minio, bucket_name: str) -> No
     bucket_name: name of the bucket
     """
     policy = {
-        "Version": datetime.date.today().isoformat(),
+        "Version": "2012-10-17",
         "Statement": [
             {
                 "Effect": "Allow",
@@ -72,9 +70,8 @@ def set_readonly_bucket_policy(client, bucket_name):
     client: minio client object
     bucket_name: name of the bucket
     """
-    version = datetime.date.today().isoformat()
     policy = {
-        "Version": version,
+        "Version": "2012-10-17",
         "Statement": [
             {
                 "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
@@ -146,7 +143,6 @@ def store_file(
     object_name = os.path.join(subpath, file_name)
     res = client.fput_object(bucket_name, object_name, file_path)
     version_id = res.version_id
-    download_url_abs = client.presigned_get_object(bucket_name, object_name)
-    download_url_rel = posixpath.relpath(download_url_abs, object_storage_url)
-    ret_value = (download_url_rel, version_id)
+    download_url = "%s/%s?versionId=%s" % (bucket_name, object_name, version_id)
+    ret_value = (download_url, version_id)
     return ret_value

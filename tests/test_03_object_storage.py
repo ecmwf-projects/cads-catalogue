@@ -1,4 +1,4 @@
-import datetime
+
 import json
 import os
 from typing import Any
@@ -13,10 +13,10 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def get_ro_policy_dict(bucket_name, version):
+def get_ro_policy_dict(bucket_name):
     """Get the read-only policy dictionary for a bucket"""
     policy = {
-        "Version": version,
+        "Version": "2012-10-17",
         "Statement": [
             {
                 "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
@@ -37,11 +37,12 @@ def get_ro_policy_dict(bucket_name, version):
 
 @pytest.mark.filterwarnings("ignore:Exception ignored")
 def test_store_file(mocker) -> None:
-    expected_url = "a/relative/path/to/a/file"
     expected_version_id = "dfbd25b3-abec-4184-a4e8-5a35a5c1174d"
     object_storage_url = "http://myobject-storage:myport/"
     bucket_name = "cads-catalogue-bucket"
-    ro_policy = get_ro_policy_dict(bucket_name, datetime.date.today().isoformat())
+    expected_url = "%s/licence-to-use-copernicus-products.pdf?versionId=%s" \
+                   % (bucket_name, expected_version_id)
+    ro_policy = get_ro_policy_dict(bucket_name)
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -57,11 +58,6 @@ def test_store_file(mocker) -> None:
     patch5 = mocker.patch.object(minio.Minio, "set_bucket_versioning")
     patch6 = mocker.patch("minio.Minio.fput_object")
     patch6.return_value.version_id = expected_version_id
-    patch7 = mocker.patch.object(
-        minio.Minio,
-        "presigned_get_object",
-        return_value=f"{object_storage_url}{expected_url}",
-    )
     patch8 = mocker.patch.object(minio.Minio, "set_bucket_policy")
 
     # run for a not existing file/not absolute path
@@ -89,19 +85,18 @@ def test_store_file(mocker) -> None:
     patch6.assert_called_once_with(
         bucket_name, "licence-to-use-copernicus-products.pdf", file_path
     )
-    patch7.assert_called_once_with(
-        bucket_name, "licence-to-use-copernicus-products.pdf"
-    )
     patch8.assert_called_once_with(bucket_name, json.dumps(ro_policy))
 
     # reset mocks
-    for patch in [patch1, patch2, patch3, patch5, patch6, patch7, patch8]:
+    for patch in [patch1, patch2, patch3, patch5, patch6, patch8]:
         patch.reset_mock()
 
     # calling with a subpath and a bucket
     subpath = "licences/mypath"
     bucket_name = "mybucket"
-    ro_policy = get_ro_policy_dict(bucket_name, datetime.date.today().isoformat())
+    expected_url = "%s/licences/mypath/licence-to-use-copernicus-products.pdf?versionId=%s" \
+                   % (bucket_name, expected_version_id)
+    ro_policy = get_ro_policy_dict(bucket_name)
     res = object_storage.store_file(
         file_path, object_storage_url, bucket_name, subpath, force=True, **storage_kws
     )
@@ -115,8 +110,5 @@ def test_store_file(mocker) -> None:
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
         bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf", file_path
-    )
-    patch7.assert_called_once_with(
-        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf"
     )
     patch8.assert_called_once_with(bucket_name, json.dumps(ro_policy))
