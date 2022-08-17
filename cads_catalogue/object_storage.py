@@ -23,71 +23,92 @@ from typing import Any
 import minio  # type: ignore
 from minio import commonconfig, versioningconfig
 
+DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": ["arn:aws:s3:::%(bucket_name)s"],
+        },
+        {
+            "Action": ["s3:GetObject"],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
+        },
+    ],
+}
+PRIVATE_POLICY_TEMPLATE: dict[str, Any] = {}
+PUBLIC_POLICY_TEMPLATE: dict[str, Any] = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+            ],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": ["arn:aws:s3:::%(bucket_name)s"],
+        },
+        {
+            "Action": [
+                "s3:PutObject",
+                "s3:AbortMultipartUpload",
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:ListMultipartUploadParts",
+            ],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
+        },
+    ],
+}
+UPLOAD_POLICY_TEMPLATE: dict[str, Any] = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": ["s3:GetBucketLocation", "s3:ListBucketMultipartUploads"],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": ["arn:aws:s3:::%(bucket_name)s"],
+        },
+        {
+            "Action": [
+                "s3:AbortMultipartUpload",
+                "s3:DeleteObject",
+                "s3:ListMultipartUploadParts",
+                "s3:PutObject",
+            ],
+            "Effect": "Allow",
+            "Principal": {"AWS": ["*"]},
+            "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
+        },
+    ],
+}
 
-def set_readwrite_bucket_policy(client: minio.api.Minio, bucket_name: str) -> None:
-    """Set anonymous read-write policy to a bucket.
+
+def set_bucket_policy(client: minio.api.Minio, bucket_name: str, policy: str) -> None:
+    """Set anonymous policy to a bucket.
 
     Parameters
     ----------
     client: minio client object
     bucket_name: name of the bucket
+    policy: one of 'private', 'public', 'upload', 'download'
     """
-    policy = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": {"AWS": "*"},
-                "Action": [
-                    "s3:GetBucketLocation",
-                    "s3:ListBucket",
-                    "s3:ListBucketMultipartUploads",
-                ],
-                "Resource": "arn:aws:s3:::%s" % bucket_name,
-            },
-            {
-                "Effect": "Allow",
-                "Principal": {"AWS": "*"},
-                "Action": [
-                    "s3:GetObject",
-                    "s3:PutObject",
-                    "s3:DeleteObject",
-                    "s3:ListMultipartUploadParts",
-                    "s3:AbortMultipartUpload",
-                ],
-                "Resource": "arn:aws:s3:::%s/*" % bucket_name,
-            },
-        ],
+    policy_map = {
+        "download": DOWNLOAD_POLICY_TEMPLATE,
+        "private": PRIVATE_POLICY_TEMPLATE,
+        "public": PUBLIC_POLICY_TEMPLATE,
+        "upload": UPLOAD_POLICY_TEMPLATE,
     }
-    client.set_bucket_policy(bucket_name, json.dumps(policy))
-
-
-def set_readonly_bucket_policy(client, bucket_name):
-    """Set anonymous read-only policy to a bucket.
-
-    Parameters
-    ----------
-    client: minio client object
-    bucket_name: name of the bucket
-    """
-    policy = {
-        "Version": "2012-10-17",
-        "Statement": [
-            {
-                "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
-                "Effect": "Allow",
-                "Principal": {"AWS": "*"},
-                "Resource": ["arn:aws:s3:::%s" % bucket_name],
-            },
-            {
-                "Action": ["s3:GetObject"],
-                "Effect": "Allow",
-                "Principal": {"AWS": "*"},
-                "Resource": ["arn:aws:s3:::%s/*" % bucket_name],
-            },
-        ],
-    }
-    client.set_bucket_policy(bucket_name, json.dumps(policy))
+    policy_json = json.dumps(policy_map[policy]) % {"bucket_name": bucket_name}
+    client.set_bucket_policy(bucket_name, policy_json)
 
 
 def store_file(
@@ -134,7 +155,7 @@ def store_file(
             client.set_bucket_versioning(
                 bucket_name, versioningconfig.VersioningConfig(commonconfig.ENABLED)
             )
-            set_readonly_bucket_policy(client, bucket_name)
+            set_bucket_policy(client, bucket_name, "download")
         else:
             raise ValueError(
                 "the bucket %r does not exist in the object storage" % bucket_name
