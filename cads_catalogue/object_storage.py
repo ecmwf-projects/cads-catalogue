@@ -123,11 +123,11 @@ def store_file(
 
     Store a file at `file_path` in the object storage, in the bucket `bucket_name`.
     If subpath is supplied, the file is stored in subpath/file_name.
-    If force is True, a (versioned and read-only) bucket `bucket_name` is created
-    if not exists.
+    If force is True, a bucket `bucket_name` is created if not existing. Note that in such case
+    the bucket is versioned and with 'download' access policy for anonymous.
     Return the tuple (download_url, version), where:
-    * download_url is the download URL of the stored file relative to the object storage
-    * version is the version stored in the object storage ('unversioned' if not versioned)
+    * download_url is the download URL of the stored file, relative to the object storage
+    * version is the version stored in the object storage (None if not versioned)
 
     Parameters
     ----------
