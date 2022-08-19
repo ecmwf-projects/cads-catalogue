@@ -1,25 +1,29 @@
 {
     "day": [
-        "21",
-        "18"
+        "10",
+        "25"
     ],
     "format": "netcdf",
     "month": "02",
     "pressure_level": [
-        "650",
-        "975"
+        "500",
+        "1"
+    ],
+    "product_type": [
+        "ensemble_members",
+        "reanalysis"
     ],
     "product_type": "reanalysis",
     "time": [
-        "10:00",
-        "05:00"
+        "21:00",
+        "00:00"
     ],
     "variable": [
-        "v_component_of_wind",
-        "vertical_velocity"
+        "specific_rain_water_content",
+        "specific_cloud_ice_water_content"
     ],
     "year": [
-        "1978",
-        "1994"
+        "1994",
+        "2006"
     ]
 }
