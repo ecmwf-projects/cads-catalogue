@@ -34,6 +34,23 @@ def test_load_resource_from_folder() -> None:
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
     expected_resource = {
+        "adaptor": {
+            "format_conversion": {
+                "netcdf_cdm": {
+                    "split_on": ["origin", "type", "dataset"],
+                    "system_call": [
+                        "cdscdm-translate",
+                        "-o",
+                        "{{outfile}}",
+                        "--product",
+                        "{{product}}",
+                        "--merge_datasets",
+                        "true",
+                        "{{infile}}",
+                    ],
+                }
+            }
+        },
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the "
         "evolution of land variables over several decades at an enhanced resolution "
         "compared to ERA5. ERA5-Land has been produced by replaying the land "
@@ -63,6 +80,9 @@ def test_load_resource_from_folder() -> None:
         "ERA5-Land "
         "documentation](https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation "
         '"ERA5-Land data documentation").\n',
+        "mapping": os.path.join(
+            TESTDATA_PATH, "reanalysis-era5-land-monthly-means", "mapping.json"
+        ),
         "description": {
             "data-type": "Gridded",
             "file-format": "GRIB",
@@ -1229,7 +1249,13 @@ def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
     stored_record = manager.store_dataset(session_obj, resource, tmp_path)
     assert 1 == stored_record.pop("resource_id")
     for column, value in stored_record.items():
-        if column not in ["record_update", "form", "constraints", "previewimage"]:
+        if column not in [
+            "record_update",
+            "form",
+            "constraints",
+            "previewimage",
+            "mapping",
+        ]:
             assert resource.get(column) == value
     assert stored_record["form"] == os.path.join(
         "resources", stored_record["resource_uid"], "form.json"
@@ -1240,9 +1266,13 @@ def test_store_dataset(session_obj: sessionmaker, tmp_path: Path) -> None:
     assert stored_record["previewimage"] == os.path.join(
         "resources", stored_record["resource_uid"], "overview.png"
     )
+    assert stored_record["mapping"] == os.path.join(
+        "resources", stored_record["resource_uid"], "mapping.json"
+    )
     assert os.path.exists(os.path.join(tmp_path, stored_record["previewimage"]))
     assert os.path.exists(os.path.join(tmp_path, stored_record["form"]))
     assert os.path.exists(os.path.join(tmp_path, stored_record["constraints"]))
+    assert os.path.exists(os.path.join(tmp_path, stored_record["mapping"]))
     assert os.path.exists(
         os.path.join(tmp_path, stored_record["references"][0]["content"])
     )

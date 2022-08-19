@@ -54,6 +54,150 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
     ]
     expected_resources: list[dict[str, Any]] = [
         {
+            "abstract": "This dataset provides bias-corrected reconstruction of near-surface "
+            "meteorological variables derived from the fifth generation of the"
+            " European Centre for Medium-Range Weather Forecasts  (ECMWF) "
+            "atmospheric reanalyses (ERA5). It is intended to be used as a "
+            "meteorological forcing dataset for land surface and hydrological "
+            "models. \n\nThe dataset has been obtained using the same methodology "
+            "used to derive the widely used water, energy and climate change "
+            "(WATCH) forcing data, and is thus also referred to as WATCH Forcing "
+            "Data methodology applied to ERA5 (WFDE5). The data are derived from "
+            "the ERA5 reanalysis product that have been re-gridded to a half-degree "
+            "resolution. Data have been adjusted using an elevation correction and "
+            "monthly-scale bias corrections based on Climatic Research Unit (CRU) "
+            "data (for temperature, diurnal temperature range, cloud-cover, wet "
+            "days number and precipitation fields) and Global Precipitation "
+            "Climatology Centre (GPCC) data (for precipitation fields only). "
+            "Additional corrections are included for varying atmospheric "
+            "aerosol-loading and separate precipitation gauge observations. "
+            "For full details please refer to the product user-guide.\n\n"
+            "This dataset was produced on behalf of Copernicus Climate Change "
+            "Service (C3S) and was generated entirely within the Climate Data "
+            "Store (CDS) Toolbox. The toolbox source code is provided in the "
+            "documentation tab.\n\n\n",
+            "adaptor": {
+                "adaptor.url": {
+                    "pattern": [
+                        "http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/"
+                        "{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_"
+                        "{{ reference_dataset }}_{{ year }}{{ month }}_v{{ version }}.nc",
+                        "{% if (year is not defined or year is none) and (month is not "
+                        "defined or month is none) %}http://hydrology-era5.copernicus-climate.eu"
+                        "/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/"
+                        "{{ variable }}_WFDE5_{{ reference_dataset }}_v{{ version }}"
+                        ".nc{% endif %}",
+                    ]
+                }
+            },
+            "constraints": "resources/derived-near-surface-meteorological-variables/"
+            "constraints.json",
+            "contact": None,
+            "description": {
+                "data-type": "Gridded",
+                "projection": "Regular latitude-longitude grid",
+                "file-format": "NetCDF 4",
+                "horizontal-coverage": "Global land",
+                "horizontal-resolution": "0.5° x 0.5°",
+                "vertical-coverage": "Surface",
+                "vertical-resolution": "Single level",
+                "temporal-coverage": "From 1979  to  2019",
+                "temporal-resolution": "Hourly",
+                "update-frequency": "No updates expected",
+                "conventions": "Climate and Forecast (CF) Metadata Convention v1.7",
+                "versions": "1.0 (deprecated), 1.1, 2.0 and 2.1",
+            },
+            "documentation": [
+                {
+                    "url": "https://confluence.ecmwf.int/x/YzmaE",
+                    "description": "Provides documentation on the algorithms used to derive "
+                    "the dataset as well as on the filename conventions and "
+                    "metedata.",
+                    "title": "Product user guide",
+                },
+                {
+                    "url": "https://doi.org/10.5194/essd-12-2097-2020",
+                    "title": "WFDE5: bias-adjusted ERA5 reanalysis data for impact studies",
+                    "description": "A peer reviewed article which describes the methods "
+                    "used in the generation of this dataset and the results "
+                    "of the validation experiments.",
+                },
+                {
+                    "datastore": "derived-near-surface-meteorological-variables/source_code.zip",
+                    "title": "Version 1.0",
+                    "description": "Source code used to generate version 1.0 of the dataset. "
+                    "The workflows are for use in the CDS toolbox.",
+                    "widget": "code",
+                },
+                {
+                    "datastore": "derived-near-surface-meteorological-variables/"
+                    "source_code_v1.1.zip",
+                    "title": "Version 1.1",
+                    "description": "Source code used to generate version 1.1 of the dataset. "
+                    "The workflows are for use in the CDS toolbox.",
+                    "widget": "code",
+                },
+                {
+                    "datastore": "derived-near-surface-meteorological-variables/"
+                    "source_code_v2.0.zip",
+                    "title": "Version 2.0",
+                    "description": "Source code used to generate version 2.0 of the dataset. "
+                    "The workflows are for use in the CDS toolbox.",
+                    "widget": "code",
+                },
+                {
+                    "datastore": "derived-near-surface-meteorological-variables/"
+                    "source_code_v2.1.zip",
+                    "title": "Version 2.1",
+                    "description": "Source code used to generate version 2.1 of the dataset. "
+                    "The workflows are for use in the CDS toolbox.",
+                    "widget": "code",
+                },
+            ],
+            "doi": "10.24381/cds.20d54e34",
+            "extent": None,
+            "form": "resources/derived-near-surface-meteorological-variables/form.json",
+            "keywords": [
+                "Product type: Derived reanalysis",
+                "Spatial coverage: Global",
+                "Variable domain: Atmosphere (surface)",
+                "Temporal coverage: Past",
+            ],
+            "mapping": "resources/derived-near-surface-meteorological-variables/mapping.json",
+            "previewimage": "resources/derived-near-surface-meteorological-variables/overview.jpg",
+            "providers": None,
+            "publication_date": datetime.date(2020, 2, 11),
+            "record_update": None,
+            "references": [
+                {
+                    "content": "resources/derived-near-surface-meteorological-variables/"
+                    "citation.md",
+                    "copy": True,
+                    "download_file": None,
+                    "title": "Citation",
+                    "url": None,
+                },
+                {
+                    "title": "Acknowledgement",
+                    "content": "resources/derived-near-surface-meteorological-variables/"
+                    "acknowledgement.html",
+                    "copy": None,
+                    "url": None,
+                    "download_file": None,
+                },
+            ],
+            "resource_id": 1,
+            "resource_uid": "derived-near-surface-meteorological-variables",
+            "resource_update": None,
+            "summaries": None,
+            "title": "Near surface meteorological variables from 1979 to 2019 derived "
+            "from bias-corrected reanalysis",
+            "type": "dataset",
+            "use_eqc": None,
+            "variables": None,
+            "version": None,
+        },
+        {
             "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of "
             "the evolution of land variables over several decades at an "
             "enhanced resolution compared to ERA5. ERA5-Land has been "
@@ -96,6 +240,23 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
             "and use more accurate information on land states.\n"
             "\n"
             "\n",
+            "adaptor": {
+                "format_conversion": {
+                    "netcdf_cdm": {
+                        "split_on": ["origin", "type", "dataset"],
+                        "system_call": [
+                            "cdscdm-translate",
+                            "-o",
+                            "{{outfile}}",
+                            "--product",
+                            "{{product}}",
+                            "--merge_datasets",
+                            "true",
+                            "{{infile}}",
+                        ],
+                    }
+                }
+            },
             "constraints": "resources/reanalysis-era5-land/constraints.json",
             "contact": None,
             "description": {
@@ -140,19 +301,11 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Variable domain: Land (biosphere)",
                 "Provider: Copernicus C3S",
             ],
+            "mapping": "resources/reanalysis-era5-land/mapping.json",
             "previewimage": "resources/reanalysis-era5-land/overview.png",
             "providers": None,
             "publication_date": datetime.date(2019, 7, 12),
-            "record_update": datetime.datetime(
-                2022,
-                7,
-                13,
-                9,
-                11,
-                30,
-                50535,
-                tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
-            ),
+            "record_update": None,
             "references": [
                 {
                     "content": "resources/reanalysis-era5-land/citation.html",
@@ -162,7 +315,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "url": None,
                 },
             ],
-            "resource_id": 3,
+            "resource_id": 4,
             "resource_uid": "reanalysis-era5-land",
             "resource_update": datetime.date(2022, 3, 14),
             "summaries": None,
@@ -1780,6 +1933,23 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "ERA5-Land+data+documentation"
                 ' "ERA5-Land data documentation").\n'
             ),
+            "adaptor": {
+                "format_conversion": {
+                    "netcdf_cdm": {
+                        "split_on": ["origin", "type", "dataset"],
+                        "system_call": [
+                            "cdscdm-translate",
+                            "-o",
+                            "{{outfile}}",
+                            "--product",
+                            "{{product}}",
+                            "--merge_datasets",
+                            "true",
+                            "{{infile}}",
+                        ],
+                    }
+                }
+            },
             "constraints": (
                 "resources/reanalysis-era5-land-monthly-means/constraints.json"
             ),
@@ -1828,19 +1998,11 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Variable domain: Land (biosphere)",
                 "Provider: Copernicus C3S",
             ],
+            "mapping": "resources/reanalysis-era5-land-monthly-means/mapping.json",
             "previewimage": "resources/reanalysis-era5-land-monthly-means/overview.png",
             "providers": None,
             "publication_date": datetime.date(2019, 6, 23),
-            "record_update": datetime.datetime(
-                2022,
-                7,
-                6,
-                12,
-                22,
-                8,
-                307930,
-                tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
-            ),
+            "record_update": None,
             "references": [
                 {
                     "title": "Citation",
@@ -1850,7 +2012,7 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "download_file": None,
                 },
             ],
-            "resource_id": 1,
+            "resource_id": 2,
             "resource_uid": "reanalysis-era5-land-monthly-means",
             "resource_update": datetime.date(2022, 3, 2),
             "summaries": None,
@@ -2567,6 +2729,23 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 ' present entry is "ERA5 hourly data on pressure levels from 1959 to'
                 ' present".\n'
             ),
+            "adaptor": {
+                "format_conversion": {
+                    "netcdf_cdm": {
+                        "split_on": ["origin", "type", "dataset"],
+                        "system_call": [
+                            "cdscdm-translate",
+                            "-o",
+                            "{{outfile}}",
+                            "--product",
+                            "{{product}}",
+                            "--merge_datasets",
+                            "true",
+                            "{{infile}}",
+                        ],
+                    }
+                }
+            },
             "constraints": "resources/reanalysis-era5-pressure-levels/constraints.json",
             "contact": None,
             "description": {
@@ -2620,19 +2799,11 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                 "Product type: Reanalysis",
                 "Provider: Copernicus C3S",
             ],
+            "mapping": "resources/reanalysis-era5-pressure-levels/mapping.json",
             "previewimage": "resources/reanalysis-era5-pressure-levels/overview.jpg",
             "providers": None,
             "publication_date": None,
-            "record_update": datetime.datetime(
-                2022,
-                7,
-                6,
-                12,
-                22,
-                8,
-                330625,
-                tzinfo=datetime.timezone(datetime.timedelta(seconds=7200)),
-            ),
+            "record_update": None,
             "references": [
                 {
                     "title": "Citation",
@@ -2649,9 +2820,9 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
                     "download_file": None,
                 },
             ],
-            "resource_id": 2,
+            "resource_id": 3,
             "resource_uid": "reanalysis-era5-pressure-levels",
-            "resource_update": datetime.date(2022, 6, 9),
+            "resource_update": datetime.date(2022, 6, 14),
             "summaries": None,
             "title": "ERA5 hourly data on pressure levels from 1959 to present",
             "type": "dataset",
@@ -2901,10 +3072,12 @@ def test_setup_test_database(postgresql: Connection[str], tmp_path: Path) -> Non
     assert result.exit_code == 0
     # check document storage
     for dataset in [
+        "derived-near-surface-meteorological-variables",
+        "reanalysis-era5-land",
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
     ]:
-        for filename in ["constraints.json", "form.json"]:
+        for filename in ["constraints.json", "form.json", "mapping.json"]:
             assert os.path.exists(
                 os.path.join(tmp_path, "resources", dataset, filename)
             )
