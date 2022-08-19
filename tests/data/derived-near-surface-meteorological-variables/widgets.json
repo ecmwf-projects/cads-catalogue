@@ -1,0 +1,32 @@
+[
+  {   
+    "tab": "doc",
+    "widgets":  
+    [
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "code",
+        "label": "CDS toolbox source code",
+        "framed": false,
+        "details": {
+          "accordion": true
+        }
+      },
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "issues",
+        "label": "Known issues",
+        "framed": false,
+        "details": {
+          "accordion": true,
+          "text:file": "known_issues.html"
+        }
+      }
+    ]
+  }
+]
+
+
+
