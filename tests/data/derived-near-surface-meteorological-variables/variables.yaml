@@ -1,0 +1,31 @@
+---
+variables:
+
+  Grid-point altitude:
+    description: "The altitude of each grid-point. Values correspond to altitudes of CRU grid-points."
+    units: "m"
+  Near-surface wind speed:
+    description: "The horizontal speed of the wind, or movement of air, at a height of 10 metres above the surface of the Earth. Values are derived from ERA5 near-surface wind speed."
+    units: "m s^-1"
+  Near-surface air temperature:
+    description: "The temperature of air at 2 metres above the surface of land, sea or inland waters. Values are derived from ERA5 2m air temperature with an elevation correction and bias correction using CRU mean monthly temperature and mean diurnal temperature range."
+    units: "K"
+  Surface air pressure:
+    description: "The pressure (force per unit area) of the atmosphere at the surface of land, sea and inland water. Values are derived from ERA5 surface air pressure with an elevation correction."
+    units: "Pa"
+  Near-surface specific humidity:
+    description: "The amount of moisture in the air divided by amount of air plus moisture at that location. Values are derived from ERA5 vapor pressure and saturation vapor pressure with an elevation correction."
+    units: "kg kg^-1"
+  Surface downwelling longwave radiation:
+    description: "The amount of thermal (also known as longwave or terrestrial) radiation emitted by the atmosphere and clouds that reaches a horizontal plane at the surface of the Earth. Values are derived from ERA5 surface downwelling longwave radiation with an elevation correction."
+    units: "W m^-2"
+  Surface downwelling shortwave radiation:
+    description: "The amount of solar radiation (also known as shortwave radiation) that reaches a horizontal plane at the surface of the Earth. This parameter comprises both direct and diffuse solar radiation. Values are derived from ERA5 surface downwelling shortwave radiation and bias corrected using CRU cloud cover and effects of inter-annual changes in atmospheric aerosol loading."
+    units: "W m^-2"
+  Rainfall flux:
+    description: "The rate of rain that falls to the Earth's surface. Values are derived from ERA5 total precipitation and snowfall and are bias corrected primarily using precipitation data from CRU and GPCC."
+    units: "kg m^-2 s^-1"
+  Snowfall flux:
+    description: "The rate of snow that falls to the Earth's surface. Values are derived from ERA5 total precipitation and snowfall and are bias corrected primarily using precipitation data from CRU and GPCC."
+    units: "kg m^-2 s^-1"
+

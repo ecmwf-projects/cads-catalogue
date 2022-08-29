@@ -34,6 +34,23 @@ def test_load_resource_from_folder() -> None:
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
     expected_resource = {
+        "adaptor": {
+            "format_conversion": {
+                "netcdf_cdm": {
+                    "split_on": ["origin", "type", "dataset"],
+                    "system_call": [
+                        "cdscdm-translate",
+                        "-o",
+                        "{{outfile}}",
+                        "--product",
+                        "{{product}}",
+                        "--merge_datasets",
+                        "true",
+                        "{{infile}}",
+                    ],
+                }
+            }
+        },
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the "
         "evolution of land variables over several decades at an enhanced resolution "
         "compared to ERA5. ERA5-Land has been produced by replaying the land "
@@ -63,6 +80,7 @@ def test_load_resource_from_folder() -> None:
         "ERA5-Land "
         "documentation](https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation "
         '"ERA5-Land data documentation").\n',
+        "mapping": os.path.join(resource_folder_path, "mapping.json"),
         "description": {
             "data-type": "Gridded",
             "file-format": "GRIB",
@@ -1232,12 +1250,18 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         session_obj, resource, object_storage_url, **storage_kws
     )
 
-    assert patch.call_count == 4
+    assert patch.call_count == 5
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
     kwargs["force"] = True
     for call_index, file_name in enumerate(
-        ["form.json", "overview.png", "constraints.json", "citation.html"]
+        [
+            "form.json",
+            "overview.png",
+            "constraints.json",
+            "mapping.json",
+            "citation.html",
+        ]
     ):
         assert patch.mock_calls[call_index].args == (
             os.path.join(resource_folder_path, file_name),
@@ -1246,12 +1270,18 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         assert patch.mock_calls[0].kwargs == kwargs
     assert 1 == stored_record.pop("resource_id")
     for column, value in stored_record.items():
-        if column not in ["record_update", "form", "constraints", "previewimage"]:
+        if column not in [
+            "record_update",
+            "form",
+            "constraints",
+            "previewimage",
+            "mapping",
+        ]:
             assert resource.get(column) == value
     assert stored_record["form"] == "an url"
     assert stored_record["constraints"] == "an url"
     assert stored_record["previewimage"] == "an url"
-
+    assert stored_record["mapping"] == "an url"
     expected_many2many_record = {
         "resource_id": 1,
         "licence_id": 1,

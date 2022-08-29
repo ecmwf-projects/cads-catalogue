@@ -113,6 +113,7 @@ def setup_test_database(
     manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
 
     datasets = [
+        "derived-near-surface-meteorological-variables",
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
         "reanalysis-era5-land",

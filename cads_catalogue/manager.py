@@ -93,6 +93,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             metadata["related_resources_keywords"] = data.get(
                 "related_resources_keywords", []
             )
+    if "adaptor.yaml" in file_names:
+        with open(os.path.join(folder_path, "adaptor.yaml")) as fp:
+            metadata["adaptor"] = yaml.load(fp, Loader=yaml.loader.SafeLoader)
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
@@ -115,6 +118,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     for file_name, db_field_name in [
         ("form.json", "form"),
         ("constraints.json", "constraints"),
+        ("mapping.json", "mapping"),
     ]:
         if file_name in file_names:
             metadata[db_field_name] = os.path.abspath(
@@ -225,8 +229,8 @@ def store_dataset(
     with session_obj() as session:
         licence_uids = dataset.pop("licence_uids", [])
         subpath = os.path.join("resources", dataset["resource_uid"])
-        doc_storage_fields = ["form", "previewimage", "constraints"]
-        for field in doc_storage_fields:
+        obj_storage_fields = ["form", "previewimage", "constraints", "mapping"]
+        for field in obj_storage_fields:
             file_path = dataset[field]
             dataset[field] = object_storage.store_file(
                 file_path,

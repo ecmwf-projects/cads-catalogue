@@ -1,4 +1,4 @@
-####mars: ../scripts/mars-on-cds-hourly.sh
+mars: ../scripts/mars-on-cds-hourly.sh -a 1959 -b 2022
 import:
   - era5
   - area-selector-mars

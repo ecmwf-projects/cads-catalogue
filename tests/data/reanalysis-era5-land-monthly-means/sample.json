@@ -1,5 +1,5 @@
 {
-    "format": "grib",
+    "format": "netcdf",
     "month": [
         "09",
         "02"
