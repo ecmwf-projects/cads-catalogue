@@ -12,11 +12,14 @@ dependencies:
 - sphinx
 - sphinx-autoapi
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
+- minio
 - pip
 - postgresql
 - psycopg
 - psycopg2
 - pydantic
+- pytest-mock
+- pyyaml
 - setuptools
 - sqlalchemy==1.4*
 - sqlalchemy-utils
