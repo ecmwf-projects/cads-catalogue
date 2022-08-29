@@ -3,7 +3,7 @@ responsible_organisation: ECMWF
 responsible_organisation_website: https://www.ecmwf.int/
 responsible_organisation_tf:
 responsible_organisation_role: pointOfContact
-contactemail: copernicus-support@ecmwf.int
+contactemail: https://support.ecmwf.int
 
 licence_list: [20180314_Copernicus_License_V1.1]
 
@@ -16,7 +16,7 @@ ds_responsible_individual: CDS
 ds_responsible_organisation_website: 
 ds_responsible_organisation_tf:
 ds_responsible_organisation: ECMWF 
-ds_contactemail: copernicus-support@ecmwf.int
+ds_contactemail: https://support.ecmwf.int
 ds_responsible_organisation_role: publisher
 
 inspire_theme: Land conditions
@@ -33,7 +33,7 @@ bboxS: -89
 bboxE: 360
 
 begin_date: 1981-01-01
-end_date: 2022-03-01
+end_date: 2022-04-01
 
 file_format: grib
 format_version: 
