@@ -1255,7 +1255,13 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
     kwargs["force"] = True
     for call_index, file_name in enumerate(
-        ["form.json", "overview.png", "constraints.json", "mapping.json", "citation.html"]
+        [
+            "form.json",
+            "overview.png",
+            "constraints.json",
+            "mapping.json",
+            "citation.html",
+        ]
     ):
         assert patch.mock_calls[call_index].args == (
             os.path.join(resource_folder_path, file_name),

@@ -3107,13 +3107,16 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             kwargs = object_storage_kws.copy()
             kwargs["subpath"] = "resources/%s" % dataset
             if (
-                dataset in ("derived-near-surface-meteorological-variables",
-                            "reanalysis-era5-pressure-levels", )
+                dataset
+                in (
+                    "derived-near-surface-meteorological-variables",
+                    "reanalysis-era5-pressure-levels",
+                )
                 and filename == "overview.png"
             ):
                 file_path = os.path.join(TESTDATA_PATH, dataset, "overview.jpg")
             if (
-                dataset in ("derived-near-surface-meteorological-variables", )
+                dataset in ("derived-near-surface-meteorological-variables",)
                 and filename == "citation.html"
             ):
                 file_path = os.path.join(TESTDATA_PATH, dataset, "citation.md")
