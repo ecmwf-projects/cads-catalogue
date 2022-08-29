@@ -1,0 +1,21 @@
+---
+title: Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis
+
+licences: ["licence-to-use-copernicus-products"]
+adaptor: adaptor.url
+
+url: hydrology-era5.copernicus-climate.eu/WFDE5/
+
+suffix: .nc
+selection_limit: 1000
+toolbox: true
+publication_date: 2020-02-11
+
+# purpose: '<p><b>WARNING 2020-12-15</b>: Issue with version 2.0 of this dataset. Consult the "Known issues" link under the "Documentation tab".</p>'
+
+# Contrat: C3S_25c
+# MANIFEST: http://hydrology-era5.copernicus-climate.eu/c3s_manifest/manifest_C3S_25c_WFDE5_latest.txt 
+#    
+# JIRA: https://jira.ecmwf.int/projects/CDSI/queues/custom/113/CDSI-305
+# JIRA: https://jira.ecmwf.int/projects/CDSI/queues/custom/113/CDSI-560
+# JIRA: https://jira.ecmwf.int/browse/CDSI-676
