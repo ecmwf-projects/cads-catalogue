@@ -88,6 +88,13 @@ def setup_test_database(
     if not structure_exists or force:
         init_db(connection_string)
     # get storage parameters from environment
+    for key in ("OBJECT_STORAGE_URL", "STORAGE_ADMIN", "STORAGE_PASSWORD"):
+        if key not in os.environ:
+            msg = (
+                "key %r must be defined in the environment in order to use the object storage"
+                % key
+            )
+            raise KeyError(msg)
     object_storage_url = os.environ["OBJECT_STORAGE_URL"]
     storage_kws: dict[str, Any] = {
         "access_key": os.environ["STORAGE_ADMIN"],
