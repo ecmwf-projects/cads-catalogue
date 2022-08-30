@@ -1,0 +1,24 @@
+{
+    "day": [
+        "04",
+        "16"
+    ],
+    "format": "netcdf",
+    "month": [
+        "12",
+        "07"
+    ],
+    "product_type": "ensemble_members",
+    "time": [
+        "03:00",
+        "12:00"
+    ],
+    "variable": [
+        "snow_albedo",
+        "vertical_integral_of_northward_total_energy_flux"
+    ],
+    "year": [
+        "2013",
+        "1968"
+    ]
+}
