@@ -66,6 +66,87 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
     return licences
 
 
+def build_description(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Build the db field `description` from the yaml data loaded.
+
+    Parameters
+    ----------
+    data: yaml data
+
+    Returns
+    -------
+    a list of items of kind {"id": ..., "label": ..., "value": ...}
+    """
+    ret_value: list[dict[str, str]] = []
+    for key, value in data.get("description", dict()).items():
+        item = {
+            "id": key,
+            "label": key.replace("-", " ").capitalize(),
+            "value": value,
+        }
+        ret_value.append(item)
+    return ret_value
+
+
+def load_variable_id_map(form_json_path: str) -> dict[str, str]:
+    """
+    Return a dictionary {variable_label: variable_id} parsing the form.json file.
+
+    Parameters
+    ----------
+    form_json_path: path to the form.json file
+
+    Returns
+    -------
+    a dictionary {variable_label: variable_id}
+    """
+    if not os.path.isfile(form_json_path):
+        return dict()
+    with open(form_json_path) as fp:
+        form_sections = json.load(fp)
+    variable_id_map = dict()
+    for form_section in form_sections:
+        if "details" in form_section:
+            details_section = form_section["details"]
+            if "groups" in details_section:
+                groups_section = details_section["groups"]
+                for group_section in groups_section:
+                    if "labels" in group_section:
+                        variable_id_map.update(group_section["labels"])
+            if "labels" in details_section:
+                variable_id_map.update(details_section["labels"])
+    variable_id_map = {v: k for k, v in variable_id_map.items()}
+    return variable_id_map
+
+
+def build_variables(
+    data: dict[str, Any], variable_id_map=dict | None
+) -> list[dict[str, Any]]:
+    """Build the db field `variables` from the yaml data loaded.
+
+    Parameters
+    ----------
+    data: yaml data
+    variable_id_map: dictionary to get the variable id from the label
+
+    Returns
+    -------
+    a list of items of kind {"label": ..., "description": ..., "units": ...}
+    """
+    if variable_id_map is None:
+        variable_id_map = dict()
+    ret_value: list[dict[str, str]] = []
+    for variable_name, properties in data.get("variables", dict()).items():
+        item = {
+            "id": variable_id_map[variable_name],
+            "label": variable_name,
+            "description": properties.get("description"),
+            "units": properties.get("units"),
+        }
+        ret_value.append(item)
+    return ret_value
+
+
 def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load metadata of a resource from a folder.
 
@@ -80,15 +161,16 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     file_names = os.listdir(folder_path)
     metadata: dict[str, Any] = dict()
     metadata["resource_uid"] = os.path.basename(folder_path)
+    variable_id_map = load_variable_id_map(os.path.join(folder_path, "form.json"))
     if "abstract.md" in file_names:
         with open(os.path.join(folder_path, "abstract.md")) as fp:
             metadata["abstract"] = fp.read()
     if "abstract.yaml" in file_names:
         with open(os.path.join(folder_path, "abstract.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            metadata["description"] = data.get("description")
+            metadata["description"] = build_description(data)
             metadata["keywords"] = data.get("keywords")
-            metadata["variables"] = data.get("variables")
+            metadata["variables"] = build_variables(data, variable_id_map)
             # NOTE: related_resources_keywords is for self-relationship, not a db field
             metadata["related_resources_keywords"] = data.get(
                 "related_resources_keywords", []
@@ -155,6 +237,12 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["type"] = data.get("resource_type")
             metadata["doi"] = data.get("doi")
+    if (
+        "variables.yaml" in file_names
+    ):  # this overrides if variables were found in abstract.yaml
+        with open(os.path.join(folder_path, "variables.yaml")) as fp:
+            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+            metadata["variables"] = build_variables(data, variable_id_map)
     return metadata
 
 
