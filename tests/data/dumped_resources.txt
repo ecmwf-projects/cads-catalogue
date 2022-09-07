@@ -75,7 +75,7 @@
             }
         },
         "mapping": "an url",
-        "contact": null,
+        "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.20d54e34",
         "form": "an url",
         "constraints": "an url",
@@ -283,7 +283,7 @@
             }
         },
         "mapping": "an url",
-        "contact": null,
+        "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.e2161bac",
         "form": "an url",
         "constraints": "an url",
@@ -704,7 +704,7 @@
             }
         },
         "mapping": "an url",
-        "contact": null,
+        "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.68d2bb30",
         "form": "an url",
         "constraints": "an url",
@@ -1120,7 +1120,7 @@
             }
         },
         "mapping": "an url",
-        "contact": null,
+        "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.bd0915c6",
         "form": "an url",
         "constraints": "an url",
@@ -1255,8 +1255,8 @@
         ],
         "type": "dataset",
         "previewimage": "an url",
-        "publication_date": null,
-        "record_update": "2022-09-06 16:10:27.587846+02:00",
+        "publication_date": "2018-06-14",
+        "record_update": "2022-08-30 07:31:55.508657+02:00",
         "references": [
             {
                 "title": "Citation",
@@ -1345,7 +1345,7 @@
             }
         },
         "mapping": "an url",
-        "contact": null,
+        "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.adbb2d47",
         "form": "an url",
         "constraints": "an url",
@@ -2961,8 +2961,8 @@
         ],
         "type": "dataset",
         "previewimage": "an url",
-        "publication_date": null,
-        "record_update": "2022-09-06 16:10:27.594158+02:00",
+        "publication_date": "2018-06-14",
+        "record_update": "2022-08-30 07:31:55.514834+02:00",
         "references": [
             {
                 "title": "Citation",

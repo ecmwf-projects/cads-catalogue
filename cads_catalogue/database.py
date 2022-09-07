@@ -59,7 +59,7 @@ class Resource(BaseModel):
     abstract = sa.Column(sa.TEXT, nullable=False)
     adaptor = sa.Column(sa.JSON)
     mapping = sa.Column(sa.String)
-    contact = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
+    contact = sa.Column(sa.String)
     doi = sa.Column(sa.String)
     form = sa.Column(sa.String)
     constraints = sa.Column(sa.String)

@@ -237,12 +237,17 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["type"] = data.get("resource_type")
             metadata["doi"] = data.get("doi")
+            metadata["contact"] = data.get("contactemail")
+            if not metadata["publication_date"]:
+                # it can be in dataset.yaml
+                metadata["publication_date"] = data.get("publication_date")
     if (
         "variables.yaml" in file_names
     ):  # this overrides if variables were found in abstract.yaml
         with open(os.path.join(folder_path, "variables.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["variables"] = build_variables(data, variable_id_map)
+
     return metadata
 
 
