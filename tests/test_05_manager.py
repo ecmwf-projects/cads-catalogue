@@ -80,6 +80,7 @@ def test_load_resource_from_folder() -> None:
         "ERA5-Land "
         "documentation](https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation "
         '"ERA5-Land data documentation").\n',
+        "contact": "https://support.ecmwf.int",
         "mapping": os.path.join(resource_folder_path, "mapping.json"),
         "description": {
             "data-type": "Gridded",
