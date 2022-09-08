@@ -268,7 +268,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
                 if isinstance(data.get(field, ""), str) and data.get(
                     field, ""
                 ).lower() in ("now", "today", "present"):
-                    metadata[field] = datetime.date.today().isoformat()
+                    metadata[field] = datetime.date.today()
             metadata["contact"] = data.get("contactemail")
             if not metadata["publication_date"]:
                 # it can be in dataset.yaml
