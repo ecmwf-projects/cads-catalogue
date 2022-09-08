@@ -81,6 +81,9 @@ def test_load_resource_from_folder() -> None:
         "documentation](https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation "
         '"ERA5-Land data documentation").\n',
         "contact": "https://support.ecmwf.int",
+        "begin_date": date(1981, 1, 1),
+        "end_date": date(2022, 5, 1),
+        "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
         "mapping": os.path.join(resource_folder_path, "mapping.json"),
         "description": [
             {"id": "file-format", "label": "File format", "value": "GRIB"},

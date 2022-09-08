@@ -144,7 +144,14 @@
         ],
         "providers": null,
         "summaries": null,
-        "extent": null,
+        "begin_date": "1979-01-01",
+        "end_date": "2018-12-31",
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxW": 0,
+            "bboxS": -89,
+            "bboxE": 360
+        },
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/x/YzmaE",
@@ -601,7 +608,14 @@
         ],
         "providers": null,
         "summaries": null,
-        "extent": null,
+        "begin_date": "1982-01-01",
+        "end_date": "2022-06-01",
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxW": 0,
+            "bboxS": -89,
+            "bboxE": 360
+        },
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
@@ -1022,7 +1036,14 @@
         ],
         "providers": null,
         "summaries": null,
-        "extent": null,
+        "begin_date": "1981-01-01",
+        "end_date": "2022-05-01",
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxW": 0,
+            "bboxS": -89,
+            "bboxE": 360
+        },
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
@@ -1233,7 +1254,14 @@
         ],
         "providers": null,
         "summaries": null,
-        "extent": null,
+        "begin_date": "1979-01-01",
+        "end_date": "2022-08-31",
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxW": 0,
+            "bboxS": -89,
+            "bboxE": 360
+        },
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
@@ -2934,7 +2962,14 @@
         ],
         "providers": null,
         "summaries": null,
-        "extent": null,
+        "begin_date": "1979-01-01",
+        "end_date": "2022-08-31",
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxW": 0,
+            "bboxS": -89,
+            "bboxE": 360
+        },
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
