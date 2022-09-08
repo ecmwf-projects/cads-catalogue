@@ -1,24 +1,24 @@
 {
     "day": [
-        "04",
-        "16"
+        "30",
+        "01"
     ],
-    "format": "netcdf",
-    "month": [
-        "12",
-        "07"
+    "format": "grib",
+    "month": "01",
+    "product_type": [
+        "ensemble_spread",
+        "ensemble_mean"
     ],
-    "product_type": "ensemble_members",
     "time": [
-        "03:00",
+        "06:00",
         "12:00"
     ],
     "variable": [
-        "snow_albedo",
-        "vertical_integral_of_northward_total_energy_flux"
+        "mean_sea_level_pressure",
+        "medium_cloud_cover"
     ],
     "year": [
-        "2013",
-        "1968"
+        "1975",
+        "1992"
     ]
 }

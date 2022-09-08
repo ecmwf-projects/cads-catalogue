@@ -12,5 +12,4 @@ toolbox: true
 selection_limit: 120000
 selection_limit_ignore: ['area', 'grid']
 
-update_date: 2022-06-14
-purpose: "<b>NOTIFICATION</b> 2021-05-18: please be aware that between 1 September 2021 and 13 December 2021 the final release of ERA5 differed from the timely updates (ERA5T). See the online ERA5 [documentation](https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation#ERA5:datadocumentation-Dataupdatefrequency) for more information."
+update_date: 2022-09-05

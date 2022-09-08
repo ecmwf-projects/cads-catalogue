@@ -1,20 +1,17 @@
 {
     "format": "netcdf",
     "month": [
-        "09",
+        "05",
         "02"
     ],
-    "product_type": "monthly_averaged_reanalysis_by_hour_of_day",
-    "time": [
-        "02:00",
-        "12:00"
-    ],
+    "product_type": "monthly_averaged_reanalysis",
+    "time": "00:00",
     "variable": [
-        "soil_temperature_level_2",
-        "lake_bottom_temperature"
+        "volumetric_soil_water_layer_1",
+        "snow_density"
     ],
     "year": [
-        "1953",
-        "2007"
+        "2012",
+        "1963"
     ]
 }

@@ -163,7 +163,7 @@ def test_load_resource_from_folder() -> None:
             },
         ],
         "resource_uid": "reanalysis-era5-land-monthly-means",
-        "resource_update": date(2022, 3, 2),
+        "resource_update": None,
         "title": "ERA5-Land monthly averaged data from 1950 to present",
         "type": "dataset",
         "use_eqc": True,

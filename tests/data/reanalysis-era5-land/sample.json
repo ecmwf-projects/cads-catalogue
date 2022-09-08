@@ -1,23 +1,17 @@
 {
     "day": [
-        "14",
-        "02"
+        "17",
+        "27"
     ],
-    "format": "netcdf",
-    "month": [
-        "09",
-        "11"
-    ],
+    "format": "grib",
+    "month": "01",
     "time": [
-        "11:00",
-        "20:00"
+        "03:00",
+        "15:00"
     ],
     "variable": [
-        "evaporation_from_the_top_of_canopy",
-        "surface_net_thermal_radiation"
+        "leaf_area_index_high_vegetation",
+        "surface_runoff"
     ],
-    "year": [
-        "1992",
-        "1951"
-    ]
+    "year": "1950"
 }

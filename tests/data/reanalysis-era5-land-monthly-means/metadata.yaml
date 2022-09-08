@@ -33,7 +33,7 @@ bboxS: -89
 bboxE: 360
 
 begin_date: 1981-01-01
-end_date: 2022-04-01
+end_date: 2022-05-01
 
 file_format: grib
 format_version: 

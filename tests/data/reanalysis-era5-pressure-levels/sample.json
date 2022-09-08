@@ -1,29 +1,22 @@
 {
     "day": [
-        "10",
-        "25"
+        "26",
+        "11"
     ],
     "format": "netcdf",
-    "month": "02",
+    "month": "08",
     "pressure_level": [
-        "500",
-        "1"
+        "30",
+        "925"
     ],
-    "product_type": [
-        "ensemble_members",
-        "reanalysis"
-    ],
-    "product_type": "reanalysis",
+    "product_type": "ensemble_members",
     "time": [
         "21:00",
-        "00:00"
+        "15:00"
     ],
     "variable": [
-        "specific_rain_water_content",
-        "specific_cloud_ice_water_content"
+        "vorticity",
+        "geopotential"
     ],
-    "year": [
-        "1994",
-        "2006"
-    ]
+    "year": "2022"
 }
