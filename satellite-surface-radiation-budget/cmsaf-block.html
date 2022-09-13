@@ -1,0 +1,54 @@
+
+
+<div class='abstract-text'>
+
+  <p>
+    The “CLARA product family” refers to EUMETSAT’s CM SAF CLARA-A2 data record (CM SAF cLoud, Albedo and surface RAdiation dataset from AVHRR data - Edition 2).
+It merges the AVHRR-sensor data from a variety of satellites into a combined TCDR over several decades.
+ It includes the daily means of surface downwelling shortwave flux as well as monthly means of surface downwelling shortwave, surface upwelling longwave, and surface downwelling longwave flux.<p> The monthly means of surface upwelling shortwave, surface net shortwave, surface net longwave and surface net radiative flux are provided by the C3S project, based on the CLARA-A2 data. The surface downwelling shortwave flux ICDR extension is provided by CM SAF; the ICDR’s for all other variables are provided by C3S. </br>
+
+The data record has been validated in peer-reviewed publications in which the uncertainties, limitations and potential applications have been detailed. The data record has sufficient length, consistency, and continuity to detect climate variability and change.
+  </p>
+  
+  
+  <p></p>
+  <table class="abstract-description abstract-table">
+    <tr><th colspan="2">DATA DESCRIPTION</th>
+      
+    <tr><th>Data type</th><td>Gridded</td></tr>
+    <tr><th>Projection</th><td>Regular latitude-longitude grid</td></tr>
+    <tr><th>Horizontal coverage</th><td>Global</td></tr>
+    <tr><th>Horizontal resolution</th><td>0.25°x0.25°</td></tr>
+    <tr><th>Vertical coverage</th><td>Surface</td></tr>
+    <tr><th>Vertical resolution</th><td>Single level</td></tr>
+    <tr><th>Temporal coverage</th><td>January 1982 to present</td></tr>
+    <tr><th>Temporal resolution</th><td>Monthly. Monthly and daily for  the surface downwelling shortwave flux variable</td></tr>
+    <tr><th>File format</th><td>NetCDF 4</td></tr>
+    <tr><th>Conventions</th><td>Climate and Forecast (CF) Metadata Convention v1.6, Attribute Convention for Dataset Discovery (ACDD) v1.3</td></tr>
+    <tr><th>Update frequency</th><td>Every quarter appends an extra three month worth of data to the end of the datasets. </td></tr>
+    <tr><th>Versions</th><td>Daily data: v2.0.1 <br> Monthly data: v2.0 (deprecated) and v2.0.1 (latest) </td></tr>
+  </table>
+  
+  
+  <p></p>
+  <table class="abstract-variables abstract-table">
+    <tr><th colspan="3">MAIN VARIABLES</th>
+    <tr><th class='variables-name'>Name</th><th class='variables-units'>Units</th><th class='variables-description'>Description</th></tr>
+    <tr><td class='variables-name'>Surface downwelling shortwave  flux                   </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Amount of shortwave radiation energy reaching the lower boundary of the atmosphere per unit of time and area from the above.</td></tr>
+    <tr><td class='variables-name'>Surface upwelling shortwave  flux                  </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Amount of shortwave radiation energy reaching the lower boundary of the atmosphere per unit of time and area from below.</td></tr>    
+    <tr><td class='variables-name'>Surface net downward shortwave  flux                        </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Difference between the amount of shortwave radiation energy reaching the lower boundary of the atmosphere from below (upwelling) and the amount from above (downwelling). Values are provided per unit of time and area.</td></tr>
+    <tr><td class='variables-name'>Surface upwelling longwave  flux                    </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Amount of longwave radiation energy reaching the lower boundary of the atmosphere per unit of time and area from below.</td></tr>
+    <tr><td class='variables-name'>Surface downwelling longwave  flux                 </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Amount of longwave radiation energy reaching the lower boundary of the atmosphere per unit of time and area from the above.</td></tr>
+    <tr><td class='variables-name'>Surface net downward longwave  flux                         </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Difference between the amount of longwave radiation energy reaching the lower boundary of the atmosphere from below (upwelling) and the amount from above (downwelling). Values are provided per unit of time and area.</td></tr>    
+    <tr><td class='variables-name'>Surface net downward radiative flux                          </td><td class='variables-units'>W m<sup>-2</sup></td><td class='variables-description'>Difference between the amount of radiation energy reaching the lower boundary of the atmosphere from below (upwelling) and the amount from above (downwelling). Values are provided per unit of time and area.</td></tr>
+  </table>
+  <br>
+  
+  <table class="abstract-description abstract-table"><tbody><tr><th>RELATED VARIABLES</th></tr>
+      <tr><td>A number of variables accounting for the uncertainty on the data provided are also included in the files along the main variables. They provide estimates on possible variations of the values of the main variables due to changes in processing and sampling algorithms. A variable containing information about clear-sky condition and target accuracy in each grid cell is also provided.</td></tr></tbody>
+  </table>
+  <br>
+  
+  
+</div>
+

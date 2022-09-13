@@ -1,0 +1,15 @@
+---
+references:
+   - id: DOIs
+     content: dois.md
+     title: DOI
+     copy: true
+   - id: Citation
+     content: citation.md
+     title: Citation
+#     filename: citation.pdf
+     copy: true
+   - id: acknowledgement
+     content: acknowledgement.html
+     title: Acknowledgement
+     #filename:  

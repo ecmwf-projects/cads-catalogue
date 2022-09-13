@@ -1,0 +1,43 @@
+
+responsible_individual: Copernicus Climate Change Service
+responsible_organisation: ECMWF
+responsible_organisation_website: https://www.ecmwf.int/
+responsible_organisation_tf:
+responsible_organisation_role: pointOfContact
+contactemail: https://support.ecmwf.int
+
+licence_list:  ["licence-to-use-copernicus-products"]
+
+use_limitation: Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.
+
+ds_responsible_organization_role:
+ds_responsible_individual:  Copernicus Climate Change Service
+ds_responsible_organisation_website: 
+ds_responsible_organisation_tf:
+ds_responsible_organisation: ECMWF 
+ds_contactemail: https://support.ecmwf.int/
+ds_responsible_organisation_role: publisher
+
+inspire_theme: Atmospheric conditions
+
+data_type: grid
+unit_measure: dd
+representative_fraction: 0.25
+
+topic: climatologyMeteorologyAtmosphere
+
+bboxN: 89
+bboxW: 0
+bboxS: -89
+bboxE: 360
+
+begin_date: 1982-01-01
+end_date: 2021-12-01
+
+file_format: NetCDF
+format_version: 3
+
+lineage: EC Copernicus program 
+
+resource_type: dataset
+

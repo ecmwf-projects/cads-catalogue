@@ -1,0 +1,25 @@
+{
+    "climate_data_record_type": "interim_climate_data_record",
+    "day": [
+        "23",
+        "13"
+    ],
+    "format": "tgz",
+    "month": [
+        "03",
+        "01"
+    ],
+    "origin": "esa",
+    "product_family": "cci",
+    "sensor_on_satellite": "atsr2_on_ers2",
+    "time_aggregation": "monthly_mean",
+    "variable": [
+        "surface_downwelling_shortwave_flux",
+        "surface_upwelling_longwave_flux"
+    ],
+    "version": "v1_0",
+    "year": [
+        "2019",
+        "2020"
+    ]
+}

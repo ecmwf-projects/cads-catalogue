@@ -1,0 +1,38 @@
+---
+title: Surface radiation budget from 1982 to present derived from satellite observations
+
+licences: ["eumetsat-cm-saf","licence-to-use-copernicus-products","CCI-data-policy-for-satellite-surface-radiation-budget"]
+adaptor: adaptor.url
+
+url: https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/
+
+suffix: .nc
+selection_limit: 1200
+selection_limit_ignore: ['area']
+toolbox: true
+
+purpose: '<b>WARNING</b>: There are current issues afflicting the data of this dataset. Consult "Known issues" under the Documentation tab for more information.'
+
+publication_date: 2020-10-20
+
+eqc: true
+
+related_resource: viewer-satellite-surface-radiation-budget
+thumbnail: overview2.png
+
+tabs: [overview, download, documentation, view]
+
+# JIRA: https://jira.ecmwf.int/browse/CDSI-82, CDSI-351 for CCI data, CDSI-297 for access, CDSI-483 and 529 for cci icdr and tcr
+
+#     All Manifests:
+MANIFEST: 
+#  CLARA-family; TCDR; Sensor=AVHRR; Origin=CMSAF
+  - https://c3s_cds_user:ZxStd3aW3CLUAUoTTtGb@c3s.satproj.klima.dwd.de/data/manifests/manifest_c3s_312b_lot1_srb_cmsaf-clara_tcdr_latest.txt
+#  CLARA-family; TCDR; Sensor=AVHRR; Origin=C3S
+  - https://c3s_cds_user:ZxStd3aW3CLUAUoTTtGb@c3s.satproj.klima.dwd.de/data/manifests/manifest_c3s_312b_lot1_srb_c3s-clara_tcdr_latest.txt
+#  CCI-family; TCDR; Sensor=AATSR, ATSR2; Origin=ESA CCI
+  - http://gws-access.jasmin.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/c3s_manifest/manifest_c3s_312b_lot1_srb_esa-cci_tcdr_latest.txt
+#              ICDR
+  - http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/c3s_manifest/manifest_c3s_312b_lot1_srb_c3s_icdr_latest.txt
+
+

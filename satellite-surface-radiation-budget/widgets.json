@@ -1,0 +1,106 @@
+[
+  {
+    "tab": "overview",
+    "widgets":
+    [
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "EUMETSAT CM SAF CLARA-A2",
+        "label": "CLARA product family data  overview",
+        "framed": false,
+        "details": {
+          "accordion": true,
+          "text:file": "cmsaf-block.html"
+         }
+        },
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "CCI product family ",
+        "label": "CCI product family data  overview",
+        "framed": false,
+        "details": {
+          "accordion": true,
+          "text:file": "cci-block.html"
+        }
+      },
+     {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "association",
+        "label": "Relationship between names for surface radiation variables",
+        "framed": false,
+        "details": {
+          "accordion": true,
+          "text:file": "association-block.html"
+        }
+      }
+    ]
+  },
+  {
+    "tab": "history",
+    "widgets":
+    [
+      {
+        "type": "FreeEditionWidget",
+        "required": true,
+        "name": "history",
+        "label": "Record of data and metadata changes",
+        "framed": false,
+        "details": {
+          "accordion": true,
+          "text": "2020-03-11: Publication date"
+        }
+      }
+    ]
+  },
+  {
+    "tab": "doc",
+    "widgets":
+    [
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "first",
+        "label": "CLARA product family",
+        "framed": false,
+        "details": {
+          "accordion": true
+        }
+      },
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "second",
+        "label": "CCI product family",
+        "framed": false,
+        "details": {
+          "accordion": true
+        }
+      },
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "tutorial",
+        "label": "Tutorial",
+        "framed": false,
+        "details": {
+          "accordion": true
+        }
+      },
+      {
+        "type": "FreeEditionWidget",
+        "required": false,
+        "name": "known_issues",
+        "label": "Known issues",
+        "framed": false,
+        "details": {
+          "accordion": true,
+          "text:file": "known_issues.html"
+        }
+      }
+    ]
+  }
+]
+

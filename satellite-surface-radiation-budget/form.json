@@ -1,0 +1,401 @@
+[
+    {
+        "css": "todo",
+        "details": {
+            "columns": 1,
+            "id": 0,
+            "labels": {
+                "cci": "CCI (Climate Change Initiative)",
+                "clara": "CLARA (CLoud, Albedo and Radiation)"
+            },
+            "values": [
+                "clara",
+                "cci"
+            ]
+        },
+        "help": "<p><strong>CLARA product family</strong> refers to EUMETSAT CM SAF CLARA-A2 dataset, with additional variables and time coverage funded by the Copernicus Climate Change Service (C3S).</p> <p><strong>CCI product family</strong> refers to the ESA Cloud_cci version 3.0 surface radiation, with additional time range funded by the Copernicus Climate Change Servive (C3S).</p>",
+        "label": "Product family",
+        "name": "product_family",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 1,
+            "id": 1,
+            "labels": {
+                "c3s": "C3S (Copernicus Climate Change Service)",
+                "esa": "ESA (European Space Agency)",
+                "eumetsat": "EUMETSAT (European Organisation for the Exploitation of Meteorological Satellites)"
+            },
+            "values": [
+                "c3s",
+                "eumetsat",
+                "esa"
+            ]
+        },
+        "help": "Service, project or organisation in charge of the production of the data. There are 3 origins or producers in this dataset: C3S, ESA, EUMETSAT. <br> The C3S origin acts as an extension of the previous provider for each one of the 2 families, keeping the same sensors and algorithms but providing a time extension for each family, CLARA and CCI.",
+        "label": "Origin",
+        "name": "origin",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 1,
+            "id": 2,
+            "labels": {
+                "all_variables": "All variables (CCI product family)",
+                "surface_downwelling_longwave_flux": "Surface downwelling longwave  flux",
+                "surface_downwelling_shortwave_flux": "Surface downwelling shortwave  flux",
+                "surface_net_downward_longwave_flux": "Surface net downward longwave  flux",
+                "surface_net_downward_radiative_flux": "Surface net downward radiative flux",
+                "surface_net_downward_shortwave_flux": "Surface net downward shortwave  flux",
+                "surface_upwelling_longwave_flux": "Surface upwelling longwave  flux",
+                "surface_upwelling_shortwave_flux": "Surface upwelling shortwave  flux"
+            },
+            "values": [
+                "surface_upwelling_shortwave_flux",
+                "surface_upwelling_longwave_flux",
+                "surface_downwelling_shortwave_flux",
+                "surface_downwelling_longwave_flux",
+                "surface_net_downward_shortwave_flux",
+                "surface_net_downward_longwave_flux",
+                "surface_net_downward_radiative_flux",
+                "all_variables"
+            ]
+        },
+        "help": "There are two families of variables: CLARA product family and CCI product family. <br> Both families contain the same 7 variables, but variables of the CLARA product family can be downloaded individually, whereas variables of the CCI product family are provided all together in a single netCDF file. <br> Note that the two families are based on the data from different sensors and algorithms. They also differ in temporal and horizontal resolution. That is why they are organised as product families.  Whitin each family there are two different providers or origins. The C3S origin acts as an extension of the previous provider for each family keeping the same sensors and algorithms but providing a time extension of the dataset.",
+        "label": "Variable",
+        "name": "variable",
+        "required": true,
+        "type": "StringListWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 1,
+            "id": 3,
+            "labels": {
+                "interim_climate_data_record": "Interim Climate Data Record (ICDR)",
+                "thematic_climate_data_record": "Thematic Climate Data Record (TCDR)"
+            },
+            "values": [
+                "interim_climate_data_record",
+                "thematic_climate_data_record"
+            ]
+        },
+        "help": "Both the ICDR and the TCDR parts of each product family were generated using the same software and algorithms. The TCDR is intended to have sufficient length, consistency, and continuity to detect climate variability and change. The ICDR provides a short-delay access to current data where consistency with the CDR baseline is expected but was not extensively checked.",
+        "label": "Climate data record type",
+        "name": "climate_data_record_type",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 3,
+            "id": 4,
+            "labels": {
+                "aatsr_on_envisat": "AATSR on ENVISAT",
+                "atsr2_on_ers2": "ATSR2 on ERS2",
+                "avhrr_on_multiple_satellites": "AVHRR on multiple satellites",
+                "slstr_on_sentinel_3a_is_under_investigation": "SLSTR on Sentinel-3A is under investigation",
+                "slstr_on_sentinel_3b_is_under_investigation": "SLSTR on Sentinel-3B is under investigation"
+            },
+            "values": [
+                "aatsr_on_envisat",
+                "atsr2_on_ers2",
+                "avhrr_on_multiple_satellites",
+                "slstr_on_sentinel_3a_is_under_investigation",
+                "slstr_on_sentinel_3b_is_under_investigation"
+            ]
+        },
+        "help": "<p><strong>CLARA product family</strong><br> AVHRR (Advanced Very High Resolution Radiometer) on NOAA-7,9,11,14,16,17,18,19 and Metop-A and -B.</p> <p><strong>CCI product family</strong><br> ATSR2 (Along-Track Scanning Radiometer 2) on ERS-2<br> AATSR (Advanced Along-Track Scanning Radiometer) on Envisat<br> SLSTR (Sea and Land Surface Temperature Radiometer) on Sentinel 3A and 3B</p>",
+        "label": "Sensor on satellite",
+        "name": "sensor_on_satellite",
+        "required": true,
+        "type": "StringListWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 3,
+            "id": 5,
+            "labels": {
+                "daily_mean": "Daily mean",
+                "monthly_mean": "Monthly mean"
+            },
+            "values": [
+                "monthly_mean",
+                "daily_mean"
+            ]
+        },
+        "help": "Daily means are only available for the variable surface downwelling shortwave flux of the CLARA-family",
+        "label": "Time aggregation",
+        "name": "time_aggregation",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 6,
+            "id": 6,
+            "labels": {
+                "1982": "1982",
+                "1983": "1983",
+                "1984": "1984",
+                "1985": "1985",
+                "1986": "1986",
+                "1987": "1987",
+                "1988": "1988",
+                "1989": "1989",
+                "1990": "1990",
+                "1991": "1991",
+                "1992": "1992",
+                "1993": "1993",
+                "1994": "1994",
+                "1995": "1995",
+                "1996": "1996",
+                "1997": "1997",
+                "1998": "1998",
+                "1999": "1999",
+                "2000": "2000",
+                "2001": "2001",
+                "2002": "2002",
+                "2003": "2003",
+                "2004": "2004",
+                "2005": "2005",
+                "2006": "2006",
+                "2007": "2007",
+                "2008": "2008",
+                "2009": "2009",
+                "2010": "2010",
+                "2011": "2011",
+                "2012": "2012",
+                "2013": "2013",
+                "2014": "2014",
+                "2015": "2015",
+                "2016": "2016",
+                "2017": "2017",
+                "2018": "2018",
+                "2019": "2019",
+                "2020": "2020",
+                "2021": "2021"
+            },
+            "values": [
+                "1982",
+                "1983",
+                "1984",
+                "1985",
+                "1986",
+                "1987",
+                "1988",
+                "1989",
+                "1990",
+                "1991",
+                "1992",
+                "1993",
+                "1994",
+                "1995",
+                "1996",
+                "1997",
+                "1998",
+                "1999",
+                "2000",
+                "2001",
+                "2002",
+                "2003",
+                "2004",
+                "2005",
+                "2006",
+                "2007",
+                "2008",
+                "2009",
+                "2010",
+                "2011",
+                "2012",
+                "2013",
+                "2014",
+                "2015",
+                "2016",
+                "2017",
+                "2018",
+                "2019",
+                "2020",
+                "2021"
+            ]
+        },
+        "help": null,
+        "label": "Year",
+        "name": "year",
+        "required": true,
+        "type": "StringListWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 6,
+            "id": 7,
+            "labels": {
+                "01": "January",
+                "02": "February",
+                "03": "March",
+                "04": "April",
+                "05": "May",
+                "06": "June",
+                "07": "July",
+                "08": "August",
+                "09": "September",
+                "10": "October",
+                "11": "November",
+                "12": "December"
+            },
+            "values": [
+                "01",
+                "02",
+                "03",
+                "04",
+                "05",
+                "06",
+                "07",
+                "08",
+                "09",
+                "10",
+                "11",
+                "12"
+            ]
+        },
+        "help": null,
+        "label": "Month",
+        "name": "month",
+        "required": true,
+        "type": "StringListWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 6,
+            "id": 8,
+            "labels": {
+                "01": "01",
+                "02": "02",
+                "03": "03",
+                "04": "04",
+                "05": "05",
+                "06": "06",
+                "07": "07",
+                "08": "08",
+                "09": "09",
+                "10": "10",
+                "11": "11",
+                "12": "12",
+                "13": "13",
+                "14": "14",
+                "15": "15",
+                "16": "16",
+                "17": "17",
+                "18": "18",
+                "19": "19",
+                "20": "20",
+                "21": "21",
+                "22": "22",
+                "23": "23",
+                "24": "24",
+                "25": "25",
+                "26": "26",
+                "27": "27",
+                "28": "28",
+                "29": "29",
+                "30": "30",
+                "31": "31"
+            },
+            "values": [
+                "01",
+                "02",
+                "03",
+                "04",
+                "05",
+                "06",
+                "07",
+                "08",
+                "09",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "30",
+                "31"
+            ]
+        },
+        "help": null,
+        "label": "Day",
+        "name": "day",
+        "required": true,
+        "type": "StringListWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 4,
+            "id": 9,
+            "labels": {
+                "v2_0": "v2.0",
+                "v2_0_1": "v2.0.1"
+            },
+            "values": [
+                "v2_0",
+                "v2_0_1",
+                "v2_2",
+                "v2_1"
+            ]
+        },
+        "help": "CLARA-family products are the only ones with a choice of versions since they are the only ones for which more than one version is available.",
+        "label": "Version",
+        "name": "version",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 2,
+            "default": [
+                "zip"
+            ],
+            "id": 10,
+            "labels": {
+                "tgz": "Compressed tar file (.tar.gz)",
+                "zip": "Zip file (.zip)"
+            },
+            "values": [
+                "zip",
+                "tgz"
+            ]
+        },
+        "help": "The original files can be recovered by using the convenient unzip software.",
+        "label": "Format",
+        "name": "format",
+        "required": true,
+        "type": "StringChoiceWidget"
+    }
+]

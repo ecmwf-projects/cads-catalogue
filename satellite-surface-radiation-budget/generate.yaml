@@ -1,0 +1,169 @@
+---
+regex: 
+
+##### CLARA
+#              Monthly
+    (?P<__ignore_0>.*)/srb/(?P<origin>[a-z0-9\-]*)/(?P<climate_data_record_type>[a-z]+)/(?P<variable_1>[A-Z]+)_MM_(?P<sensor_on_satellite>[A-Z]*)_CLARA/(?P<version_1>[v0-9\.]+)/(?P<year_1>\d{4})/(?P<month_1>\d{2})/(?P<variable_2>[A-Z]*)mm(?P<year_2>\d{4})(?P<month_2>\d{2})(?P<__ignore_1>.*).nc:
+        product_family: CLARA
+        time_aggregation: MM
+      
+
+#              Daily
+    (?P<__ignore_0>.*)/srb/(?P<origin>[a-z0-9\-]*)/(?P<climate_data_record_type>[a-z]+)/(?P<variable_1>[A-Z]+)_DM_(?P<sensor_on_satellite>[A-Z]*)_CLARA/(?P<__ignore_product_version_1>[v0-9\.]+)/(?P<year_1>\d{4})/(?P<month_1>\d{2})/(?P<variable_2>[A-Z]*)dm(?P<year_2>\d{4})(?P<month_2>\d{2})(?P<day>\d{2})0000(?P<__ignore_1>.*).nc:
+        product_family: CLARA
+        time_aggregation: DM
+
+
+##### CCI
+#              Monthly
+    (?P<__ignore_0>.*)cds_c3s_cloud/c3s_312b_lot1/data/srb/(?P<origin>[a-z0-9\_\-]*)/(?P<climate_data_record_type>[a-z]+)/(?P<__ignore_product_version_1>[r0-9\.]+)/monthly/(?P<year_1>\d{4})/(?P<month_1>\d{2})/C3S-312bL1-(?P<__ignore_processinglevel_1>\w+)-MONTHLY-SRB-(?P<sensor_on_satellite>[A-Za-z23\-\_]*)_(?P<year_2>\d{4})(?P<month_2>\d{2})_fv(?P<__ignore_CCI_file_version_1>[v0-9\.]+).nc:
+        variable: esa_cci
+        time_aggregation: MM
+        product_family: CCI
+
+
+labels:
+
+  variable:
+    SRS: Surface upwelling shortwave  flux
+    SOL: Surface upwelling longwave  flux
+    SIS: Surface downwelling shortwave  flux
+    SDL: Surface downwelling longwave  flux
+    SNS: Surface net downward shortwave  flux
+    SNL: Surface net downward longwave  flux
+    SRB: Surface net downward radiative flux
+    esa_cci: All variables (CCI product family)  
+
+  time_aggregation:
+    MM: Monthly mean
+    DM: Daily mean
+
+  climate_data_record_type:
+    icdr: Interim Climate Data Record (ICDR)
+    tcdr: Thematic Climate Data Record (TCDR)
+
+  origin:
+#    c3s-clara: C3S (Copernicus Climate Change Service)
+#    cmsaf-clara: CM SAF (Climate Monitoring Satellite Applications Facility)
+#    esa-cci: ESA Cloud CCI (European Space Agency Climate Change Initiative)
+    cmsaf: EUMETSAT (European Organisation for the Exploitation of Meteorological Satellites)
+    c3s: C3S (Copernicus Climate Change Service)
+    esa_cci: ESA (European Space Agency)
+
+  sensor_on_satellite:
+    'AATSR_ORAC_ENVISAT':   'AATSR on ENVISAT'
+    'ATSR2_ORAC_ERS2':   'ATSR2 on ERS2'
+    'AVHRR':   'AVHRR on multiple satellites'
+    'SLSTR_ORAC_Sentinel-3a': 'SLSTR on Sentinel-3A is under investigation'
+    'SLSTR_ORAC_Sentinel-3b': 'SLSTR on Sentinel-3B is under investigation'
+
+  version:
+    v2.0: v2.0 
+    v2.0.1: v2.0.1
+    v1.0: v1.0
+    v2.2: v2.2
+    v2.1: v2.1
+ 
+  product_family :
+    CLARA: CLARA (CLoud, Albedo and Radiation)
+    CCI: CCI (Climate Change Initiative)
+
+
+
+#groups:
+#  version:
+#    - label: CLARA product
+#      open: true
+#      values:
+#      - "v2_0"
+#      - "v2_0_1"
+#      - "v1_0"
+#
+  
+#defaults:
+#  version: ['v2_0_1']
+
+   
+columns:
+   product_family: 1
+   climate_data_record_type: 1
+   origin: 1
+   variable: 1
+   time_aggregation: 3
+   sensor_on_satellite: 3
+   year: 6
+   month: 6
+   day: 6
+
+widget_order:
+  - product_family
+  - origin
+  - variable
+  - climate_data_record_type
+  - sensor_on_satellite
+  - time_aggregation
+  - year
+  - month
+  - day
+  - version
+  - format
+
+titles:
+  processinglevel: Processing level
+  origin: Origin 
+  climate_data_record_type: "Climate data record type"
+
+widget_types:
+  product_family: "StringChoiceWidget"
+  time_aggregation: "StringChoiceWidget"
+  origin: "StringChoiceWidget"
+  version: "StringChoiceWidget"
+  climate_data_record_type: "StringChoiceWidget"
+
+
+
+
+
+
+
+helps:
+  product_family: >-
+    <p><strong>CLARA product family</strong> refers to EUMETSAT CM SAF CLARA-A2 dataset, with additional variables and time coverage funded by the Copernicus Climate Change Service (C3S).</p>
+    <p><strong>CCI product family</strong> refers to the ESA Cloud_cci version 3.0 surface radiation, with additional time range funded by the Copernicus Climate Change Servive (C3S).</p>
+ 
+  processinglevel: >-
+    <p><strong> Level 4:</strong> SST observations from multiple instruments using an analysis system (e.g. optimal interpolation) to produce a gridded, gap-free product.</p>
+    <p><strong>Level 3C:</strong> Collated data product made of observations from a single instrument combined into a space-time grid. In this project, a typical L3C file may contain all the observations from a single instrument in a 24-hour period.</p>
+
+  variable: >-
+     There are two families of variables: CLARA product family and CCI product family. <br>
+     Both families contain the same 7 variables, but variables of the CLARA product family can be downloaded individually, whereas variables of the CCI product family are provided all together in a single netCDF file. <br>
+     Note that the two families are based on the data from different sensors and algorithms. They also differ in temporal and horizontal resolution. That is why they are organised as product families. 
+     Whitin each family there are two different providers or origins. The C3S origin acts as an extension of the previous provider for each family keeping the same sensors and algorithms but providing a time extension of the dataset.
+
+  origin: >-
+     Service, project or organisation in charge of the production of the data.
+     There are 3 origins or producers in this dataset: C3S, ESA, EUMETSAT. <br>
+     The C3S origin acts as an extension of the previous provider for each one of the 2 families, keeping the same sensors and algorithms but providing a time extension for each family, CLARA and CCI.
+
+  climate_data_record_type: >-
+     Both the ICDR and the TCDR parts of each product family were generated using the same software and algorithms. The TCDR is intended to have sufficient length, consistency, and continuity to detect climate variability and change. The ICDR provides a short-delay access to current data where consistency with the CDR baseline is expected but was not extensively checked.
+ 
+ 
+  sensor_on_satellite: >-
+     <p><strong>CLARA product family</strong><br>
+     AVHRR (Advanced Very High Resolution Radiometer) on NOAA-7,9,11,14,16,17,18,19 and Metop-A and -B.</p>
+     <p><strong>CCI product family</strong><br>
+     ATSR2 (Along-Track Scanning Radiometer 2) on ERS-2<br>
+     AATSR (Advanced Along-Track Scanning Radiometer) on Envisat<br>
+     SLSTR (Sea and Land Surface Temperature Radiometer) on Sentinel 3A and 3B</p>
+
+  time_aggregation: >-
+     Daily means are only available for the variable surface downwelling shortwave flux of the CLARA-family
+
+
+  version: >-
+     CLARA-family products are the only ones with a choice of versions since they are the only ones for which more than one version is available.
+
+#
+
