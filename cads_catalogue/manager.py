@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import glob
 import itertools
 import json
@@ -147,6 +148,30 @@ def build_variables(
     return ret_value
 
 
+def build_geo_extent(data: dict[str, Any]) -> dict[str, float | None]:
+    """Build the db field `geo_extent` from the yaml data loaded.
+
+    Parameters
+    ----------
+    data: yaml data
+
+    Returns
+    -------
+    a dictionary of kind {"bboxN": ..., "bboxW": ..., "bboxS": ..., "bboxE": ...}
+    """
+    yaml_db_keymap = {
+        # key_on_yaml: key_on_db_field
+        "bboxN": "bboxN",
+        "bboxW": "bboxW",
+        "bboxS": "bboxS",
+        "bboxE": "bboxE",
+    }
+    geo_extent = dict()
+    for key_on_yaml, key_on_db_field in yaml_db_keymap.items():
+        geo_extent[key_on_db_field] = data.get(key_on_yaml)
+    return geo_extent
+
+
 def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load metadata of a resource from a folder.
 
@@ -237,6 +262,13 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["type"] = data.get("resource_type")
             metadata["doi"] = data.get("doi")
+            metadata["geo_extent"] = build_geo_extent(data)
+            for field in ("begin_date", "end_date"):
+                metadata[field] = data.get(field)
+                if isinstance(data.get(field, ""), str) and data.get(
+                    field, ""
+                ).lower() in ("now", "today", "present"):
+                    metadata[field] = datetime.date.today()
             metadata["contact"] = data.get("contactemail")
             if not metadata["publication_date"]:
                 # it can be in dataset.yaml
