@@ -1,0 +1,46 @@
+responsible_individual: Richard Engelen
+responsible_organisation: ECMWF
+responsible_organisation_website: https://www.ecmwf.int/
+responsible_organisation_role: pointOfContact
+contactemail: copernicus-support@ecmwf.int
+
+use_limitation: Content accessible through the ADS may only be used under the terms
+  of the licenses attributed to each particular resource.
+
+publication_date: 2020-02-06
+
+ds_responsible_organization_role:
+ds_responsible_individual: Richard Engelen
+ds_responsible_organisation_website:
+ds_responsible_organisation: ECMWF
+ds_contactemail: copernicus-support@ecmwf.int
+# Role values must be valid values on a registered code list - CI_RoleCode
+# (recommended values are: author, owner, pointOfContact, publisher,
+# resourceProvider)
+ds_responsible_organisation_role: publisher
+
+# Inspire theme must be a valid value on a registered code list (see Confluence:
+# CDS Infrastructure Related Components -> 02.06 Compliant Metadata (ISO -
+# INSPIRE))
+inspire_theme: Atmospheric conditions
+
+# WMO theme must be a valid value on a registered code list
+wmo_theme:
+- airPollution
+
+# Topic must be a valid value on a registered code list (see Confluence:
+# CDS Infrastructure Related Components -> 02.06 Compliant Metadata (ISO -
+# INSPIRE))
+topic: climatologyMeteorologyAtmosphere
+
+data_type: grid
+
+bboxN: 89
+bboxW: 0
+bboxS: -89
+bboxE: 360
+
+file_format: CSV
+
+begin_date: '2004-01-01'
+end_date: '2022-09-11'  # Automatically updated!

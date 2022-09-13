@@ -1,0 +1,28 @@
+---
+description:
+  file-format: CSV, netCDF
+  data-type: point data
+  horizontal-coverage: Global, Meteosat satellite field-of-view
+  horizontal-resolution: 3-5 km interpolated to point of interest
+  temporal-coverage: February 2004 to present
+  temporal-resolution: 1-minute, 15-minute, 1-hourly, daily, monthly
+
+
+keywords:
+  - "Variable domain: Solar radiation"
+  - "Parameter family: Radiation"
+  - "Spatial coverage: Global"
+  - "Spatial coverage: Satellite image area"
+  - "Product type: Analysis"
+  - "Temporal coverage: Past"
+
+
+documentation:
+
+- url: https://confluence.ecmwf.int/x/jOLjDw
+  title: CAMS Solar Radiation Documentation
+  description: Documentation on the CAMS solar radiation products
+
+- url: https://atmosphere.copernicus.eu/supplementary-services#fa6856b7-a306-4cc4-9137-f3e0cb703093
+  title: Evaluation and quality assurance (EQA) reports
+  description: Evaluation and Quality Assurance (EQA) reports for the CAMS solar irradiance products are provided on a quarterly basis. They lag by about eight months in order to acquire sufficient validation observations.

@@ -1,0 +1,7 @@
+# Config file used by ecFlow suite that does the daily updates of the dataset.
+
+# Maximum number of hours between the current UTC time and the latest
+# published datetime. Basetimes are separated by 12 hours and should
+# be published within 11 hours so the maximum difference should be
+# 12+11=23
+max_lag_hours: 23

@@ -1,0 +1,9 @@
+---
+title: 'CAMS global atmospheric composition forecasts'
+licences: [licence-to-use-copernicus-products]
+adaptor: adaptor.mars_constrained.internalexternal
+status: production
+toolbox: false
+selection_limit: 10000
+selection_limit_ignore:
+  - area

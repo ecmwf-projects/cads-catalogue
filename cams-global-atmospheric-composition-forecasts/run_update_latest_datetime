@@ -1,0 +1,52 @@
+#!/bin/ksh
+
+# Script to update the latest basetime in the CAMS global forecast dataset with
+# the same method as the one used each day in the ecFlow suite. Useful when
+# generate.sh has been re-run with a not-up-to-date mars.list file, to get the
+# basetime back up to date.
+
+set -eu
+
+this_dir=$(readlink -e $(dirname $0))
+dataset=$(basename $this_dir)
+
+# The global forecast is updated by the "direct" method, i.e. you explicitly
+# tell it the latest basetime and the number of hours between basetimes
+latest_basetime=$(date +%Y%m%d)00
+#latest_basetime=2021030700
+hours_between_basetimes=6
+
+# bootstrap.sh should have checked out cds-forms-scripts to ../scripts
+scripts_dir=$(readlink -e $this_dir/../scripts)
+
+# You should have already cloned cds-common (camsdev branch) to here
+cdscommon_dir=~/cds/cds-common
+
+forms_repo=cds-forms-cams
+forms_branch=$(git rev-parse --abbrev-ref HEAD)
+#forms_branch=camstest
+
+# Directory containing cds-forms-cams
+work_dir=$(readlink -e $this_dir/../..)
+if [[ ! -d $work_dir/$forms_repo/$dataset ]] ; then
+  echo Did not find $work_dir/$forms_repo/$dataset
+  exit 1
+fi
+update_opts="-w $work_dir"
+
+# Do not obliterate local uncommited edits
+update_opts="$update_opts -k"
+
+# Pull the forms repo before starting
+#update_opts="$update_opts -g"
+
+# Do not commit or push the repo change
+update_opts="$update_opts -c -p"
+
+export PYTHONUNBUFFERED=1
+export PYTHONPATH=$scripts_dir:$cdscommon_dir
+module load python3
+
+$scripts_dir/update_latest_datetime/update_latest_datetime.py ${update_opts:-} \
+  -d ${latest_basetime}/${hours_between_basetimes} \
+  $forms_repo $forms_branch $dataset

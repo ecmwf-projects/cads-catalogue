@@ -1,0 +1,17 @@
+{
+    "date": "2018-06-26",
+    "format": "netcdf_zip",
+    "model_level": [
+        "33",
+        "9"
+    ],
+    "time": [
+        "18:00",
+        "06:00"
+    ],
+    "type": "analysis",
+    "variable": [
+        "hydroxyl_radical",
+        "ethene"
+    ]
+}

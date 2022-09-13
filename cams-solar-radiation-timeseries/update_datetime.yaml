@@ -1,0 +1,20 @@
+# Config file used by ecFlow suite that does the daily updates of the dataset.
+
+# Data for a given day is generally available by midnight 2 days later, so
+# the typical maximum lag is 24 + 48 = 72. Allow a bit of leeway though.
+max_lag_hours: 76
+
+# Don't bother polling for new data until lag is at least this
+min_lag_hours: 71
+
+# Request used to poll for new data
+request:
+  'date': '%Y-%m-%d/%Y-%m-%d'
+  'sky_type': 'get_mcclear'
+  'location':
+    'latitude': 0.0
+    'longitude': 0.0
+  'altitude': '0.0'
+  'time_step': 'PT01H'
+  'time_reference': 'UT'
+  'format': 'csv'

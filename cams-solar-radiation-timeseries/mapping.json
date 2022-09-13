@@ -1,0 +1,23 @@
+{
+    "remap": {
+        "sky_type": {
+            "clear": "get_mcclear",
+            "observed_cloud": "get_cams_radiation"
+        },
+        "time_reference": {
+            "true_solar_time": "TST",
+            "universal_time": "UT"
+        },
+        "time_step": {
+            "15minute": "PT15M",
+            "1day": "P01D",
+            "1hour": "PT01H",
+            "1minute": "PT01M",
+            "1month": "P01M"
+        }
+    },
+    "selection_limit": 10000,
+    "selection_limit_ignore": [
+        "location"
+    ]
+}

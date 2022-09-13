@@ -1,0 +1,159 @@
+[
+    {
+        "css": "todo",
+        "details": {
+            "columns": 3,
+            "id": 0,
+            "labels": {
+                "clear": "Cloud-free conditions only",
+                "observed_cloud": "Both cloud-free and actual weather conditions"
+            },
+            "values": [
+                "clear",
+                "observed_cloud"
+            ]
+        },
+        "help": null,
+        "label": "Sky Conditions",
+        "name": "sky_type",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "details": {
+            "id": 1,
+            "latitude": {
+                "default": 0,
+                "precision": 5,
+                "range": {
+                    "max": 90,
+                    "min": -90
+                }
+            },
+            "longitude": {
+                "default": 0,
+                "precision": 5,
+                "range": {
+                    "max": 180,
+                    "min": -180
+                }
+            }
+        },
+        "help": "For cloud-free conditions only, location may be anywhere. For actual weather conditions, location must be within Meteosat disk, which extends to approximately \u00b166 degrees in longitude and latitude.",
+        "label": "Location",
+        "name": "location",
+        "required": true,
+        "type": "GeographicLocationWidget"
+    },
+    {
+        "details": {
+            "concat": "",
+            "default": [
+                [
+                    "-999."
+                ]
+            ],
+            "fields": [
+                {
+                    "comment": "Enter altitude in meters. Use -999 for an automated look-up from the NASA SRTM database",
+                    "maxlength": 20,
+                    "placeholder": "Altitude in meters",
+                    "required": true,
+                    "type": "text"
+                }
+            ],
+            "id": 2
+        },
+        "help": null,
+        "label": "Altitude",
+        "name": "altitude",
+        "required": true,
+        "type": "StringWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "default": [
+                "2022-09-11/2022-09-11"
+            ],
+            "id": 3,
+            "range": [
+                "2004-01-01",
+                "2022-09-11"
+            ]
+        },
+        "help": null,
+        "label": "Date",
+        "name": "date",
+        "required": true,
+        "type": "DateRangeWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 3,
+            "id": 4,
+            "labels": {
+                "15minute": "15 minutes",
+                "1day": "1 day",
+                "1hour": "1 hour",
+                "1minute": "1 minute",
+                "1month": "1 month"
+            },
+            "values": [
+                "1minute",
+                "15minute",
+                "1hour",
+                "1day",
+                "1month"
+            ]
+        },
+        "help": null,
+        "label": "Time step",
+        "name": "time_step",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 3,
+            "id": 5,
+            "labels": {
+                "true_solar_time": "True solar time",
+                "universal_time": "Universal time"
+            },
+            "values": [
+                "true_solar_time",
+                "universal_time"
+            ]
+        },
+        "help": null,
+        "label": "Time reference",
+        "name": "time_reference",
+        "required": true,
+        "type": "StringChoiceWidget"
+    },
+    {
+        "css": "todo",
+        "details": {
+            "columns": 3,
+            "id": 6,
+            "labels": {
+                "csv": "CSV",
+                "csv_expert": "CSV (expert mode)",
+                "netcdf": "NetCDF"
+            },
+            "values": [
+                "csv",
+                "csv_expert",
+                "netcdf"
+            ]
+        },
+        "help": "CSV (expert mode) is only available for a 1 minute time step and universal time",
+        "label": "Format",
+        "name": "format",
+        "required": true,
+        "type": "StringChoiceWidget"
+    }
+]

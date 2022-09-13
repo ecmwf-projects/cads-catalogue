@@ -1,0 +1,9 @@
+
+---
+title: 'CAMS solar radiation time-series'
+
+licences: [licence-to-use-copernicus-products]
+adaptor: adaptor.cams_solar_rad.retrieve
+status: production
+
+selection_limit: 10000

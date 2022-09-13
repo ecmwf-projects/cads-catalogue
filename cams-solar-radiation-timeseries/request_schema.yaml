@@ -1,0 +1,52 @@
+# This file defines a JSON schema that is used to check and, where possible,
+# force conformance of user request dicts to a specific form. It is read by
+# cds_common.regularise_request, which is called from the adaptor.
+
+# The latest draft version available in the jsonschema package version used at
+# time of writing
+$schema: 'http://json-schema.org/draft-07/schema#'
+
+# Constraints should never split a request into multiple dicts, so we can
+# require remain as a scalar dict
+type: object
+
+# Note that although format is required, a default value below is used if not
+# provided by user
+required:
+- sky_type
+- location
+- altitude
+- date
+- time_step
+- time_reference
+- format
+
+properties:
+  sky_type:
+    type: string
+  location:
+    type: object
+    properties:
+      latitude:
+        type: number
+        minimum: -90.0
+        maximum: 90.0
+      longitude:
+        type: number
+        minimum: -180.0
+        maximum: 180.0
+  altitude:
+    type: string
+    format: 'numeric string'
+  date:
+    type: string
+    format: date_range
+  time_step:
+    type: string
+  time_reference:
+    type: string
+  format:
+    type: string
+
+_defaults:
+  format: csv

@@ -1,0 +1,6 @@
+{"_kids": [
+  {"date": ["2004-01-01/2022-03-15"], "sky_type": ["clear"], "format": ["csv", "netcdf"], "time_reference": ["true_solar_time", "universal_time"], "time_step": ["15minute", "1day", "1hour", "1minute", "1month"]},
+  {"date": ["2004-01-01/2022-03-15"], "sky_type": ["clear"], "format": ["csv_expert"], "time_reference": ["universal_time"], "time_step": ["1minute"]},
+  {"date": ["2004-02-01/2022-03-15"], "sky_type": ["observed_cloud"], "format": ["csv", "netcdf"], "time_reference": ["true_solar_time", "universal_time"], "time_step": ["15minute", "1day", "1hour", "1minute", "1month"]},
+  {"date": ["2004-02-01/2022-03-15"], "sky_type": ["observed_cloud"], "format": ["csv_expert"], "time_reference": ["universal_time"], "time_step": ["1minute"]}
+]}

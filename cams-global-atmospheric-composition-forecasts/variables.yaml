@@ -1,0 +1,812 @@
+variables:
+  10m u-component of wind:
+    units: m s^-1
+  10m v-component of wind:
+    units: m s^-1
+  10m wind gust in the last 3 hours:
+    units: m s^-1
+  2m dewpoint temperature:
+    units: K
+  2m temperature:
+    units: K
+  Acetone:
+    units: kg kg^-1
+  Acetone product:
+    units: kg kg^-1
+  Aerosol extinction coefficient at 1064 nm:
+    units: m^-1
+  Aerosol extinction coefficient at 355 nm:
+    units: m^-1
+  Aerosol extinction coefficient at 532 nm:
+    units: m^-1
+  Aldehydes:
+    units: kg kg^-1
+  Amine:
+    units: kg kg^-1
+  Ammonia:
+    units: kg kg^-1
+  Ammonium:
+    units: kg kg^-1
+  Ammonium aerosol mass mixing ratio:
+    units: kg kg^-1
+  Ammonium aerosol optical depth at 550 nm:
+    units: dimensionless
+  Asymmetry factor at 1020 nm:
+    units: dimensionless
+  Asymmetry factor at 1064 nm:
+    units: dimensionless
+  Asymmetry factor at 1240 nm:
+    units: dimensionless
+  Asymmetry factor at 1640 nm:
+    units: dimensionless
+  Asymmetry factor at 2130 nm:
+    units: dimensionless
+  Asymmetry factor at 340 nm:
+    units: dimensionless
+  Asymmetry factor at 355 nm:
+    units: dimensionless
+  Asymmetry factor at 380 nm:
+    units: dimensionless
+  Asymmetry factor at 400 nm:
+    units: dimensionless
+  Asymmetry factor at 440 nm:
+    units: dimensionless
+  Asymmetry factor at 469 nm:
+    units: dimensionless
+  Asymmetry factor at 500 nm:
+    units: dimensionless
+  Asymmetry factor at 532 nm:
+    units: dimensionless
+  Asymmetry factor at 550 nm:
+    units: dimensionless
+  Asymmetry factor at 645 nm:
+    units: dimensionless
+  Asymmetry factor at 670 nm:
+    units: dimensionless
+  Asymmetry factor at 800 nm:
+    units: dimensionless
+  Asymmetry factor at 858 nm:
+    units: dimensionless
+  Asymmetry factor at 865 nm:
+    units: dimensionless
+  Attenuated backscatter due to aerosol at 1064 nm (from ground):
+    units: m^-1 sr^-1
+  Attenuated backscatter due to aerosol at 1064 nm (from top of atmosphere):
+    units: m^-1 sr^-1
+  Attenuated backscatter due to aerosol at 355 nm (from ground):
+    units: m^-1 sr^-1
+  Attenuated backscatter due to aerosol at 355 nm (from top of atmosphere):
+    units: m^-1 sr^-1
+  Attenuated backscatter due to aerosol at 532 nm (from ground):
+    units: m^-1 sr^-1
+  Attenuated backscatter due to aerosol at 532 nm (from top of atmosphere):
+    units: m^-1 sr^-1
+  Black carbon aerosol optical depth at 550 nm:
+    units: dimensionless
+  Boundary layer height:
+    units: m
+  Carbon monoxide:
+    units: kg kg^-1
+  Clear sky surface photosynthetically active radiation:
+    units: J m^-2
+  Clear-sky direct solar radiation at surface:
+    units: J m^-2
+  Cloud base height:
+    units: m
+  Convective available potential energy:
+    units: J kg^-1
+  Convective inhibition:
+    units: J kg^-1
+  Convective precipitation:
+    units: m
+  Dimethyl sulfide:
+    units: kg kg^-1
+  Dinitrogen pentoxide:
+    units: kg kg^-1
+  Direct solar radiation:
+    units: J m^-2
+  Downward UV radiation at the surface:
+    units: J m^-2
+  Dry deposition of ammonium aerosol:
+    units: kg m^-2 s^-1
+  Dry deposition of coarse-mode nitrate aerosol:
+    units: kg m^-2 s^-1
+  "Dry deposition of dust aerosol (0.03 - 0.55 \xB5m)":
+    units: kg m^-2 s^-1
+  "Dry deposition of dust aerosol (0.55 - 9 \xB5m)":
+    units: kg m^-2 s^-1
+  "Dry deposition of dust aerosol (9 - 20 \xB5m)":
+    units: kg m^-2 s^-1
+  Dry deposition of fine-mode nitrate aerosol:
+    units: kg m^-2 s^-1
+  Dry deposition of hydrophilic black carbon aerosol:
+    units: kg m^-2 s^-1
+  Dry deposition of hydrophilic organic matter aerosol:
+    units: kg m^-2 s^-1
+  Dry deposition of hydrophobic black carbon aerosol:
+    units: kg m^-2 s^-1
+  Dry deposition of hydrophobic organic matter aerosol:
+    units: kg m^-2 s^-1
+  "Dry deposition of sea salt aerosol (0.03 - 0.5 \xB5m)":
+    units: kg m^-2 s^-1
+  "Dry deposition of sea salt aerosol (0.5 - 5 \xB5m)":
+    units: kg m^-2 s^-1
+  "Dry deposition of sea salt aerosol (5 - 20 \xB5m)":
+    units: kg m^-2 s^-1
+  Dry deposition of sulphate aerosol:
+    units: kg m^-2 s^-1
+  "Dust aerosol (0.03 - 0.55 \xB5m) mixing ratio":
+    units: kg kg^-1
+  "Dust aerosol (0.03 - 0.55 \xB5m) optical depth at 550 nm":
+    units: dimensionless
+  "Dust aerosol (0.55 - 0.9 \xB5m) mixing ratio":
+    units: kg kg^-1
+  "Dust aerosol (0.55 - 9 \xB5m) optical depth at 550 nm":
+    units: dimensionless
+  "Dust aerosol (0.9 - 20 \xB5m) mixing ratio":
+    units: kg kg^-1
+  "Dust aerosol (9 - 20 \xB5m) optical depth at 550 nm":
+    units: dimensionless
+  Dust aerosol optical depth at 550 nm:
+    units: dimensionless
+  Ethane:
+    units: kg kg^-1
+  Ethanol:
+    units: kg kg^-1
+  Ethene:
+    units: kg kg^-1
+  Evaporation:
+    units: m of water equivalent
+  Forecast albedo:
+    units: (0 - 1)
+  Formaldehyde:
+    units: kg kg^-1
+  Formic acid:
+    units: kg kg^-1
+  Fraction of cloud cover:
+    units: (0 - 1)
+  Friction velocity:
+    units: m s^-1
+  Geopotential:
+    units: m^2 s^-2
+  Height of convective cloud top:
+    units: m
+  High cloud cover:
+    units: (0 - 1)
+  Hydrogen peroxide:
+    units: kg kg^-1
+  Hydroperoxy radical:
+    units: kg kg^-1
+  Hydrophilic black carbon aerosol mixing ratio:
+    units: kg kg^-1
+  Hydrophilic black carbon aerosol optical depth at 550 nm:
+    units: dimensionless
+  Hydrophilic organic matter aerosol mixing ratio:
+    units: kg kg^-1
+  Hydrophilic organic matter aerosol optical depth at 550 nm:
+    units: dimensionless
+  Hydrophobic black carbon aerosol mixing ratio:
+    units: kg kg^-1
+  Hydrophobic black carbon aerosol optical depth at 550 nm:
+    units: dimensionless
+  Hydrophobic organic matter aerosol mixing ratio:
+    units: kg kg^-1
+  Hydrophobic organic matter aerosol optical depth at 550 nm:
+    units: dimensionless
+  Hydroxyl radical:
+    units: kg kg^-1
+  Isoprene:
+    units: kg kg^-1
+  Lake cover:
+    units: (0 - 1)
+  Land-sea mask:
+    units: (0 - 1)
+  Large-scale precipitation:
+    units: m
+  Lead:
+    units: kg kg^-1
+  Leaf area index, high vegetation:
+    units: m^2 m^-2
+  Leaf area index, low vegetation:
+    units: m^2 m^-2
+  Low cloud cover:
+    units: (0 - 1)
+  Mean sea level pressure:
+    units: Pa
+  Medium cloud cover:
+    units: (0 - 1)
+  Methacrolein MVK:
+    units: kg kg^-1
+  Methacrylic acid:
+    units: kg kg^-1
+  Methane:
+    units: kg kg^-1
+  Methane sulfonic acid:
+    units: kg kg^-1
+  Methanol:
+    units: kg kg^-1
+  Methyl glyoxal:
+    units: kg kg^-1
+  Methyl peroxide:
+    units: kg kg^-1
+  Methylperoxy radical:
+    units: kg kg^-1
+  Nitrate:
+    units: kg kg^-1
+  Nitrate aerosol optical depth at 550 nm:
+    units: dimensionless
+  Nitrate coarse mode aerosol mass mixing ratio:
+    units: kg kg^-1
+  Nitrate coarse-mode aerosol optical depth at 550 nm:
+    units: dimensionless
+  Nitrate fine mode aerosol mass mixing ratio:
+    units: kg kg^-1
+  Nitrate fine-mode aerosol optical depth at 550 nm:
+    units: dimensionless
+  Nitrate radical:
+    units: kg kg^-1
+  Nitric acid:
+    units: kg kg^-1
+  Nitrogen dioxide:
+    units: kg kg^-1
+  Nitrogen monoxide:
+    units: kg kg^-1
+  Olefins:
+    units: kg kg^-1
+  Organic ethers:
+    units: kg kg^-1
+  Organic matter aerosol optical depth at 550 nm:
+    units: dimensionless
+  Organic nitrates:
+    units: kg kg^-1
+  Ozone:
+    units: kg kg^-1
+  Paraffins:
+    units: kg kg^-1
+  "Particulate matter d < 1 \xB5m (PM1)":
+    units: kg m^-3
+  "Particulate matter d < 10 \xB5m (PM10)":
+    units: kg m^-3
+  "Particulate matter d < 2.5 \xB5m (PM2.5)":
+    units: kg m^-3
+  Pernitric acid:
+    units: kg kg^-1
+  Peroxides:
+    units: kg kg^-1
+  Peroxy acetyl radical:
+    units: kg kg^-1
+  Peroxyacetyl nitrate:
+    units: kg kg^-1
+  Photosynthetically active radiation at the surface:
+    units: J m^-2
+  Potential evaporation:
+    units: m
+  Potential vorticity:
+    units: K m^2 kg^-1 s^-1
+  Precipitation type:
+    units: dimensionless
+  Propane:
+    units: kg kg^-1
+  Propene:
+    units: kg kg^-1
+  Radon:
+    units: kg kg^-1
+  Relative humidity:
+    units: '%'
+  "Sea salt aerosol (0.03 - 0.5 \xB5m) mixing ratio":
+    units: kg kg^-1
+  "Sea salt aerosol (0.03 - 0.5 \xB5m) optical depth at 550 nm":
+    units: dimensionless
+  "Sea salt aerosol (0.5 - 5 \xB5m) mixing ratio":
+    units: kg kg^-1
+  "Sea salt aerosol (0.5 - 5 \xB5m) optical depth at 550 nm":
+    units: dimensionless
+  "Sea salt aerosol (5 - 20 \xB5m) mixing ratio":
+    units: kg kg^-1
+  "Sea salt aerosol (5 - 20 \xB5m) optical depth at 550 nm":
+    units: dimensionless
+  Sea salt aerosol optical depth at 550 nm:
+    units: dimensionless
+  Sea surface temperature:
+    units: K
+  Sea-ice cover:
+    units: (0 - 1)
+  Sedimentation of ammonium aerosol:
+    units: kg m^-2 s^-1
+  Sedimentation of coarse-mode nitrate aerosol:
+    units: kg m^-2 s^-1
+  "Sedimentation of dust aerosol (0.03 - 0.55 \xB5m)":
+    units: kg m^-2 s^-1
+  "Sedimentation of dust aerosol (0.55 - 9 \xB5m)":
+    units: kg m^-2 s^-1
+  "Sedimentation of dust aerosol (9 - 20 \xB5m)":
+    units: kg m^-2 s^-1
+  Sedimentation of fine-mode nitrate aerosol:
+    units: kg m^-2 s^-1
+  Sedimentation of hydrophilic black carbon aerosol:
+    units: kg m^-2 s^-1
+  Sedimentation of hydrophilic organic matter aerosol:
+    units: kg m^-2 s^-1
+  Sedimentation of hydrophobic black carbon aerosol:
+    units: kg m^-2 s^-1
+  Sedimentation of hydrophobic organic matter aerosol:
+    units: kg m^-2 s^-1
+  "Sedimentation of sea salt aerosol (0.03 - 0.5 \xB5m)":
+    units: kg m^-2 s^-1
+  "Sedimentation of sea salt aerosol (0.5 - 5 \xB5m)":
+    units: kg m^-2 s^-1
+  "Sedimentation of sea salt aerosol (5 - 20 \xB5m)":
+    units: kg m^-2 s^-1
+  Sedimentation of sulphate aerosol:
+    units: kg m^-2 s^-1
+  Single scattering albedo at 1020 nm:
+    units: (0 - 1)
+  Single scattering albedo at 1064 nm:
+    units: (0 - 1)
+  Single scattering albedo at 1240 nm:
+    units: (0 - 1)
+  Single scattering albedo at 1640 nm:
+    units: (0 - 1)
+  Single scattering albedo at 2130 nm:
+    units: (0 - 1)
+  Single scattering albedo at 340 nm:
+    units: (0 - 1)
+  Single scattering albedo at 355 nm:
+    units: (0 - 1)
+  Single scattering albedo at 380 nm:
+    units: (0 - 1)
+  Single scattering albedo at 400 nm:
+    units: (0 - 1)
+  Single scattering albedo at 440 nm:
+    units: (0 - 1)
+  Single scattering albedo at 469 nm:
+    units: (0 - 1)
+  Single scattering albedo at 500 nm:
+    units: (0 - 1)
+  Single scattering albedo at 532 nm:
+    units: (0 - 1)
+  Single scattering albedo at 550 nm:
+    units: (0 - 1)
+  Single scattering albedo at 645 nm:
+    units: (0 - 1)
+  Single scattering albedo at 670 nm:
+    units: (0 - 1)
+  Single scattering albedo at 800 nm:
+    units: (0 - 1)
+  Single scattering albedo at 858 nm:
+    units: (0 - 1)
+  Single scattering albedo at 865 nm:
+    units: (0 - 1)
+  Skin reservoir content:
+    units: m of water equivalent
+  Skin temperature:
+    units: K
+  Snow albedo:
+    units: (0 - 1)
+  Snow depth:
+    units: m of water equivalent
+  Source/gain of ammonium aerosol:
+    units: kg m^-2 s^-1
+  Source/gain of coarse-mode nitrate aerosol:
+    units: kg m^-2 s^-1
+  "Source/gain of dust aerosol (0.03 - 0.55 \xB5m)":
+    units: kg m^-2 s^-1
+  "Source/gain of dust aerosol (0.55 - 9 \xB5m)":
+    units: kg m^-2 s^-1
+  "Source/gain of dust aerosol (9 - 20 \xB5m)":
+    units: kg m^-2 s^-1
+  Source/gain of fine-mode nitrate aerosol:
+    units: kg m^-2 s^-1
+  Source/gain of hydrophilic black carbon aerosol:
+    units: kg m^-2 s^-1
+  Source/gain of hydrophilic organic matter aerosol:
+    units: kg m^-2 s^-1
+  Source/gain of hydrophobic black carbon aerosol:
+    units: kg m^-2 s^-1
+  Source/gain of hydrophobic organic matter aerosol:
+    units: kg m^-2 s^-1
+  "Source/gain of sea salt aerosol (0.03 - 0.5 \xB5m)":
+    units: kg m^-2 s^-1
+  "Source/gain of sea salt aerosol (0.5 - 5 \xB5m)":
+    units: kg m^-2 s^-1
+  "Source/gain of sea salt aerosol (5 - 20 \xB5m)":
+    units: kg m^-2 s^-1
+  Source/gain of sulphate aerosol:
+    units: kg m^-2 s^-1
+  Specific cloud ice water content:
+    units: kg kg^-1
+  Specific cloud liquid water content:
+    units: kg kg^-1
+  Specific humidity:
+    units: kg kg^-1
+  Specific rain water content:
+    units: kg kg^-1
+  Specific snow water content:
+    units: kg kg^-1
+  Stratospheric ozone tracer:
+    units: kg kg^-1
+  Sulphate aerosol mixing ratio:
+    units: kg kg^-1
+  Sulphate aerosol optical depth at 550 nm:
+    units: dimensionless
+  Sulphur dioxide:
+    units: kg kg^-1
+  Sunshine duration:
+    units: s
+  Surface Geopotential:
+    units: m^2 s^-2
+  Surface latent heat flux:
+    units: J m^-2
+  Surface net solar radiation:
+    units: J m^-2
+  Surface net solar radiation, clear sky:
+    units: J m^-2
+  Surface net thermal radiation:
+    units: J m^-2
+  Surface net thermal radiation, clear sky:
+    units: J m^-2
+  Surface pressure:
+    units: Pa
+  Surface sensible heat flux:
+    units: J m^-2
+  Surface solar radiation downward, clear sky:
+    units: J m^-2
+  Surface solar radiation downwards:
+    units: J m^-2
+  Surface thermal radiation downward, clear sky:
+    units: J m^-2
+  Surface thermal radiation downwards:
+    units: J m^-2
+  TOA incident solar radiation:
+    units: J m^-2
+  Temperature:
+    units: K
+  Terpenes:
+    units: kg kg^-1
+  Top net solar radiation:
+    units: J m^-2
+  Top net solar radiation, clear sky:
+    units: J m^-2
+  Top net thermal radiation:
+    units: J m^-2
+  Top net thermal radiation, clear sky:
+    units: J m^-2
+  Total absorption aerosol optical depth at 1020 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 1064 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 1240 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 1640 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 2130 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 340 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 355 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 380 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 400 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 440 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 469 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 500 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 532 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 550 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 645 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 670 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 800 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 858 nm:
+    units: dimensionless
+  Total absorption aerosol optical depth at 865 nm:
+    units: dimensionless
+  Total aerosol optical depth at 1020 nm:
+    units: dimensionless
+  Total aerosol optical depth at 1064 nm:
+    units: dimensionless
+  Total aerosol optical depth at 1240 nm:
+    units: dimensionless
+  Total aerosol optical depth at 1640 nm:
+    units: dimensionless
+  Total aerosol optical depth at 2130 nm:
+    units: dimensionless
+  Total aerosol optical depth at 340 nm:
+    units: dimensionless
+  Total aerosol optical depth at 355 nm:
+    units: dimensionless
+  Total aerosol optical depth at 380 nm:
+    units: dimensionless
+  Total aerosol optical depth at 400 nm:
+    units: dimensionless
+  Total aerosol optical depth at 440 nm:
+    units: dimensionless
+  Total aerosol optical depth at 469 nm:
+    units: dimensionless
+  Total aerosol optical depth at 500 nm:
+    units: dimensionless
+  Total aerosol optical depth at 532 nm:
+    units: dimensionless
+  Total aerosol optical depth at 550 nm:
+    units: dimensionless
+  Total aerosol optical depth at 645 nm:
+    units: dimensionless
+  Total aerosol optical depth at 670 nm:
+    units: dimensionless
+  Total aerosol optical depth at 800 nm:
+    units: dimensionless
+  Total aerosol optical depth at 858 nm:
+    units: dimensionless
+  Total aerosol optical depth at 865 nm:
+    units: dimensionless
+  Total cloud cover:
+    units: (0 - 1)
+  Total column HYPROPO2:
+    units: kg m^-2
+  Total column IC3H7O2:
+    units: kg m^-2
+  Total column NO to NO2 operator:
+    units: kg m^-2
+  Total column NO to alkyl nitrate operator:
+    units: kg m^-2
+  Total column acetone:
+    units: kg m^-2
+  Total column acetone product:
+    units: kg m^-2
+  Total column aldehydes:
+    units: kg m^-2
+  Total column amine:
+    units: kg m^-2
+  Total column ammonia:
+    units: kg m^-2
+  Total column ammonium:
+    units: kg m^-2
+  Total column carbon monoxide:
+    units: kg m^-2
+  Total column cloud ice water:
+    units: kg m^-2
+  Total column cloud liquid water:
+    units: kg m^-2
+  Total column dimethyl sulfide:
+    units: kg m^-2
+  Total column dinitrogen pentoxide:
+    units: kg m^-2
+  Total column ethane:
+    units: kg m^-2
+  Total column ethanol:
+    units: kg m^-2
+  Total column ethene:
+    units: kg m^-2
+  Total column formaldehyde:
+    units: kg m^-2
+  Total column formic acid:
+    units: kg m^-2
+  Total column hydrogen peroxide:
+    units: kg m^-2
+  Total column hydroperoxy radical:
+    units: kg m^-2
+  Total column hydroxyl radical:
+    units: kg m^-2
+  Total column isoprene:
+    units: kg m^-2
+  Total column lead:
+    units: kg m^-2
+  Total column methacrolein MVK:
+    units: kg m^-2
+  Total column methacrylic acid:
+    units: kg m^-2
+  Total column methane:
+    units: kg m^-2
+  Total column methane sulfonic acid:
+    units: kg m^-2
+  Total column methanol:
+    units: kg m^-2
+  Total column methyl glyoxal:
+    units: kg m^-2
+  Total column methyl peroxide:
+    units: kg m^-2
+  Total column methylperoxy radical:
+    units: kg m^-2
+  Total column nitrate:
+    units: kg m^-2
+  Total column nitrate radical:
+    units: kg m^-2
+  Total column nitric acid:
+    units: kg m^-2
+  Total column nitrogen dioxide:
+    units: kg m^-2
+  Total column nitrogen monoxide:
+    units: kg m^-2
+  Total column nitrogen oxides transp:
+    units: kg m^-2
+  Total column olefins:
+    units: kg m^-2
+  Total column organic ethers:
+    units: kg m^-2
+  Total column organic nitrates:
+    units: kg m^-2
+  Total column ozone:
+    units: kg m^-2
+  Total column paraffins:
+    units: kg m^-2
+  Total column pernitric acid:
+    units: kg m^-2
+  Total column peroxides:
+    units: kg m^-2
+  Total column peroxy acetyl radical:
+    units: kg m^-2
+  Total column peroxyacetyl nitrate:
+    units: kg m^-2
+  Total column polar stratospheric cloud:
+    units: kg m^-2
+  Total column propane:
+    units: kg m^-2
+  Total column propene:
+    units: kg m^-2
+  Total column radon:
+    units: kg m^-2
+  Total column rain water:
+    units: kg m^-2
+  Total column snow water:
+    units: kg m^-2
+  Total column stratospheric ozone:
+    units: kg m^-2
+  Total column sulphur dioxide:
+    units: kg m^-2
+  Total column supercooled liquid water:
+    units: kg m^-2
+  Total column terpenes:
+    units: kg m^-2
+  Total column water:
+    units: kg m^-2
+  Total column water vapour:
+    units: kg m^-2
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 1020 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 1064 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 1240 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 1640 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 2130 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 340 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 355 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 380 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 400 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 440 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 469 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 500 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 532 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 550 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 645 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 670 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 800 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 858 nm":
+    units: dimensionless
+  "Total fine mode (r < 0.5 \xB5m) aerosol optical depth at 865 nm":
+    units: dimensionless
+  Total precipitation:
+    units: m
+  Total sky direct solar radiation at surface:
+    units: J m^-2
+  U-component of wind:
+    units: m s^-1
+  UV biologically effective dose:
+    units: W m^-2
+  UV biologically effective dose, clear sky:
+    units: W m^-2
+  V-component of wind:
+    units: m s^-1
+  Vertical velocity:
+    units: Pa s^-1
+  Vertically integrated mass of ammonium aerosol:
+    units: kg m^-2
+  Vertically integrated mass of coarse-mode nitrate aerosol:
+    units: kg m^-2
+  "Vertically integrated mass of dust aerosol (0.03 - 0.55 \xB5m)":
+    units: kg m^-2
+  "Vertically integrated mass of dust aerosol (0.55 - 9 \xB5m)":
+    units: kg m^-2
+  "Vertically integrated mass of dust aerosol (9 - 20 \xB5m)":
+    units: kg m^-2
+  Vertically integrated mass of fine-mode nitrate aerosol:
+    units: kg m^-2
+  Vertically integrated mass of hydrophilic black carbon aerosol:
+    units: kg m^-2
+  Vertically integrated mass of hydrophilic organic matter aerosol:
+    units: kg m^-2
+  Vertically integrated mass of hydrophobic black carbon aerosol:
+    units: kg m^-2
+  Vertically integrated mass of hydrophobic organic matter aerosol:
+    units: kg m^-2
+  "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \xB5m)":
+    units: kg m^-2
+  "Vertically integrated mass of sea salt aerosol (0.5 - 5 \xB5m)":
+    units: kg m^-2
+  "Vertically integrated mass of sea salt aerosol (5 - 20 \xB5m)":
+    units: kg m^-2
+  Vertically integrated mass of sulphate aerosol:
+    units: kg m^-2
+  Vertically integrated moisture divergence:
+    units: kg m^-2
+  Visibility:
+    units: m
+  Wet deposition of ammonium aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of ammonium aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of coarse-mode nitrate aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of coarse-mode nitrate aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  "Wet deposition of dust aerosol (0.03 - 0.55 \xB5m) by convective precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of dust aerosol (0.03 - 0.55 \xB5m) by large-scale precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of dust aerosol (0.55 - 9 \xB5m) by convective precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of dust aerosol (0.55 - 9 \xB5m) by large-scale precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of dust aerosol (9 - 20 \xB5m) by convective precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of dust aerosol (9 - 20 \xB5m) by large-scale precipitation":
+    units: kg m^-2 s^-1
+  Wet deposition of fine-mode nitrate aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of fine-mode nitrate aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophilic black carbon aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophilic black carbon aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophilic organic matter aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophilic organic matter aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophobic black carbon aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophobic black carbon aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophobic organic matter aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of hydrophobic organic matter aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+  "Wet deposition of sea salt aerosol (0.03 - 0.5 \xB5m) by convective precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of sea salt aerosol (0.03 - 0.5 \xB5m) by large-scale precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of sea salt aerosol (0.5 - 5 \xB5m) by convective precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of sea salt aerosol (0.5 - 5 \xB5m) by large-scale precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of sea salt aerosol (5 - 20 \xB5m) by convective precipitation":
+    units: kg m^-2 s^-1
+  "Wet deposition of sea salt aerosol (5 - 20 \xB5m) by large-scale precipitation":
+    units: kg m^-2 s^-1
+  Wet deposition of sulphate aerosol by convective precipitation:
+    units: kg m^-2 s^-1
+  Wet deposition of sulphate aerosol by large-scale precipitation:
+    units: kg m^-2 s^-1
+

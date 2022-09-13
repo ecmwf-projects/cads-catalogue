@@ -1,0 +1,45 @@
+---
+description:
+  file-format: GRIB (optional conversion to netCDF)
+  data-type: Gridded
+  horizontal-coverage: Global
+  horizontal-resolution: 0.4°x0.4°
+  temporal-coverage: 2015 to present
+  temporal-resolution: 1-hourly (single-level), 3-hourly (multi-level)
+  vertical-coverage: Surface, total column, model levels and pressure levels.  
+  vertical-resolution: '60 model levels before July 7 2019 00UTC, then 137 model levels. Pressure levels: 1000, 950, 925, 900, 850, 800, 700, 600, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10, 7, 5, 3, 2, 1 hPa'
+  update-frequency: 'New 00UTC and 12UTC forecasts added each day. Model upgrades made approximately once a year'
+  versions: 'Only one version, but with occasional model upgrades'
+
+keywords:
+  - "Variable domain: Atmosphere (composition)"
+  - "Variable domain: Atmosphere (meteorology)"
+  - "Parameter family: Aerosol"
+  - "Parameter family: Reactive gas"
+  - "Spatial coverage: Global"
+  - "Product type: Forecast"
+  - "Product type: Analysis"
+  - "Temporal coverage: Future"
+  - "Temporal coverage: Past"
+  - "Temporal coverage: Present"
+
+related_resources_keywords:
+  - 'global-reanalysis'
+  - 'regional-forecast'
+
+documentation:
+- url: 'https://confluence.ecmwf.int/x/5cqpD'
+  title: 'CAMS Global atmospheric composition forecast data documentation'
+  description: 'Copernicus Knowledge Base documentation on the dataset'
+
+- url: 'https://atmosphere.copernicus.eu/node/326'
+  title: 'Changes in CAMS global production system'
+  description: 'Detailed descriptions of the upgrades to the forecast and assimilation system'
+
+- url: 'https://atmosphere.copernicus.eu/node/325#fd66a9d3-e408-4b51-84c0-c2253a06f727'
+  title: 'Evaluation and quality assurance (EQA) reports'
+  description: 'Validation reports giving a summary of the forecast system and detailed information on forecast quality by comparing with observations'
+
+- url: 'https://global-evaluation.atmosphere.copernicus.eu/'
+  title: 'Global Validation Server'
+  description: 'Extensive catalogue of plots evaluating the CAMS global forecasting system using independent observations'

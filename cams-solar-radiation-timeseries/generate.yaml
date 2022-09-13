@@ -1,0 +1,116 @@
+
+remap:
+  sky_type:
+    get_cams_radiation: observed_cloud
+    get_mcclear: clear
+  time_step:
+    PT01M: 1minute
+    PT15M: 15minute
+    PT01H: 1hour
+    P01D: 1day
+    P01M: 1month
+  time_reference:
+    UT: universal_time
+    TST: true_solar_time
+
+titles:
+  sky_type: Sky Conditions
+
+labels:
+  sky_type:
+    clear: Cloud-free conditions only
+    observed_cloud: Both cloud-free and actual weather conditions
+  time_step:
+    15minute: 15 minutes
+    1day: 1 day
+    1hour: 1 hour
+    1minute: 1 minute
+    1month: 1 month
+  time_reference:
+    true_solar_time: True solar time
+    universal_time: Universal time
+  format:
+    csv: CSV
+    csv_expert: CSV (expert mode)
+    netcdf: NetCDF
+
+widget_order:
+  - 'sky_type'
+  - 'location'
+  - 'altitude'
+  - 'date'
+  - 'time_step'
+  - 'time_reference'
+  - 'format'
+
+order:
+  time_step:
+    - 1minute
+    - 15minute
+    - 1hour
+    - 1day
+    - 1month
+  format:
+    - csv
+    - csv_expert
+    - netcdf
+
+columns:
+  sky_type: 3
+  time_step: 3
+  time_reference: 3
+  format: 3
+
+helps:
+  format: CSV (expert mode) is only available for a 1 minute time step and universal time
+
+constraints_options:
+  compress_dates: true
+  sort: true
+  # Having these keys first on each line makes things clearer
+  leading_keys: ['date', 'sky_type', 'format']
+
+extra_widgets:
+  - name: location
+    label: Location
+    required: true
+    help: "For cloud-free conditions only, location may be anywhere. For actual weather conditions, location must be within Meteosat disk, which extends to approximately \xB166 degrees in longitude and latitude."
+    type: GeographicLocationWidget
+    details:
+      latitude:
+        default: 0
+        precision: 5
+        range:
+          min: -90
+          max: 90
+      longitude:
+        default: 0
+        precision: 5
+        range:
+          min: -180
+          max: 180
+  - name: altitude
+    label: Altitude
+    type: StringWidget
+    required: true
+    help: null
+    details:
+      fields:
+      - comment: Enter altitude in meters. Use -999 for an automated look-up from the NASA SRTM database
+        type: text
+        required: true
+        placeholder: Altitude in meters
+        maxlength: 20
+      default:
+      - - '-999.'
+      concat: ''
+
+widget_types:
+  sky_type: StringChoiceWidget
+  time_step: StringChoiceWidget
+  time_reference: StringChoiceWidget
+  format: StringChoiceWidget
+  date: DateRangeWidget
+
+# Suppress insertion of a default "variable" widget into the form
+no_variable_widget: true

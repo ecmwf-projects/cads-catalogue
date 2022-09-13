@@ -1,0 +1,470 @@
+
+import:
+  - mars_multi_levtype
+  - mars_variable_labels
+  - global_area_widget
+
+# NOTE: generate.sh can be run for one or both of the following reasons:
+# 1. A model upgrade, in which case mars.list needs to be up to date
+# 2. Some other change to the dataset config, in which case it doesn't
+# If running for reason 2, and the mars.list is not up to date, then we 
+# don't want to override the existing date range in the form or overwrite the
+# constraints. This option keeps the existing form date range. Setting
+# constraints_options: no_save: True (below) avoids over-writing the
+# constraints. Both of these must be commenting if running generate with an
+# up-to-date mars.list for a model upgrade.
+form_retain_existing:
+  date:
+    details:
+        default:
+        range:
+
+# Supply custom code to form the variable groups
+grouper_callback:
+  variable:
+    path: '..'
+    module: 'mars_param_groups'
+    function: 'generate_groups'
+
+# Supply custom code the make the whitelist and apply it to the constraints
+post_generate_callback:
+  path: '.'
+  module: 'make_whitelist'
+  function: 'main'
+
+formats:
+  - grib
+  - netcdf_zip
+
+extra_widgets:
+  - name: 'recent_met_info'
+    label: 'Recent meteorological fields'
+    type: 'FreeEditionWidget'
+    details:
+      text: 'Recent forecast data is limited to atmospheric composition variables only because Copernicus is not authorised to give access to recent meteorological forecasts. Therefore you will notice that meteorological variables grey out when selecting dates less than 6 days old and data returned from API requests will have recent meteorological fields filtered out automatically.'
+  - name: 'fast_slow_info'
+    label: 'Fast vs slow data'
+    type: 'FreeEditionWidget'
+    details:
+      text: 'PLEASE NOTE: any data labelled as "slow access" is stored on tape instead of disk. Retrieval of this data will be MUCH SLOWER than disk-resident data. You should not select any tape-resident data unless absolutely required for your purposes. Dates more than 30 days old are slow access.'
+  - name: 'ml_help'
+    label: 'Model levels'
+    type: 'FreeEditionWidget'
+    details:
+      text: 'Please note that model level 1 is the top of the atmosphere and that the vertical resolution increased from 60 to 137 levels from the July 7 2019 00UTC forecast. Therefore to obtain surface values of multi-level variables, select the largest model level available for the date in question (60 or 137). Above-surface model level fields are not comparable between forecasts at different vertical resolutions.'
+  - name: 'netcdf_info'
+    label: 'NetCDF conversion'
+    type: 'FreeEditionWidget'
+    details:
+      text: 'If requesting netCDF format please note:<P>&bull; Fields on different level types (single, pressure and model levels) will be converted separately so there will be one output file per type.<P>&bull; If the selected dates, times and lead-times result in data from neighbouring forecasts overlapping then it will not be possible to represent the data with a single netCDF time dimension, and so the data will also be split by forecast base time.<P>&bull; The output is currently netCDF3, a limitation of which is that all but the last variable in the file must require less than 4GiB of storage. Since the values are packed into 2-byte integers and there are 405900 (900 longitude x 451 latitude, assuming the full area) values per horizontal field, it means the product of the number of dates, times and levels in a given file must not exceed 5290 or netCDF file creation will fail. This limit does not apply to the last variable in the file so can be disregarded if you have only selected one variable (per level type). The limit increases in proportion to any reduction in the area retrieved.<P>&bull; We are working on new GRIB-to-netCDF conversion software which will likely address some of these points in the future.'
+
+mars_list_read_opts:
+  # Use faster version of code to read the MARS list output
+  fast: true
+  read_prefactorised: true
+
+# If vorticity and divergence are present then add u and v
+add_u_and_v:
+  true
+
+rename:
+  step: leadtime_hour
+
+# Don't split date into separate year, month and day widgets
+no_date_to_ymd:
+  - date
+
+# Force a DateRangeWidget
+widget_types:
+  date: DateRangeWidget
+
+columns:
+  variable: 2
+  leadtime_hour: 6
+  model_level: 6
+
+constraints_options:
+  compress_dates: true # Compress lists of consecutive dates to ymd/ymd format
+  merge: true    # Attempt additional merging
+  sort: true     # Sort so that subsequent updates make nice diffs
+  no_save: true  # Only save the constraints if the mars.list is up to date
+
+helps:
+  'variable': 'Multi level variables require the selection of a pressure or model level. Singe level variables do not. Slow access variables are archived on tape and will be slow to retrieve. Meteorological variables are not accessible for very recent dates (see note above).'
+  'model_level': 'Model level 1 is the top of the atmosphere. All levels changed on July 7 2019 00UTC when the number of levels was increased from 60 to 137. Model levels from this base time onwards are not comparable with those before.'
+  'date': 'Model base date. Note that dates older than 30 days will be slow access (see note above).'
+  'time': 'Model base time as HH:MM (UTC)'
+  'leadtime_hour': 'Forecast lead time in hours'
+
+# Force interpolation to a regular grid. Note that once the fields on the
+# cds fdb are all pre-interpolated, this will be a waste of time for them
+force:
+  grid: '0.4/0.4'
+
+labels:
+  type:
+    'fc': 'Forecast'
+    'an': 'Analysis (Slow-access!)'
+  # Make sure "GEMS" doesn't appear in ozone labels
+  variable:
+    'multilev_210203': 'Ozone'
+    'surface_210206': 'Total column ozone'
+    'multilev_217004': 'Methane'
+  format:
+    grib: 'GRIB'
+    netcdf_zip: 'Zipped netCDF (experimental)'
+
+widget_order:
+  - 'recent_met_info'
+  - 'fast_slow_info'
+  - 'ml_help'
+  - 'variable'
+  - 'pressure_level'
+  - 'model_level'
+  - 'date'
+  - 'time'
+  - 'type'
+  - 'leadtime_hour'
+  - 'type'
+  - 'subarea_switch'
+  - 'full_area'
+  - 'area'
+  - 'netcdf_info'
+  - 'format'
+
+# Ensure that variable names containing wavelengths or sizes are sorted 
+# numerically among themselves according to those numbers
+order:
+  variable:
+    order_by: labels_containing_numbers
+    case_sensitive: false
+
+# This produces a warning about the max number of fields that can be
+# retrieved in netCDF format on the download form. The grid resolution
+# is used to give a max number of fields that can be in a variable (other
+# than the last variable)
+#netcdf_size_warning:
+#  field_dims:
+#    longitude: 900
+#    latitude: 451
+#  extrinsic_dims: ['levels', 'dates', 'times']
+
+# Stop the sample.json from changing all the time
+random_seed: 0
+
+# Hide the analysis
+hide_values:
+  type:
+    - 'analysis'
+  time:
+    - '06:00'
+    - '18:00'
+
+defaults:
+  type: ['forecast']
+
+# Config to be written into the adaptor.yaml
+adaptor_config:
+
+  # The CDS FDB outputs fields in a random order which leads grib_to_netcdf
+  # to produce files with unordered time and level dimensions
+  sort_grib:
+    'date asc, time:i asc, step:i asc, level:i asc'
+  
+  # We could just set database to cdsfdb/external for all requests, but we know
+  # which database we're going to use when we route the request to mars.internal
+  # or mars.external, so set the database precisely for each. This means there's
+  # no chance of requests ending up in MARS external after being routed through
+  # the mars.internal adaptor method (and QOS), which could happen if there's a
+  # mistake in the list of internal fields. This would be bad because it could
+  # overload MARS external.
+  # Also note that, if you set database=cdsfdb/external,expect=any and ask for
+  # param=166/215166 (where 166 is on the cdsfdb and 215166 isn't) then you only
+  # get back 166.
+  mars_internal_force:
+    database: cdsfdb
+  mars_external_force:
+    database: external
+  
+  # Communicate the subset of fields that exist in "MARS internal" to the
+  # adaptor
+  mars_internal_fields:
+     - type: ['fc']
+       date: ['current-30/current']
+       param: [
+        'surface_129', 'surface_134', 'surface_137', 'surface_151', 'surface_165',
+        'surface_166', 'surface_167', 'surface_168', 'surface_172',
+        'surface_210072', 'surface_210073', 'surface_210074', 'surface_210125',
+        'surface_210126', 'surface_210127', 'surface_210128', 'surface_210206',
+        'surface_210207', 'surface_210208', 'surface_210209', 'surface_210210',
+        'surface_210211', 'surface_210212', 'surface_210213', 'surface_210214',
+        'surface_210215', 'surface_210216', 'surface_210250', 'surface_210251',
+        'surface_214002', 'surface_214003', 'surface_218003', 'surface_218004',
+        'surface_218006', 'surface_218013', 'surface_218016', 'surface_218027',
+        'surface_218030', 'surface_218045', 'surface_218047',
+        'multilev_130', 'multilev_131', 'multilev_132', 'multilev_133',
+        'multilev_210001', 'multilev_210002', 'multilev_210003',
+        'multilev_210004', 'multilev_210005', 'multilev_210006',
+        'multilev_210007', 'multilev_210008', 'multilev_210009',
+        'multilev_210010', 'multilev_210011', 'multilev_210121',
+        'multilev_210122', 'multilev_210123', 'multilev_210124',
+        'multilev_210203', 'multilev_210247', 'multilev_210248',
+        'multilev_210249', 'multilev_217003', 'multilev_217004',
+        'multilev_217006', 'multilev_217013', 'multilev_217016',
+        'multilev_217027', 'multilev_217030', 'multilev_217045',
+        'multilev_217047']
+
+  # To temporarily use MARS external instead of CDS FDB
+  #mars_internal_fields:
+  #  - date: ['current-1/current']
+  #mars_internal_force:
+  #  database: external
+  #mars_external_force:
+  #  database: external  
+
+# Unwanted fields
+ignore_values:
+  param:
+    - '8' # Surface runoff
+    - '9' # Sub-surface runoff
+    - '15' # uv_visible_albedo_for_direct_radiation
+    - '16' # uv_visible_albedo_for_diffuse_radiation
+    - '17' # near_ir_albedo_for_direct_radiation
+    - '18' # Near IR albedo for diffuse radiation
+    - '27' # low_vegetation_cover
+    - '28' # high_vegetation_cover
+    - '29' # type_of_low_vegetation
+    - '30' # type_of_high_vegetation 
+    - '33' # Snow density
+    - '35' # Ice temperature layer 1
+    - '36' # Ice temperature layer 2
+    - '37' # Ice temperature layer 3
+    - '38' # Ice temperature layer 4
+    - '39' # Volumetric soil water layer 1
+    - '40' # Volumetric soil water layer 2
+    - '41' # Volumetric soil water layer 3
+    - '42' # Volumetric soil water layer 4
+    - '43' # soil_type
+    - '44' # Snow evaporation
+    - '45' # Snowmelt
+    - '49' # 10 metre wind gust since previous post-processing
+    - '50' # Large-scale precipitation fraction
+    - '74' # Standard deviation of filtered subgrid orography
+    - '77' # Eta-coordinate vertical velocity
+    - '121' # Maximum temperature at 2 metres in the last 6 hours
+    - '122' # Minimum temperature at 2 metres in the last 6 hours
+    - '123' # 10 metre wind gust in the last 6 hours
+    - '138' # Vorticity (relative)
+    - '139' # Soil temperature level 1
+    - '144' # Snowfall
+    - '145' # Boundary layer dissipation
+    - '148' # Charnock
+    - '152' # LNSP
+    - '155' # Divergence
+    - '160' # Standard deviation of orography
+    - '161' # Anisotropy of sub-gridscale orography
+    - '162' # Angle of sub-gridscale orography
+    - '163' # Slope of sub-gridscale orography
+    - '170' # Soil temperature level 2
+    - '173' # surface_roughness
+    - '174' # Albedo
+    - '180' # Eastward turbulent surface stress
+    - '181' # Northward turbulent surface stress
+    - '183' # Soil temperature level 3
+    - '195' # Eastward gravity wave surface stress
+    - '196' # Northward gravity wave surface stress
+    - '197' # Gravity wave dissipation
+    - '201' # Maximum temperature at 2 metres since previous post-processing
+    - '202' # Minimum temperature at 2 metres since previous post-processing
+    - '203' # Ozone mass mixing ratio
+    - '205' # Runoff
+    - '206' # Total column ozone
+    - '229' # Instantaneous eastward turbulent surface stress
+    - '230' # Instantaneous northward turbulent surface stress
+    - '231' # Instantaneous surface sensible heat flux
+    - '232' # Instantaneous moisture flux
+    - '234' # Logarithm of surface roughness length for heat
+    - '236' # Soil temperature level 4
+    - '238' # Temperature of snow layer
+    - '244' # Forecast surface roughness
+    - '245' # Forecast logarithm of surface roughness for heat
+    - '210012' # SO2 precursor mixing ratio
+    - '210016' # Aerosol type 1 source/gain accumulated
+    - '210017' # Aerosol type 2 source/gain accumulated
+    - '210018' # Aerosol type 3 source/gain accumulated
+    - '210019' # Aerosol type 4 source/gain accumulated
+    - '210020' # Aerosol type 5 source/gain accumulated
+    - '210021' # Aerosol type 6 source/gain accumulated
+    - '210022' # Aerosol type 7 source/gain accumulated
+    - '210023' # Aerosol type 8 source/gain accumulated
+    - '210024' # Aerosol type 9 source/gain accumulated
+    - '210025' # Aerosol type 10 source/gain accumulated
+    - '210026' # Aerosol type 11 source/gain accumulated
+    - '210027' # Aerosol type 12 source/gain accumulated
+    - '210031' # Aerosol type 1 sink/loss accumulated
+    - '210032' # Aerosol type 2 sink/loss accumulated
+    - '210033' # Aerosol type 3 sink/loss accumulated
+    - '210034' # Aerosol type 4 sink/loss accumulated
+    - '210035' # Aerosol type 5 sink/loss accumulated
+    - '210036' # Aerosol type 6 sink/loss accumulated
+    - '210037' # Aerosol type 7 sink/loss accumulated
+    - '210038' # Aerosol type 8 sink/loss accumulated
+    - '210039' # Aerosol type 9 sink/loss accumulated
+    - '210040' # Aerosol type 10 sink/loss accumulated
+    - '210041' # Aerosol type 11 sink/loss accumulated
+    - '210042' # Aerosol type 12 sink/loss accumulated
+    - '210043' # DMS surface emission
+    - '210048' # Aerosol large mode mixing ratio
+    - '210052' # Dust emission potential
+    - '210053' # Lifting threshold speed
+    - '210054' # Soil clay content
+    - '210055' # Experimental product
+    - '210056' # Experimental product
+    - '210119' # Mean altitude of maximum injection
+    - '210129' # Nitrogen Oxides
+    - '210130' # Total Column Nitrogen Oxides
+    - '210186' # uv visible albedo for direct radiation isotropic component
+    - '210187' # uv visible albedo for direct radiation, volumetric component
+    - '210188' # uv visible albedo for direct radiation geometric component
+    - '210189' # near ir albedo for direct radiation isotropic component
+    - '210190' # near ir albedo for direct radiation volumetric component
+    - '210191' # near ir albedo for direct radiation geometric component
+    - '212001' # Experimental product
+    - '212002' # Experimental product
+    - '212003' # Experimental product
+    - '212004' # Experimental product
+    - '212005' # Experimental product
+    - '212006' # Experimental product
+    - '212007' # Experimental product
+    - '212008' # Experimental product
+    - '212009' # Experimental product
+    - '212010' # Experimental product
+    - '212011' # Experimental product
+    - '212250' # Experimental product
+    - '212251' # Experimental product
+    - '212252' # Experimental product
+    - '215016' # Negative fixer of sea salt aerosol (0.03 - 0.5 um)
+    - '215017' # Negative fixer of sea salt aerosol (0.5 - 5 um)
+    - '215018' # Negative fixer of sea salt aerosol (5 - 20 um)
+    - '215040' # Negative fixer of dust aerosol (0.03 - 0.55 um)
+    - '215041' # Negative fixer of dust aerosol (0.55 - 9 um)
+    - '215042' # Negative fixer of dust aerosol (9 - 20 um)
+    - '215059' # Negative fixer of hydrophobic organic matter aerosol
+    - '215060' # Negative fixer of hydrophilic organic matter aerosol
+    - '215075' # Negative fixer of hydrophobic black carbon aerosol
+    - '215076' # Negative fixer of hydrophilic black carbon aerosol
+    - '215086' # Negative fixer of sulphate aerosol
+    - '215088' # Sulphate aerosol optical depth
+    - '215093' # Total aerosol optical thickness at 532 nm
+    - '215094' # Natural (sea-salt and dust) aerosol optical thickness at 532 nm
+    - '215095' # Antropogenic (black carbon, organic matter, sulphate) aerosol optical thickness at 532 nm
+    - '215168' # Source/gain of sulphur dioxide
+    - '215169' # Dry deposition of sulphur dioxide
+    - '215170' # Sedimentation of sulphur dioxide
+    - '215171' # Wet deposition of sulphur dioxide by large-scale precipitation
+    - '215172' # Wet deposition of sulphur dioxide by convective precipitation
+    - '215173' # Negative fixer of sulphur dioxide
+    - '215174' # Vertically integrated mass of sulphur dioxide
+    - '215175' # Sulphur dioxide optical depth
+    - '215199' # Negative fixer of fine-mode nitrate aerosol
+    - '215200' # Negative fixer of coarse-mode nitrate aerosol
+    - '215210' # Negative fixer of ammonium aerosol
+    - '216004' # Experimental product
+    - '216005' # Experimental product
+    - '216006' # Experimental product
+    - '216007' # Experimental product
+    - '216008' # Experimental product
+    - '216009' # Experimental product
+    - '216010' # Experimental product
+    - '216011' # Experimental product
+    - '216012' # Experimental product
+    - '216013' # Experimental product
+    - '216014' # Experimental product
+    - '216015' # Experimental product
+    - '216016' # Experimental product
+    - '216017' # Experimental product
+    - '216018' # Experimental product
+    - '216042' # Experimental product
+    - '216043' # Experimental product
+    - '216044' # Experimental product
+    - '216045' # Experimental product
+    - '216046' # Experimental product
+    - '217020' # Sulfate
+    - '217037' # PAR budget corrector
+    - '217038' # NO to NO2 operator
+    - '217039' # NO to alkyl nitrate operator
+    - '217041' # Polar stratospheric cloud
+    - '217054' # IC3H7O2
+    - '217055' # HYPROPO2
+    - '217056' # Nitrogen oxides Transp
+    - '217189' # Sulfur trioxide
+    - '218020' # Total column  sulfate
+    - '218037' # Total column PAR budget corrector
+    - '219052' # Acetone emissions
+    - '219012' # Aldehydes emissions
+    - '219019' # Ammonia emissions
+    - '219005' # Carbon monoxide emissions
+    - '219018' # Dimethyl sulfide emissions
+    - '219045' # Ethane emissions
+    - '219046' # Ethanol emissions
+    - '219010' # Ethene emissions
+    - '219008' # Formaldehyde emissions
+    - '219043' # Formic acid emissions
+    - '219016' # Isoprene emissions
+    - '219050' # Methacrolein MVK  emissions
+    - '219044' # Methacrylic acid emissions
+    - '219042' # Methanol emissions
+    - '219023' # Methyl glyoxal emissions
+    - '219027' # Nitrogen monoxide emissions
+    - '219011' # Olefins emissions
+    - '219009' # Paraffins emissions
+    - '219047' # Propane emissions
+    - '219048' # Propene emissions
+    - '219025' # Radon emissions
+    - '219017' # Sulfur dioxide emissions
+    - '219049' # Terpenes emissions
+    - '228007' # Lake depth
+    - '228008' # Lake mix-layer temperature
+    - '228009' # Lake mix-layer depth
+    - '228010' # Lake bottom temperature
+    - '228011' # Lake total layer temperature
+    - '228012' # Lake shape factor
+    - '228013' # Lake ice temperature
+    - '228014' # Lake ice depth
+    - '228024' # Zero degree level
+    - '228026' # Maximum temperature at 2 metres in the last 3 hours
+    - '228027' # Minimum temperature at 2 metres in the last 3 hours
+    - '228029' # Instantaneous 10 metre wind gust
+    - '228044' # Convective available potential energy shear
+    - '228047' # Height of zero-degree wet-bulb temperature
+    - '228048' # Height of one-degree wet-bulb temperature
+    - '228050' # Instantaneous total lightning flash density
+    - '228080' # Accumulated Carbon Dioxide Net Ecosystem Exchange
+    - '228081' # Accumulated Carbon Dioxide Gross Primary Production
+    - '228082' # Accumulated Carbon Dioxide Ecosystem Respiration
+    - '228083' # Flux of Carbon Dioxide Net Ecosystem Exchange
+    - '228084' # Flux of Carbon Dioxide Gross Primary Production
+    - '228085' # Flux of Carbon Dioxide Ecosystem Respiration
+    - '228131' # Neutral wind at 10 m u-component
+    - '228132' # Neutral wind at 10 m v-component
+    - '228216' # Accumulated freezing rain
+    - '228217' # Instantaneous large-scale surface precipitation fraction
+    - '228218' # Convective rain rate
+    - '228219' # Large scale rain rate
+    - '228220' # Convective snowfall rate water equivalent
+    - '228221' # Large scale snowfall rate water equivalent
+    - '228222' # Maximum total precipitation rate in the last 3 hours
+    - '228223' # Minimum total precipitation rate in the last 3 hours
+    - '228224' # Maximum total precipitation rate in the last 6 hours
+    - '228225' # Minimum total precipitation rate in the last 6 hours
+    - '228226' # Maximum total precipitation rate since previous post-processing
+    - '228227' # Minimum total precipitation rate since previous post-processing
+    - '228239' # 200 metre U wind component
+    - '228240' # 200 metre V wind component
+    - '228241' # 200 metre wind speed
+    - '228246' # 100 metre U wind component
+    - '228247' # 100 metre V wind component
+    - '260048' # Total precipitation rate
+    - '260109' # Ceiling
+    - '260121' # K index
+    - '260123' # Total totals index
