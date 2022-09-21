@@ -190,6 +190,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     if "abstract.md" in file_names:
         with open(os.path.join(folder_path, "abstract.md")) as fp:
             metadata["abstract"] = fp.read()
+    else:
+        # abstract is required
+        raise ValueError("'abstract.md' missing in %r" % folder_path)
     if "abstract.yaml" in file_names:
         with open(os.path.join(folder_path, "abstract.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
@@ -240,7 +243,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
                     "title": data_item["title"],
                     "content": None,
                     "copy": data_item.get("copy"),
-                    "url": None,
+                    "url": data_item.get("url"),
                     "download_file": None,
                 }
                 content_file_name = data_item["content"]
@@ -260,6 +263,8 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     if "metadata.yaml" in file_names:
         with open(os.path.join(folder_path, "metadata.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+            if "resource_type" not in data:
+                raise ValueError("missing key 'resource_type' in metadata.yaml")
             metadata["type"] = data.get("resource_type")
             metadata["doi"] = data.get("doi")
             metadata["geo_extent"] = build_geo_extent(data)
@@ -273,6 +278,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             if not metadata["publication_date"]:
                 # it can be in dataset.yaml
                 metadata["publication_date"] = data.get("publication_date")
+    else:
+        # type is required
+        raise ValueError("'metadata.yaml' missing in %r" % folder_path)
     if (
         "variables.yaml" in file_names
     ):  # this overrides if variables were found in abstract.yaml
