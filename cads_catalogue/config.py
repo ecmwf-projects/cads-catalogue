@@ -21,31 +21,31 @@ dbsettings = None
 class SqlalchemySettings(pydantic.BaseSettings):
     """Postgres-specific API settings.
 
-    - ``postgres_user``: postgres username.
-    - ``postgres_password``: postgres password.
-    - ``postgres_host``: hostname for the connection.
-    - ``postgres_dbname``: database name.
+    - ``catalogue_db_user``: postgres username.
+    - ``catalogue_db_password``: postgres password.
+    - ``catalogue_db_host``: hostname for the connection.
+    - ``catalogue_db_name``: database name.
     """
 
-    postgres_user: str = "catalogue"
-    postgres_password: str | None = None
-    postgres_host: str = "catalogue-db"
-    postgres_dbname: str = "catalogue"
+    catalogue_db_user: str = "catalogue"
+    catalogue_db_password: str | None = None
+    catalogue_db_host: str = "catalogue-db"
+    catalogue_db_name: str = "catalogue"
 
-    @pydantic.validator("postgres_password")
+    @pydantic.validator("catalogue_db_password")
     def password_must_be_set(cls: pydantic.BaseSettings, v: str | None) -> str | None:
         """Validate postgresql password."""
         if v is None:
-            raise ValueError("postgres_password must be set")
+            raise ValueError("catalogue_db_password must be set")
         return v
 
     @property
     def connection_string(self) -> str:
         """Create reader psql connection string."""
         return (
-            f"postgresql://{self.postgres_user}"
-            f":{self.postgres_password}@{self.postgres_host}"
-            f"/{self.postgres_dbname}"
+            f"postgresql://{self.catalogue_db_user}"
+            f":{self.catalogue_db_password}@{self.catalogue_db_host}"
+            f"/{self.catalogue_db_name}"
         )
 
 
