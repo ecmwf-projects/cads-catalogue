@@ -206,6 +206,11 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     if "adaptor.yaml" in file_names:
         with open(os.path.join(folder_path, "adaptor.yaml")) as fp:
             metadata["adaptor"] = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+    if "adaptor_configuration.yaml" in file_names:
+        with open(os.path.join(folder_path, "adaptor_configuration.yaml")) as fp:
+            metadata["adaptor_configuration"] = yaml.load(
+                fp, Loader=yaml.loader.SafeLoader
+            )
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)

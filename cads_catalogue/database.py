@@ -75,6 +75,7 @@ class Resource(BaseModel):
     type = sa.Column(sa.VARCHAR(300), nullable=False)
     previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
+    adaptor_configuration = sa.Column(sa.JSON)
     record_update = sa.Column(
         sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
