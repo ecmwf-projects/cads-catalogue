@@ -58,6 +58,16 @@ def init_db(connection_string: str | None = None) -> None:
     print("successfully created the catalogue database structure.")
 
 
+DATASETS = [
+    "derived-near-surface-meteorological-variables",
+    "reanalysis-era5-land-monthly-means",
+    "reanalysis-era5-pressure-levels",
+    "reanalysis-era5-land",
+    "reanalysis-era5-single-levels",
+    "cams-global-reanalysis-eac4-monthly",
+]
+
+
 @app.command()
 def setup_test_database(
     connection_string: str | None = None, force: bool = False
@@ -112,16 +122,8 @@ def setup_test_database(
 
     manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
 
-    datasets = [
-        "derived-near-surface-meteorological-variables",
-        "reanalysis-era5-land-monthly-means",
-        "reanalysis-era5-pressure-levels",
-        "reanalysis-era5-land",
-        "reanalysis-era5-single-levels",
-        "cams-global-reanalysis-eac4-monthly",
-    ]
     resources = []
-    for dataset in datasets:
+    for dataset in DATASETS:
         resource_folder_path = os.path.abspath(
             os.path.join(this_path, "../tests/data", dataset)
         )
