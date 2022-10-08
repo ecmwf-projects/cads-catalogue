@@ -118,6 +118,7 @@ def setup_test_database(
         "reanalysis-era5-pressure-levels",
         "reanalysis-era5-land",
         "reanalysis-era5-single-levels",
+        "cams-global-reanalysis-eac4-monthly",
     ]
     resources = []
     for dataset in datasets:

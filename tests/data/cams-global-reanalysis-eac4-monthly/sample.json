@@ -1,0 +1,21 @@
+{
+    "format": "netcdf",
+    "month": "12",
+    "pressure_level": [
+        "70",
+        "7"
+    ],
+    "product_type": "monthly_mean_by_hour_of_day",
+    "time": [
+        "03:00",
+        "12:00"
+    ],
+    "variable": [
+        "so2_precursor_mixing_ratio",
+        "hydrophilic_organic_matter_aerosol_mixing_ratio"
+    ],
+    "year": [
+        "2009",
+        "2019"
+    ]
+}
