@@ -206,12 +206,17 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     if "adaptor.yaml" in file_names:
         with open(os.path.join(folder_path, "adaptor.yaml")) as fp:
             metadata["adaptor"] = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+    if "adaptor_configuration.yaml" in file_names:
+        with open(os.path.join(folder_path, "adaptor_configuration.yaml")) as fp:
+            metadata["adaptor_configuration"] = yaml.load(
+                fp, Loader=yaml.loader.SafeLoader
+            )
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
             metadata["title"] = data.get("title")
             # NOTE: licence_ids is for relationship, not a db field
-            metadata["licence_uids"] = data.get("licences")
+            metadata["licence_uids"] = data.get("licences", [])
             metadata["publication_date"] = data.get("publication_date")
             metadata["resource_update"] = data.get("update_date")
             if "eqc" in data:
@@ -219,7 +224,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     if "documentation.yaml" in file_names:
         with open(os.path.join(folder_path, "documentation.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            metadata["documentation"] = data.get("documentation")
+    else:
+        data = {}
+    metadata["documentation"] = data.get("documentation", [])
     for candidate_name in ["overview.png", "overview.jpg"]:
         if candidate_name in file_names:
             metadata["previewimage"] = os.path.abspath(

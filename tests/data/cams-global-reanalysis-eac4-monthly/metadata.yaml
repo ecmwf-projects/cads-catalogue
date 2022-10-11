@@ -1,0 +1,53 @@
+responsible_individual: Richard Engelen
+responsible_organisation: ECMWF
+responsible_organisation_website: https://www.ecmwf.int/
+responsible_organisation_role: pointOfContact
+contactemail: copernicus-support@ecmwf.int
+
+use_limitation: Content accessible through the ADS may only be used under the terms of the licenses attributed to each particular resource.
+
+publication_date: 2020-02-06
+
+ds_responsible_organization_role:
+ds_responsible_individual: Richard Engelen
+ds_responsible_organisation_website:
+ds_responsible_organisation: ECMWF
+ds_contactemail: copernicus-support@ecmwf.int
+ds_responsible_organisation_role: publisher
+
+# Role values must be valid values on a registered code list - CI_RoleCode
+# (recommended values are: author, owner, pointOfContact, publisher,
+# resourceProvider)
+ds_responsible_organisation_role:
+
+# Inspire theme must be a valid value on a registered code list (see Confluence:
+# CDS Infrastructure Related Components -> 02.06 Compliant Metadata (ISO -
+# INSPIRE))
+inspire_theme: Atmospheric conditions
+
+# WMO theme must be a valid value on a registered code list
+wmo_theme: 
+  - airPollution
+
+# Topic must be a valid value on a registered code list (see Confluence:
+# CDS Infrastructure Related Components -> 02.06 Compliant Metadata (ISO -
+# INSPIRE))
+topic: climatologyMeteorologyAtmosphere
+
+# Format version is voidable
+format_version: 1
+
+# Free text. Mandatory to have value.
+lineage: Copernicus Atmospheric Monitoring Service
+
+# This field might be duplicated on dataset.yaml or abstract.yaml, in case so
+# one of the entrance should be removed. Valid domain (dataset, application)
+resource_type: dataset
+
+begin_date: 2003-01-01
+end_date: 2021-06-30
+
+bboxN: 89
+bboxW: 0
+bboxS: -89
+bboxE: 360

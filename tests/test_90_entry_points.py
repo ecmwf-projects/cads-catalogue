@@ -64,6 +64,15 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
+    # only load basic datasets
+    tested_datasets = [
+        "derived-near-surface-meteorological-variables",
+        "reanalysis-era5-land-monthly-means",
+        "reanalysis-era5-pressure-levels",
+        "reanalysis-era5-land",
+        "reanalysis-era5-single-levels",
+    ]
+    entry_points.DATASETS = tested_datasets
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
@@ -88,13 +97,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     # check no errors
     assert result.exit_code == 0
     # check object storage calls
-    for dataset in [
-        "derived-near-surface-meteorological-variables",
-        "reanalysis-era5-land",
-        "reanalysis-era5-land-monthly-means",
-        "reanalysis-era5-pressure-levels",
-        "reanalysis-era5-single-levels",
-    ]:
+    for dataset in tested_datasets:
         for filename in [
             "form.json",
             "overview.png",
