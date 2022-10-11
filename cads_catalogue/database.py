@@ -63,7 +63,7 @@ class Resource(BaseModel):
     doi = sa.Column(sa.String)
     form = sa.Column(sa.String)
     constraints = sa.Column(sa.String)
-    keywords = sa.Column(sa.ARRAY(sa.VARCHAR(300)))
+    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     version = sa.Column(sa.VARCHAR(300))
     variables = sa.Column(sa.JSON)
     providers = sa.Column(sa.JSON)
