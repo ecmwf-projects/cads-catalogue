@@ -1,5 +1,599 @@
 [
     {
+        "resource_id": 6,
+        "resource_uid": "cams-global-reanalysis-eac4-monthly",
+        "title": "CAMS global reanalysis (EAC4) monthly averaged fields",
+        "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB (optional conversion to netCDF)"
+            },
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "0.75\u00b0x0.75\u00b0"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "2003 to 2021"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "monthly"
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "Surface, total column, 1 model level and 25 pressure levels."
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "The lowest model level, Pressure levels: 1000, 950, 925, 900, 850, 800, 700, 600, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10, 7, 5, 3, 2, 1 hPa"
+            },
+            {
+                "id": "update-frequency",
+                "label": "Update frequency",
+                "value": "Twice a year with 4-6 month delay"
+            },
+            {
+                "id": "versions",
+                "label": "Versions",
+                "value": "Only one version"
+            }
+        ],
+        "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window. \n",
+        "adaptor": {
+            "format_conversion": {
+                "netcdf": {
+                    "legacy_basetime_splitting": false
+                },
+                "netcdf_zip": {
+                    "legacy_basetime_splitting": false
+                }
+            }
+        },
+        "mapping": "an url",
+        "contact": "copernicus-support@ecmwf.int",
+        "doi": null,
+        "form": "an url",
+        "constraints": "an url",
+        "keywords": [
+            "Variable domain: Atmosphere (composition)",
+            "Variable domain: Atmosphere (meteorology)",
+            "Parameter family: Aerosol",
+            "Parameter family: Reactive gas",
+            "Spatial coverage: Global",
+            "Product type: Reanalysis",
+            "Temporal coverage: Past"
+        ],
+        "version": null,
+        "variables": [
+            {
+                "id": "2m_dewpoint_temperature",
+                "label": "2m dewpoint temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "2m_temperature",
+                "label": "2m temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "black_carbon_aerosol_optical_depth_550nm",
+                "label": "Black carbon aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "carbon_monoxide",
+                "label": "Carbon monoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "charnock",
+                "label": "Charnock",
+                "description": null,
+                "units": "~"
+            },
+            {
+                "id": "dust_aerosol_0.03-0.55um_mixing_ratio",
+                "label": "Dust aerosol (0.03 - 0.55 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.55-0.9um_mixing_ratio",
+                "label": "Dust aerosol (0.55 - 0.9 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.9-20um_mixing_ratio",
+                "label": "Dust aerosol (0.9 - 20 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_optical_depth_550nm",
+                "label": "Dust aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "ethane",
+                "label": "Ethane",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "formaldehyde",
+                "label": "Formaldehyde",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "geopotential",
+                "label": "Geopotential",
+                "description": null,
+                "units": "m^2 s^-2"
+            },
+            {
+                "id": "hydrophilic_black_carbon_aerosol_mixing_ratio",
+                "label": "Hydrophilic black carbon aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophilic_organic_matter_aerosol_mixing_ratio",
+                "label": "Hydrophilic organic matter aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophobic_black_carbon_aerosol_mixing_ratio",
+                "label": "Hydrophobic black carbon aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophobic_organic_matter_aerosol_mixing_ratio",
+                "label": "Hydrophobic organic matter aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydroxyl_radical",
+                "label": "Hydroxyl radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ice_temperature_layer_1",
+                "label": "Ice temperature layer 1",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "isoprene",
+                "label": "Isoprene",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "leaf_area_index_high_vegetation",
+                "label": "Leaf area index, high vegetation",
+                "description": null,
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "leaf_area_index_low_vegetation",
+                "label": "Leaf area index, low vegetation",
+                "description": null,
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "mean_sea_level_pressure",
+                "label": "Mean sea level pressure",
+                "description": null,
+                "units": "Pa"
+            },
+            {
+                "id": "methane_chemistry",
+                "label": "Methane (chemistry)",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitric_acid",
+                "label": "Nitric acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrogen_dioxide",
+                "label": "Nitrogen dioxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrogen_monoxide",
+                "label": "Nitrogen monoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "organic_matter_aerosol_optical_depth_550nm",
+                "label": "Organic matter aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "ozone",
+                "label": "Ozone",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "particulate_matter_10um",
+                "label": "Particulate matter d < 10 \u00b5m (PM10)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "particulate_matter_2.5um",
+                "label": "Particulate matter d < 2.5 \u00b5m (PM2.5)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "peroxyacetyl_nitrate",
+                "label": "Peroxyacetyl nitrate",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "potential_vorticity",
+                "label": "Potential vorticity",
+                "description": null,
+                "units": "K m^2 kg^-1 s^-1"
+            },
+            {
+                "id": "propane",
+                "label": "Propane",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "relative_humidity",
+                "label": "Relative humidity",
+                "description": null,
+                "units": "%"
+            },
+            {
+                "id": "so2_precursor_mixing_ratio",
+                "label": "SO2 precursor mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_0.03-0.5um_mixing_ratio",
+                "label": "Sea salt aerosol (0.03 - 0.5 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_0.5-5um_mixing_ratio",
+                "label": "Sea salt aerosol (0.5 - 5 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_5-20um_mixing_ratio",
+                "label": "Sea salt aerosol (5 - 20 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_optical_depth_550nm",
+                "label": "Sea salt aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "sea_surface_temperature",
+                "label": "Sea surface temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "sea_ice_cover",
+                "label": "Sea-ice cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "snow_albedo",
+                "label": "Snow albedo",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "snow_density",
+                "label": "Snow density",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "snow_depth",
+                "label": "Snow depth",
+                "description": null,
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "soil_temperature_level_1",
+                "label": "Soil temperature level 1",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "specific_humidity",
+                "label": "Specific humidity",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sulphate_aerosol_mixing_ratio",
+                "label": "Sulphate aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sulphate_aerosol_optical_depth_550nm",
+                "label": "Sulphate aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "sulphur_dioxide",
+                "label": "Sulphur dioxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "surface_pressure",
+                "label": "Surface pressure",
+                "description": null,
+                "units": "Pa"
+            },
+            {
+                "id": "temperature",
+                "label": "Temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "temperature_of_snow_layer",
+                "label": "Temperature of snow layer",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "total_aerosol_optical_depth_550nm",
+                "label": "Total aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_column_carbon_monoxide",
+                "label": "Total column carbon monoxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ethane",
+                "label": "Total column ethane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_formaldehyde",
+                "label": "Total column formaldehyde",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_hydroxyl_radical",
+                "label": "Total column hydroxyl radical",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_isoprene",
+                "label": "Total column isoprene",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_methane",
+                "label": "Total column methane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitric_acid",
+                "label": "Total column nitric acid",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitrogen_dioxide",
+                "label": "Total column nitrogen dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitrogen_monoxide",
+                "label": "Total column nitrogen monoxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ozone",
+                "label": "Total column ozone",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_peroxyacetyl_nitrate",
+                "label": "Total column peroxyacetyl nitrate",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_propane",
+                "label": "Total column propane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_sulphur_dioxide",
+                "label": "Total column sulphur dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_water",
+                "label": "Total column water",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_water_vapour",
+                "label": "Total column water vapour",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertical_velocity",
+                "label": "Vertical velocity",
+                "description": null,
+                "units": "Pa s^-1"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um",
+                "label": "Vertically integrated mass of dust aerosol (0.03 - 0.55 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_0.55-9um",
+                "label": "Vertically integrated mass of dust aerosol (0.55 - 9 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_9-20um",
+                "label": "Vertically integrated mass of dust aerosol (9 - 20 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol",
+                "label": "Vertically integrated mass of hydrophilic black carbon aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol",
+                "label": "Vertically integrated mass of hydrophilic organic matter aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol",
+                "label": "Vertically integrated mass of hydrophobic black carbon aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol",
+                "label": "Vertically integrated mass of hydrophobic organic matter aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um",
+                "label": "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um",
+                "label": "Vertically integrated mass of sea salt aerosol (0.5 - 5 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_5-20um",
+                "label": "Vertically integrated mass of sea salt aerosol (5 - 20 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sulphate_aerosol",
+                "label": "Vertically integrated mass of sulphate aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sulphur_dioxide",
+                "label": "Vertically integrated mass of sulphur dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            }
+        ],
+        "providers": null,
+        "summaries": null,
+        "begin_date": "2003-01-01",
+        "end_date": "2021-06-30",
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxW": 0,
+            "bboxS": -89,
+            "bboxE": 360
+        },
+        "documentation": [],
+        "type": "dataset",
+        "previewimage": "an url",
+        "publication_date": "2020-02-06",
+        "adaptor_configuration": {
+            "url": "https://ads.atmosphere.copernicus.eu/api/v2",
+            "key": "11325:b5c65565-ef76-4e44-adfb-ae7050f293c6",
+            "collection_id": "cams-global-reanalysis-eac4-monthly"
+        },
+        "record_update": "2022-10-11 14:22:22.960327+02:00",
+        "references": [],
+        "resource_update": null,
+        "use_eqc": null
+    },
+    {
         "resource_id": 1,
         "resource_uid": "derived-near-surface-meteorological-variables",
         "title": "Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis",
@@ -191,6 +785,7 @@
         "type": "dataset",
         "previewimage": "an url",
         "publication_date": "2020-02-11",
+        "adaptor_configuration": null,
         "record_update": "2022-09-06 16:10:27.579077+02:00",
         "references": [
             {
@@ -626,6 +1221,7 @@
         "type": "dataset",
         "previewimage": "an url",
         "publication_date": "2019-07-12",
+        "adaptor_configuration": null,
         "record_update": "2022-09-06 16:10:27.590809+02:00",
         "references": [
             {
@@ -1054,6 +1650,7 @@
         "type": "dataset",
         "previewimage": "an url",
         "publication_date": "2019-06-23",
+        "adaptor_configuration": null,
         "record_update": "2022-09-06 16:10:27.584074+02:00",
         "references": [
             {
@@ -1284,6 +1881,7 @@
         "type": "dataset",
         "previewimage": "an url",
         "publication_date": "2018-06-14",
+        "adaptor_configuration": null,
         "record_update": "2022-08-30 07:31:55.508657+02:00",
         "references": [
             {
@@ -2997,6 +3595,7 @@
         "type": "dataset",
         "previewimage": "an url",
         "publication_date": "2018-06-14",
+        "adaptor_configuration": null,
         "record_update": "2022-08-30 07:31:55.514834+02:00",
         "references": [
             {

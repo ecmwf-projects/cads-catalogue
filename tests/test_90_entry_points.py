@@ -65,14 +65,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         return_value=("an url", "a version"),
     )
     # only load basic datasets
-    tested_datasets = [
-        "derived-near-surface-meteorological-variables",
-        "reanalysis-era5-land-monthly-means",
-        "reanalysis-era5-pressure-levels",
-        "reanalysis-era5-land",
-        "reanalysis-era5-single-levels",
-    ]
-    entry_points.DATASETS = tested_datasets
+    tested_datasets = entry_points.DATASETS
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
@@ -83,7 +76,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
         },
     )
-    assert patch.call_count == 29
+    assert patch.call_count == 33
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
     assert patch.mock_calls[0].kwargs == {
@@ -97,6 +90,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     # check no errors
     assert result.exit_code == 0
     # check object storage calls
+    kwargs = dict()
     for dataset in tested_datasets:
         for filename in [
             "form.json",
@@ -123,6 +117,11 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
                 and filename == "citation.html"
             ):
                 file_path = os.path.join(TESTDATA_PATH, dataset, "citation.md")
+            if (
+                dataset in ("cams-global-reanalysis-eac4-monthly",)
+                and filename == "citation.html"
+            ):
+                continue
             expected_call = unittest.mock.call(
                 file_path, object_storage_url, force=True, **kwargs
             )
