@@ -4,7 +4,7 @@ from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import database, manager, object_storage
+from cads_catalogue import config, database, manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -877,6 +877,8 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     assert db_obj_as_dict == licences[0]
     assert db_obj_as_dict["download_filename"] == "an url"
     session.close()
+    # reset globals for tests following
+    config.dbsettings = None
 
 
 def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
@@ -952,3 +954,5 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     )
 
     session.close()
+    # reset globals for tests following
+    config.dbsettings = None

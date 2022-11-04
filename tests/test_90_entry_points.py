@@ -9,7 +9,7 @@ from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
 from typer.testing import CliRunner
 
-from cads_catalogue import database, entry_points, manager
+from cads_catalogue import config, database, entry_points, manager
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -166,3 +166,5 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
                 value = value.isoformat()
             assert value == expected_resources[i][key]
     session.close()
+    # reset globals for tests following
+    config.dbsettings = None

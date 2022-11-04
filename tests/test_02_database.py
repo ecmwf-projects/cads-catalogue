@@ -4,7 +4,7 @@ import sqlalchemy as sa
 from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import database
+from cads_catalogue import config, database
 
 
 def test_init_database(postgresql: Connection[str]) -> None:
@@ -31,8 +31,10 @@ def test_ensure_session_obj(
     # case of session is already set
     ret_value = database.ensure_session_obj(session_obj)
     assert ret_value is session_obj
+    config.dbsettings = None
 
     # case of session not set
-    temp_environ["postgres_password"] = postgresql.info.password
+    temp_environ["catalogue_db_password"] = postgresql.info.password
     ret_value = database.ensure_session_obj(None)
     assert isinstance(ret_value, sessionmaker)
+    config.dbsettings = None

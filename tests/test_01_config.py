@@ -12,15 +12,18 @@ def test_sqlalchemysettings(temp_environ: Any) -> None:
     with pytest.raises(ValueError) as excinfo:
         config.SqlalchemySettings()
     assert "catalogue_db_password" in str(excinfo.value)
+    config.dbsettings = None
 
     # also an empty password can be set
     settings = config.SqlalchemySettings(catalogue_db_password="")
     assert settings.catalogue_db_password == ""
+    config.dbsettings = None
 
     # also a not empty password can be set
     temp_environ["catalogue_db_password"] = "a password"
     settings = config.SqlalchemySettings()
     assert settings.catalogue_db_password == "a password"
+    config.dbsettings = None
 
 
 def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) -> None:
@@ -36,6 +39,7 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
         == "postgresql://catalogue:apassword@catalogue-db/catalogue"
     )
     assert config.dbsettings == effective_settings
+    config.dbsettings = None
 
     # setting a custom configuration works as well
     my_settings_dict = {
@@ -54,3 +58,4 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
     assert config.dbsettings == effective_settings
     assert effective_settings == mysettings
     assert effective_settings.connection_string == my_settings_connection_string
+    config.dbsettings = None
