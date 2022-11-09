@@ -118,7 +118,6 @@ def setup_test_database(
         os.path.join(this_path, "../tests/data/cds-licences")
     )
     licences = manager.load_licences_from_folder(licences_folder_path)
-    engine = database.init_database(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
 
     manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)

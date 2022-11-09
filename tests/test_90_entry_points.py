@@ -7,6 +7,7 @@ from typing import Any
 import sqlalchemy as sa
 from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
+import sqlalchemy_utils
 from typer.testing import CliRunner
 
 from cads_catalogue import config, database, entry_points, manager
@@ -39,6 +40,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         f"postgresql://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
+    sqlalchemy_utils.drop_database(connection_string)
     engine = sa.create_engine(connection_string)
     session_obj = sessionmaker(engine)
     licence_path = os.path.join(
@@ -66,16 +68,18 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     )
     # only load basic datasets
     tested_datasets = entry_points.DATASETS
+    spy_initdb = mocker.spy(database, 'init_database')
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string],
+        ["setup-test-database", "--connection-string", connection_string, '--force'],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
         },
     )
+    assert spy_initdb.call_count == 1
     assert patch.call_count == 33
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
@@ -166,5 +170,32 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
                 value = value.isoformat()
             assert value == expected_resources[i][key]
     session.close()
+
+    # spy_initdb.reset_mock()
+    # result = runner.invoke(
+    #     entry_points.app,
+    #     ["setup-test-database", "--connection-string", connection_string],
+    #     env={
+    #         "OBJECT_STORAGE_URL": object_storage_url,
+    #         "STORAGE_ADMIN": object_storage_kws["access_key"],
+    #         "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+    #     },
+    # )
+    # assert spy_initdb.call_count == 0
+    # assert result.exit_code == 1
+
+    spy_initdb.reset_mock()
+    result = runner.invoke(
+        entry_points.app,
+        ["setup-test-database", "--connection-string", connection_string, '--force'],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+        },
+    )
+    assert spy_initdb.call_count == 1
+    assert result.exit_code == 0
+
     # reset globals for tests following
     config.dbsettings = None
