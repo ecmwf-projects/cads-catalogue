@@ -5,9 +5,9 @@ import unittest.mock
 from typing import Any
 
 import sqlalchemy as sa
+import sqlalchemy_utils
 from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
-import sqlalchemy_utils
 from typer.testing import CliRunner
 
 from cads_catalogue import config, database, entry_points, manager
@@ -68,11 +68,11 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     )
     # only load basic datasets
     tested_datasets = entry_points.DATASETS
-    spy_initdb = mocker.spy(database, 'init_database')
+    spy_initdb = mocker.spy(database, "init_database")
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, '--force'],
+        ["setup-test-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
@@ -187,7 +187,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     spy_initdb.reset_mock()
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, '--force'],
+        ["setup-test-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
