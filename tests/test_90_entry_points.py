@@ -169,8 +169,10 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             if isinstance(value, datetime.date):
                 value = value.isoformat()
             assert value == expected_resources[i][key]
-    res = session.execute("SELECT related_resource_id, parent_resource_id, child_resource_id"
-                          " FROM related_resources ORDER BY related_resource_id").all()
+    res = session.execute(
+        "SELECT related_resource_id, parent_resource_id, child_resource_id"
+        " FROM related_resources ORDER BY related_resource_id"
+    ).all()
     assert res == [(1, 4, 2), (2, 2, 4), (3, 5, 3), (4, 3, 5)]
     session.close()
 
@@ -205,7 +207,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
 
 
 def test_transaction_setup_test_database(postgresql: Connection[str], mocker) -> None:
-    """"here we want to test that transactions are managed outside the setup test database"""
+    """ "here we want to test that transactions are managed outside the setup test database"""
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
@@ -226,7 +228,7 @@ def test_transaction_setup_test_database(postgresql: Connection[str], mocker) ->
     )
     # ... but the store_dataset fails to work
     mocker.patch.object(
-        manager, "store_dataset", side_effect=Exception('dataset error')
+        manager, "store_dataset", side_effect=Exception("dataset error")
     )
     # the entry point execution should fail
     result = runner.invoke(

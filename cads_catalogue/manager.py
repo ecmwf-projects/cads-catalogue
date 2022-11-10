@@ -24,8 +24,8 @@ from typing import Any
 
 import yaml
 from sqlalchemy import inspect
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+
 from cads_catalogue import database, object_storage
 
 
@@ -299,7 +299,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
 
 
 def store_licences(
-    session: Session | None,
+    session: Session,
     licences: list[Any],
     object_storage_url: str,
     **storage_kws: Any,
@@ -340,7 +340,7 @@ def store_licences(
 
 
 def store_dataset(
-    session: Session | None,
+    session: Session,
     dataset_md: dict[str, Any],
     object_storage_url: str,
     **storage_kws: Any,

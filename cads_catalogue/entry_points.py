@@ -132,7 +132,9 @@ def setup_test_database(
                 resources.append(resource)
             related_resources = manager.find_related_resources(resources)
             for resource in resources:
-                manager.store_dataset(session, resource, object_storage_url, **storage_kws)
+                manager.store_dataset(
+                    session, resource, object_storage_url, **storage_kws
+                )
             for res1, res2 in related_resources:
                 res1_obj = (
                     session.query(database.Resource)
@@ -146,7 +148,7 @@ def setup_test_database(
                 )
                 res1_obj.related_resources.append(res2_obj)
                 res2_obj.related_resources.append(res1_obj)
-        except:
+        except Exception:
             session.rollback()
             raise
         else:
