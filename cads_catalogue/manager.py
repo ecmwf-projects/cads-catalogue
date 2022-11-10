@@ -25,7 +25,7 @@ from typing import Any
 import yaml
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
-
+from sqlalchemy.orm.session import Session
 from cads_catalogue import database, object_storage
 
 
@@ -299,7 +299,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
 
 
 def store_licences(
-    session_obj: sessionmaker | None,
+    session: Session | None,
     licences: list[Any],
     object_storage_url: str,
     **storage_kws: Any,
@@ -312,7 +312,7 @@ def store_licences(
 
     Parameters
     ----------
-    session_obj: Session sqlalchemy object
+    session: opened SQLAlchemy session
     licences: list of licences (as returned by `load_licences_from_folder`)
     object_storage_url: endpoint URL of the object storage
     storage_kws: dictionary of parameters used to pass to the storage client
@@ -322,28 +322,25 @@ def store_licences(
     list: list of dictionaries of records inserted.
     """
     all_stored = []
-    session_obj = database.ensure_session_obj(session_obj)
-    with session_obj() as session:
-        for licence in licences:
-            file_path = licence["download_filename"]
-            subpath = os.path.join("licences", licence["licence_uid"])
-            licence["download_filename"] = object_storage.store_file(
-                file_path,
-                object_storage_url,
-                subpath=subpath,
-                force=True,
-                **storage_kws,
-            )[0]
-            licence_obj = database.Licence(**licence)
-            session.add(licence_obj)
-            stored_as_dict = object_as_dict(licence_obj)
-            all_stored.append(stored_as_dict)
-        session.commit()
+    for licence in licences:
+        file_path = licence["download_filename"]
+        subpath = os.path.join("licences", licence["licence_uid"])
+        licence["download_filename"] = object_storage.store_file(
+            file_path,
+            object_storage_url,
+            subpath=subpath,
+            force=True,
+            **storage_kws,
+        )[0]
+        licence_obj = database.Licence(**licence)
+        session.add(licence_obj)
+        stored_as_dict = object_as_dict(licence_obj)
+        all_stored.append(stored_as_dict)
     return all_stored
 
 
 def store_dataset(
-    session_obj: sessionmaker | None,
+    session: Session | None,
     dataset_md: dict[str, Any],
     object_storage_url: str,
     **storage_kws: Any,
@@ -355,7 +352,7 @@ def store_dataset(
 
     Parameters
     ----------
-    session_obj: Session sqlalchemy object
+    session: opened SQLAlchemy session
     dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
     object_storage_url: endpoint URL of the object storage
     storage_kws: dictionary of parameters used to pass to the storage client
@@ -365,46 +362,43 @@ def store_dataset(
     dict: a dictionary of the record stored.
     """
     dataset = dataset_md.copy()
-    session_obj = database.ensure_session_obj(session_obj)
-    with session_obj() as session:
-        licence_uids = dataset.pop("licence_uids", [])
-        subpath = os.path.join("resources", dataset["resource_uid"])
-        obj_storage_fields = ["form", "previewimage", "constraints", "mapping"]
-        for field in obj_storage_fields:
-            file_path = dataset[field]
-            dataset[field] = object_storage.store_file(
-                file_path,
-                object_storage_url,
-                subpath=subpath,
-                force=True,
-                **storage_kws,
-            )[0]
-        # some fields to storage are inside references
-        for reference in dataset["references"]:
-            for subfield in ["content", "download_file"]:
-                if reference.get(subfield):
-                    file_path = reference[subfield]
-                    reference[subfield] = object_storage.store_file(
-                        file_path,
-                        object_storage_url,
-                        subpath=subpath,
-                        force=True,
-                        **storage_kws,
-                    )[0]
-        dataset.pop("related_resources_keywords")
-        dataset_obj = database.Resource(**dataset)
-        session.add(dataset_obj)
-        for licence_uid in licence_uids:
-            licence_obj = (
-                session.query(database.Licence)
-                .filter_by(licence_uid=licence_uid)
-                .order_by(database.Licence.revision.desc())
-                .first()
-            )
-            if licence_obj:
-                dataset_obj.licences.append(licence_obj)  # type: ignore
-        stored_as_dict = object_as_dict(dataset_obj)
-        session.commit()
+    licence_uids = dataset.pop("licence_uids", [])
+    subpath = os.path.join("resources", dataset["resource_uid"])
+    obj_storage_fields = ["form", "previewimage", "constraints", "mapping"]
+    for field in obj_storage_fields:
+        file_path = dataset[field]
+        dataset[field] = object_storage.store_file(
+            file_path,
+            object_storage_url,
+            subpath=subpath,
+            force=True,
+            **storage_kws,
+        )[0]
+    # some fields to storage are inside references
+    for reference in dataset["references"]:
+        for subfield in ["content", "download_file"]:
+            if reference.get(subfield):
+                file_path = reference[subfield]
+                reference[subfield] = object_storage.store_file(
+                    file_path,
+                    object_storage_url,
+                    subpath=subpath,
+                    force=True,
+                    **storage_kws,
+                )[0]
+    dataset.pop("related_resources_keywords")
+    dataset_obj = database.Resource(**dataset)
+    session.add(dataset_obj)
+    for licence_uid in licence_uids:
+        licence_obj = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=licence_uid)
+            .order_by(database.Licence.revision.desc())
+            .first()
+        )
+        if licence_obj:
+            dataset_obj.licences.append(licence_obj)  # type: ignore
+    stored_as_dict = object_as_dict(dataset_obj)
     return stored_as_dict
 
 
