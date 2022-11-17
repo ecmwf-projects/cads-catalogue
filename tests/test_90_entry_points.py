@@ -169,6 +169,11 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             if isinstance(value, datetime.date):
                 value = value.isoformat()
             assert value == expected_resources[i][key]
+    res = session.execute(
+        "SELECT related_resource_id, parent_resource_id, child_resource_id"
+        " FROM related_resources ORDER BY related_resource_id"
+    ).all()
+    assert res == [(1, 4, 2), (2, 2, 4), (3, 5, 3), (4, 3, 5)]
     session.close()
 
     # spy_initdb.reset_mock()
@@ -199,3 +204,45 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
 
     # reset globals for tests following
     config.dbsettings = None
+
+
+def test_transaction_setup_test_database(postgresql: Connection[str], mocker) -> None:
+    """ "here we want to test that transactions are managed outside the setup test database"""
+    connection_string = (
+        f"postgresql+psycopg2://{postgresql.info.user}:"
+        f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
+    )
+    object_storage_url = "http://myobject-storage:myport/"
+    object_storage_kws: dict[str, Any] = {
+        "access_key": "storage_user",
+        "secret_key": "storage_password",
+        "secure": False,
+    }
+    sqlalchemy_utils.drop_database(connection_string)
+    engine = sa.create_engine(connection_string)
+    session_obj = sessionmaker(engine)
+    # simulate the object storage working...
+    mocker.patch(
+        "cads_catalogue.object_storage.store_file",
+        return_value=("an url", "a version"),
+    )
+    # ... but the store_dataset fails to work
+    mocker.patch.object(
+        manager, "store_dataset", side_effect=Exception("dataset error")
+    )
+    # the entry point execution should fail
+    result = runner.invoke(
+        entry_points.app,
+        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+        },
+    )
+    assert result.exit_code != 0
+    # but db must stay unchanged (empty)
+    session = session_obj()
+    assert session.query(database.Resource).all() == []
+    assert session.query(database.Licence).all() == []
+    session.close()

@@ -856,8 +856,8 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
         return_value=("an url", "a version"),
     )
 
-    manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
-
+    manager.store_licences(session, licences, object_storage_url, **storage_kws)
+    session.commit()
     assert patch.call_count == len(licences)
     assert patch.mock_calls[0].args == (
         os.path.join(licences_folder_path, "licence-to-use-copernicus-products.pdf"),
@@ -894,12 +894,12 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     )
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
-    manager.store_licences(session_obj, licences, object_storage_url, **storage_kws)
+    session = session_obj()
+    manager.store_licences(session, licences, object_storage_url, **storage_kws)
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
-    session = session_obj()
     assert resource["licence_uids"] == [licences[0]["licence_uid"]]
     res = session.query(database.Resource).all()
     assert res == []
@@ -909,9 +909,9 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         return_value=("an url", "a version"),
     )
     stored_record = manager.store_dataset(
-        session_obj, resource, object_storage_url, **storage_kws
+        session, resource, object_storage_url, **storage_kws
     )
-
+    session.commit()
     assert patch.call_count == 5
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
