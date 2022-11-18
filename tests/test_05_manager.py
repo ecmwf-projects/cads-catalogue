@@ -4,7 +4,7 @@ from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import config, database, manager, object_storage
+from cads_catalogue import DATA_PATH, config, database, manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -84,6 +84,7 @@ def test_load_resource_from_folder() -> None:
         "begin_date": date(1981, 1, 1),
         "end_date": date(2022, 5, 1),
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
+        "layout": os.path.join(DATA_PATH, "layout.json"),
         "mapping": os.path.join(resource_folder_path, "mapping.json"),
         "description": [
             {"id": "file-format", "label": "File format", "value": "GRIB"},
@@ -912,24 +913,28 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         session, resource, object_storage_url, **storage_kws
     )
     session.commit()
-    assert patch.call_count == 5
+    assert patch.call_count == 6
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
     kwargs["force"] = True
-    for call_index, file_name in enumerate(
-        [
-            "form.json",
-            "overview.png",
-            "constraints.json",
-            "mapping.json",
-            "citation.html",
-        ]
-    ):
-        assert patch.mock_calls[call_index].args == (
-            os.path.join(resource_folder_path, file_name),
-            object_storage_url,
+    effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
+    for file_name in [
+        "form.json",
+        "overview.png",
+        "constraints.json",
+        "mapping.json",
+        "citation.html",
+    ]:
+        expected_call_pars = (
+            (os.path.join(resource_folder_path, file_name), object_storage_url),
+            kwargs,
         )
-        assert patch.mock_calls[0].kwargs == kwargs
+        assert expected_call_pars in effective_calls_pars
+    assert (
+        (os.path.join(DATA_PATH, "layout.json"), object_storage_url),
+        kwargs,
+    ) in effective_calls_pars
+
     assert 1 == stored_record.pop("resource_id")
     for column, value in stored_record.items():
         if column not in [
@@ -938,12 +943,14 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
             "constraints",
             "previewimage",
             "mapping",
+            "layout",
         ]:
             assert resource.get(column) == value
     assert stored_record["form"] == "an url"
     assert stored_record["constraints"] == "an url"
     assert stored_record["previewimage"] == "an url"
     assert stored_record["mapping"] == "an url"
+    assert stored_record["layout"] == "an url"
     expected_many2many_record = {
         "resource_id": 1,
         "licence_id": 1,

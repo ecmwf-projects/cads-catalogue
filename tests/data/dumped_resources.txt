@@ -71,6 +71,7 @@
         "doi": null,
         "form": "an url",
         "constraints": "an url",
+        "layout": "an url",
         "keywords": [
             "Variable domain: Atmosphere (composition)",
             "Variable domain: Atmosphere (meteorology)",
@@ -673,6 +674,7 @@
         "doi": "10.24381/cds.20d54e34",
         "form": "an url",
         "constraints": "an url",
+        "layout": "an url",
         "keywords": [
             "Product type: Derived reanalysis",
             "Spatial coverage: Global",
@@ -889,6 +891,7 @@
         "doi": "10.24381/cds.e2161bac",
         "form": "an url",
         "constraints": "an url",
+        "layout": "an url",
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -1318,6 +1321,7 @@
         "doi": "10.24381/cds.68d2bb30",
         "form": "an url",
         "constraints": "an url",
+        "layout": "an url",
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -1742,6 +1746,7 @@
         "doi": "10.24381/cds.bd0915c6",
         "form": "an url",
         "constraints": "an url",
+        "layout": "an url",
         "keywords": [
             "Variable domain: Atmosphere (surface)",
             "Variable domain: Atmosphere (upper air)",
@@ -1975,6 +1980,7 @@
         "doi": "10.24381/cds.adbb2d47",
         "form": "an url",
         "constraints": "an url",
+        "layout": "an url",
         "keywords": [
             "Variable domain: Atmosphere (surface)",
             "Variable domain: Atmosphere (upper air)",

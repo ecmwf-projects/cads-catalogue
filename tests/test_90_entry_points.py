@@ -80,7 +80,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert spy_initdb.call_count == 1
-    assert patch.call_count == 33
+    assert patch.call_count == 39
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
     assert patch.mock_calls[0].kwargs == {

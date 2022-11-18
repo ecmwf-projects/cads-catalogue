@@ -28,6 +28,9 @@ from sqlalchemy.orm.session import Session
 
 from cads_catalogue import database, object_storage
 
+THIS_PATH = os.path.abspath(os.path.dirname(__file__))
+DATA_PATH = os.path.join(THIS_PATH, "db_data")
+
 
 def object_as_dict(obj: Any) -> dict[str, Any]:
     """Convert a sqlalchemy object in a python dictionary."""
@@ -241,6 +244,8 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             metadata[db_field_name] = os.path.abspath(
                 os.path.join(folder_path, file_name)
             )
+    # layout is static at the moment
+    metadata["layout"] = os.path.abspath(os.path.join(DATA_PATH, "layout.json"))
     metadata["references"] = []
     if "references.yaml" in file_names:
         with open(os.path.join(folder_path, "references.yaml")) as fp:
@@ -364,7 +369,7 @@ def store_dataset(
     dataset = dataset_md.copy()
     licence_uids = dataset.pop("licence_uids", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
-    obj_storage_fields = ["form", "previewimage", "constraints", "mapping"]
+    obj_storage_fields = ["form", "previewimage", "constraints", "mapping", "layout"]
     for field in obj_storage_fields:
         file_path = dataset[field]
         dataset[field] = object_storage.store_file(
