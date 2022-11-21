@@ -58,7 +58,7 @@ class Resource(BaseModel):
     description = sa.Column(sa.JSON, nullable=False)
     abstract = sa.Column(sa.TEXT, nullable=False)
     adaptor = sa.Column(sa.JSON)
-    layout = sa.Column(sa.JSON)
+    layout = sa.Column(sa.String)
     mapping = sa.Column(sa.String)
     contact = sa.Column(sa.String)
     doi = sa.Column(sa.String)
