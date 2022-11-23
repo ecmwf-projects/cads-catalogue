@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
+import functools
 import glob
 import itertools
 import json
@@ -30,6 +30,49 @@ from cads_catalogue import database, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 DATA_PATH = os.path.join(THIS_PATH, "db_data")
+OBJECT_STORAGE_UPLOAD_FILES = [
+    # (file_name, "db_field_name),
+    ("adaptor.json", "adaptor"),  # FIXME: or store as a json?
+    ("constraints.json", "constraints"),
+    ("form.json", "form"),
+    ("layout.json", "layout"),  # FIXME: or use the static file?
+    ("mapping.json", "mapping"),
+    ("overview.png", "previewimage"),
+    ("overview.jpg", "previewimage"),
+]
+
+
+def recursive_key_search(
+    obj, key: str, current_result: list[Any] | None = None
+) -> list[Any]:
+    """Crowl inside input dictionary/list searching for all keys=key for each dictionary found.
+
+    Note that it does not search inside values of the key found.
+
+    Parameters
+    ----------
+    obj: input dictionary or list
+    key: key to search
+    current_result: list of results where aggregate what found on
+
+    Returns
+    -------
+    list of found values
+    """
+    if current_result is None:
+        current_result = []
+    if isinstance(obj, dict):
+        for current_key, current_value in obj.items():
+            if current_key == key:
+                current_result.append(current_value)
+            else:
+                current_result = recursive_key_search(
+                    current_value, key, current_result
+                )
+    elif isinstance(obj, list):
+        for item in obj:
+            current_result = recursive_key_search(item, key, current_result)
+    return current_result
 
 
 def object_as_dict(obj: Any) -> dict[str, Any]:
@@ -70,113 +113,229 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
     return licences
 
 
-def build_description(data: dict[str, Any]) -> list[dict[str, Any]]:
-    """Build the db field `description` from the yaml data loaded.
+def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's metadata regarding files that should be uploaded to the object storage.
+
+    Look inside the folder_path tree for files listed in OBJECT_STORAGE_UPLOAD_FILES.
+    Actually metadata collected is the absolute path of the files to be uploaded.
 
     Parameters
     ----------
-    data: yaml data
+    folder_path: root folder path where to collect metadata of a resource
 
     Returns
     -------
-    a list of items of kind {"id": ..., "label": ..., "value": ...}
+    dict: dictionary of metadata collected
     """
-    ret_value: list[dict[str, str]] = []
-    for key, value in data.get("description", dict()).items():
-        item = {
-            "id": key,
-            "label": key.replace("-", " ").capitalize(),
-            "value": value,
-        }
-        ret_value.append(item)
-    return ret_value
+    metadata = dict()
+    exclude_dirs = ["geco-config"]
+    for root, dirs, files in os.walk(folder_path):
+        if root in exclude_dirs:
+            continue
+        found_file_names = list(
+            set(files) & set(dict(OBJECT_STORAGE_UPLOAD_FILES).keys())
+        )
+        for found_file_name in found_file_names:
+            db_field_name = dict(OBJECT_STORAGE_UPLOAD_FILES)[found_file_name]
+            metadata[db_field_name] = os.path.abspath(
+                os.path.join(root, found_file_name)
+            )
+    return metadata
 
 
-def load_variable_id_map(form_json_path: str) -> dict[str, str]:
+def load_variable_id_map(form_json_path: str, mapping_json_path: str) -> dict[str, str]:
     """
-    Return a dictionary {variable_label: variable_id} parsing the form.json file.
+    Return a dictionary {variable_label: variable_id} parsing form.json and mapping.json.
 
     Parameters
     ----------
     form_json_path: path to the form.json file
+    mapping_json_path: path to the mapping.json file
 
     Returns
     -------
     a dictionary {variable_label: variable_id}
     """
-    if not os.path.isfile(form_json_path):
-        return dict()
+    ret_value: dict[str, str] = dict()
+    if not os.path.isfile(form_json_path) or not os.path.isfile(mapping_json_path):
+        return ret_value
+    # mapping.json is used to find the list of variable ids
+    with open(mapping_json_path) as fp:
+        mapping = json.load(fp)
+        variable_ids = list(mapping["remap"]["variable"].keys())
+
     with open(form_json_path) as fp:
-        form_sections = json.load(fp)
-    variable_id_map = dict()
-    for form_section in form_sections:
-        if "details" in form_section:
-            details_section = form_section["details"]
-            if "groups" in details_section:
-                groups_section = details_section["groups"]
-                for group_section in groups_section:
-                    if "labels" in group_section:
-                        variable_id_map.update(group_section["labels"])
-            if "labels" in details_section:
-                variable_id_map.update(details_section["labels"])
-    variable_id_map = {v: k for k, v in variable_id_map.items()}
-    return variable_id_map
+        form_data = json.load(fp)
+    # inside form.json we can find more keys 'labels' with id-value mappings
+    search_results = recursive_key_search(form_data, key="labels")
+    label_id_map: dict[str, str] = functools.reduce(
+        lambda d, src: d.update(src) or d, search_results, {}
+    )
+    ret_value = {
+        value: key for key, value in label_id_map.items() if key in variable_ids
+    }
+    return ret_value
 
 
-def build_variables(
-    data: dict[str, Any], variable_id_map=dict | None
-) -> list[dict[str, Any]]:
-    """Build the db field `variables` from the yaml data loaded.
+def load_resource_documentation(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's documentation metadata.
 
     Parameters
     ----------
-    data: yaml data
-    variable_id_map: dictionary to get the variable id from the label
+    folder_path: root folder path where to collect metadata of a resource
 
     Returns
     -------
-    a list of items of kind {"label": ..., "description": ..., "units": ...}
+    dict: dictionary of metadata collected
     """
-    if variable_id_map is None:
-        variable_id_map = dict()
-    ret_value: list[dict[str, str]] = []
-    for variable_name, properties in data.get("variables", dict()).items():
+    metadata: dict[str, Any] = dict()
+    metadata["documentation"] = []
+    doc_file_path = os.path.join(
+        folder_path, "content", "documentation", "documentation.yaml"
+    )
+    if not os.path.isfile(doc_file_path):
+        return metadata
+    with open(doc_file_path) as fp:
+        data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+    metadata["documentation"] = data.get("documentation", [])
+    return metadata
+
+
+def load_resource_abstract(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's abstract metadata.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata = dict()
+    metadata["abstract"] = ""
+    overview_file_path = os.path.join(folder_path, "overview", "overview.md")
+    if not os.path.isfile(overview_file_path):
+        return metadata
+    with open(overview_file_path) as fp:
+        metadata["abstract"] = fp.read()
+    return metadata
+
+
+def load_resource_description(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's description metadata.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata: dict[str, Any] = dict()
+    metadata["description"] = []
+    desc_file_path = os.path.join(
+        folder_path, "content", "overview", "description.yaml"
+    )
+    if not os.path.isfile(desc_file_path):
+        return metadata
+    with open(desc_file_path) as fp:
+        data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+    description: list[dict[str, str]] = []
+    for key, value in data.get("data-description", dict()).items():
         item = {
+            "id": key,
+            "label": key.replace("-", " ").capitalize(),
+            "value": value,
+        }
+        description.append(item)
+    metadata["description"] = description
+    return metadata
+
+
+def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's metadata from the metadata.json file.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata = dict()
+    json_folder_path = os.path.join(folder_path, "json-config")
+    metadata_file_path = os.path.join(json_folder_path, "metadata.json")
+    if not os.path.isfile(metadata_file_path):
+        # some fields are required
+        raise ValueError("'metadata.json' not found in %r" % json_folder_path)
+    with open(os.path.join(json_folder_path, "metadata.json")) as fp:
+        data = json.load(fp)
+    metadata["begin_date"] = data.get("begin_date")
+    metadata["contact"] = data.get("contactemail")
+    metadata["doi"] = data.get("doi")
+    metadata["end_date"] = data.get("end_date")
+    metadata["geo_extent"] = {
+        "bboxN": data.get("bboxN"),
+        "bboxS": data.get("bboxS"),
+        "bboxE": data.get("bboxE"),
+        "bboxW": data.get("bboxW"),
+    }
+    metadata["keywords"] = data.get("keywords")
+    # NOTE: licence_uids is for relationship, not a db field
+    metadata["licence_uids"] = data.get("licences", [])
+    metadata["publication_date"] = data.get("publication_date")
+    metadata["title"] = data.get("title")
+    metadata["type"] = data.get("resource_type")
+    return metadata
+
+
+def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's variables metadata.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata: dict[str, Any] = dict()
+    metadata["variables"] = []
+    variables_file_path = os.path.join(
+        folder_path, "content", "overview", "variables.yaml"
+    )
+    if not os.path.isfile(variables_file_path):
+        return metadata
+    with open(variables_file_path) as fp:
+        variables_data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+
+    form_json_path = os.path.join(folder_path, "json-config", "form.json")
+    mapping_json_path = os.path.join(folder_path, "json-config", "mapping.json")
+    variable_id_map = load_variable_id_map(form_json_path, mapping_json_path)
+    variables: list[dict[str, str]] = []
+    for variable_name, properties in variables_data.get(
+        "main-variables", dict()
+    ).items():
+        variable_item = {
             "id": variable_id_map[variable_name],
             "label": variable_name,
             "description": properties.get("description"),
             "units": properties.get("units"),
         }
-        ret_value.append(item)
-    return ret_value
-
-
-def build_geo_extent(data: dict[str, Any]) -> dict[str, float | None]:
-    """Build the db field `geo_extent` from the yaml data loaded.
-
-    Parameters
-    ----------
-    data: yaml data
-
-    Returns
-    -------
-    a dictionary of kind {"bboxN": ..., "bboxW": ..., "bboxS": ..., "bboxE": ...}
-    """
-    yaml_db_keymap = {
-        # key_on_yaml: key_on_db_field
-        "bboxN": "bboxN",
-        "bboxW": "bboxW",
-        "bboxS": "bboxS",
-        "bboxE": "bboxE",
-    }
-    geo_extent = dict()
-    for key_on_yaml, key_on_db_field in yaml_db_keymap.items():
-        geo_extent[key_on_db_field] = data.get(key_on_yaml)
-    return geo_extent
+        variables.append(variable_item)
+    metadata["variables"] = variables
+    return metadata
 
 
 def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
-    """Load metadata of a resource from a folder.
+    """Load metadata of a resource from an input folder.
+
+    Actually imported is based on examples provided for reanalysis-era5-land and
+    satellite-surface-radiation-budget.
 
     Parameters
     ----------
@@ -186,120 +345,14 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     -------
     dict: dictionary of metadata collected
     """
-    file_names = os.listdir(folder_path)
     metadata: dict[str, Any] = dict()
     metadata["resource_uid"] = os.path.basename(folder_path)
-    variable_id_map = load_variable_id_map(os.path.join(folder_path, "form.json"))
-    if "abstract.md" in file_names:
-        with open(os.path.join(folder_path, "abstract.md")) as fp:
-            metadata["abstract"] = fp.read()
-    else:
-        # abstract is required
-        raise ValueError("'abstract.md' missing in %r" % folder_path)
-    if "abstract.yaml" in file_names:
-        with open(os.path.join(folder_path, "abstract.yaml")) as fp:
-            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            metadata["description"] = build_description(data)
-            metadata["keywords"] = data.get("keywords")
-            metadata["variables"] = build_variables(data, variable_id_map)
-            # NOTE: related_resources_keywords is for self-relationship, not a db field
-            metadata["related_resources_keywords"] = data.get(
-                "related_resources_keywords", []
-            )
-    if "adaptor.yaml" in file_names:
-        with open(os.path.join(folder_path, "adaptor.yaml")) as fp:
-            metadata["adaptor"] = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-    if "adaptor_configuration.yaml" in file_names:
-        with open(os.path.join(folder_path, "adaptor_configuration.yaml")) as fp:
-            metadata["adaptor_configuration"] = yaml.load(
-                fp, Loader=yaml.loader.SafeLoader
-            )
-    if "dataset.yaml" in file_names:
-        with open(os.path.join(folder_path, "dataset.yaml")) as fp:
-            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            metadata["title"] = data.get("title")
-            # NOTE: licence_ids is for relationship, not a db field
-            metadata["licence_uids"] = data.get("licences", [])
-            metadata["publication_date"] = data.get("publication_date")
-            metadata["resource_update"] = data.get("update_date")
-            if "eqc" in data:
-                metadata["use_eqc"] = data["eqc"]
-    if "documentation.yaml" in file_names:
-        with open(os.path.join(folder_path, "documentation.yaml")) as fp:
-            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-    else:
-        data = {}
-    metadata["documentation"] = data.get("documentation", [])
-    for candidate_name in ["overview.png", "overview.jpg"]:
-        if candidate_name in file_names:
-            metadata["previewimage"] = os.path.abspath(
-                os.path.join(folder_path, candidate_name)
-            )
-    for file_name, db_field_name in [
-        ("form.json", "form"),
-        ("constraints.json", "constraints"),
-        ("mapping.json", "mapping"),
-    ]:
-        if file_name in file_names:
-            metadata[db_field_name] = os.path.abspath(
-                os.path.join(folder_path, file_name)
-            )
-    # layout is static at the moment
-    metadata["layout"] = os.path.abspath(os.path.join(DATA_PATH, "layout.json"))
-    metadata["references"] = []
-    if "references.yaml" in file_names:
-        with open(os.path.join(folder_path, "references.yaml")) as fp:
-            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            for data_item in data.get("references", []):
-                reference_item = {
-                    "title": data_item["title"],
-                    "content": None,
-                    "copy": data_item.get("copy"),
-                    "url": data_item.get("url"),
-                    "download_file": None,
-                }
-                content_file_name = data_item["content"]
-                if content_file_name and content_file_name in file_names:
-                    reference_item["content"] = os.path.abspath(
-                        os.path.join(folder_path, content_file_name)
-                    )
-                else:
-                    print("warning: reference to item %r not found" % content_file_name)
-                    continue
-                download_file_name = data_item.get("filename")
-                if download_file_name and download_file_name in file_names:
-                    reference_item["download_file"] = os.path.abspath(
-                        os.path.join(folder_path, download_file_name)
-                    )
-                metadata["references"].append(reference_item)
-    if "metadata.yaml" in file_names:
-        with open(os.path.join(folder_path, "metadata.yaml")) as fp:
-            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            if "resource_type" not in data:
-                raise ValueError("missing key 'resource_type' in metadata.yaml")
-            metadata["type"] = data.get("resource_type")
-            metadata["doi"] = data.get("doi")
-            metadata["geo_extent"] = build_geo_extent(data)
-            for field in ("begin_date", "end_date"):
-                metadata[field] = data.get(field)
-                if isinstance(data.get(field, ""), str) and data.get(
-                    field, ""
-                ).lower() in ("now", "today", "present"):
-                    metadata[field] = datetime.date.today()
-            metadata["contact"] = data.get("contactemail")
-            if not metadata["publication_date"]:
-                # it can be in dataset.yaml
-                metadata["publication_date"] = data.get("publication_date")
-    else:
-        # type is required
-        raise ValueError("'metadata.yaml' missing in %r" % folder_path)
-    if (
-        "variables.yaml" in file_names
-    ):  # this overrides if variables were found in abstract.yaml
-        with open(os.path.join(folder_path, "variables.yaml")) as fp:
-            data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-            metadata["variables"] = build_variables(data, variable_id_map)
-
+    metadata.update(load_resource_for_object_storage(folder_path))
+    metadata.update(load_resource_documentation(folder_path))
+    metadata.update(load_resource_description(folder_path))
+    metadata.update(load_resource_abstract(folder_path))
+    metadata.update(load_resource_metadata_file(folder_path))
+    metadata.update(load_resource_variables(folder_path))
     return metadata
 
 
@@ -369,29 +422,15 @@ def store_dataset(
     dataset = dataset_md.copy()
     licence_uids = dataset.pop("licence_uids", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
-    obj_storage_fields = ["form", "previewimage", "constraints", "mapping", "layout"]
-    for field in obj_storage_fields:
-        file_path = dataset[field]
-        dataset[field] = object_storage.store_file(
+    for db_field in set(dict(OBJECT_STORAGE_UPLOAD_FILES).values()):
+        file_path = dataset[db_field]
+        dataset[db_field] = object_storage.store_file(
             file_path,
             object_storage_url,
             subpath=subpath,
             force=True,
             **storage_kws,
         )[0]
-    # some fields to storage are inside references
-    for reference in dataset["references"]:
-        for subfield in ["content", "download_file"]:
-            if reference.get(subfield):
-                file_path = reference[subfield]
-                reference[subfield] = object_storage.store_file(
-                    file_path,
-                    object_storage_url,
-                    subpath=subpath,
-                    force=True,
-                    **storage_kws,
-                )[0]
-    dataset.pop("related_resources_keywords")
     dataset_obj = database.Resource(**dataset)
     session.add(dataset_obj)
     for licence_uid in licence_uids:
@@ -416,7 +455,6 @@ def find_related_resources(
     load_resource_from_folder.
     At the moment the current implementation filters input resources in this way:
      - look for resources with the same (not empty) list of "keywords" metadata
-     - look for resources with at least one common element in the "related_resources_keywords"
     It assumes that the relationship is commutative.
 
     Parameters
@@ -433,9 +471,5 @@ def find_related_resources(
         res1_keywords = res1.get("keywords", [])
         res2_keywords = res2.get("keywords", [])
         if set(res1_keywords) == set(res2_keywords) and len(res1_keywords) > 0:
-            relationships_found.append((res1, res2))
-        res1_rel_res_kws = res1.get("related_resources_keywords", [])
-        res2_rel_res_kws = res2.get("related_resources_keywords", [])
-        if set(res1_rel_res_kws) & set(res2_rel_res_kws):
             relationships_found.append((res1, res2))
     return relationships_found
