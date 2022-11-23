@@ -1,29 +1,4 @@
----
-description:
-  file-format: GRIB
-  data-type: Gridded
-  projection: Regular latitude-longitude grid
-  horizontal-coverage: Global
-  horizontal-resolution: 0.1° x 0.1°; Native resolution is 9 km.
-  vertical-coverage: |
-     From 2 m above the surface level, to a soil depth of 289 cm.
-  vertical-resolution: |
-     4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm
-     Some parameters are defined at 2 m over the surface.
-  temporal-coverage: January 1950 to present
-  temporal-resolution: Hourly
-  update-frequency: Monthly with a delay of about three months relatively to actual date.
-keywords:
-  - 'Product type: Reanalysis'
-  - 'Spatial coverage: Global'
-  - 'Temporal coverage: Past'
-  - 'Variable domain: Land (hydrology)'
-  - 'Variable domain: Land (physics)'
-  - 'Variable domain: Land (biosphere)'
-  - 'Provider: Copernicus C3S'
-
-
-variables:
+main-variables:
     10m u-component of wind:
       description: >-
         Eastward component of the 10m wind. It is the horizontal

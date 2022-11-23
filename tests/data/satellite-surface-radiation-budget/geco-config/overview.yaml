@@ -1,0 +1,43 @@
+title: Overview
+image: overview.png
+text1: 
+  type: text
+  source: abstract.md
+text2:
+  type: text
+  source: abstract2.md
+table1: 
+  type: table
+  source: abstract.yaml
+widget_order:
+  - text1
+  - table1
+  - text2
+
+
+structure:
+  - text: abstract.md
+  - table: abstract.yaml
+  - table: variables.yaml
+  - text: abstract2.md
+  - image: diagram.png
+  - accordion:
+      title: CLARA product family data overview
+      structure:
+        - text: clara/abstract.md
+        - table: clara/abstract.yaml
+        - table: clara/variables.yaml
+  - accordion:
+      title: CCI product family data overview
+      structure:
+        - text: cci/abstract.md
+        - table: cci/abstract.yaml
+        - table: cci/variables.yaml
+  - row:
+      - text: 
+          source: something.md
+          width: 70%
+      - image: 
+          source: something.png
+          width: 30%
+

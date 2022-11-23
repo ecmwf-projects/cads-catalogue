@@ -1,0 +1,12 @@
+main_variables:
+  Surface downwelling shortwave flux:
+    units: W m<sup>-2</sup>
+    description: 'Amount of shortwave radiation energy reaching the lower boundary of the atmosphere per unit of time and area from the above'
+  Surface upwelling shortwave flux:
+    units: W m<sup>-2</sup>
+    description: 'Amount of shortwave radiation energy reaching the lower boundary of the atmosphere per unit of time and area from below.'
+
+related_variables:
+  descriptor: A number of variables accounting for the uncertainty on the data provided are also included in the files along the main variables. They provide estimates on possible variations of the values of the main variables due to changes in processing and sampling algorithms. A variable containing information about clear-sky condition and target accuracy in each grid cell is also provided.'
+  
+

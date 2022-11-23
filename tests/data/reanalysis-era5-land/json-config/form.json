@@ -615,5 +615,9 @@
         "name": "format",
         "required": true,
         "type": "StringChoiceWidget"
+    },
+    {
+        "type": "Licence",
+        "label": "Licences"
     }
 ]

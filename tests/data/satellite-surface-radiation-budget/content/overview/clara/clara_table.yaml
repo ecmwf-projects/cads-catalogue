@@ -1,0 +1,15 @@
+data_description:
+  conventions: Climate and Forecast (CF) Metadata Convention v1.6, Attribute Convention for Dataset Discovery (ACDD) v1.3
+  projection: Regular latitude-longitude grid
+  format: NetCDF4
+  data-type: Gridded
+  file-format: NetCDF4
+  horizontal-coverage: Global
+  horizontal-resolution: 0.25°x0.25° for monthly mean values
+  vertical-coverage: Surface
+  vertical-resolution: Single level
+  spatial-gaps: No gaps
+  temporal-coverage: January 1982 to present
+  temporal-resolution: Monthly and daily
+  update-frequency: 'Quarterly'
+  versions: 'v2.0 (deprecated) and v2.0.1 (latest)'
