@@ -52,38 +52,61 @@ class Resource(BaseModel):
 
     __tablename__ = "resources"
 
+    # primary/surrogate keys
     resource_id = sa.Column(sa.Integer, primary_key=True)
     resource_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
-    title = sa.Column(sa.String)
-    description = sa.Column(sa.JSON, nullable=False)
-    abstract = sa.Column(sa.TEXT, nullable=False)
-    adaptor = sa.Column(sa.String)
+
+    # file urls
+    constraints = sa.Column(sa.String)
+    form = sa.Column(sa.String)
     layout = sa.Column(sa.String)
     mapping = sa.Column(sa.String)
-    contact = sa.Column(sa.String)
-    doi = sa.Column(sa.String)
-    form = sa.Column(sa.String)
-    constraints = sa.Column(sa.String)
-    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
-    version = sa.Column(sa.VARCHAR(300))
-    variables = sa.Column(sa.JSON)
-    providers = sa.Column(sa.JSON)
-    summaries = sa.Column(sa.JSON, nullable=True)
-    begin_date = sa.Column(sa.Date)
-    end_date = sa.Column(sa.Date)
-    geo_extent = sa.Column(sa.JSON)
-    documentation = sa.Column(sa.JSON)
-    type = sa.Column(sa.VARCHAR(300), nullable=False)
     previewimage = sa.Column(sa.String)
-    publication_date = sa.Column(sa.DATE)
+
+    # internal functionality related
+    adaptor = sa.Column(sa.String)
     adaptor_configuration = sa.Column(sa.JSON)
+
+    # geo extent
+    geo_extent = sa.Column(sa.JSON)
+
+    # date/time
+    begin_date = sa.Column(sa.Date)
+    end_date = sa.Column(sa.Date)  # NOTE: null=now
+    publication_date = sa.Column(sa.DATE)
     record_update = sa.Column(
         sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
-    references = sa.Column(sa.JSON)
-    resource_update = sa.Column(sa.DATE)
-    use_eqc = sa.Column(sa.Boolean)
+    resource_update = sa.Column(sa.DATE)  # update_date of the source file
 
+    # other metadata
+    abstract = sa.Column(sa.TEXT, nullable=False)
+    contactemail = sa.Column(sa.String)
+    description = sa.Column(sa.JSON, nullable=False)
+    documentation = sa.Column(sa.JSON)
+    doi = sa.Column(sa.String)
+    ds_contactemail = sa.Column(sa.String)
+    ds_responsible_organisation = sa.Column(sa.String)
+    ds_responsible_organisation_role = sa.Column(sa.String)
+    file_format = sa.Column(sa.String)
+    format_version = sa.Column(sa.String)
+    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
+    lineage = sa.Column(sa.String)
+    providers = sa.Column(sa.JSON)
+    representative_fraction = sa.Column(sa.Float)
+    responsible_organisation = sa.Column(sa.String)
+    responsible_organisation_role = sa.Column(sa.String)
+    responsible_organisation_website = sa.Column(sa.String)
+    summaries = sa.Column(sa.JSON, nullable=True)
+    title = sa.Column(sa.String)
+    topic = sa.Column(sa.String)
+    type = sa.Column(sa.VARCHAR(300), nullable=False)
+    unit_measure = sa.Column(sa.String)
+    use_limitation = sa.Column(sa.String)
+    variables = sa.Column(sa.JSON)
+    version = sa.Column(sa.VARCHAR(300))
+
+    # relationship attributes
     licences = sa.orm.relationship(
         "Licence", secondary="resources_licences", back_populates="resources"
     )
