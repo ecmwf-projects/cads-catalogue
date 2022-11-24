@@ -72,11 +72,9 @@ class Resource(BaseModel):
 
     # date/time
     begin_date = sa.Column(sa.Date)
-    end_date = sa.Column(sa.Date)  # NOTE: null=now
+    end_date = sa.Column(sa.Date)
     publication_date = sa.Column(sa.DATE)
-    record_update = sa.Column(
-        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
-    )
+    record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow)
     resource_update = sa.Column(sa.DATE)  # update_date of the source file
 
     # other metadata
@@ -92,19 +90,16 @@ class Resource(BaseModel):
     format_version = sa.Column(sa.String)
     keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     lineage = sa.Column(sa.String)
-    providers = sa.Column(sa.JSON)
     representative_fraction = sa.Column(sa.Float)
     responsible_organisation = sa.Column(sa.String)
     responsible_organisation_role = sa.Column(sa.String)
     responsible_organisation_website = sa.Column(sa.String)
-    summaries = sa.Column(sa.JSON, nullable=True)
     title = sa.Column(sa.String)
     topic = sa.Column(sa.String)
     type = sa.Column(sa.VARCHAR(300), nullable=False)
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
     variables = sa.Column(sa.JSON)
-    version = sa.Column(sa.VARCHAR(300))
 
     # relationship attributes
     licences = sa.orm.relationship(

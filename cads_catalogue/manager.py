@@ -32,7 +32,6 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 DATA_PATH = os.path.join(THIS_PATH, "db_data")
 OBJECT_STORAGE_UPLOAD_FILES = [
     # (file_name, "db_field_name),
-    ("adaptor.json", "adaptor"),  # FIXME: or store as a json?
     ("constraints.json", "constraints"),
     ("form.json", "form"),
     ("layout.json", "layout"),  # FIXME: or use the static file?
@@ -222,6 +221,31 @@ def load_resource_abstract(folder_path: str | pathlib.Path) -> dict[str, Any]:
     return metadata
 
 
+def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's adaptor metadata.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata = dict()
+    json_folder_path = os.path.join(folder_path, "json-config")
+    adaptor_file_path = os.path.join(json_folder_path, "adaptor.json")
+    adaptor_config_file_path = os.path.join(json_folder_path, "adaptor_configuration.json")
+    for file_path, db_field in [
+        (adaptor_file_path, "adaptor"),
+        (adaptor_config_file_path, "adaptor_configuration")
+    ]:
+        if os.path.isfile(file_path):
+            with open(file_path) as fp:
+                metadata[db_field] = fp.read()
+    return metadata
+
+
 def load_resource_description(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load a resource's description metadata.
 
@@ -271,12 +295,19 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     if not os.path.isfile(metadata_file_path):
         # some fields are required
         raise ValueError("'metadata.json' not found in %r" % json_folder_path)
-    with open(os.path.join(json_folder_path, "metadata.json")) as fp:
+    with open(metadata_file_path) as fp:
         data = json.load(fp)
     metadata["begin_date"] = data.get("begin_date")
-    metadata["contact"] = data.get("contactemail")
+    metadata["contactemail"] = data.get("contactemail")
     metadata["doi"] = data.get("doi")
-    metadata["end_date"] = data.get("end_date")
+    metadata["ds_contactemail"] = data.get("ds_contactemail")
+    metadata["ds_responsible_organisation"] = data.get("ds_responsible_organisation")
+    metadata["ds_responsible_organisation_role"] = data.get("ds_responsible_organisation_role")
+    end_date = data.get("end_date")
+    if end_date != 'now':
+        metadata["end_date"] = end_date
+    metadata["file_format"] = data.get("file_format")
+    metadata["format_version"] = data.get("format_version")
     metadata["geo_extent"] = {
         "bboxN": data.get("bboxN"),
         "bboxS": data.get("bboxS"),
@@ -284,11 +315,22 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         "bboxW": data.get("bboxW"),
     }
     metadata["keywords"] = data.get("keywords")
+
     # NOTE: licence_uids is for relationship, not a db field
     metadata["licence_uids"] = data.get("licences", [])
+
+    metadata["lineage"] = data.get("lineage")
     metadata["publication_date"] = data.get("publication_date")
+    metadata["representative_fraction"] = data.get("representative_fraction")
+    metadata["responsible_organisation"] = data.get("responsible_organisation")
+    metadata["responsible_organisation_role"] = data.get("responsible_organisation_role")
+    metadata["responsible_organisation_website"] = data.get("responsible_organisation_website")
+    metadata["resource_update"] = data.get("update_date")
     metadata["title"] = data.get("title")
+    metadata["topic"] = data.get("topic")
     metadata["type"] = data.get("resource_type")
+    metadata["unit_measure"] = data.get("unit_measure")
+    metadata["use_limitation"] = data.get("use_limitation")
     return metadata
 
 
@@ -347,12 +389,17 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     """
     metadata: dict[str, Any] = dict()
     metadata["resource_uid"] = os.path.basename(folder_path)
-    metadata.update(load_resource_for_object_storage(folder_path))
-    metadata.update(load_resource_documentation(folder_path))
-    metadata.update(load_resource_description(folder_path))
-    metadata.update(load_resource_abstract(folder_path))
-    metadata.update(load_resource_metadata_file(folder_path))
-    metadata.update(load_resource_variables(folder_path))
+    loader_functions = [
+        load_resource_for_object_storage,
+        load_adaptor_information,
+        load_resource_documentation,
+        load_resource_description,
+        load_resource_abstract,
+        load_resource_metadata_file,
+        load_resource_variables,
+    ]
+    for loader_function in loader_functions:
+        metadata.update(loader_function(folder_path))
     return metadata
 
 
@@ -424,6 +471,8 @@ def store_dataset(
     subpath = os.path.join("resources", dataset["resource_uid"])
     for db_field in set(dict(OBJECT_STORAGE_UPLOAD_FILES).values()):
         file_path = dataset[db_field]
+        if not file_path:
+            continue
         dataset[db_field] = object_storage.store_file(
             file_path,
             object_storage_url,
