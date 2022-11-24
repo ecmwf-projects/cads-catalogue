@@ -74,7 +74,9 @@ class Resource(BaseModel):
     begin_date = sa.Column(sa.Date)
     end_date = sa.Column(sa.Date)
     publication_date = sa.Column(sa.DATE)
-    record_update = sa.Column(sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow)
+    record_update = sa.Column(
+        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
+    )
     resource_update = sa.Column(sa.DATE)  # update_date of the source file
 
     # other metadata

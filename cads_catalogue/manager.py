@@ -235,10 +235,12 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     metadata = dict()
     json_folder_path = os.path.join(folder_path, "json-config")
     adaptor_file_path = os.path.join(json_folder_path, "adaptor.json")
-    adaptor_config_file_path = os.path.join(json_folder_path, "adaptor_configuration.json")
+    adaptor_config_file_path = os.path.join(
+        json_folder_path, "adaptor_configuration.json"
+    )
     for file_path, db_field in [
         (adaptor_file_path, "adaptor"),
-        (adaptor_config_file_path, "adaptor_configuration")
+        (adaptor_config_file_path, "adaptor_configuration"),
     ]:
         if os.path.isfile(file_path):
             with open(file_path) as fp:
@@ -302,9 +304,11 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["doi"] = data.get("doi")
     metadata["ds_contactemail"] = data.get("ds_contactemail")
     metadata["ds_responsible_organisation"] = data.get("ds_responsible_organisation")
-    metadata["ds_responsible_organisation_role"] = data.get("ds_responsible_organisation_role")
+    metadata["ds_responsible_organisation_role"] = data.get(
+        "ds_responsible_organisation_role"
+    )
     end_date = data.get("end_date")
-    if end_date != 'now':
+    if end_date != "now":
         metadata["end_date"] = end_date
     metadata["file_format"] = data.get("file_format")
     metadata["format_version"] = data.get("format_version")
@@ -323,8 +327,12 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["publication_date"] = data.get("publication_date")
     metadata["representative_fraction"] = data.get("representative_fraction")
     metadata["responsible_organisation"] = data.get("responsible_organisation")
-    metadata["responsible_organisation_role"] = data.get("responsible_organisation_role")
-    metadata["responsible_organisation_website"] = data.get("responsible_organisation_website")
+    metadata["responsible_organisation_role"] = data.get(
+        "responsible_organisation_role"
+    )
+    metadata["responsible_organisation_website"] = data.get(
+        "responsible_organisation_website"
+    )
     metadata["resource_update"] = data.get("update_date")
     metadata["title"] = data.get("title")
     metadata["topic"] = data.get("topic")

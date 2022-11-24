@@ -1,11 +1,10 @@
 import json
 import os.path
-from datetime import date
 from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import DATA_PATH, config, database, manager, object_storage
+from cads_catalogue import config, database, manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -261,14 +260,14 @@ def test_load_resource_from_folder() -> None:
     expected_resource = {
         "abstract": "",
         "adaptor": (
-            '{\n'
+            "{\n"
             '  "format_conversion": {\n'
             '    "netcdf_cdm": {\n'
             '      "split_on": [\n'
             '        "origin",\n'
             '        "type",\n'
             '        "dataset"\n'
-            '      ],\n'
+            "      ],\n"
             '      "system_call": [\n'
             '        "cdscdm-translate",\n'
             '        "-o",\n'
@@ -278,10 +277,10 @@ def test_load_resource_from_folder() -> None:
             '        "--merge_datasets",\n'
             '        "true",\n'
             '        "{{infile}}"\n'
-            '      ]\n'
-            '    }\n'
-            '  }\n'
-            '}'
+            "      ]\n"
+            "    }\n"
+            "  }\n"
+            "}"
         ),
         "begin_date": "1982-01-01",
         "constraints": os.path.join(
@@ -348,13 +347,13 @@ def test_load_resource_from_folder() -> None:
             }
         ],
         "doi": "10.24381/cds.e2161bac",
-        'ds_contactemail': 'https://support.ecmwf.int',
-        'ds_responsible_organisation': 'ECMWF',
-        'ds_responsible_organisation_role': 'publisher',
+        "ds_contactemail": "https://support.ecmwf.int",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": "publisher",
         "end_date": "2022-06-01",
-        'file_format': 'grib',
+        "file_format": "grib",
         "form": os.path.join(resource_folder_path, "json-config", "form.json"),
-        'format_version': None,
+        "format_version": None,
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
         "keywords": [
             "Product type: Reanalysis",
@@ -367,25 +366,25 @@ def test_load_resource_from_folder() -> None:
         ],
         "layout": os.path.join(resource_folder_path, "json-config", "layout.json"),
         "licence_uids": ["licence-to-use-copernicus-products"],
-        'lineage': 'EC Copernicus program',
+        "lineage": "EC Copernicus program",
         "mapping": os.path.join(resource_folder_path, "json-config", "mapping.json"),
         "previewimage": os.path.join(
             resource_folder_path, "content", "overview", "overview.png"
         ),
         "publication_date": "2019-07-12",
-        'representative_fraction': 0.25,
+        "representative_fraction": 0.25,
         "resource_uid": "reanalysis-era5-land",
-        'resource_update': '2022-11-24',
-        'responsible_organisation': 'ECMWF',
-        'responsible_organisation_role': 'pointOfContact',
-        'responsible_organisation_website': 'https://www.ecmwf.int/',
+        "resource_update": "2022-11-24",
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
         "title": None,
-        'topic': 'climatologyMeteorologyAtmosphere',
+        "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
-        'unit_measure': 'dd',
-        'use_limitation': 'Content accessible through the CDS may only be used under '
-                          'the terms of the licenses attributed to each particular '
-                          'resource.',
+        "unit_measure": "dd",
+        "use_limitation": "Content accessible through the CDS may only be used under "
+        "the terms of the licenses attributed to each particular "
+        "resource.",
         "variables": [
             {
                 "description": "Eastward component of the 10m wind. It is the "
