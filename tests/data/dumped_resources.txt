@@ -2,7 +2,26 @@
     {
         "resource_id": 1,
         "resource_uid": "reanalysis-era5-land",
-        "title": null,
+        "constraints": "an url",
+        "form": "an url",
+        "layout": "an url",
+        "mapping": "an url",
+        "previewimage": "an url",
+        "adaptor": "{\n  \"format_conversion\": {\n    \"netcdf_cdm\": {\n      \"split_on\": [\n        \"origin\",\n        \"type\",\n        \"dataset\"\n      ],\n      \"system_call\": [\n        \"cdscdm-translate\",\n        \"-o\",\n        \"{{outfile}}\",\n        \"--product\",\n        \"{{product}}\",\n        \"--merge_datasets\",\n        \"true\",\n        \"{{infile}}\"\n      ]\n    }\n  }\n}",
+        "adaptor_configuration": null,
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxS": -89,
+            "bboxE": 360,
+            "bboxW": 0
+        },
+        "begin_date": "1982-01-01",
+        "end_date": "2022-06-01",
+        "publication_date": "2019-07-12",
+        "record_update": "2022-11-24 13:01:03.223265+01:00",
+        "resource_update": "2022-11-24",
+        "abstract": "",
+        "contactemail": "https://support.ecmwf.int",
         "description": [
             {
                 "id": "file-format",
@@ -55,14 +74,19 @@
                 "value": "Monthly with a delay of about three months relatively to actual date."
             }
         ],
-        "abstract": "",
-        "adaptor": "an url",
-        "layout": "an url",
-        "mapping": "an url",
-        "contact": "https://support.ecmwf.int",
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
+                "title": "ERA5-Land online documentation",
+                "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above."
+            }
+        ],
         "doi": "10.24381/cds.e2161bac",
-        "form": "an url",
-        "constraints": "an url",
+        "ds_contactemail": "https://support.ecmwf.int",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": "publisher",
+        "file_format": "grib",
+        "format_version": null,
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -72,7 +96,16 @@
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S"
         ],
-        "version": null,
+        "lineage": "EC Copernicus program",
+        "representative_fraction": 0.25,
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
+        "title": null,
+        "topic": "climatologyMeteorologyAtmosphere",
+        "type": "dataset",
+        "unit_measure": "dd",
+        "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [
             {
                 "id": "10m_u_component_of_wind",
@@ -374,67 +407,32 @@
                 "description": "Volume of water in soil layer 4 (100-289 cm) of the ECMWF Integrated Forecasting System.",
                 "units": "m^3 m^-3"
             }
-        ],
-        "providers": null,
-        "summaries": null,
-        "begin_date": "1982-01-01",
-        "end_date": "2022-06-01",
-        "geo_extent": {
-            "bboxN": 89,
-            "bboxS": -89,
-            "bboxE": 360,
-            "bboxW": 0
-        },
-        "documentation": [
-            {
-                "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
-                "title": "ERA5-Land online documentation",
-                "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above."
-            }
-        ],
-        "type": "dataset",
-        "previewimage": "an url",
-        "publication_date": "2019-07-12",
-        "adaptor_configuration": null,
-        "record_update": "2022-11-23 13:49:10.562743+01:00",
-        "references": null,
-        "resource_update": null,
-        "use_eqc": null
+        ]
     },
     {
         "resource_id": 2,
         "resource_uid": "satellite-surface-radiation-budget",
-        "title": null,
-        "description": [],
-        "abstract": "",
-        "adaptor": "an url",
+        "constraints": "an url",
+        "form": "an url",
         "layout": "an url",
         "mapping": "an url",
-        "contact": "https://support.ecmwf.int",
-        "doi": null,
-        "form": "an url",
-        "constraints": "an url",
-        "keywords": [
-            "Product type: Satellite observations",
-            "Temporal coverage: Past",
-            "Variable domain: Atmosphere (surface)",
-            "Spatial coverage: Global",
-            "Provider: EUMETSAT SAF",
-            "Provider: Copernicus C3S",
-            "Provider: ESA CCI"
-        ],
-        "version": null,
-        "variables": [],
-        "providers": null,
-        "summaries": null,
-        "begin_date": "1982-01-01",
-        "end_date": "2021-12-01",
+        "previewimage": "an url",
+        "adaptor": "{\n  \"adaptor.url\": {\n    \"pattern\": [\n      \"{% if product_family == 'CLARA' and time_aggregation == 'DM' %}{% if (version is not defined or version is none) %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_DM_{{ sensor_on_satellite }}_CLARA/v1.0/{{ year }}/{{ month }}/{{ variable }}dm{{ year }}{{ month }}{{ day }}000000219AVPOS01GL.nc{% endif %}{% endif %}\",\n      \"{% if product_family == 'CLARA' and time_aggregation == 'MM' %}{% if (day is not defined or day is none) %}{% if origin == 'c3s' and variable in ['SNL','SNS','SRB','SRS'] %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_MM_{{ sensor_on_satellite }}_CLARA/{{ version }}/{{ year }}/{{ month }}/{{ variable }}mm{{ year }}{{ month }}01000010.nc{% endif %}{% endif %}{% endif %}\",\n      \"{% if product_family == 'CLARA' and time_aggregation == 'MM' %}{% if (day is not defined or day is none) %}{% if origin == 'cmsaf' and variable in ['SDL','SIS','SOL'] %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_MM_{{ sensor_on_satellite }}_CLARA/{{ version }}/{{ year }}/{{ month }}/{{ variable }}mm{{ year }}{{ month }}01000000219AVPOS01GL.nc{% endif %}{% endif %}{% endif %}\",\n      \"{% if variable == 'esa_cci' and time_aggregation == 'MM' and product_family == 'CCI' %}{% if (day is not defined or day is none) and (version is not defined or version is none) %}{% if origin == 'c3s' and climate_data_record_type == 'icdr' and year in ['2017','2018','2019','2020'] and sensor_on_satellite in ['SLSTR_ORAC_Sentinel-3a','SLSTR_ORAC_Sentinel-3b'] %}http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/data/srb/{{ origin }}/{{ climate_data_record_type }}/r01/monthly/{{ year }}/{{ month }}/C3S-312bL1-L3C-MONTHLY-SRB-{{ sensor_on_satellite }}_{{ year }}{{ month }}_fv3.1.nc{% endif %}{% endif %}{% endif %}\",\n      \"{% if variable == 'esa_cci' and time_aggregation == 'MM' and product_family == 'CCI' %}{% if (day is not defined or day is none) and (version is not defined or version is none) %}{% if origin == 'esa_cci' and climate_data_record_type == 'tcdr' and year in ['1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012'] and sensor_on_satellite in ['AATSR_ORAC_ENVISAT','ATSR2_ORAC_ERS2'] %}http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/data/srb/{{ origin }}/{{ climate_data_record_type }}/r01/monthly/{{ year }}/{{ month }}/C3S-312bL1-L3C-MONTHLY-SRB-{{ sensor_on_satellite }}_{{ year }}{{ month }}_fv3.0.nc{% endif %}{% endif %}{% endif %}\"\n    ]\n  }\n}",
+        "adaptor_configuration": null,
         "geo_extent": {
             "bboxN": 89,
             "bboxS": -89,
             "bboxE": 360,
             "bboxW": 0
         },
+        "begin_date": "1982-01-01",
+        "end_date": "2021-12-01",
+        "publication_date": "2020-10-20",
+        "record_update": "2022-11-24 13:01:03.227989+01:00",
+        "resource_update": null,
+        "abstract": "",
+        "contactemail": "https://support.ecmwf.int",
+        "description": [],
         "documentation": [
             {
                 "title": "Algorithm Theoretical Basis Document, v2.3, CM SAF documentation",
@@ -509,13 +507,31 @@
                 "widget": "tutorial"
             }
         ],
+        "doi": null,
+        "ds_contactemail": "https://support.ecmwf.int/",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": "publisher",
+        "file_format": "NetCDF",
+        "format_version": "3",
+        "keywords": [
+            "Product type: Satellite observations",
+            "Temporal coverage: Past",
+            "Variable domain: Atmosphere (surface)",
+            "Spatial coverage: Global",
+            "Provider: EUMETSAT SAF",
+            "Provider: Copernicus C3S",
+            "Provider: ESA CCI"
+        ],
+        "lineage": "EC Copernicus program",
+        "representative_fraction": 0.25,
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
+        "title": null,
+        "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
-        "previewimage": "an url",
-        "publication_date": "2020-10-20",
-        "adaptor_configuration": null,
-        "record_update": "2022-11-23 13:49:10.567300+01:00",
-        "references": null,
-        "resource_update": null,
-        "use_eqc": null
+        "unit_measure": "dd",
+        "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
+        "variables": []
     }
 ]
