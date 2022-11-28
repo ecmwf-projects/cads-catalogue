@@ -1,4 +1,6 @@
 {
+  "title": "ERA5-Land hourly data from 1950 to present",
+  "citation": "Muñoz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\nMuñoz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac",
   "responsible_individual": "Copernicus Climate Change Service",
   "responsible_organisation": "ECMWF",
   "responsible_organisation_website": "https://www.ecmwf.int/",
