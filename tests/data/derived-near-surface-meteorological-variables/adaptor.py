@@ -1,6 +1,8 @@
+import cacholote
 from cads_retrieve_tools import mapping, url_tools
 
 
+@cacholote.cacheable
 def url_adaptor(request, config, metadata):
 
     mapping_config = config.pop("mapping", {})
