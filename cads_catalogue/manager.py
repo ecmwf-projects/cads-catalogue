@@ -206,9 +206,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             metadata["related_resources_keywords"] = data.get(
                 "related_resources_keywords", []
             )
-    if "adaptor.yaml" in file_names:
-        with open(os.path.join(folder_path, "adaptor.yaml")) as fp:
-            metadata["adaptor"] = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+    if "adaptor.py" in file_names:
+        with open(os.path.join(folder_path, "adaptor.py")) as fp:
+            metadata["adaptor"] = fp.read()
     if "adaptor_configuration.yaml" in file_names:
         with open(os.path.join(folder_path, "adaptor_configuration.yaml")) as fp:
             metadata["adaptor_configuration"] = yaml.load(
