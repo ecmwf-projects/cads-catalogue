@@ -81,6 +81,7 @@ class Resource(BaseModel):
 
     # other metadata
     abstract = sa.Column(sa.TEXT, nullable=False)
+    citation = sa.Column(sa.String)
     contactemail = sa.Column(sa.String)
     description = sa.Column(sa.JSON, nullable=False)
     documentation = sa.Column(sa.JSON)

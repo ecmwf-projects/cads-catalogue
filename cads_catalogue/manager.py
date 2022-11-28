@@ -299,7 +299,9 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         raise ValueError("'metadata.json' not found in %r" % json_folder_path)
     with open(metadata_file_path) as fp:
         data = json.load(fp)
+
     metadata["begin_date"] = data.get("begin_date")
+    metadata["citation"] = data.get("citation")
     metadata["contactemail"] = data.get("contactemail")
     metadata["doi"] = data.get("doi")
     metadata["ds_contactemail"] = data.get("ds_contactemail")
@@ -325,6 +327,10 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
 
     metadata["lineage"] = data.get("lineage")
     metadata["publication_date"] = data.get("publication_date")
+
+    # NOTE: licence_uids is for relationship, not a db field
+    metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
+
     metadata["representative_fraction"] = data.get("representative_fraction")
     metadata["responsible_organisation"] = data.get("responsible_organisation")
     metadata["responsible_organisation_role"] = data.get(
@@ -523,10 +529,14 @@ def find_related_resources(
     list: list of tuples (res1, res2), when res1 and res2 are related input resources.
     """
     relationships_found = []
-    all_possible_relationships = itertools.combinations(resources, 2)
-    for (res1, res2) in all_possible_relationships:
+    all_possible_related_resources = itertools.combinations(resources, 2)
+    for (res1, res2) in all_possible_related_resources:
         res1_keywords = res1.get("keywords", [])
         res2_keywords = res2.get("keywords", [])
         if set(res1_keywords) == set(res2_keywords) and len(res1_keywords) > 0:
+            relationships_found.append((res1, res2))
+        res1_rel_res_kws = res1.get("related_resources_keywords", [])
+        res2_rel_res_kws = res2.get("related_resources_keywords", [])
+        if set(res1_rel_res_kws) & set(res2_rel_res_kws):
             relationships_found.append((res1, res2))
     return relationships_found
