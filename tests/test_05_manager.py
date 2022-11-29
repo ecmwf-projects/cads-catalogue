@@ -34,23 +34,6 @@ def test_load_resource_from_folder() -> None:
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
     expected_resource = {
-        "adaptor": {
-            "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": ["origin", "type", "dataset"],
-                    "system_call": [
-                        "cdscdm-translate",
-                        "-o",
-                        "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
-                        "{{infile}}",
-                    ],
-                }
-            }
-        },
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the "
         "evolution of land variables over several decades at an enhanced resolution "
         "compared to ERA5. ERA5-Land has been produced by replaying the land "
