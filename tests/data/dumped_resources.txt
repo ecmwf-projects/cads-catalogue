@@ -56,16 +56,6 @@
             }
         ],
         "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window. \n",
-        "adaptor": {
-            "format_conversion": {
-                "netcdf": {
-                    "legacy_basetime_splitting": false
-                },
-                "netcdf_zip": {
-                    "legacy_basetime_splitting": false
-                }
-            }
-        },
         "mapping": "an url",
         "contact": "copernicus-support@ecmwf.int",
         "doi": null,
@@ -589,6 +579,7 @@
             "key": "11325:b5c65565-ef76-4e44-adfb-ae7050f293c6",
             "collection_id": "cams-global-reanalysis-eac4-monthly"
         },
+        "adaptor": null,
         "record_update": "2022-10-11 14:22:22.960327+02:00",
         "references": [],
         "resource_update": null,
@@ -661,14 +652,6 @@
             }
         ],
         "abstract": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models. \n\nThe dataset has been obtained using the same methodology used to derive the widely used water, energy and climate change (WATCH) forcing data, and is thus also referred to as WATCH Forcing Data methodology applied to ERA5 (WFDE5). The data are derived from the ERA5 reanalysis product that have been re-gridded to a half-degree resolution. Data have been adjusted using an elevation correction and monthly-scale bias corrections based on Climatic Research Unit (CRU) data (for temperature, diurnal temperature range, cloud-cover, wet days number and precipitation fields) and Global Precipitation Climatology Centre (GPCC) data (for precipitation fields only). Additional corrections are included for varying atmospheric aerosol-loading and separate precipitation gauge observations. For full details please refer to the product user-guide.\n\nThis dataset was produced on behalf of Copernicus Climate Change Service (C3S) and was generated entirely within the Climate Data Store (CDS) Toolbox. The toolbox source code is provided in the documentation tab.\n\n\n",
-        "adaptor": {
-            "adaptor.url": {
-                "pattern": [
-                    "http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_{{ year }}{{ month }}_v{{ version }}.nc",
-                    "{% if (year is not defined or year is none) and (month is not defined or month is none) %}http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_v{{ version }}.nc{% endif %}"
-                ]
-            }
-        },
         "mapping": "an url",
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.20d54e34",
@@ -787,7 +770,14 @@
         "type": "dataset",
         "previewimage": "an url",
         "publication_date": "2020-02-11",
-        "adaptor_configuration": null,
+        "adaptor_configuration": {
+            "entry_point": "url_adaptor",
+            "patterns": [
+                "http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_{{ year }}{{ month }}_v{{ version }}.nc",
+                "{% if (year is not defined or year is none) and (month is not defined or month is none) %}http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_v{{ version }}.nc{% endif %}"
+            ]
+        },
+        "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls([ru[\"url\"] for ru in requests_urls])\n    return open(path, \"rb\")\n",
         "record_update": "2022-09-06 16:10:27.579077+02:00",
         "references": [
             {
@@ -865,27 +855,6 @@
             }
         ],
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past. \n\nERA5-Land uses as input to control the simulated land fields ERA5 atmospheric variables, such as air temperature and air humidity. This is called the atmospheric forcing. Without the constraint of the atmospheric forcing, the model-based estimates can rapidly deviate from reality. Therefore, while observations are not directly used in the production of ERA5-Land, they have an indirect influence through the atmospheric forcing used to run the simulation. In addition, the input air temperature, air humidity and pressure used to run ERA5-Land are corrected to account for the altitude difference between the grid of the forcing and the higher resolution grid of ERA5-Land. This correction is called 'lapse rate correction'.    \n\nThe ERA5-Land dataset, as any other simulation, provides estimates which have some degree of uncertainty. Numerical models can only provide a more or less accurate representation of the real physical processes governing different components of the Earth System. In general, the uncertainty of model estimates grows as we go back in time, because the number of observations available to create a good quality atmospheric forcing is lower. ERA5-land parameter fields can currently be used in combination with the uncertainty of the equivalent ERA5 fields. \n\nThe temporal and spatial resolutions of ERA5-Land makes this dataset very useful for all kind of land surface applications such as flood or drought forecasting. The temporal and spatial resolution of this dataset, the period covered in time, as well as the fixed grid used for the data distribution at any period enables decisions makers, businesses and individuals to access and use more accurate information on land states.\n\n\n",
-        "adaptor": {
-            "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": [
-                        "origin",
-                        "type",
-                        "dataset"
-                    ],
-                    "system_call": [
-                        "cdscdm-translate",
-                        "-o",
-                        "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
-                        "{{infile}}"
-                    ]
-                }
-            }
-        },
         "mapping": "an url",
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.e2161bac",
@@ -1225,6 +1194,7 @@
         "previewimage": "an url",
         "publication_date": "2019-07-12",
         "adaptor_configuration": null,
+        "adaptor": null,
         "record_update": "2022-09-06 16:10:27.590809+02:00",
         "references": [
             {
@@ -1295,27 +1265,6 @@
             }
         ],
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.\n\nERA5-Land provides a consistent view of the water and energy cycles at surface level during several decades.\nIt contains a detailed record from 1950 onwards, with a temporal resolution of 1 hour. The native spatial resolution of the ERA5-Land reanalysis dataset is 9km on a reduced Gaussian grid (TCo1279). The data in the CDS has been regridded to a regular lat-lon grid of 0.1x0.1 degrees.\n\nThe data presented here is a post-processed subset of the full ERA5-Land dataset. Monthly-mean averages have been pre-calculated to facilitate many applications requiring easy and fast access to the data, when sub-monthly fields are not required.\n\nHourly fields can be found in the [ERA5-Land hourly fields CDS page](https://cds-dev.copernicus-climate.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview \"ERA5-Land hourly data\"). Documentation can be found in the [online ERA5-Land documentation](https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation \"ERA5-Land data documentation\").\n",
-        "adaptor": {
-            "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": [
-                        "origin",
-                        "type",
-                        "dataset"
-                    ],
-                    "system_call": [
-                        "cdscdm-translate",
-                        "-o",
-                        "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
-                        "{{infile}}"
-                    ]
-                }
-            }
-        },
         "mapping": "an url",
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.68d2bb30",
@@ -1655,6 +1604,7 @@
         "previewimage": "an url",
         "publication_date": "2019-06-23",
         "adaptor_configuration": null,
+        "adaptor": null,
         "record_update": "2022-09-06 16:10:27.584074+02:00",
         "references": [
             {
@@ -1720,27 +1670,6 @@
             }
         ],
         "abstract": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on pressure levels from 1959 to present\".\n",
-        "adaptor": {
-            "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": [
-                        "origin",
-                        "type",
-                        "dataset"
-                    ],
-                    "system_call": [
-                        "cdscdm-translate",
-                        "-o",
-                        "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
-                        "{{infile}}"
-                    ]
-                }
-            }
-        },
         "mapping": "an url",
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.bd0915c6",
@@ -1887,6 +1816,7 @@
         "previewimage": "an url",
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
+        "adaptor": null,
         "record_update": "2022-08-30 07:31:55.508657+02:00",
         "references": [
             {
@@ -1954,27 +1884,6 @@
             }
         ],
         "abstract": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on single levels from 1959 to present\".\n",
-        "adaptor": {
-            "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": [
-                        "origin",
-                        "type",
-                        "dataset"
-                    ],
-                    "system_call": [
-                        "cdscdm-translate",
-                        "-o",
-                        "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
-                        "{{infile}}"
-                    ]
-                }
-            }
-        },
         "mapping": "an url",
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.adbb2d47",
@@ -3602,6 +3511,7 @@
         "previewimage": "an url",
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
+        "adaptor": null,
         "record_update": "2022-08-30 07:31:55.514834+02:00",
         "references": [
             {

@@ -57,7 +57,6 @@ class Resource(BaseModel):
     title = sa.Column(sa.String)
     description = sa.Column(sa.JSON, nullable=False)
     abstract = sa.Column(sa.TEXT, nullable=False)
-    adaptor = sa.Column(sa.JSON)
     layout = sa.Column(sa.String)
     mapping = sa.Column(sa.String)
     contact = sa.Column(sa.String)
@@ -77,6 +76,7 @@ class Resource(BaseModel):
     previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
     adaptor_configuration = sa.Column(sa.JSON)
+    adaptor = sa.Column(sa.Text)
     record_update = sa.Column(
         sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
