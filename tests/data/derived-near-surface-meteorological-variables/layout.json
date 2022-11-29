@@ -64,7 +64,7 @@
           "blocks": [
             {
               "type": "markdown",
-              "content": "### [ERA5 data documentation](https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation)\n\nDetailed information relating to the ERA5 data archive can be found in the web link above.\n\n### [The ERA5 global reanalysis: Preliminary extension to 1950](https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174)\n\nJournal article describing the ERA5 preliminary extension.\n\n### [The ERA5 global reanalysis](https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803)\n\nJournal article describing ERA5.\n"
+              "content": ""
             }
           ]
         }
