@@ -67,7 +67,7 @@ def test_load_resource_from_folder() -> None:
         "begin_date": date(1981, 1, 1),
         "end_date": date(2022, 5, 1),
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
-        "layout": os.path.join(DATA_PATH, "layout.json"),
+        "layout": os.path.join(resource_folder_path, "layout.json"),
         "mapping": {
             "force": {
                 "class": ["l5"],
@@ -80,7 +80,8 @@ def test_load_resource_from_folder() -> None:
             "remap": {
                 "product_type": {
                     "monthly_averaged_reanalysis": "reanalysis-monthly-means-of-daily-means",
-                    "monthly_averaged_reanalysis_by_hour_of_day": "reanalysis-synoptic-monthly-means",
+                    "monthly_averaged_reanalysis_by_hour_of_day":
+                        "reanalysis-synoptic-monthly-means",
                 },
                 "time": {
                     "00:00": "00:00:00",
@@ -1003,6 +1004,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
     for file_name in [
         "form.json",
+        "layout.json",
         "overview.png",
         "constraints.json",
         "citation.html",
@@ -1012,10 +1014,6 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
             kwargs,
         )
         assert expected_call_pars in effective_calls_pars
-    assert (
-        (os.path.join(DATA_PATH, "layout.json"), object_storage_url),
-        kwargs,
-    ) in effective_calls_pars
 
     assert 1 == stored_record.pop("resource_id")
     for column, value in stored_record.items():

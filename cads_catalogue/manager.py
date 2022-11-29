@@ -241,13 +241,12 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     for file_name, db_field_name in [
         ("form.json", "form"),
         ("constraints.json", "constraints"),
+        ("layout.json", "layout"),
     ]:
         if file_name in file_names:
             metadata[db_field_name] = os.path.abspath(
                 os.path.join(folder_path, file_name)
             )
-    # layout is static at the moment
-    metadata["layout"] = os.path.abspath(os.path.join(DATA_PATH, "layout.json"))
     metadata["references"] = []
     if "references.yaml" in file_names:
         with open(os.path.join(folder_path, "references.yaml")) as fp:
