@@ -68,7 +68,7 @@ def test_load_resource_from_folder() -> None:
         "end_date": date(2022, 5, 1),
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
         "layout": os.path.join(DATA_PATH, "layout.json"),
-        "mapping": os.path.join(resource_folder_path, "mapping.json"),
+        "mapping": {},
         "description": [
             {"id": "file-format", "label": "File format", "value": "GRIB"},
             {"id": "data-type", "label": "Data type", "value": "Gridded"},
@@ -905,7 +905,6 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         "form.json",
         "overview.png",
         "constraints.json",
-        "mapping.json",
         "citation.html",
     ]:
         expected_call_pars = (
@@ -932,7 +931,6 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     assert stored_record["form"] == "an url"
     assert stored_record["constraints"] == "an url"
     assert stored_record["previewimage"] == "an url"
-    assert stored_record["mapping"] == "an url"
     assert stored_record["layout"] == "an url"
     expected_many2many_record = {
         "resource_id": 1,

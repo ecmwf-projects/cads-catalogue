@@ -101,7 +101,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             "overview.png",
             "constraints.json",
             "citation.html",
-            "mapping.json",
         ]:
             file_path = os.path.join(TESTDATA_PATH, dataset, filename)
             kwargs = object_storage_kws.copy()
