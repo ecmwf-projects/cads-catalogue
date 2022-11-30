@@ -4,7 +4,7 @@ from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import DATA_PATH, config, database, manager, object_storage
+from cads_catalogue import config, database, manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -80,8 +80,7 @@ def test_load_resource_from_folder() -> None:
             "remap": {
                 "product_type": {
                     "monthly_averaged_reanalysis": "reanalysis-monthly-means-of-daily-means",
-                    "monthly_averaged_reanalysis_by_hour_of_day":
-                        "reanalysis-synoptic-monthly-means",
+                    "monthly_averaged_reanalysis_by_hour_of_day": "reanalysis-synoptic-monthly-means",
                 },
                 "time": {
                     "00:00": "00:00:00",
@@ -1041,3 +1040,81 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     session.close()
     # reset globals for tests following
     config.dbsettings = None
+
+
+def test_find_related_resources() -> None:
+    entry_1a = {"related_resources_keywords": ["link_a", "link_b"]}
+    entry_2a = {"related_resources_keywords": ["link_a"]}
+    entry_3a = {"related_resources_keywords": ["link_b", "link_c"]}
+    entry_4a = {"related_resources_keywords": ["link_c"]}
+    entry_5a = {"related_resources_keywords": ["link_b"]}
+    all_entries = [entry_1a, entry_2a, entry_3a, entry_4a, entry_5a]
+    expected_result = [
+        (entry_1a, entry_2a),
+        (entry_1a, entry_3a),
+        (entry_1a, entry_5a),
+        (entry_2a, entry_1a),
+        (entry_3a, entry_1a),
+        (entry_3a, entry_4a),
+        (entry_3a, entry_5a),
+        (entry_4a, entry_3a),
+        (entry_5a, entry_1a),
+        (entry_5a, entry_3a),
+    ]
+    effective_result = manager.find_related_resources(all_entries)
+    assert len(effective_result) == len(expected_result)
+    for effective_entry in effective_result:
+        assert effective_entry in expected_result
+
+    entry_1b = {
+        "keywords": [
+            "key1: value_a1",
+            "key1: value_a2",
+            "key2: value_b1",
+            "key2: value_b2",
+        ]
+    }
+    entry_2b = {"keywords": ["key1: value_a1"]}
+    entry_3b = {"keywords": ["key2: value_b1", "key2: value_b2"]}
+    entry_4b = {"keywords": ["key2: value_b2"]}
+    entry_5b = {"keywords": ["key1: value_a1", "key1: value_a2", "key2: value_b2"]}
+    all_entries = [entry_1b, entry_2b, entry_3b, entry_4b, entry_5b]
+    expected_result = [
+        (entry_2b, entry_1b),
+        (entry_2b, entry_5b),
+        (entry_3b, entry_1b),
+        (entry_4b, entry_1b),
+        (entry_4b, entry_3b),
+        (entry_4b, entry_5b),
+        (entry_5b, entry_1b),
+    ]
+    effective_result = manager.find_related_resources(all_entries)
+    assert len(effective_result) == len(expected_result)
+    for effective_entry in effective_result:
+        assert effective_entry in expected_result
+
+    entry_1a.update(entry_1b)
+    entry_2a.update(entry_2b)
+    entry_3a.update(entry_3b)
+    entry_4a.update(entry_4b)
+    entry_5a.update(entry_5b)
+    all_entries = [entry_1a, entry_2a, entry_3a, entry_4a, entry_5a]
+    expected_result = [
+        (entry_1a, entry_2a),
+        (entry_1a, entry_3a),
+        (entry_1a, entry_5a),
+        (entry_2a, entry_1a),
+        (entry_2a, entry_5a),
+        (entry_3a, entry_1a),
+        (entry_3a, entry_4a),
+        (entry_3a, entry_5a),
+        (entry_4a, entry_1a),
+        (entry_4a, entry_3a),
+        (entry_4a, entry_5a),
+        (entry_5a, entry_1a),
+        (entry_5a, entry_3a),
+    ]
+    effective_result = manager.find_related_resources(all_entries)
+    assert len(effective_result) == len(expected_result)
+    for effective_entry in effective_result:
+        assert effective_entry in expected_result
