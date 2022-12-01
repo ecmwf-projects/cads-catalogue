@@ -214,6 +214,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
             metadata["adaptor_configuration"] = yaml.load(
                 fp, Loader=yaml.loader.SafeLoader
             )
+    if "mapping.json" in file_names:
+        with open(os.path.join(folder_path, "mapping.json")) as fp:
+            metadata["mapping"] = json.load(fp)
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
@@ -238,14 +241,12 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     for file_name, db_field_name in [
         ("form.json", "form"),
         ("constraints.json", "constraints"),
-        ("mapping.json", "mapping"),
+        ("layout.json", "layout"),
     ]:
         if file_name in file_names:
             metadata[db_field_name] = os.path.abspath(
                 os.path.join(folder_path, file_name)
             )
-    # layout is static at the moment
-    metadata["layout"] = os.path.abspath(os.path.join(DATA_PATH, "layout.json"))
     metadata["references"] = []
     if "references.yaml" in file_names:
         with open(os.path.join(folder_path, "references.yaml")) as fp:
@@ -369,7 +370,7 @@ def store_dataset(
     dataset = dataset_md.copy()
     licence_uids = dataset.pop("licence_uids", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
-    obj_storage_fields = ["form", "previewimage", "constraints", "mapping", "layout"]
+    obj_storage_fields = ["form", "previewimage", "constraints", "layout"]
     for field in obj_storage_fields:
         file_path = dataset[field]
         dataset[field] = object_storage.store_file(
@@ -414,10 +415,9 @@ def find_related_resources(
 
     Each input resources is a python dictionary as returned by the function
     load_resource_from_folder.
-    At the moment the current implementation filters input resources in this way:
-     - look for resources with the same (not empty) list of "keywords" metadata
-     - look for resources with at least one common element in the "related_resources_keywords"
-    It assumes that the relationship is commutative.
+    Links from a resource A to resource B created this way:
+     - B has a (not empty) list of "keywords" metadata completely included in A's keywords
+     - B has at least one common element in the "related_resources_keywords"
 
     Parameters
     ----------
@@ -425,17 +425,18 @@ def find_related_resources(
 
     Returns
     -------
-    list: list of tuples (res1, res2), when res1 and res2 are related input resources.
+    list: list of tuples [(res1, res2), ...], where (res1, res2) means: res1 has a link to res2
     """
     relationships_found = []
-    all_possible_relationships = itertools.combinations(resources, 2)
+    all_possible_relationships = itertools.permutations(resources, 2)
     for (res1, res2) in all_possible_relationships:
-        res1_keywords = res1.get("keywords", [])
-        res2_keywords = res2.get("keywords", [])
-        if set(res1_keywords) == set(res2_keywords) and len(res1_keywords) > 0:
+        res1_keywords = set(res1.get("keywords", []))
+        res2_keywords = set(res2.get("keywords", []))
+        if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
-        res1_rel_res_kws = res1.get("related_resources_keywords", [])
-        res2_rel_res_kws = res2.get("related_resources_keywords", [])
-        if set(res1_rel_res_kws) & set(res2_rel_res_kws):
+            continue
+        res1_rel_res_kws = set(res1.get("related_resources_keywords", []))
+        res2_rel_res_kws = set(res2.get("related_resources_keywords", []))
+        if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found

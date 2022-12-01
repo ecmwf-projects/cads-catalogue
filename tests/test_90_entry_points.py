@@ -80,7 +80,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert spy_initdb.call_count == 1
-    assert patch.call_count == 39
+    assert patch.call_count == 33
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
     assert patch.mock_calls[0].kwargs == {
@@ -101,7 +101,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             "overview.png",
             "constraints.json",
             "citation.html",
-            "mapping.json",
         ]:
             file_path = os.path.join(TESTDATA_PATH, dataset, filename)
             kwargs = object_storage_kws.copy()

@@ -56,12 +56,161 @@
             }
         ],
         "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window. \n",
-        "mapping": "an url",
+        "layout": "an url",
+        "mapping": {
+            "force": {
+                "class": [
+                    "mc"
+                ],
+                "day": [
+                    "01"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "multi_levtype": {
+                "level_groups": [
+                    {
+                        "label_prefix": "",
+                        "levtypes": [
+                            "pl",
+                            "ml"
+                        ],
+                        "param_prefix": "multilev_"
+                    },
+                    {
+                        "label_prefix": "Surface ",
+                        "levtypes": [
+                            "sfc"
+                        ],
+                        "param_prefix": "surface_"
+                    }
+                ],
+                "levelist_names": {
+                    "ml": "model_level",
+                    "pl": "pressure_level"
+                }
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "product_type": {
+                    "monthly_mean": "reanalysis-monthly-means-of-daily-means",
+                    "monthly_mean_by_hour_of_day": "reanalysis-synoptic-monthly-means"
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "03:00": "03:00:00",
+                    "06:00": "06:00:00",
+                    "09:00": "09:00:00",
+                    "12:00": "12:00:00",
+                    "15:00": "15:00:00",
+                    "18:00": "18:00:00",
+                    "21:00": "21:00:00"
+                },
+                "variable": {
+                    "2m_dewpoint_temperature": "surface_168",
+                    "2m_temperature": "surface_167",
+                    "black_carbon_aerosol_optical_depth_550nm": "surface_210211",
+                    "carbon_monoxide": "multilev_210123",
+                    "charnock": "surface_148",
+                    "dust_aerosol_0.03-0.55um_mixing_ratio": "multilev_210004",
+                    "dust_aerosol_0.55-0.9um_mixing_ratio": "multilev_210005",
+                    "dust_aerosol_0.9-20um_mixing_ratio": "multilev_210006",
+                    "dust_aerosol_optical_depth_550nm": "surface_210209",
+                    "ethane": "multilev_217045",
+                    "formaldehyde": "multilev_210124",
+                    "geopotential": "multilev_129",
+                    "hydrophilic_black_carbon_aerosol_mixing_ratio": "multilev_210009",
+                    "hydrophilic_organic_matter_aerosol_mixing_ratio": "multilev_210007",
+                    "hydrophobic_black_carbon_aerosol_mixing_ratio": "multilev_210010",
+                    "hydrophobic_organic_matter_aerosol_mixing_ratio": "multilev_210008",
+                    "hydroxyl_radical": "multilev_217030",
+                    "ice_temperature_layer_1": "surface_35",
+                    "isoprene": "multilev_217016",
+                    "leaf_area_index_high_vegetation": "surface_67",
+                    "leaf_area_index_low_vegetation": "surface_66",
+                    "mean_sea_level_pressure": "surface_151",
+                    "methane_chemistry": "multilev_217004",
+                    "nitric_acid": "multilev_217006",
+                    "nitrogen_dioxide": "multilev_210121",
+                    "nitrogen_monoxide": "multilev_217027",
+                    "organic_matter_aerosol_optical_depth_550nm": "surface_210210",
+                    "ozone": "multilev_210203",
+                    "particulate_matter_10um": "surface_210074",
+                    "particulate_matter_2.5um": "surface_210073",
+                    "peroxyacetyl_nitrate": "multilev_217013",
+                    "potential_vorticity": "multilev_60",
+                    "propane": "multilev_217047",
+                    "relative_humidity": "multilev_157",
+                    "sea_ice_cover": "surface_31",
+                    "sea_salt_aerosol_0.03-0.5um_mixing_ratio": "multilev_210001",
+                    "sea_salt_aerosol_0.5-5um_mixing_ratio": "multilev_210002",
+                    "sea_salt_aerosol_5-20um_mixing_ratio": "multilev_210003",
+                    "sea_salt_aerosol_optical_depth_550nm": "surface_210208",
+                    "sea_surface_temperature": "surface_34",
+                    "snow_albedo": "surface_32",
+                    "snow_density": "surface_33",
+                    "snow_depth": "surface_141",
+                    "so2_precursor_mixing_ratio": "multilev_210012",
+                    "soil_temperature_level_1": "surface_139",
+                    "specific_humidity": "multilev_133",
+                    "sulphate_aerosol_mixing_ratio": "multilev_210011",
+                    "sulphate_aerosol_optical_depth_550nm": "surface_210212",
+                    "sulphur_dioxide": "multilev_210122",
+                    "surface_pressure": "surface_134",
+                    "temperature": "multilev_130",
+                    "temperature_of_snow_layer": "surface_238",
+                    "total_aerosol_optical_depth_550nm": "surface_210207",
+                    "total_column_carbon_monoxide": "surface_210127",
+                    "total_column_ethane": "surface_218045",
+                    "total_column_formaldehyde": "surface_210128",
+                    "total_column_hydroxyl_radical": "surface_218030",
+                    "total_column_isoprene": "surface_218016",
+                    "total_column_methane": "surface_218004",
+                    "total_column_nitric_acid": "surface_218006",
+                    "total_column_nitrogen_dioxide": "surface_210125",
+                    "total_column_nitrogen_monoxide": "surface_218027",
+                    "total_column_ozone": "surface_210206",
+                    "total_column_peroxyacetyl_nitrate": "surface_218013",
+                    "total_column_propane": "surface_218047",
+                    "total_column_sulphur_dioxide": "surface_210126",
+                    "total_column_water": "surface_136",
+                    "total_column_water_vapour": "surface_137",
+                    "vertical_velocity": "multilev_135",
+                    "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um": "surface_215043",
+                    "vertically_integrated_mass_of_dust_aerosol_0.55-9um": "surface_215044",
+                    "vertically_integrated_mass_of_dust_aerosol_9-20um": "surface_215045",
+                    "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol": "surface_215078",
+                    "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol": "surface_215062",
+                    "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol": "surface_215077",
+                    "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol": "surface_215061",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um": "surface_215019",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um": "surface_215020",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_5-20um": "surface_215021",
+                    "vertically_integrated_mass_of_sulphate_aerosol": "surface_215087",
+                    "vertically_integrated_mass_of_sulphur_dioxide": "surface_215174"
+                }
+            },
+            "rename": {
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
         "contact": "copernicus-support@ecmwf.int",
         "doi": null,
         "form": "an url",
         "constraints": "an url",
-        "layout": "an url",
         "keywords": [
             "Variable domain: Atmosphere (composition)",
             "Variable domain: Atmosphere (meteorology)",
@@ -580,7 +729,7 @@
             "collection_id": "cams-global-reanalysis-eac4-monthly"
         },
         "adaptor": null,
-        "record_update": "2022-10-11 14:22:22.960327+02:00",
+        "record_update": "2022-11-29 14:44:17.104045+01:00",
         "references": [],
         "resource_update": null,
         "use_eqc": null
@@ -652,12 +801,43 @@
             }
         ],
         "abstract": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models. \n\nThe dataset has been obtained using the same methodology used to derive the widely used water, energy and climate change (WATCH) forcing data, and is thus also referred to as WATCH Forcing Data methodology applied to ERA5 (WFDE5). The data are derived from the ERA5 reanalysis product that have been re-gridded to a half-degree resolution. Data have been adjusted using an elevation correction and monthly-scale bias corrections based on Climatic Research Unit (CRU) data (for temperature, diurnal temperature range, cloud-cover, wet days number and precipitation fields) and Global Precipitation Climatology Centre (GPCC) data (for precipitation fields only). Additional corrections are included for varying atmospheric aerosol-loading and separate precipitation gauge observations. For full details please refer to the product user-guide.\n\nThis dataset was produced on behalf of Copernicus Climate Change Service (C3S) and was generated entirely within the Climate Data Store (CDS) Toolbox. The toolbox source code is provided in the documentation tab.\n\n\n",
-        "mapping": "an url",
+        "layout": "an url",
+        "mapping": {
+            "options": {
+                "wants_ymd": true
+            },
+            "remap": {
+                "reference_dataset": {
+                    "cru": "CRU",
+                    "cru_and_gpcc": "CRU+GPCC"
+                },
+                "variable": {
+                    "grid_point_altitude": "ASurf",
+                    "near_surface_air_temperature": "Tair",
+                    "near_surface_specific_humidity": "Qair",
+                    "near_surface_wind_speed": "Wind",
+                    "rainfall_flux": "Rainf",
+                    "snowfall_flux": "Snowf",
+                    "surface_air_pressure": "PSurf",
+                    "surface_downwelling_longwave_radiation": "LWdown",
+                    "surface_downwelling_shortwave_radiation": "SWdown"
+                },
+                "version": {
+                    "deprecated (1.0)": "1.0"
+                }
+            },
+            "rename": {
+                "format": "resultcombiner"
+            },
+            "selection_limit": 1000,
+            "selection_limit_ignore": [
+                "area"
+            ]
+        },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.20d54e34",
         "form": "an url",
         "constraints": "an url",
-        "layout": "an url",
         "keywords": [
             "Product type: Derived reanalysis",
             "Spatial coverage: Global",
@@ -778,7 +958,7 @@
             ]
         },
         "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls([ru[\"url\"] for ru in requests_urls])\n    return open(path, \"rb\")\n",
-        "record_update": "2022-09-06 16:10:27.579077+02:00",
+        "record_update": "2022-11-29 14:44:17.081006+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -855,12 +1035,123 @@
             }
         ],
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past. \n\nERA5-Land uses as input to control the simulated land fields ERA5 atmospheric variables, such as air temperature and air humidity. This is called the atmospheric forcing. Without the constraint of the atmospheric forcing, the model-based estimates can rapidly deviate from reality. Therefore, while observations are not directly used in the production of ERA5-Land, they have an indirect influence through the atmospheric forcing used to run the simulation. In addition, the input air temperature, air humidity and pressure used to run ERA5-Land are corrected to account for the altitude difference between the grid of the forcing and the higher resolution grid of ERA5-Land. This correction is called 'lapse rate correction'.    \n\nThe ERA5-Land dataset, as any other simulation, provides estimates which have some degree of uncertainty. Numerical models can only provide a more or less accurate representation of the real physical processes governing different components of the Earth System. In general, the uncertainty of model estimates grows as we go back in time, because the number of observations available to create a good quality atmospheric forcing is lower. ERA5-land parameter fields can currently be used in combination with the uncertainty of the equivalent ERA5 fields. \n\nThe temporal and spatial resolutions of ERA5-Land makes this dataset very useful for all kind of land surface applications such as flood or drought forecasting. The temporal and spatial resolution of this dataset, the period covered in time, as well as the fixed grid used for the data distribution at any period enables decisions makers, businesses and individuals to access and use more accurate information on land states.\n\n\n",
-        "mapping": "an url",
+        "layout": "an url",
+        "mapping": {
+            "force": {
+                "class": [
+                    "l5"
+                ],
+                "dataset": [
+                    "reanalysis"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "levtype": [
+                    "sfc"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00"
+                },
+                "variable": {
+                    "10m_u_component_of_wind": "165",
+                    "10m_v_component_of_wind": "166",
+                    "2m_dewpoint_temperature": "168",
+                    "2m_temperature": "167",
+                    "evaporation_from_bare_soil": "228101",
+                    "evaporation_from_open_water_surfaces_excluding_oceans": "228102",
+                    "evaporation_from_the_top_of_canopy": "228100",
+                    "evaporation_from_vegetation_transpiration": "228103",
+                    "forecast_albedo": "243",
+                    "lake_bottom_temperature": "228010",
+                    "lake_ice_depth": "228014",
+                    "lake_ice_temperature": "228013",
+                    "lake_mix_layer_depth": "228009",
+                    "lake_mix_layer_temperature": "228008",
+                    "lake_shape_factor": "228012",
+                    "lake_total_layer_temperature": "228011",
+                    "leaf_area_index_high_vegetation": "67",
+                    "leaf_area_index_low_vegetation": "66",
+                    "potential_evaporation": "228251",
+                    "runoff": "205",
+                    "skin_reservoir_content": "198",
+                    "skin_temperature": "235",
+                    "snow_albedo": "32",
+                    "snow_cover": "260038",
+                    "snow_density": "33",
+                    "snow_depth": "3066",
+                    "snow_depth_water_equivalent": "141",
+                    "snow_evaporation": "44",
+                    "snowfall": "144",
+                    "snowmelt": "45",
+                    "soil_temperature_level_1": "139",
+                    "soil_temperature_level_2": "170",
+                    "soil_temperature_level_3": "183",
+                    "soil_temperature_level_4": "236",
+                    "sub_surface_runoff": "9",
+                    "surface_latent_heat_flux": "147",
+                    "surface_net_solar_radiation": "176",
+                    "surface_net_thermal_radiation": "177",
+                    "surface_pressure": "134",
+                    "surface_runoff": "8",
+                    "surface_sensible_heat_flux": "146",
+                    "surface_solar_radiation_downwards": "169",
+                    "surface_thermal_radiation_downwards": "175",
+                    "temperature_of_snow_layer": "238",
+                    "total_evaporation": "182",
+                    "total_precipitation": "228",
+                    "volumetric_soil_water_layer_1": "39",
+                    "volumetric_soil_water_layer_2": "40",
+                    "volumetric_soil_water_layer_3": "41",
+                    "volumetric_soil_water_layer_4": "42"
+                }
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.e2161bac",
         "form": "an url",
         "constraints": "an url",
-        "layout": "an url",
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -1195,7 +1486,7 @@
         "publication_date": "2019-07-12",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-09-06 16:10:27.590809+02:00",
+        "record_update": "2022-11-29 14:44:17.091930+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -1265,12 +1556,127 @@
             }
         ],
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.\n\nERA5-Land provides a consistent view of the water and energy cycles at surface level during several decades.\nIt contains a detailed record from 1950 onwards, with a temporal resolution of 1 hour. The native spatial resolution of the ERA5-Land reanalysis dataset is 9km on a reduced Gaussian grid (TCo1279). The data in the CDS has been regridded to a regular lat-lon grid of 0.1x0.1 degrees.\n\nThe data presented here is a post-processed subset of the full ERA5-Land dataset. Monthly-mean averages have been pre-calculated to facilitate many applications requiring easy and fast access to the data, when sub-monthly fields are not required.\n\nHourly fields can be found in the [ERA5-Land hourly fields CDS page](https://cds-dev.copernicus-climate.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview \"ERA5-Land hourly data\"). Documentation can be found in the [online ERA5-Land documentation](https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation \"ERA5-Land data documentation\").\n",
-        "mapping": "an url",
+        "layout": "an url",
+        "mapping": {
+            "force": {
+                "class": [
+                    "l5"
+                ],
+                "day": [
+                    "01"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "levtype": [
+                    "sfc"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "product_type": {
+                    "monthly_averaged_reanalysis": "reanalysis-monthly-means-of-daily-means",
+                    "monthly_averaged_reanalysis_by_hour_of_day": "reanalysis-synoptic-monthly-means"
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00"
+                },
+                "variable": {
+                    "10m_u_component_of_wind": "165",
+                    "10m_v_component_of_wind": "166",
+                    "2m_dewpoint_temperature": "168",
+                    "2m_temperature": "167",
+                    "evaporation_from_bare_soil": "228101",
+                    "evaporation_from_open_water_surfaces_excluding_oceans": "228102",
+                    "evaporation_from_the_top_of_canopy": "228100",
+                    "evaporation_from_vegetation_transpiration": "228103",
+                    "forecast_albedo": "243",
+                    "lake_bottom_temperature": "228010",
+                    "lake_ice_depth": "228014",
+                    "lake_ice_temperature": "228013",
+                    "lake_mix_layer_depth": "228009",
+                    "lake_mix_layer_temperature": "228008",
+                    "lake_shape_factor": "228012",
+                    "lake_total_layer_temperature": "228011",
+                    "leaf_area_index_high_vegetation": "67",
+                    "leaf_area_index_low_vegetation": "66",
+                    "potential_evaporation": "228251",
+                    "runoff": "205",
+                    "skin_reservoir_content": "198",
+                    "skin_temperature": "235",
+                    "snow_albedo": "32",
+                    "snow_cover": "260038",
+                    "snow_density": "33",
+                    "snow_depth": "3066",
+                    "snow_depth_water_equivalent": "141",
+                    "snow_evaporation": "44",
+                    "snowfall": "144",
+                    "snowmelt": "45",
+                    "soil_temperature_level_1": "139",
+                    "soil_temperature_level_2": "170",
+                    "soil_temperature_level_3": "183",
+                    "soil_temperature_level_4": "236",
+                    "sub_surface_runoff": "9",
+                    "surface_latent_heat_flux": "147",
+                    "surface_net_solar_radiation": "176",
+                    "surface_net_thermal_radiation": "177",
+                    "surface_pressure": "134",
+                    "surface_runoff": "8",
+                    "surface_sensible_heat_flux": "146",
+                    "surface_solar_radiation_downwards": "169",
+                    "surface_thermal_radiation_downwards": "175",
+                    "temperature_of_snow_layer": "238",
+                    "total_evaporation": "182",
+                    "total_precipitation": "228",
+                    "volumetric_soil_water_layer_1": "39",
+                    "volumetric_soil_water_layer_2": "40",
+                    "volumetric_soil_water_layer_3": "41",
+                    "volumetric_soil_water_layer_4": "42"
+                }
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.68d2bb30",
         "form": "an url",
         "constraints": "an url",
-        "layout": "an url",
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -1605,7 +2011,7 @@
         "publication_date": "2019-06-23",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-09-06 16:10:27.584074+02:00",
+        "record_update": "2022-11-29 14:44:17.085458+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -1670,12 +2076,91 @@
             }
         ],
         "abstract": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on pressure levels from 1959 to present\".\n",
-        "mapping": "an url",
+        "layout": "an url",
+        "mapping": {
+            "force": {
+                "class": [
+                    "ea"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "levtype": [
+                    "pl"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "product_type": {
+                    "ensemble_mean": "mean",
+                    "ensemble_members": "members",
+                    "ensemble_spread": "spread"
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00"
+                },
+                "variable": {
+                    "divergence": "155",
+                    "fraction_of_cloud_cover": "248",
+                    "geopotential": "129",
+                    "ozone_mass_mixing_ratio": "203",
+                    "potential_vorticity": "60",
+                    "relative_humidity": "157",
+                    "specific_cloud_ice_water_content": "247",
+                    "specific_cloud_liquid_water_content": "246",
+                    "specific_humidity": "133",
+                    "specific_rain_water_content": "75",
+                    "specific_snow_water_content": "76",
+                    "temperature": "130",
+                    "u_component_of_wind": "131",
+                    "v_component_of_wind": "132",
+                    "vertical_velocity": "135",
+                    "vorticity": "138"
+                }
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 120000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.bd0915c6",
         "form": "an url",
         "constraints": "an url",
-        "layout": "an url",
         "keywords": [
             "Variable domain: Atmosphere (surface)",
             "Variable domain: Atmosphere (upper air)",
@@ -1817,7 +2302,7 @@
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-08-30 07:31:55.508657+02:00",
+        "record_update": "2022-11-29 14:44:17.089210+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -1884,12 +2369,337 @@
             }
         ],
         "abstract": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on single levels from 1959 to present\".\n",
-        "mapping": "an url",
+        "layout": "an url",
+        "mapping": {
+            "force": {
+                "class": [
+                    "ea"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "levtype": [
+                    "sfc"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "product_type": {
+                    "ensemble_mean": "mean",
+                    "ensemble_members": "members",
+                    "ensemble_spread": "spread"
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00"
+                },
+                "variable": {
+                    "100m_u_component_of_wind": "228246",
+                    "100m_v_component_of_wind": "228247",
+                    "10m_u_component_of_neutral_wind": "228131",
+                    "10m_u_component_of_wind": "165",
+                    "10m_v_component_of_neutral_wind": "228132",
+                    "10m_v_component_of_wind": "166",
+                    "10m_wind_gust_since_previous_post_processing": "49",
+                    "2m_dewpoint_temperature": "168",
+                    "2m_temperature": "167",
+                    "air_density_over_the_oceans": "140209",
+                    "angle_of_sub_gridscale_orography": "162",
+                    "anisotropy_of_sub_gridscale_orography": "161",
+                    "benjamin_feir_index": "140253",
+                    "boundary_layer_dissipation": "145",
+                    "boundary_layer_height": "159",
+                    "charnock": "148",
+                    "clear_sky_direct_solar_radiation_at_surface": "228022",
+                    "cloud_base_height": "228023",
+                    "coefficient_of_drag_with_waves": "140233",
+                    "convective_available_potential_energy": "59",
+                    "convective_inhibition": "228001",
+                    "convective_precipitation": "143",
+                    "convective_rain_rate": "228218",
+                    "convective_snowfall": "239",
+                    "convective_snowfall_rate_water_equivalent": "228220",
+                    "downward_uv_radiation_at_the_surface": "57",
+                    "duct_base_height": "228017",
+                    "eastward_gravity_wave_surface_stress": "195",
+                    "eastward_turbulent_surface_stress": "180",
+                    "evaporation": "182",
+                    "forecast_albedo": "243",
+                    "forecast_logarithm_of_surface_roughness_for_heat": "245",
+                    "forecast_surface_roughness": "244",
+                    "free_convective_velocity_over_the_oceans": "140208",
+                    "friction_velocity": "228003",
+                    "geopotential": "129",
+                    "gravity_wave_dissipation": "197",
+                    "high_cloud_cover": "188",
+                    "high_vegetation_cover": "28",
+                    "ice_temperature_layer_1": "35",
+                    "ice_temperature_layer_2": "36",
+                    "ice_temperature_layer_3": "37",
+                    "ice_temperature_layer_4": "38",
+                    "instantaneous_10m_wind_gust": "228029",
+                    "instantaneous_eastward_turbulent_surface_stress": "229",
+                    "instantaneous_large_scale_surface_precipitation_fraction": "228217",
+                    "instantaneous_moisture_flux": "232",
+                    "instantaneous_northward_turbulent_surface_stress": "230",
+                    "instantaneous_surface_sensible_heat_flux": "231",
+                    "k_index": "260121",
+                    "lake_bottom_temperature": "228010",
+                    "lake_cover": "26",
+                    "lake_depth": "228007",
+                    "lake_ice_depth": "228014",
+                    "lake_ice_temperature": "228013",
+                    "lake_mix_layer_depth": "228009",
+                    "lake_mix_layer_temperature": "228008",
+                    "lake_shape_factor": "228012",
+                    "lake_total_layer_temperature": "228011",
+                    "land_sea_mask": "172",
+                    "large_scale_precipitation": "142",
+                    "large_scale_precipitation_fraction": "50",
+                    "large_scale_rain_rate": "228219",
+                    "large_scale_snowfall": "240",
+                    "large_scale_snowfall_rate_water_equivalent": "228221",
+                    "leaf_area_index_high_vegetation": "67",
+                    "leaf_area_index_low_vegetation": "66",
+                    "low_cloud_cover": "186",
+                    "low_vegetation_cover": "27",
+                    "maximum_2m_temperature_since_previous_post_processing": "201",
+                    "maximum_individual_wave_height": "140218",
+                    "maximum_total_precipitation_rate_since_previous_post_processing": "228226",
+                    "mean_boundary_layer_dissipation": "235032",
+                    "mean_convective_precipitation_rate": "235030",
+                    "mean_convective_snowfall_rate": "235056",
+                    "mean_direction_of_total_swell": "140238",
+                    "mean_direction_of_wind_waves": "140235",
+                    "mean_eastward_gravity_wave_surface_stress": "235045",
+                    "mean_eastward_turbulent_surface_stress": "235041",
+                    "mean_evaporation_rate": "235043",
+                    "mean_gravity_wave_dissipation": "235047",
+                    "mean_large_scale_precipitation_fraction": "235026",
+                    "mean_large_scale_precipitation_rate": "235029",
+                    "mean_large_scale_snowfall_rate": "235057",
+                    "mean_northward_gravity_wave_surface_stress": "235046",
+                    "mean_northward_turbulent_surface_stress": "235042",
+                    "mean_period_of_total_swell": "140239",
+                    "mean_period_of_wind_waves": "140236",
+                    "mean_potential_evaporation_rate": "235070",
+                    "mean_runoff_rate": "235048",
+                    "mean_sea_level_pressure": "151",
+                    "mean_snow_evaporation_rate": "235023",
+                    "mean_snowfall_rate": "235031",
+                    "mean_snowmelt_rate": "235024",
+                    "mean_square_slope_of_waves": "140244",
+                    "mean_sub_surface_runoff_rate": "235021",
+                    "mean_surface_direct_short_wave_radiation_flux": "235058",
+                    "mean_surface_direct_short_wave_radiation_flux_clear_sky": "235059",
+                    "mean_surface_downward_long_wave_radiation_flux": "235036",
+                    "mean_surface_downward_long_wave_radiation_flux_clear_sky": "235069",
+                    "mean_surface_downward_short_wave_radiation_flux": "235035",
+                    "mean_surface_downward_short_wave_radiation_flux_clear_sky": "235068",
+                    "mean_surface_downward_uv_radiation_flux": "235027",
+                    "mean_surface_latent_heat_flux": "235034",
+                    "mean_surface_net_long_wave_radiation_flux": "235038",
+                    "mean_surface_net_long_wave_radiation_flux_clear_sky": "235052",
+                    "mean_surface_net_short_wave_radiation_flux": "235037",
+                    "mean_surface_net_short_wave_radiation_flux_clear_sky": "235051",
+                    "mean_surface_runoff_rate": "235020",
+                    "mean_surface_sensible_heat_flux": "235033",
+                    "mean_top_downward_short_wave_radiation_flux": "235053",
+                    "mean_top_net_long_wave_radiation_flux": "235040",
+                    "mean_top_net_long_wave_radiation_flux_clear_sky": "235050",
+                    "mean_top_net_short_wave_radiation_flux": "235039",
+                    "mean_top_net_short_wave_radiation_flux_clear_sky": "235049",
+                    "mean_total_precipitation_rate": "235055",
+                    "mean_vertical_gradient_of_refractivity_inside_trapping_layer": "228016",
+                    "mean_vertically_integrated_moisture_divergence": "235054",
+                    "mean_wave_direction": "140230",
+                    "mean_wave_direction_of_first_swell_partition": "140122",
+                    "mean_wave_direction_of_second_swell_partition": "140125",
+                    "mean_wave_direction_of_third_swell_partition": "140128",
+                    "mean_wave_period": "140232",
+                    "mean_wave_period_based_on_first_moment": "140220",
+                    "mean_wave_period_based_on_first_moment_for_swell": "140226",
+                    "mean_wave_period_based_on_first_moment_for_wind_waves": "140223",
+                    "mean_wave_period_based_on_second_moment_for_swell": "140227",
+                    "mean_wave_period_based_on_second_moment_for_wind_waves": "140224",
+                    "mean_wave_period_of_first_swell_partition": "140123",
+                    "mean_wave_period_of_second_swell_partition": "140126",
+                    "mean_wave_period_of_third_swell_partition": "140129",
+                    "mean_zero_crossing_wave_period": "140221",
+                    "medium_cloud_cover": "187",
+                    "minimum_2m_temperature_since_previous_post_processing": "202",
+                    "minimum_total_precipitation_rate_since_previous_post_processing": "228227",
+                    "minimum_vertical_gradient_of_refractivity_inside_trapping_layer": "228015",
+                    "model_bathymetry": "140219",
+                    "near_ir_albedo_for_diffuse_radiation": "18",
+                    "near_ir_albedo_for_direct_radiation": "17",
+                    "normalized_energy_flux_into_ocean": "140212",
+                    "normalized_energy_flux_into_waves": "140211",
+                    "normalized_stress_into_ocean": "140214",
+                    "northward_gravity_wave_surface_stress": "196",
+                    "northward_turbulent_surface_stress": "181",
+                    "ocean_surface_stress_equivalent_10m_neutral_wind_direction": "140249",
+                    "ocean_surface_stress_equivalent_10m_neutral_wind_speed": "140245",
+                    "peak_wave_period": "140231",
+                    "period_corresponding_to_maximum_individual_wave_height": "140217",
+                    "potential_evaporation": "228251",
+                    "precipitation_type": "260015",
+                    "runoff": "205",
+                    "sea_ice_cover": "31",
+                    "sea_surface_temperature": "34",
+                    "significant_height_of_combined_wind_waves_and_swell": "140229",
+                    "significant_height_of_total_swell": "140237",
+                    "significant_height_of_wind_waves": "140234",
+                    "significant_wave_height_of_first_swell_partition": "140121",
+                    "significant_wave_height_of_second_swell_partition": "140124",
+                    "significant_wave_height_of_third_swell_partition": "140127",
+                    "skin_reservoir_content": "198",
+                    "skin_temperature": "235",
+                    "slope_of_sub_gridscale_orography": "163",
+                    "snow_albedo": "32",
+                    "snow_density": "33",
+                    "snow_depth": "141",
+                    "snow_evaporation": "44",
+                    "snowfall": "144",
+                    "snowmelt": "45",
+                    "soil_temperature_level_1": "139",
+                    "soil_temperature_level_2": "170",
+                    "soil_temperature_level_3": "183",
+                    "soil_temperature_level_4": "236",
+                    "soil_type": "43",
+                    "standard_deviation_of_filtered_subgrid_orography": "74",
+                    "standard_deviation_of_orography": "160",
+                    "sub_surface_runoff": "9",
+                    "surface_latent_heat_flux": "147",
+                    "surface_net_solar_radiation": "176",
+                    "surface_net_solar_radiation_clear_sky": "210",
+                    "surface_net_thermal_radiation": "177",
+                    "surface_net_thermal_radiation_clear_sky": "211",
+                    "surface_pressure": "134",
+                    "surface_runoff": "8",
+                    "surface_sensible_heat_flux": "146",
+                    "surface_solar_radiation_downward_clear_sky": "228129",
+                    "surface_solar_radiation_downwards": "169",
+                    "surface_thermal_radiation_downward_clear_sky": "228130",
+                    "surface_thermal_radiation_downwards": "175",
+                    "temperature_of_snow_layer": "238",
+                    "toa_incident_solar_radiation": "212",
+                    "top_net_solar_radiation": "178",
+                    "top_net_solar_radiation_clear_sky": "208",
+                    "top_net_thermal_radiation": "179",
+                    "top_net_thermal_radiation_clear_sky": "209",
+                    "total_cloud_cover": "164",
+                    "total_column_cloud_ice_water": "79",
+                    "total_column_cloud_liquid_water": "78",
+                    "total_column_ozone": "206",
+                    "total_column_rain_water": "228089",
+                    "total_column_snow_water": "228090",
+                    "total_column_supercooled_liquid_water": "228088",
+                    "total_column_water": "136",
+                    "total_column_water_vapour": "137",
+                    "total_precipitation": "228",
+                    "total_sky_direct_solar_radiation_at_surface": "228021",
+                    "total_totals_index": "260123",
+                    "trapping_layer_base_height": "228018",
+                    "trapping_layer_top_height": "228019",
+                    "type_of_high_vegetation": "30",
+                    "type_of_low_vegetation": "29",
+                    "u_component_stokes_drift": "140215",
+                    "uv_visible_albedo_for_diffuse_radiation": "16",
+                    "uv_visible_albedo_for_direct_radiation": "15",
+                    "v_component_stokes_drift": "140216",
+                    "vertical_integral_of_divergence_of_cloud_frozen_water_flux": "162080",
+                    "vertical_integral_of_divergence_of_cloud_liquid_water_flux": "162079",
+                    "vertical_integral_of_divergence_of_geopotential_flux": "162085",
+                    "vertical_integral_of_divergence_of_kinetic_energy_flux": "162082",
+                    "vertical_integral_of_divergence_of_mass_flux": "162081",
+                    "vertical_integral_of_divergence_of_moisture_flux": "162084",
+                    "vertical_integral_of_divergence_of_ozone_flux": "162087",
+                    "vertical_integral_of_divergence_of_thermal_energy_flux": "162083",
+                    "vertical_integral_of_divergence_of_total_energy_flux": "162086",
+                    "vertical_integral_of_eastward_cloud_frozen_water_flux": "162090",
+                    "vertical_integral_of_eastward_cloud_liquid_water_flux": "162088",
+                    "vertical_integral_of_eastward_geopotential_flux": "162073",
+                    "vertical_integral_of_eastward_heat_flux": "162069",
+                    "vertical_integral_of_eastward_kinetic_energy_flux": "162067",
+                    "vertical_integral_of_eastward_mass_flux": "162065",
+                    "vertical_integral_of_eastward_ozone_flux": "162077",
+                    "vertical_integral_of_eastward_total_energy_flux": "162075",
+                    "vertical_integral_of_eastward_water_vapour_flux": "162071",
+                    "vertical_integral_of_energy_conversion": "162064",
+                    "vertical_integral_of_kinetic_energy": "162059",
+                    "vertical_integral_of_mass_of_atmosphere": "162053",
+                    "vertical_integral_of_mass_tendency": "162092",
+                    "vertical_integral_of_northward_cloud_frozen_water_flux": "162091",
+                    "vertical_integral_of_northward_cloud_liquid_water_flux": "162089",
+                    "vertical_integral_of_northward_geopotential_flux": "162074",
+                    "vertical_integral_of_northward_heat_flux": "162070",
+                    "vertical_integral_of_northward_kinetic_energy_flux": "162068",
+                    "vertical_integral_of_northward_mass_flux": "162066",
+                    "vertical_integral_of_northward_ozone_flux": "162078",
+                    "vertical_integral_of_northward_total_energy_flux": "162076",
+                    "vertical_integral_of_northward_water_vapour_flux": "162072",
+                    "vertical_integral_of_potential_and_internal_energy": "162061",
+                    "vertical_integral_of_potential_internal_and_latent_energy": "162062",
+                    "vertical_integral_of_temperature": "162054",
+                    "vertical_integral_of_thermal_energy": "162060",
+                    "vertical_integral_of_total_energy": "162063",
+                    "vertically_integrated_moisture_divergence": "213",
+                    "volumetric_soil_water_layer_1": "39",
+                    "volumetric_soil_water_layer_2": "40",
+                    "volumetric_soil_water_layer_3": "41",
+                    "volumetric_soil_water_layer_4": "42",
+                    "wave_spectral_directional_width": "140222",
+                    "wave_spectral_directional_width_for_swell": "140228",
+                    "wave_spectral_directional_width_for_wind_waves": "140225",
+                    "wave_spectral_kurtosis": "140252",
+                    "wave_spectral_peakedness": "140254",
+                    "wave_spectral_skewness": "140207",
+                    "zero_degree_level": "228024"
+                }
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 120000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.adbb2d47",
         "form": "an url",
         "constraints": "an url",
-        "layout": "an url",
         "keywords": [
             "Variable domain: Atmosphere (surface)",
             "Variable domain: Atmosphere (upper air)",
@@ -3512,7 +4322,7 @@
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-08-30 07:31:55.514834+02:00",
+        "record_update": "2022-11-29 14:44:17.094974+01:00",
         "references": [
             {
                 "title": "Citation",
