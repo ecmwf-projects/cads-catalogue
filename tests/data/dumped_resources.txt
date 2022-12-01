@@ -729,7 +729,7 @@
             "collection_id": "cams-global-reanalysis-eac4-monthly"
         },
         "adaptor": null,
-        "record_update": "2022-11-29 14:44:17.104045+01:00",
+        "record_update": "2022-12-01 10:23:37.209569+01:00",
         "references": [],
         "resource_update": null,
         "use_eqc": null
@@ -957,8 +957,8 @@
                 "{% if (year is not defined or year is none) and (month is not defined or month is none) %}http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_v{{ version }}.nc{% endif %}"
             ]
         },
-        "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls([ru[\"url\"] for ru in requests_urls])\n    return open(path, \"rb\")\n",
-        "record_update": "2022-11-29 14:44:17.081006+01:00",
+        "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    data_format = request.pop(\"format\", \"zip\")\n\n    if data_format not in {\"zip\", \"tgz\"}:\n        raise ValueError(f\"{data_format=} is not supported\")\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls(\n        [ru[\"url\"] for ru in requests_urls],\n        data_format=data_format\n    )\n    return open(path, \"rb\")\n",
+        "record_update": "2022-12-01 10:23:37.181706+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -1486,7 +1486,7 @@
         "publication_date": "2019-07-12",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-11-29 14:44:17.091930+01:00",
+        "record_update": "2022-12-01 10:23:37.195492+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -2011,7 +2011,7 @@
         "publication_date": "2019-06-23",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-11-29 14:44:17.085458+01:00",
+        "record_update": "2022-12-01 10:23:37.187489+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -2302,7 +2302,7 @@
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-11-29 14:44:17.089210+01:00",
+        "record_update": "2022-12-01 10:23:37.192044+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -4322,7 +4322,7 @@
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-11-29 14:44:17.094974+01:00",
+        "record_update": "2022-12-01 10:23:37.199439+01:00",
         "references": [
             {
                 "title": "Citation",
