@@ -4,7 +4,7 @@ from typing import Any
 
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import DATA_PATH, config, database, manager, object_storage
+from cads_catalogue import config, database, manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -67,8 +67,108 @@ def test_load_resource_from_folder() -> None:
         "begin_date": date(1981, 1, 1),
         "end_date": date(2022, 5, 1),
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
-        "layout": os.path.join(DATA_PATH, "layout.json"),
-        "mapping": os.path.join(resource_folder_path, "mapping.json"),
+        "layout": os.path.join(resource_folder_path, "layout.json"),
+        "mapping": {
+            "force": {
+                "class": ["l5"],
+                "day": ["01"],
+                "expect": ["any"],
+                "levtype": ["sfc"],
+                "number": ["all"],
+            },
+            "options": {"wants_dates": True},
+            "remap": {
+                "product_type": {
+                    "monthly_averaged_reanalysis": "reanalysis-monthly-means-of-daily-means",
+                    "monthly_averaged_reanalysis_by_hour_of_day": "reanalysis-synoptic-monthly-means",
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00",
+                },
+                "variable": {
+                    "10m_u_component_of_wind": "165",
+                    "10m_v_component_of_wind": "166",
+                    "2m_dewpoint_temperature": "168",
+                    "2m_temperature": "167",
+                    "evaporation_from_bare_soil": "228101",
+                    "evaporation_from_open_water_surfaces_excluding_oceans": "228102",
+                    "evaporation_from_the_top_of_canopy": "228100",
+                    "evaporation_from_vegetation_transpiration": "228103",
+                    "forecast_albedo": "243",
+                    "lake_bottom_temperature": "228010",
+                    "lake_ice_depth": "228014",
+                    "lake_ice_temperature": "228013",
+                    "lake_mix_layer_depth": "228009",
+                    "lake_mix_layer_temperature": "228008",
+                    "lake_shape_factor": "228012",
+                    "lake_total_layer_temperature": "228011",
+                    "leaf_area_index_high_vegetation": "67",
+                    "leaf_area_index_low_vegetation": "66",
+                    "potential_evaporation": "228251",
+                    "runoff": "205",
+                    "skin_reservoir_content": "198",
+                    "skin_temperature": "235",
+                    "snow_albedo": "32",
+                    "snow_cover": "260038",
+                    "snow_density": "33",
+                    "snow_depth": "3066",
+                    "snow_depth_water_equivalent": "141",
+                    "snow_evaporation": "44",
+                    "snowfall": "144",
+                    "snowmelt": "45",
+                    "soil_temperature_level_1": "139",
+                    "soil_temperature_level_2": "170",
+                    "soil_temperature_level_3": "183",
+                    "soil_temperature_level_4": "236",
+                    "sub_surface_runoff": "9",
+                    "surface_latent_heat_flux": "147",
+                    "surface_net_solar_radiation": "176",
+                    "surface_net_thermal_radiation": "177",
+                    "surface_pressure": "134",
+                    "surface_runoff": "8",
+                    "surface_sensible_heat_flux": "146",
+                    "surface_solar_radiation_downwards": "169",
+                    "surface_thermal_radiation_downwards": "175",
+                    "temperature_of_snow_layer": "238",
+                    "total_evaporation": "182",
+                    "total_precipitation": "228",
+                    "volumetric_soil_water_layer_1": "39",
+                    "volumetric_soil_water_layer_2": "40",
+                    "volumetric_soil_water_layer_3": "41",
+                    "volumetric_soil_water_layer_4": "42",
+                },
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param",
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": ["area", "grid"],
+        },
         "description": [
             {"id": "file-format", "label": "File format", "value": "GRIB"},
             {"id": "data-type", "label": "Data type", "value": "Gridded"},
@@ -896,16 +996,16 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         session, resource, object_storage_url, **storage_kws
     )
     session.commit()
-    assert patch.call_count == 6
+    assert patch.call_count == 5
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
     kwargs["force"] = True
     effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
     for file_name in [
         "form.json",
+        "layout.json",
         "overview.png",
         "constraints.json",
-        "mapping.json",
         "citation.html",
     ]:
         expected_call_pars = (
@@ -913,10 +1013,6 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
             kwargs,
         )
         assert expected_call_pars in effective_calls_pars
-    assert (
-        (os.path.join(DATA_PATH, "layout.json"), object_storage_url),
-        kwargs,
-    ) in effective_calls_pars
 
     assert 1 == stored_record.pop("resource_id")
     for column, value in stored_record.items():
@@ -925,14 +1021,12 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
             "form",
             "constraints",
             "previewimage",
-            "mapping",
             "layout",
         ]:
             assert resource.get(column) == value
     assert stored_record["form"] == "an url"
     assert stored_record["constraints"] == "an url"
     assert stored_record["previewimage"] == "an url"
-    assert stored_record["mapping"] == "an url"
     assert stored_record["layout"] == "an url"
     expected_many2many_record = {
         "resource_id": 1,
@@ -946,3 +1040,81 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     session.close()
     # reset globals for tests following
     config.dbsettings = None
+
+
+def test_find_related_resources() -> None:
+    entry_1a = {"related_resources_keywords": ["link_a", "link_b"]}
+    entry_2a = {"related_resources_keywords": ["link_a"]}
+    entry_3a = {"related_resources_keywords": ["link_b", "link_c"]}
+    entry_4a = {"related_resources_keywords": ["link_c"]}
+    entry_5a = {"related_resources_keywords": ["link_b"]}
+    all_entries = [entry_1a, entry_2a, entry_3a, entry_4a, entry_5a]
+    expected_result = [
+        (entry_1a, entry_2a),
+        (entry_1a, entry_3a),
+        (entry_1a, entry_5a),
+        (entry_2a, entry_1a),
+        (entry_3a, entry_1a),
+        (entry_3a, entry_4a),
+        (entry_3a, entry_5a),
+        (entry_4a, entry_3a),
+        (entry_5a, entry_1a),
+        (entry_5a, entry_3a),
+    ]
+    effective_result = manager.find_related_resources(all_entries)
+    assert len(effective_result) == len(expected_result)
+    for effective_entry in effective_result:
+        assert effective_entry in expected_result
+
+    entry_1b = {
+        "keywords": [
+            "key1: value_a1",
+            "key1: value_a2",
+            "key2: value_b1",
+            "key2: value_b2",
+        ]
+    }
+    entry_2b = {"keywords": ["key1: value_a1"]}
+    entry_3b = {"keywords": ["key2: value_b1", "key2: value_b2"]}
+    entry_4b = {"keywords": ["key2: value_b2"]}
+    entry_5b = {"keywords": ["key1: value_a1", "key1: value_a2", "key2: value_b2"]}
+    all_entries = [entry_1b, entry_2b, entry_3b, entry_4b, entry_5b]
+    expected_result = [
+        (entry_2b, entry_1b),
+        (entry_2b, entry_5b),
+        (entry_3b, entry_1b),
+        (entry_4b, entry_1b),
+        (entry_4b, entry_3b),
+        (entry_4b, entry_5b),
+        (entry_5b, entry_1b),
+    ]
+    effective_result = manager.find_related_resources(all_entries)
+    assert len(effective_result) == len(expected_result)
+    for effective_entry in effective_result:
+        assert effective_entry in expected_result
+
+    entry_1a.update(entry_1b)
+    entry_2a.update(entry_2b)
+    entry_3a.update(entry_3b)
+    entry_4a.update(entry_4b)
+    entry_5a.update(entry_5b)
+    all_entries = [entry_1a, entry_2a, entry_3a, entry_4a, entry_5a]
+    expected_result = [
+        (entry_1a, entry_2a),
+        (entry_1a, entry_3a),
+        (entry_1a, entry_5a),
+        (entry_2a, entry_1a),
+        (entry_2a, entry_5a),
+        (entry_3a, entry_1a),
+        (entry_3a, entry_4a),
+        (entry_3a, entry_5a),
+        (entry_4a, entry_1a),
+        (entry_4a, entry_3a),
+        (entry_4a, entry_5a),
+        (entry_5a, entry_1a),
+        (entry_5a, entry_3a),
+    ]
+    effective_result = manager.find_related_resources(all_entries)
+    assert len(effective_result) == len(expected_result)
+    for effective_entry in effective_result:
+        assert effective_entry in expected_result
