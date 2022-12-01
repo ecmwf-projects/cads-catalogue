@@ -51,7 +51,7 @@
         "label": "Reference dataset",
         "name": "reference_dataset",
         "required": true,
-        "type": "StringListWidget"
+        "type": "StringChoiceWidget"
     },
     {
         "css": "todo",
