@@ -151,7 +151,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             database.Resource.resource_uid
         )
     ]
-    # with open(os.path.join(TESTDATA_PATH, 'dumped_resources.txt'), 'w') as fp:
+    # with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt"), "w") as fp:
     #     json.dump(resources, fp, default=str, indent=4)
     with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt")) as fp:
         expected_resources: list[dict[str, Any]] = json.load(fp)
