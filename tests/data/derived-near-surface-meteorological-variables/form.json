@@ -38,6 +38,9 @@
         "details": {
             "columns": 1,
             "id": 1,
+            "default": [
+                "cru"
+            ],
             "labels": {
                 "cru": "CRU (Climate Research Unit)",
                 "cru_and_gpcc": "CRU and GPCC (Climate Research Unit and Global Precipitation Climatology Centre)"
