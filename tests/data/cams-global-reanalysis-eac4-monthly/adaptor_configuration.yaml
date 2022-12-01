@@ -1,4 +1,5 @@
 ---
+"entry_point": "cds_adaptor"
 url: https://ads.atmosphere.copernicus.eu/api/v2
 key: 11325:b5c65565-ef76-4e44-adfb-ae7050f293c6
 collection_id: cams-global-reanalysis-eac4-monthly
