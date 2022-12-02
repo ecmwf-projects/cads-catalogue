@@ -618,7 +618,6 @@
     },
     {
         "type": "Licence",
-        "label": "Licences",
-
+        "label": "Licences"
     }
 ]

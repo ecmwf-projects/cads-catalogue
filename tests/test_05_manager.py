@@ -276,12 +276,7 @@ def test_load_resource_from_folder() -> None:
             }
         },
         "begin_date": "1982-01-01",
-        "citation": "Muñoz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. "
-        "Copernicus Climate Change Service (C3S) Climate Data Store (CDS). "
-        "(Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\nMuñoz Sabater, "
-        "J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate "
-        "Change Service (C3S) Climate Data Store (CDS). (Accessed on < "
-        "DD-MMM-YYYY >), 10.24381/cds.e2161bac",
+        "citation": None,
         "constraints": os.path.join(
             resource_folder_path, "json-config", "constraints.json"
         ),
@@ -474,7 +469,7 @@ def test_load_resource_from_folder() -> None:
         "responsible_organisation": "ECMWF",
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
-        "title": "ERA5-Land hourly data from 1950 to present",
+        "title": None,
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
         "unit_measure": "dd",
