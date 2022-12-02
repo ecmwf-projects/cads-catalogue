@@ -260,19 +260,27 @@ def test_load_resource_from_folder() -> None:
         "abstract": "",
         "adaptor_configuration": {
             "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": ["origin", "type", "dataset"],
+                "netcdf.zip": {
+                    "always_zip": [True],
                     "system_call": [
-                        "cdscdm-translate",
+                        "/opt/ecmwf/eccodes/bin/grib_to_netcdf",
+                        "-S",
+                        "param",
                         "-o",
                         "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
                         "{{infile}}",
                     ],
-                }
+                    "zip_compression_kwargs": {"compression": "ZIP_DEFLATED"},
+                },
+                "netcdf4": {
+                    "system_call": [
+                        "cfgrib",
+                        "to_netcdf",
+                        "-o",
+                        "{{outfile}}",
+                        "{{infile}}",
+                    ]
+                },
             }
         },
         "begin_date": "1982-01-01",
@@ -344,7 +352,7 @@ def test_load_resource_from_folder() -> None:
         "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
         "ds_responsible_organisation_role": "publisher",
-        "end_date": "2022-06-01",
+        "end_date": "2022-09-01",
         "file_format": "grib",
         "form": os.path.join(resource_folder_path, "json-config", "form.json"),
         "format_version": None,
@@ -465,11 +473,11 @@ def test_load_resource_from_folder() -> None:
         "related_resources_keywords": [],
         "representative_fraction": 0.25,
         "resource_uid": "reanalysis-era5-land",
-        "resource_update": "2022-11-24",
+        "resource_update": "2022-11-21",
         "responsible_organisation": "ECMWF",
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
-        "title": None,
+        "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
         "unit_measure": "dd",

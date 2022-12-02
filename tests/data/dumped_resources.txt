@@ -9,20 +9,28 @@
         "adaptor": null,
         "adaptor_configuration": {
             "format_conversion": {
-                "netcdf_cdm": {
-                    "split_on": [
-                        "origin",
-                        "type",
-                        "dataset"
+                "netcdf.zip": {
+                    "always_zip": [
+                        true
                     ],
                     "system_call": [
-                        "cdscdm-translate",
+                        "/opt/ecmwf/eccodes/bin/grib_to_netcdf",
+                        "-S",
+                        "param",
                         "-o",
                         "{{outfile}}",
-                        "--product",
-                        "{{product}}",
-                        "--merge_datasets",
-                        "true",
+                        "{{infile}}"
+                    ],
+                    "zip_compression_kwargs": {
+                        "compression": "ZIP_DEFLATED"
+                    }
+                },
+                "netcdf4": {
+                    "system_call": [
+                        "cfgrib",
+                        "to_netcdf",
+                        "-o",
+                        "{{outfile}}",
                         "{{infile}}"
                     ]
                 }
@@ -147,10 +155,10 @@
             "bboxW": 0
         },
         "begin_date": "1982-01-01",
-        "end_date": "2022-06-01",
+        "end_date": "2022-09-01",
         "publication_date": "2019-07-12",
-        "record_update": "2022-12-02 11:21:26.607658+01:00",
-        "resource_update": "2022-11-24",
+        "record_update": "2022-12-02 11:30:13.863033+01:00",
+        "resource_update": "2022-11-21",
         "abstract": "",
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
@@ -233,7 +241,7 @@
         "responsible_organisation": "ECMWF",
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
-        "title": null,
+        "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
         "unit_measure": "dd",
@@ -622,7 +630,7 @@
         "begin_date": "1982-01-01",
         "end_date": "2021-12-01",
         "publication_date": "2020-10-20",
-        "record_update": "2022-12-02 11:21:26.612568+01:00",
+        "record_update": "2022-12-02 11:30:13.867841+01:00",
         "resource_update": null,
         "abstract": "",
         "citation": null,
@@ -722,7 +730,7 @@
         "responsible_organisation": "ECMWF",
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
-        "title": null,
+        "title": "Surface radiation budget from 1982 to present derived from satellite observations",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
         "unit_measure": "dd",

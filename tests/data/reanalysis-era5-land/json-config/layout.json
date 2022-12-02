@@ -16,70 +16,109 @@
               "image": "overview/overview.png"
             },
             {
-              "type": "table-vertical",
+              "type": "table",
               "id": "data-description",
               "caption": "Data-description",
-              "tableStructure": {
-                "columns": [
+              "structure": {
+                "headings": [
                   {
-                    "id": "header"
+                    "id": "data-type",
+                    "label": "Data-type"
                   },
                   {
-                    "id": "content"
+                    "id": "file-format",
+                    "label": "File-format"
+                  },
+                  {
+                    "id": "horizontal-coverage",
+                    "label": "Horizontal-coverage"
+                  },
+                  {
+                    "id": "horizontal-resolution",
+                    "label": "Horizontal-resolution"
+                  },
+                  {
+                    "id": "projection",
+                    "label": "Projection"
+                  },
+                  {
+                    "id": "temporal-coverage",
+                    "label": "Temporal-coverage"
+                  },
+                  {
+                    "id": "temporal-resolution",
+                    "label": "Temporal-resolution"
+                  },
+                  {
+                    "id": "update-frequency",
+                    "label": "Update-frequency"
+                  },
+                  {
+                    "id": "vertical-coverage",
+                    "label": "Vertical-coverage"
+                  },
+                  {
+                    "id": "vertical-resolution",
+                    "label": "Vertical-resolution"
                   }
-                ]
+                ],
+                "orientation": "horizontal"
               },
-              "tableContent": [
+              "content": [
                 {
-                  "header": "File-format",
-                  "content": "GRIB"
+                  "data-type": "Gridded"
                 },
                 {
-                  "header": "Data-type",
-                  "content": "Gridded"
+                  "file-format": "GRIB"
                 },
                 {
-                  "header": "Projection",
-                  "content": "Regular latitude-longitude grid"
+                  "horizontal-coverage": "Global"
                 },
                 {
-                  "header": "Horizontal-coverage",
-                  "content": "Global"
+                  "horizontal-resolution": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
                 },
                 {
-                  "header": "Horizontal-resolution",
-                  "content": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
+                  "projection": "Regular latitude-longitude grid"
                 },
                 {
-                  "header": "Vertical-coverage",
-                  "content": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
+                  "temporal-coverage": "January 1950 to present"
                 },
                 {
-                  "header": "Vertical-resolution",
-                  "content": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
+                  "temporal-resolution": "Hourly"
                 },
                 {
-                  "header": "Temporal-coverage",
-                  "content": "January 1950 to present"
+                  "update-frequency": "Monthly with a delay of about three months relatively to actual date."
                 },
                 {
-                  "header": "Temporal-resolution",
-                  "content": "Hourly"
+                  "vertical-coverage": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
                 },
                 {
-                  "header": "Update-frequency",
-                  "content": "Monthly with a delay of about three months relatively to actual date."
+                  "vertical-resolution": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
                 }
               ]
             },
             {
               "type": "table",
               "id": "main-variables",
-              "caption": "Main-variables",
-              "tableStructure": {
-                "columns": []
+              "caption": "Main variables",
+              "structure": {
+                "orientation": "vertical",
+                "headings": [
+                  {
+                    "id": "name",
+                    "label": "Name"
+                  },
+                  {
+                    "id": "units",
+                    "label": "Units"
+                  },
+                  {
+                    "id": "description",
+                    "label": "Description"
+                  }
+                ]
               },
-              "tableContent": [
+              "content": [
                 {
                   "name": "10m u-component of wind",
                   "description": "Eastward component of the 10m wind. It is the horizontal speed of air moving towards the east, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the V component of 10m wind to give the speed and direction of the horizontal 10m wind.",
@@ -340,27 +379,15 @@
           "blocks": []
         },
         {
-          "title": "documentation",
+          "title": "Documentation",
           "id": "documentation",
           "blocks": [
             {
-              "id": "online_documentation",
+              "id": "all_docs-0",
               "type": "link",
               "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
               "title": "ERA5-Land online documentation",
               "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above."
-            }
-          ]
-        },
-        {
-          "title": "View",
-          "id": "view",
-          "blocks": [
-            {
-              "id": "era5-explorer",
-              "type": "application",
-              "title": "Era5-explorer",
-              "content": "app-era5-explorer"
             }
           ]
         }
@@ -371,9 +398,8 @@
         {
           "id": "contact",
           "title": "Contact",
-          "type": "accordion",
+          "type": "section",
           "open": true,
-          "collapsable": false,
           "blocks": [
             {
               "id": "portal",
@@ -386,7 +412,9 @@
         {
           "id": "licence",
           "title": "Licence",
-          "type": "licence",
+          "type": "button",
+          "scope": "licence",
+          "action": "modal",
           "licences": [
             "licence-to-use-copernicus-products"
           ]
@@ -394,9 +422,8 @@
         {
           "id": "publication_date-section",
           "title": "Publication date",
-          "type": "accordion",
+          "type": "section",
           "open": true,
-          "collapsable": false,
           "blocks": [
             {
               "id": "publication_date-markdown",
@@ -408,28 +435,28 @@
         {
           "id": "update_date-section",
           "title": "Update date",
-          "type": "accordion",
+          "type": "section",
           "open": true,
-          "collapsable": false,
           "blocks": [
             {
               "id": "update_date-markdown",
               "type": "markdown",
-              "content": "2022-11-20"
+              "content": "2022-11-21"
             }
           ]
         },
         {
           "id": "references",
           "title": "",
-          "type": "accordion",
+          "type": "section",
           "open": true,
-          "collapsable": false,
           "blocks": [
             {
               "id": "citation",
-              "type": "popup",
+              "type": "button",
               "content": "**How to cite this dataset**\n\nAll users of data uploaded on the Climate Data Store (CDS) must provide clear and visible attribution to the Copernicus programme and are asked to cite and reference the dataset provider. Please refer to How to acknowledge, cite and reference data published on the Climate Data Store for complete details.\n\n(1) Acknowledge according to the licence to use Copernicus Products.\n\n(2) Cite each dataset version used:\n\n- Mu\u00f1oz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac \n\n- Mu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac ",
+              "action": "popup",
+              "scope": "popup",
               "title": "Citation",
               "copy_to_clipboard": true
             }

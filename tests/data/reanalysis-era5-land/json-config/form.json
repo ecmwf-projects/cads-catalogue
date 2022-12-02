@@ -596,28 +596,23 @@
     {
         "css": "todo",
         "details": {
-            "columns": 2,
-            "default": [
-                "grib"
-            ],
+            "columns": 4,
             "id": 8,
             "labels": {
                 "grib": "GRIB",
-                "netcdf": "NetCDF (experimental)"
+                "netcdf": "NetCDF-3 (experimental, not recommended)",
+                "netcdf.zip": "Zipped NetCDF-3 (experimental)"
             },
             "values": [
                 "grib",
+                "netcdf.zip",
                 "netcdf"
             ]
         },
-        "help": null,
+        "help": "<p>To protect the performance of the CDS the un-compressed <strong>NetCDF-3</strong> option will be deprecated in the in the near future, this deprecation date will be communicated when a date has been set.</p> \n <p><strong>GRIB</strong> is the native format of the ERA5-land data. The CDS provides a conversion to <strong>NetCDF-3</strong> using the <a href=\"https://confluence.ecmwf.int/display/ECC/grib_to_netcdf\">grib_to_netcdf</a> tool. <strong>NetCDF-3</strong> does not permit internal compression and can result in very large files, users are therefore encouraged to use the <strong>Zipped NetCDF-3</strong> option.</p>\n",
         "label": "Format",
         "name": "format",
         "required": true,
         "type": "StringChoiceWidget"
-    },
-    {
-        "type": "Licence",
-        "label": "Licences"
     }
 ]
