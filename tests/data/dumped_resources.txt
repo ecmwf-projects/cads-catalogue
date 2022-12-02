@@ -1,6 +1,190 @@
 [
     {
         "resource_id": 1,
+        "resource_uid": "derived-near-surface-meteorological-variables",
+        "constraints": "an url",
+        "form": "an url",
+        "layout": "an url",
+        "previewimage": null,
+        "adaptor": null,
+        "adaptor_configuration": {
+            "adaptor.url": {
+                "pattern": [
+                    "http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_{{ year }}{{ month }}_v{{ version }}.nc",
+                    "{% if (year is not defined or year is none) and (month is not defined or month is none) %}http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_v{{ version }}.nc{% endif %}"
+                ]
+            }
+        },
+        "mapping": {
+            "options": {
+                "wants_ymd": true
+            },
+            "remap": {
+                "reference_dataset": {
+                    "cru": "CRU",
+                    "cru_and_gpcc": "CRU+GPCC"
+                },
+                "variable": {
+                    "grid_point_altitude": "ASurf",
+                    "near_surface_air_temperature": "Tair",
+                    "near_surface_specific_humidity": "Qair",
+                    "near_surface_wind_speed": "Wind",
+                    "rainfall_flux": "Rainf",
+                    "snowfall_flux": "Snowf",
+                    "surface_air_pressure": "PSurf",
+                    "surface_downwelling_longwave_radiation": "LWdown",
+                    "surface_downwelling_shortwave_radiation": "SWdown"
+                },
+                "version": {
+                    "deprecated (1.0)": "1.0"
+                }
+            },
+            "rename": {
+                "format": "resultcombiner"
+            },
+            "selection_limit": 1000,
+            "selection_limit_ignore": [
+                "area"
+            ]
+        },
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxS": -89,
+            "bboxE": 360,
+            "bboxW": 0
+        },
+        "begin_date": "1979-01-01",
+        "end_date": "2018-12-31",
+        "publication_date": "2020-02-11",
+        "record_update": "2022-12-02 14:31:52.744221+01:00",
+        "resource_update": null,
+        "abstract": "",
+        "citation": null,
+        "contactemail": "https://support.ecmwf.int",
+        "description": [
+            {
+                "id": "conventions",
+                "label": "Conventions",
+                "value": "Climate and Forecast (CF) Metadata Convention v1.7"
+            },
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "NetCDF 4"
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global land"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "0.5\u00b0 x 0.5\u00b0"
+            },
+            {
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "From 1979  to  2019"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "Hourly"
+            },
+            {
+                "id": "update-frequency",
+                "label": "Update frequency",
+                "value": "No updates expected"
+            },
+            {
+                "id": "versions",
+                "label": "Versions",
+                "value": "1.0 (deprecated), 1.1, 2.0 and 2.1"
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "Surface"
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "Single level"
+            }
+        ],
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/x/YzmaE",
+                "description": "Provides documentation on the algorithms used to derive the dataset as well as on the filename conventions and metedata.",
+                "title": "Product user guide"
+            },
+            {
+                "url": "https://doi.org/10.5194/essd-12-2097-2020",
+                "title": "WFDE5: bias-adjusted ERA5 reanalysis data for impact studies",
+                "description": "A peer reviewed article which describes the methods used in the generation of this dataset and the results of the validation experiments."
+            },
+            {
+                "datastore": "derived-near-surface-meteorological-variables/source_code.zip",
+                "title": "Version 1.0",
+                "description": "Source code used to generate version 1.0 of the dataset. The workflows are for use in the CDS toolbox.",
+                "widget": "code"
+            },
+            {
+                "datastore": "derived-near-surface-meteorological-variables/source_code_v1.1.zip",
+                "title": "Version 1.1",
+                "description": "Source code used to generate version 1.1 of the dataset. The workflows are for use in the CDS toolbox.",
+                "widget": "code"
+            },
+            {
+                "datastore": "derived-near-surface-meteorological-variables/source_code_v2.0.zip",
+                "title": "Version 2.0",
+                "description": "Source code used to generate version 2.0 of the dataset. The workflows are for use in the CDS toolbox.",
+                "widget": "code"
+            },
+            {
+                "datastore": "derived-near-surface-meteorological-variables/source_code_v2.1.zip",
+                "title": "Version 2.1",
+                "description": "Source code used to generate version 2.1 of the dataset. The workflows are for use in the CDS toolbox.",
+                "widget": "code"
+            }
+        ],
+        "doi": "10.24381/cds.20d54e34",
+        "ds_contactemail": "https://support.ecmwf.int",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": "publisher",
+        "file_format": "grib",
+        "format_version": null,
+        "keywords": [
+            "Product type: Derived reanalysis",
+            "Spatial coverage: Global",
+            "Variable domain: Atmosphere (surface)",
+            "Temporal coverage: Past"
+        ],
+        "lineage": "EC Copernicus program",
+        "representative_fraction": 0.25,
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
+        "title": "Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis",
+        "topic": "climatologyMeteorologyAtmosphere",
+        "type": "dataset",
+        "unit_measure": "dd",
+        "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
+        "variables": []
+    },
+    {
+        "resource_id": 2,
         "resource_uid": "reanalysis-era5-land",
         "constraints": "an url",
         "form": "an url",
@@ -157,7 +341,7 @@
         "begin_date": "1982-01-01",
         "end_date": "2022-09-01",
         "publication_date": "2019-07-12",
-        "record_update": "2022-12-02 11:30:13.863033+01:00",
+        "record_update": "2022-12-02 14:31:52.748313+01:00",
         "resource_update": "2022-11-21",
         "abstract": "",
         "citation": null,
@@ -550,7 +734,468 @@
         ]
     },
     {
-        "resource_id": 2,
+        "resource_id": 3,
+        "resource_uid": "reanalysis-era5-single-levels",
+        "constraints": "an url",
+        "form": "an url",
+        "layout": "an url",
+        "previewimage": null,
+        "adaptor": null,
+        "adaptor_configuration": {
+            "format_conversion": {
+                "netcdf_cdm": {
+                    "split_on": [
+                        "origin",
+                        "type",
+                        "dataset"
+                    ],
+                    "system_call": [
+                        "cdscdm-translate",
+                        "-o",
+                        "{{outfile}}",
+                        "--product",
+                        "{{product}}",
+                        "--merge_datasets",
+                        "true",
+                        "{{infile}}"
+                    ]
+                }
+            }
+        },
+        "mapping": {
+            "force": {
+                "class": [
+                    "ea"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "levtype": [
+                    "sfc"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "product_type": {
+                    "ensemble_mean": "mean",
+                    "ensemble_members": "members",
+                    "ensemble_spread": "spread"
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00"
+                },
+                "variable": {
+                    "100m_u_component_of_wind": "228246",
+                    "100m_v_component_of_wind": "228247",
+                    "10m_u_component_of_neutral_wind": "228131",
+                    "10m_u_component_of_wind": "165",
+                    "10m_v_component_of_neutral_wind": "228132",
+                    "10m_v_component_of_wind": "166",
+                    "10m_wind_gust_since_previous_post_processing": "49",
+                    "2m_dewpoint_temperature": "168",
+                    "2m_temperature": "167",
+                    "air_density_over_the_oceans": "140209",
+                    "angle_of_sub_gridscale_orography": "162",
+                    "anisotropy_of_sub_gridscale_orography": "161",
+                    "benjamin_feir_index": "140253",
+                    "boundary_layer_dissipation": "145",
+                    "boundary_layer_height": "159",
+                    "charnock": "148",
+                    "clear_sky_direct_solar_radiation_at_surface": "228022",
+                    "cloud_base_height": "228023",
+                    "coefficient_of_drag_with_waves": "140233",
+                    "convective_available_potential_energy": "59",
+                    "convective_inhibition": "228001",
+                    "convective_precipitation": "143",
+                    "convective_rain_rate": "228218",
+                    "convective_snowfall": "239",
+                    "convective_snowfall_rate_water_equivalent": "228220",
+                    "downward_uv_radiation_at_the_surface": "57",
+                    "duct_base_height": "228017",
+                    "eastward_gravity_wave_surface_stress": "195",
+                    "eastward_turbulent_surface_stress": "180",
+                    "evaporation": "182",
+                    "forecast_albedo": "243",
+                    "forecast_logarithm_of_surface_roughness_for_heat": "245",
+                    "forecast_surface_roughness": "244",
+                    "free_convective_velocity_over_the_oceans": "140208",
+                    "friction_velocity": "228003",
+                    "geopotential": "129",
+                    "gravity_wave_dissipation": "197",
+                    "high_cloud_cover": "188",
+                    "high_vegetation_cover": "28",
+                    "ice_temperature_layer_1": "35",
+                    "ice_temperature_layer_2": "36",
+                    "ice_temperature_layer_3": "37",
+                    "ice_temperature_layer_4": "38",
+                    "instantaneous_10m_wind_gust": "228029",
+                    "instantaneous_eastward_turbulent_surface_stress": "229",
+                    "instantaneous_large_scale_surface_precipitation_fraction": "228217",
+                    "instantaneous_moisture_flux": "232",
+                    "instantaneous_northward_turbulent_surface_stress": "230",
+                    "instantaneous_surface_sensible_heat_flux": "231",
+                    "k_index": "260121",
+                    "lake_bottom_temperature": "228010",
+                    "lake_cover": "26",
+                    "lake_depth": "228007",
+                    "lake_ice_depth": "228014",
+                    "lake_ice_temperature": "228013",
+                    "lake_mix_layer_depth": "228009",
+                    "lake_mix_layer_temperature": "228008",
+                    "lake_shape_factor": "228012",
+                    "lake_total_layer_temperature": "228011",
+                    "land_sea_mask": "172",
+                    "large_scale_precipitation": "142",
+                    "large_scale_precipitation_fraction": "50",
+                    "large_scale_rain_rate": "228219",
+                    "large_scale_snowfall": "240",
+                    "large_scale_snowfall_rate_water_equivalent": "228221",
+                    "leaf_area_index_high_vegetation": "67",
+                    "leaf_area_index_low_vegetation": "66",
+                    "low_cloud_cover": "186",
+                    "low_vegetation_cover": "27",
+                    "maximum_2m_temperature_since_previous_post_processing": "201",
+                    "maximum_individual_wave_height": "140218",
+                    "maximum_total_precipitation_rate_since_previous_post_processing": "228226",
+                    "mean_boundary_layer_dissipation": "235032",
+                    "mean_convective_precipitation_rate": "235030",
+                    "mean_convective_snowfall_rate": "235056",
+                    "mean_direction_of_total_swell": "140238",
+                    "mean_direction_of_wind_waves": "140235",
+                    "mean_eastward_gravity_wave_surface_stress": "235045",
+                    "mean_eastward_turbulent_surface_stress": "235041",
+                    "mean_evaporation_rate": "235043",
+                    "mean_gravity_wave_dissipation": "235047",
+                    "mean_large_scale_precipitation_fraction": "235026",
+                    "mean_large_scale_precipitation_rate": "235029",
+                    "mean_large_scale_snowfall_rate": "235057",
+                    "mean_northward_gravity_wave_surface_stress": "235046",
+                    "mean_northward_turbulent_surface_stress": "235042",
+                    "mean_period_of_total_swell": "140239",
+                    "mean_period_of_wind_waves": "140236",
+                    "mean_potential_evaporation_rate": "235070",
+                    "mean_runoff_rate": "235048",
+                    "mean_sea_level_pressure": "151",
+                    "mean_snow_evaporation_rate": "235023",
+                    "mean_snowfall_rate": "235031",
+                    "mean_snowmelt_rate": "235024",
+                    "mean_square_slope_of_waves": "140244",
+                    "mean_sub_surface_runoff_rate": "235021",
+                    "mean_surface_direct_short_wave_radiation_flux": "235058",
+                    "mean_surface_direct_short_wave_radiation_flux_clear_sky": "235059",
+                    "mean_surface_downward_long_wave_radiation_flux": "235036",
+                    "mean_surface_downward_long_wave_radiation_flux_clear_sky": "235069",
+                    "mean_surface_downward_short_wave_radiation_flux": "235035",
+                    "mean_surface_downward_short_wave_radiation_flux_clear_sky": "235068",
+                    "mean_surface_downward_uv_radiation_flux": "235027",
+                    "mean_surface_latent_heat_flux": "235034",
+                    "mean_surface_net_long_wave_radiation_flux": "235038",
+                    "mean_surface_net_long_wave_radiation_flux_clear_sky": "235052",
+                    "mean_surface_net_short_wave_radiation_flux": "235037",
+                    "mean_surface_net_short_wave_radiation_flux_clear_sky": "235051",
+                    "mean_surface_runoff_rate": "235020",
+                    "mean_surface_sensible_heat_flux": "235033",
+                    "mean_top_downward_short_wave_radiation_flux": "235053",
+                    "mean_top_net_long_wave_radiation_flux": "235040",
+                    "mean_top_net_long_wave_radiation_flux_clear_sky": "235050",
+                    "mean_top_net_short_wave_radiation_flux": "235039",
+                    "mean_top_net_short_wave_radiation_flux_clear_sky": "235049",
+                    "mean_total_precipitation_rate": "235055",
+                    "mean_vertical_gradient_of_refractivity_inside_trapping_layer": "228016",
+                    "mean_vertically_integrated_moisture_divergence": "235054",
+                    "mean_wave_direction": "140230",
+                    "mean_wave_direction_of_first_swell_partition": "140122",
+                    "mean_wave_direction_of_second_swell_partition": "140125",
+                    "mean_wave_direction_of_third_swell_partition": "140128",
+                    "mean_wave_period": "140232",
+                    "mean_wave_period_based_on_first_moment": "140220",
+                    "mean_wave_period_based_on_first_moment_for_swell": "140226",
+                    "mean_wave_period_based_on_first_moment_for_wind_waves": "140223",
+                    "mean_wave_period_based_on_second_moment_for_swell": "140227",
+                    "mean_wave_period_based_on_second_moment_for_wind_waves": "140224",
+                    "mean_wave_period_of_first_swell_partition": "140123",
+                    "mean_wave_period_of_second_swell_partition": "140126",
+                    "mean_wave_period_of_third_swell_partition": "140129",
+                    "mean_zero_crossing_wave_period": "140221",
+                    "medium_cloud_cover": "187",
+                    "minimum_2m_temperature_since_previous_post_processing": "202",
+                    "minimum_total_precipitation_rate_since_previous_post_processing": "228227",
+                    "minimum_vertical_gradient_of_refractivity_inside_trapping_layer": "228015",
+                    "model_bathymetry": "140219",
+                    "near_ir_albedo_for_diffuse_radiation": "18",
+                    "near_ir_albedo_for_direct_radiation": "17",
+                    "normalized_energy_flux_into_ocean": "140212",
+                    "normalized_energy_flux_into_waves": "140211",
+                    "normalized_stress_into_ocean": "140214",
+                    "northward_gravity_wave_surface_stress": "196",
+                    "northward_turbulent_surface_stress": "181",
+                    "ocean_surface_stress_equivalent_10m_neutral_wind_direction": "140249",
+                    "ocean_surface_stress_equivalent_10m_neutral_wind_speed": "140245",
+                    "peak_wave_period": "140231",
+                    "period_corresponding_to_maximum_individual_wave_height": "140217",
+                    "potential_evaporation": "228251",
+                    "precipitation_type": "260015",
+                    "runoff": "205",
+                    "sea_ice_cover": "31",
+                    "sea_surface_temperature": "34",
+                    "significant_height_of_combined_wind_waves_and_swell": "140229",
+                    "significant_height_of_total_swell": "140237",
+                    "significant_height_of_wind_waves": "140234",
+                    "significant_wave_height_of_first_swell_partition": "140121",
+                    "significant_wave_height_of_second_swell_partition": "140124",
+                    "significant_wave_height_of_third_swell_partition": "140127",
+                    "skin_reservoir_content": "198",
+                    "skin_temperature": "235",
+                    "slope_of_sub_gridscale_orography": "163",
+                    "snow_albedo": "32",
+                    "snow_density": "33",
+                    "snow_depth": "141",
+                    "snow_evaporation": "44",
+                    "snowfall": "144",
+                    "snowmelt": "45",
+                    "soil_temperature_level_1": "139",
+                    "soil_temperature_level_2": "170",
+                    "soil_temperature_level_3": "183",
+                    "soil_temperature_level_4": "236",
+                    "soil_type": "43",
+                    "standard_deviation_of_filtered_subgrid_orography": "74",
+                    "standard_deviation_of_orography": "160",
+                    "sub_surface_runoff": "9",
+                    "surface_latent_heat_flux": "147",
+                    "surface_net_solar_radiation": "176",
+                    "surface_net_solar_radiation_clear_sky": "210",
+                    "surface_net_thermal_radiation": "177",
+                    "surface_net_thermal_radiation_clear_sky": "211",
+                    "surface_pressure": "134",
+                    "surface_runoff": "8",
+                    "surface_sensible_heat_flux": "146",
+                    "surface_solar_radiation_downward_clear_sky": "228129",
+                    "surface_solar_radiation_downwards": "169",
+                    "surface_thermal_radiation_downward_clear_sky": "228130",
+                    "surface_thermal_radiation_downwards": "175",
+                    "temperature_of_snow_layer": "238",
+                    "toa_incident_solar_radiation": "212",
+                    "top_net_solar_radiation": "178",
+                    "top_net_solar_radiation_clear_sky": "208",
+                    "top_net_thermal_radiation": "179",
+                    "top_net_thermal_radiation_clear_sky": "209",
+                    "total_cloud_cover": "164",
+                    "total_column_cloud_ice_water": "79",
+                    "total_column_cloud_liquid_water": "78",
+                    "total_column_ozone": "206",
+                    "total_column_rain_water": "228089",
+                    "total_column_snow_water": "228090",
+                    "total_column_supercooled_liquid_water": "228088",
+                    "total_column_water": "136",
+                    "total_column_water_vapour": "137",
+                    "total_precipitation": "228",
+                    "total_sky_direct_solar_radiation_at_surface": "228021",
+                    "total_totals_index": "260123",
+                    "trapping_layer_base_height": "228018",
+                    "trapping_layer_top_height": "228019",
+                    "type_of_high_vegetation": "30",
+                    "type_of_low_vegetation": "29",
+                    "u_component_stokes_drift": "140215",
+                    "uv_visible_albedo_for_diffuse_radiation": "16",
+                    "uv_visible_albedo_for_direct_radiation": "15",
+                    "v_component_stokes_drift": "140216",
+                    "vertical_integral_of_divergence_of_cloud_frozen_water_flux": "162080",
+                    "vertical_integral_of_divergence_of_cloud_liquid_water_flux": "162079",
+                    "vertical_integral_of_divergence_of_geopotential_flux": "162085",
+                    "vertical_integral_of_divergence_of_kinetic_energy_flux": "162082",
+                    "vertical_integral_of_divergence_of_mass_flux": "162081",
+                    "vertical_integral_of_divergence_of_moisture_flux": "162084",
+                    "vertical_integral_of_divergence_of_ozone_flux": "162087",
+                    "vertical_integral_of_divergence_of_thermal_energy_flux": "162083",
+                    "vertical_integral_of_divergence_of_total_energy_flux": "162086",
+                    "vertical_integral_of_eastward_cloud_frozen_water_flux": "162090",
+                    "vertical_integral_of_eastward_cloud_liquid_water_flux": "162088",
+                    "vertical_integral_of_eastward_geopotential_flux": "162073",
+                    "vertical_integral_of_eastward_heat_flux": "162069",
+                    "vertical_integral_of_eastward_kinetic_energy_flux": "162067",
+                    "vertical_integral_of_eastward_mass_flux": "162065",
+                    "vertical_integral_of_eastward_ozone_flux": "162077",
+                    "vertical_integral_of_eastward_total_energy_flux": "162075",
+                    "vertical_integral_of_eastward_water_vapour_flux": "162071",
+                    "vertical_integral_of_energy_conversion": "162064",
+                    "vertical_integral_of_kinetic_energy": "162059",
+                    "vertical_integral_of_mass_of_atmosphere": "162053",
+                    "vertical_integral_of_mass_tendency": "162092",
+                    "vertical_integral_of_northward_cloud_frozen_water_flux": "162091",
+                    "vertical_integral_of_northward_cloud_liquid_water_flux": "162089",
+                    "vertical_integral_of_northward_geopotential_flux": "162074",
+                    "vertical_integral_of_northward_heat_flux": "162070",
+                    "vertical_integral_of_northward_kinetic_energy_flux": "162068",
+                    "vertical_integral_of_northward_mass_flux": "162066",
+                    "vertical_integral_of_northward_ozone_flux": "162078",
+                    "vertical_integral_of_northward_total_energy_flux": "162076",
+                    "vertical_integral_of_northward_water_vapour_flux": "162072",
+                    "vertical_integral_of_potential_and_internal_energy": "162061",
+                    "vertical_integral_of_potential_internal_and_latent_energy": "162062",
+                    "vertical_integral_of_temperature": "162054",
+                    "vertical_integral_of_thermal_energy": "162060",
+                    "vertical_integral_of_total_energy": "162063",
+                    "vertically_integrated_moisture_divergence": "213",
+                    "volumetric_soil_water_layer_1": "39",
+                    "volumetric_soil_water_layer_2": "40",
+                    "volumetric_soil_water_layer_3": "41",
+                    "volumetric_soil_water_layer_4": "42",
+                    "wave_spectral_directional_width": "140222",
+                    "wave_spectral_directional_width_for_swell": "140228",
+                    "wave_spectral_directional_width_for_wind_waves": "140225",
+                    "wave_spectral_kurtosis": "140252",
+                    "wave_spectral_peakedness": "140254",
+                    "wave_spectral_skewness": "140207",
+                    "zero_degree_level": "228024"
+                }
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 120000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
+        "geo_extent": {
+            "bboxN": 89,
+            "bboxS": -89,
+            "bboxE": 360,
+            "bboxW": 0
+        },
+        "begin_date": "1979-01-01",
+        "end_date": "2022-11-23",
+        "publication_date": "2018-06-14",
+        "record_update": "2022-12-02 14:31:52.751912+01:00",
+        "resource_update": "2022-11-29",
+        "abstract": "",
+        "citation": null,
+        "contactemail": "https://support.ecmwf.int",
+        "description": [
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB"
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "\nReanalysis: 0.25\u00b0 x 0.25\u00b0 (atmosphere), 0.5\u00b0 x 0.5\u00b0 (ocean waves)\n\nMean, spread and members: 0.5\u00b0 x 0.5\u00b0 (atmosphere), 1\u00b0 x 1\u00b0 (ocean waves)"
+            },
+            {
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "1959 to present"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "Hourly"
+            },
+            {
+                "id": "update-frequency",
+                "label": "Update frequency",
+                "value": "Daily"
+            }
+        ],
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
+                "title": "ERA5 data documentation",
+                "description": "Detailed information relating to the ERA5 data archive can be found in the web link above."
+            },
+            {
+                "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174",
+                "title": "The ERA5 global reanalysis: Preliminary extension to 1950",
+                "description": "Journal article describing the ERA5 preliminary extension.",
+                "kind": ""
+            },
+            {
+                "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803",
+                "title": "The ERA5 global reanalysis",
+                "description": "Journal article describing ERA5.",
+                "kind": ""
+            },
+            {
+                "url": "https://confluence.ecmwf.int/x/ggleC",
+                "title": "Renamed variable: form ocean waves 10m wind to ocean surface stress equivalent 10m neutral wind",
+                "description": "The reason for the change was a parameter name clash between variables in ERA5 wind and ERA5 ocean waves."
+            }
+        ],
+        "doi": "10.24381/cds.adbb2d47",
+        "ds_contactemail": "https://support.ecmwf.int",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": "publisher",
+        "file_format": "grib",
+        "format_version": null,
+        "keywords": [
+            "Variable domain: Atmosphere (surface)",
+            "Variable domain: Atmosphere (upper air)",
+            "Temporal coverage: Past",
+            "Spatial coverage: Global",
+            "Product type: Reanalysis",
+            "Provider: Copernicus C3S"
+        ],
+        "lineage": "EC Copernicus program",
+        "representative_fraction": 0.25,
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
+        "title": "ERA5 hourly data on single levels from 1959 to present",
+        "topic": "climatologyMeteorologyAtmosphere",
+        "type": "dataset",
+        "unit_measure": "dd",
+        "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
+        "variables": []
+    },
+    {
+        "resource_id": 4,
         "resource_uid": "satellite-surface-radiation-budget",
         "constraints": "an url",
         "form": "an url",
@@ -630,7 +1275,7 @@
         "begin_date": "1982-01-01",
         "end_date": "2021-12-01",
         "publication_date": "2020-10-20",
-        "record_update": "2022-12-02 11:30:13.867841+01:00",
+        "record_update": "2022-12-02 14:31:52.754647+01:00",
         "resource_update": null,
         "abstract": "",
         "citation": null,

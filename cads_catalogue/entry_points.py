@@ -59,11 +59,11 @@ def init_db(connection_string: str | None = None) -> None:
 
 
 DATASETS = [
-    # "derived-near-surface-meteorological-variables",
+    "derived-near-surface-meteorological-variables",
     # "reanalysis-era5-land-monthly-means",
     # "reanalysis-era5-pressure-levels",
     "reanalysis-era5-land",
-    # "reanalysis-era5-single-levels",
+    "reanalysis-era5-single-levels",
     # "cams-global-reanalysis-eac4-monthly",
     "satellite-surface-radiation-budget",
 ]

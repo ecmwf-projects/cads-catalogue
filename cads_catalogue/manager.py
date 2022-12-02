@@ -487,7 +487,7 @@ def store_dataset(
     _ = dataset.pop("related_resources_keywords", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
     for db_field in set(dict(OBJECT_STORAGE_UPLOAD_FILES).values()):
-        file_path = dataset[db_field]
+        file_path = dataset.get(db_field)
         if not file_path:
             continue
         dataset[db_field] = object_storage.store_file(
