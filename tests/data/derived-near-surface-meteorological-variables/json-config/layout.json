@@ -1,0 +1,294 @@
+{
+  "uid": "derived-near-surface-meteorological-variables",
+  "title": "Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis",
+  "description": "",
+  "body": {
+    "main": {
+      "sections": [
+        {
+          "title": "Overview",
+          "id": "overview",
+          "blocks": [
+            {
+              "id": "abstract",
+              "type": "thumb-markdown",
+              "content": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models. \n\nThe dataset has been obtained using the same methodology used to derive the widely used water, energy and climate change (WATCH) forcing data, and is thus also referred to as WATCH Forcing Data methodology applied to ERA5 (WFDE5). The data are derived from the ERA5 reanalysis product that have been re-gridded to a half-degree resolution. Data have been adjusted using an elevation correction and monthly-scale bias corrections based on Climatic Research Unit (CRU) data (for temperature, diurnal temperature range, cloud-cover, wet days number and precipitation fields) and Global Precipitation Climatology Centre (GPCC) data (for precipitation fields only). Additional corrections are included for varying atmospheric aerosol-loading and separate precipitation gauge observations. For full details please refer to the product user-guide.\n\nThis dataset was produced on behalf of Copernicus Climate Change Service (C3S) and was generated entirely within the Climate Data Store (CDS) Toolbox. The toolbox source code is provided in the documentation tab.\n\n\n",
+              "image": "overview/overview.png"
+            },
+            {
+              "type": "table",
+              "id": "data-description",
+              "caption": "Data-description",
+              "structure": {
+                "headings": [
+                  {
+                    "id": "conventions",
+                    "label": "Conventions"
+                  },
+                  {
+                    "id": "data-type",
+                    "label": "Data-type"
+                  },
+                  {
+                    "id": "file-format",
+                    "label": "File-format"
+                  },
+                  {
+                    "id": "horizontal-coverage",
+                    "label": "Horizontal-coverage"
+                  },
+                  {
+                    "id": "horizontal-resolution",
+                    "label": "Horizontal-resolution"
+                  },
+                  {
+                    "id": "projection",
+                    "label": "Projection"
+                  },
+                  {
+                    "id": "temporal-coverage",
+                    "label": "Temporal-coverage"
+                  },
+                  {
+                    "id": "temporal-resolution",
+                    "label": "Temporal-resolution"
+                  },
+                  {
+                    "id": "update-frequency",
+                    "label": "Update-frequency"
+                  },
+                  {
+                    "id": "versions",
+                    "label": "Versions"
+                  },
+                  {
+                    "id": "vertical-coverage",
+                    "label": "Vertical-coverage"
+                  },
+                  {
+                    "id": "vertical-resolution",
+                    "label": "Vertical-resolution"
+                  }
+                ],
+                "orientation": "horizontal"
+              },
+              "content": [
+                {
+                  "conventions": "Climate and Forecast (CF) Metadata Convention v1.7"
+                },
+                {
+                  "data-type": "Gridded"
+                },
+                {
+                  "file-format": "NetCDF 4"
+                },
+                {
+                  "horizontal-coverage": "Global land"
+                },
+                {
+                  "horizontal-resolution": "0.5\u00b0 x 0.5\u00b0"
+                },
+                {
+                  "projection": "Regular latitude-longitude grid"
+                },
+                {
+                  "temporal-coverage": "From 1979  to  2019"
+                },
+                {
+                  "temporal-resolution": "Hourly"
+                },
+                {
+                  "update-frequency": "No updates expected"
+                },
+                {
+                  "versions": "1.0 (deprecated), 1.1, 2.0 and 2.1"
+                },
+                {
+                  "vertical-coverage": "Surface"
+                },
+                {
+                  "vertical-resolution": "Single level"
+                }
+              ]
+            },
+            {
+              "type": "table",
+              "id": "variables",
+              "caption": "Variables",
+              "structure": {
+                "orientation": "vertical",
+                "headings": [
+                  {
+                    "id": "name",
+                    "label": "Name"
+                  },
+                  {
+                    "id": "units",
+                    "label": "Units"
+                  },
+                  {
+                    "id": "description",
+                    "label": "Description"
+                  }
+                ]
+              },
+              "content": [
+                {
+                  "name": "Grid-point altitude",
+                  "description": "The altitude of each grid-point. Values correspond to altitudes of CRU grid-points.",
+                  "units": "m"
+                },
+                {
+                  "name": "Near-surface wind speed",
+                  "description": "The horizontal speed of the wind, or movement of air, at a height of 10 metres above the surface of the Earth. Values are derived from ERA5 near-surface wind speed.",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "Near-surface air temperature",
+                  "description": "The temperature of air at 2 metres above the surface of land, sea or inland waters. Values are derived from ERA5 2m air temperature with an elevation correction and bias correction using CRU mean monthly temperature and mean diurnal temperature range.",
+                  "units": "K"
+                },
+                {
+                  "name": "Surface air pressure",
+                  "description": "The pressure (force per unit area) of the atmosphere at the surface of land, sea and inland water. Values are derived from ERA5 surface air pressure with an elevation correction.",
+                  "units": "Pa"
+                },
+                {
+                  "name": "Near-surface specific humidity",
+                  "description": "The amount of moisture in the air divided by amount of air plus moisture at that location. Values are derived from ERA5 vapor pressure and saturation vapor pressure with an elevation correction.",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Surface downwelling longwave radiation",
+                  "description": "The amount of thermal (also known as longwave or terrestrial) radiation emitted by the atmosphere and clouds that reaches a horizontal plane at the surface of the Earth. Values are derived from ERA5 surface downwelling longwave radiation with an elevation correction.",
+                  "units": "Wm<sup>-2</sup>"
+                },
+                {
+                  "name": "Surface downwelling shortwave radiation",
+                  "description": "The amount of solar radiation (also known as shortwave radiation) that reaches a horizontal plane at the surface of the Earth. This parameter comprises both direct and diffuse solar radiation. Values are derived from ERA5 surface downwelling shortwave radiation and bias corrected using CRU cloud cover and effects of inter-annual changes in atmospheric aerosol loading.",
+                  "units": "Wm<sup>-2</sup>"
+                },
+                {
+                  "name": "Rainfall flux",
+                  "description": "The rate of rain that falls to the Earth's surface. Values are derived from ERA5 total precipitation and snowfall and are bias corrected primarily using precipitation data from CRU and GPCC.",
+                  "units": "kgm<sup>-2</sup>s<sup>-1</sup>"
+                },
+                {
+                  "name": "Snowfall flux",
+                  "description": "The rate of snow that falls to the Earth's surface. Values are derived from ERA5 total precipitation and snowfall and are bias corrected primarily using precipitation data from CRU and GPCC.",
+                  "units": "kgm<sup>-2</sup>s<sup>-1</sup>"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Download",
+          "id": "download",
+          "blocks": []
+        },
+        {
+          "title": "Documentation",
+          "id": "documentation",
+          "blocks": [
+            {
+              "id": "all_docs-0",
+              "type": "link",
+              "url": "https://confluence.ecmwf.int/x/YzmaE",
+              "title": "Product user guide",
+              "description": "Provides documentation on the algorithms used to derive the dataset as well as on the filename conventions and metedata."
+            },
+            {
+              "id": "all_docs-1",
+              "type": "link",
+              "url": "https://doi.org/10.5194/essd-12-2097-2020",
+              "title": "WFDE5: bias-adjusted ERA5 reanalysis data for impact studies",
+              "description": "A peer reviewed article which describes the methods used in the generation of this dataset and the results of the validation experiments."
+            },
+            {
+              "id": "all_docs-2",
+              "type": "link",
+              "url": "https://datastore.copernicus-climate.eu/documents/derived-near-surface-meteorological-variables/source_code.zip",
+              "title": "Version 1.0",
+              "description": "Source code used to generate version 1.0 of the dataset. The workflows are for use in the CDS toolbox."
+            },
+            {
+              "id": "all_docs-3",
+              "type": "link",
+              "url": "https://datastore.copernicus-climate.eu/documents/derived-near-surface-meteorological-variables/source_code_v1.1.zip",
+              "title": "Version 1.1",
+              "description": "Source code used to generate version 1.1 of the dataset. The workflows are for use in the CDS toolbox."
+            },
+            {
+              "id": "all_docs-4",
+              "type": "link",
+              "url": "https://datastore.copernicus-climate.eu/documents/derived-near-surface-meteorological-variables/source_code_v2.0.zip",
+              "title": "Version 2.0",
+              "description": "Source code used to generate version 2.0 of the dataset. The workflows are for use in the CDS toolbox."
+            },
+            {
+              "id": "all_docs-5",
+              "type": "link",
+              "url": "https://datastore.copernicus-climate.eu/documents/derived-near-surface-meteorological-variables/source_code_v2.1.zip",
+              "title": "Version 2.1",
+              "description": "Source code used to generate version 2.1 of the dataset. The workflows are for use in the CDS toolbox."
+            }
+          ]
+        }
+      ]
+    },
+    "aside": {
+      "blocks": [
+        {
+          "id": "contact",
+          "title": "Contact",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "portal",
+              "type": "link",
+              "url": "https://support.ecmwf.int",
+              "title": "ECMWF Support Portal"
+            }
+          ]
+        },
+        {
+          "id": "licence",
+          "title": "Licence",
+          "type": "button",
+          "scope": "licence",
+          "action": "modal",
+          "licences": [
+            "licence-to-use-copernicus-products"
+          ]
+        },
+        {
+          "id": "publication_date-section",
+          "title": "Publication date",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "publication_date-markdown",
+              "type": "markdown",
+              "content": "2020-02-11"
+            }
+          ]
+        },
+        {
+          "id": "related_applications",
+          "type": "related_artefacts",
+          "title": "Related applications",
+          "content": "applications"
+        },
+        {
+          "id": "related_dataset",
+          "type": "related_artefacts",
+          "title": "Related datasets",
+          "content": "datasets"
+        }
+      ]
+    }
+  }
+}

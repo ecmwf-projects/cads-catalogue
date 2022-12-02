@@ -16,59 +16,84 @@
               "image": "overview/overview.png"
             },
             {
-              "type": "table-vertical",
+              "type": "table",
               "id": "data-description",
               "caption": "Data-description",
-              "tableStructure": {
-                "columns": [
+              "structure": {
+                "headings": [
                   {
-                    "id": "header"
+                    "id": "file-format",
+                    "label": "File-format"
                   },
                   {
-                    "id": "content"
+                    "id": "data-type",
+                    "label": "Data-type"
+                  },
+                  {
+                    "id": "projection",
+                    "label": "Projection"
+                  },
+                  {
+                    "id": "horizontal-coverage",
+                    "label": "Horizontal-coverage"
+                  },
+                  {
+                    "id": "horizontal-resolution",
+                    "label": "Horizontal-resolution"
+                  },
+                  {
+                    "id": "vertical-coverage",
+                    "label": "Vertical-coverage"
+                  },
+                  {
+                    "id": "vertical-resolution",
+                    "label": "Vertical-resolution"
+                  },
+                  {
+                    "id": "temporal-coverage",
+                    "label": "Temporal-coverage"
+                  },
+                  {
+                    "id": "temporal-resolution",
+                    "label": "Temporal-resolution"
+                  },
+                  {
+                    "id": "update-frequency",
+                    "label": "Update-frequency"
                   }
-                ]
+                ],
+                "orientation": "horizontal"
               },
-              "tableContent": [
+              "content": [
                 {
-                  "header": "File-format",
-                  "content": "GRIB"
+                  "file-format": "GRIB"
                 },
                 {
-                  "header": "Data-type",
-                  "content": "Gridded"
+                  "data-type": "Gridded"
                 },
                 {
-                  "header": "Projection",
-                  "content": "Regular latitude-longitude grid"
+                  "projection": "Regular latitude-longitude grid"
                 },
                 {
-                  "header": "Horizontal-coverage",
-                  "content": "Global"
+                  "horizontal-coverage": "Global"
                 },
                 {
-                  "header": "Horizontal-resolution",
-                  "content": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
+                  "horizontal-resolution": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
                 },
                 {
-                  "header": "Vertical-coverage",
-                  "content": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
+                  "vertical-coverage": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
                 },
                 {
-                  "header": "Vertical-resolution",
-                  "content": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
+                  "vertical-resolution": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
                 },
                 {
-                  "header": "Temporal-coverage",
-                  "content": "January 1950 to present"
+                  "temporal-coverage": "January 1950 to present"
                 },
                 {
-                  "header": "Temporal-resolution",
-                  "content": "Hourly"
+                  "temporal-resolution": "Hourly"
                 },
                 {
-                  "header": "Update-frequency",
-                  "content": "Monthly with a delay of about three months relatively to actual date."
+                  "update-frequency": "Monthly with a delay of about three months relatively to actual date."
                 }
               ]
             },
@@ -76,10 +101,24 @@
               "type": "table",
               "id": "main-variables",
               "caption": "Main-variables",
-              "tableStructure": {
-                "columns": []
+              "structure": {
+                "orientation": "vertical",
+                "headings": [
+                  {
+                    "id": "name",
+                    "label": "Name"
+                  },
+                  {
+                    "id": "units",
+                    "label": "Units"
+                  },
+                  {
+                    "id": "description",
+                    "label": "Description"
+                  }
+                ]
               },
-              "tableContent": [
+              "content": [
                 {
                   "name": "10m u-component of wind",
                   "description": "Eastward component of the 10m wind. It is the horizontal speed of air moving towards the east, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the V component of 10m wind to give the speed and direction of the horizontal 10m wind.",
@@ -415,7 +454,7 @@
             {
               "id": "update_date-markdown",
               "type": "markdown",
-              "content": "2022-11-21"
+              "content": "gecko_run_date"
             }
           ]
         },

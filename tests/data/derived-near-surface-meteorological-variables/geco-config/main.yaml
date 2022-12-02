@@ -1,0 +1,16 @@
+title: Near surface meteorological variables from 1979 to 2019 derived from bias-corrected
+  reanalysis
+licences:
+- licence-to-use-copernicus-products
+adaptor: adaptor.url
+url: hydrology-era5.copernicus-climate.eu/WFDE5/
+suffix: .nc
+selection_limit: 1000
+toolbox: true
+publication_date: 2020-02-11
+type: dataset
+tabs:
+- overview
+- download
+- documentation
+aside: sidepanel
