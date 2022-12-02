@@ -5,10 +5,141 @@
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
-        "mapping": "an url",
         "previewimage": "an url",
-        "adaptor": "{\n  \"format_conversion\": {\n    \"netcdf_cdm\": {\n      \"split_on\": [\n        \"origin\",\n        \"type\",\n        \"dataset\"\n      ],\n      \"system_call\": [\n        \"cdscdm-translate\",\n        \"-o\",\n        \"{{outfile}}\",\n        \"--product\",\n        \"{{product}}\",\n        \"--merge_datasets\",\n        \"true\",\n        \"{{infile}}\"\n      ]\n    }\n  }\n}",
-        "adaptor_configuration": null,
+        "adaptor": null,
+        "adaptor_configuration": {
+            "format_conversion": {
+                "netcdf_cdm": {
+                    "split_on": [
+                        "origin",
+                        "type",
+                        "dataset"
+                    ],
+                    "system_call": [
+                        "cdscdm-translate",
+                        "-o",
+                        "{{outfile}}",
+                        "--product",
+                        "{{product}}",
+                        "--merge_datasets",
+                        "true",
+                        "{{infile}}"
+                    ]
+                }
+            }
+        },
+        "mapping": {
+            "force": {
+                "class": [
+                    "l5"
+                ],
+                "dataset": [
+                    "reanalysis"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "levtype": [
+                    "sfc"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "time": {
+                    "00:00": "00:00:00",
+                    "01:00": "01:00:00",
+                    "02:00": "02:00:00",
+                    "03:00": "03:00:00",
+                    "04:00": "04:00:00",
+                    "05:00": "05:00:00",
+                    "06:00": "06:00:00",
+                    "07:00": "07:00:00",
+                    "08:00": "08:00:00",
+                    "09:00": "09:00:00",
+                    "10:00": "10:00:00",
+                    "11:00": "11:00:00",
+                    "12:00": "12:00:00",
+                    "13:00": "13:00:00",
+                    "14:00": "14:00:00",
+                    "15:00": "15:00:00",
+                    "16:00": "16:00:00",
+                    "17:00": "17:00:00",
+                    "18:00": "18:00:00",
+                    "19:00": "19:00:00",
+                    "20:00": "20:00:00",
+                    "21:00": "21:00:00",
+                    "22:00": "22:00:00",
+                    "23:00": "23:00:00"
+                },
+                "variable": {
+                    "10m_u_component_of_wind": "165",
+                    "10m_v_component_of_wind": "166",
+                    "2m_dewpoint_temperature": "168",
+                    "2m_temperature": "167",
+                    "evaporation_from_bare_soil": "228101",
+                    "evaporation_from_open_water_surfaces_excluding_oceans": "228102",
+                    "evaporation_from_the_top_of_canopy": "228100",
+                    "evaporation_from_vegetation_transpiration": "228103",
+                    "forecast_albedo": "243",
+                    "lake_bottom_temperature": "228010",
+                    "lake_ice_depth": "228014",
+                    "lake_ice_temperature": "228013",
+                    "lake_mix_layer_depth": "228009",
+                    "lake_mix_layer_temperature": "228008",
+                    "lake_shape_factor": "228012",
+                    "lake_total_layer_temperature": "228011",
+                    "leaf_area_index_high_vegetation": "67",
+                    "leaf_area_index_low_vegetation": "66",
+                    "potential_evaporation": "228251",
+                    "runoff": "205",
+                    "skin_reservoir_content": "198",
+                    "skin_temperature": "235",
+                    "snow_albedo": "32",
+                    "snow_cover": "260038",
+                    "snow_density": "33",
+                    "snow_depth": "3066",
+                    "snow_depth_water_equivalent": "141",
+                    "snow_evaporation": "44",
+                    "snowfall": "144",
+                    "snowmelt": "45",
+                    "soil_temperature_level_1": "139",
+                    "soil_temperature_level_2": "170",
+                    "soil_temperature_level_3": "183",
+                    "soil_temperature_level_4": "236",
+                    "sub_surface_runoff": "9",
+                    "surface_latent_heat_flux": "147",
+                    "surface_net_solar_radiation": "176",
+                    "surface_net_thermal_radiation": "177",
+                    "surface_pressure": "134",
+                    "surface_runoff": "8",
+                    "surface_sensible_heat_flux": "146",
+                    "surface_solar_radiation_downwards": "169",
+                    "surface_thermal_radiation_downwards": "175",
+                    "temperature_of_snow_layer": "238",
+                    "total_evaporation": "182",
+                    "total_precipitation": "228",
+                    "volumetric_soil_water_layer_1": "39",
+                    "volumetric_soil_water_layer_2": "40",
+                    "volumetric_soil_water_layer_3": "41",
+                    "volumetric_soil_water_layer_4": "42"
+                }
+            },
+            "rename": {
+                "pressure_level": "levelist",
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
         "geo_extent": {
             "bboxN": 89,
             "bboxS": -89,
@@ -18,9 +149,10 @@
         "begin_date": "1982-01-01",
         "end_date": "2022-06-01",
         "publication_date": "2019-07-12",
-        "record_update": "2022-11-24 13:01:03.223265+01:00",
+        "record_update": "2022-12-02 10:18:19.654745+01:00",
         "resource_update": "2022-11-24",
         "abstract": "",
+        "citation": "Mu\u00f1oz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\nMu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac",
         "contactemail": "https://support.ecmwf.int",
         "description": [
             {
@@ -101,7 +233,7 @@
         "responsible_organisation": "ECMWF",
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
-        "title": null,
+        "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
         "unit_measure": "dd",
@@ -415,10 +547,72 @@
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
-        "mapping": "an url",
         "previewimage": "an url",
-        "adaptor": "{\n  \"adaptor.url\": {\n    \"pattern\": [\n      \"{% if product_family == 'CLARA' and time_aggregation == 'DM' %}{% if (version is not defined or version is none) %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_DM_{{ sensor_on_satellite }}_CLARA/v1.0/{{ year }}/{{ month }}/{{ variable }}dm{{ year }}{{ month }}{{ day }}000000219AVPOS01GL.nc{% endif %}{% endif %}\",\n      \"{% if product_family == 'CLARA' and time_aggregation == 'MM' %}{% if (day is not defined or day is none) %}{% if origin == 'c3s' and variable in ['SNL','SNS','SRB','SRS'] %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_MM_{{ sensor_on_satellite }}_CLARA/{{ version }}/{{ year }}/{{ month }}/{{ variable }}mm{{ year }}{{ month }}01000010.nc{% endif %}{% endif %}{% endif %}\",\n      \"{% if product_family == 'CLARA' and time_aggregation == 'MM' %}{% if (day is not defined or day is none) %}{% if origin == 'cmsaf' and variable in ['SDL','SIS','SOL'] %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_MM_{{ sensor_on_satellite }}_CLARA/{{ version }}/{{ year }}/{{ month }}/{{ variable }}mm{{ year }}{{ month }}01000000219AVPOS01GL.nc{% endif %}{% endif %}{% endif %}\",\n      \"{% if variable == 'esa_cci' and time_aggregation == 'MM' and product_family == 'CCI' %}{% if (day is not defined or day is none) and (version is not defined or version is none) %}{% if origin == 'c3s' and climate_data_record_type == 'icdr' and year in ['2017','2018','2019','2020'] and sensor_on_satellite in ['SLSTR_ORAC_Sentinel-3a','SLSTR_ORAC_Sentinel-3b'] %}http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/data/srb/{{ origin }}/{{ climate_data_record_type }}/r01/monthly/{{ year }}/{{ month }}/C3S-312bL1-L3C-MONTHLY-SRB-{{ sensor_on_satellite }}_{{ year }}{{ month }}_fv3.1.nc{% endif %}{% endif %}{% endif %}\",\n      \"{% if variable == 'esa_cci' and time_aggregation == 'MM' and product_family == 'CCI' %}{% if (day is not defined or day is none) and (version is not defined or version is none) %}{% if origin == 'esa_cci' and climate_data_record_type == 'tcdr' and year in ['1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012'] and sensor_on_satellite in ['AATSR_ORAC_ENVISAT','ATSR2_ORAC_ERS2'] %}http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/data/srb/{{ origin }}/{{ climate_data_record_type }}/r01/monthly/{{ year }}/{{ month }}/C3S-312bL1-L3C-MONTHLY-SRB-{{ sensor_on_satellite }}_{{ year }}{{ month }}_fv3.0.nc{% endif %}{% endif %}{% endif %}\"\n    ]\n  }\n}",
-        "adaptor_configuration": null,
+        "adaptor": null,
+        "adaptor_configuration": {
+            "adaptor.url": {
+                "pattern": [
+                    "{% if product_family == 'CLARA' and time_aggregation == 'DM' %}{% if (version is not defined or version is none) %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_DM_{{ sensor_on_satellite }}_CLARA/v1.0/{{ year }}/{{ month }}/{{ variable }}dm{{ year }}{{ month }}{{ day }}000000219AVPOS01GL.nc{% endif %}{% endif %}",
+                    "{% if product_family == 'CLARA' and time_aggregation == 'MM' %}{% if (day is not defined or day is none) %}{% if origin == 'c3s' and variable in ['SNL','SNS','SRB','SRS'] %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_MM_{{ sensor_on_satellite }}_CLARA/{{ version }}/{{ year }}/{{ month }}/{{ variable }}mm{{ year }}{{ month }}01000010.nc{% endif %}{% endif %}{% endif %}",
+                    "{% if product_family == 'CLARA' and time_aggregation == 'MM' %}{% if (day is not defined or day is none) %}{% if origin == 'cmsaf' and variable in ['SDL','SIS','SOL'] %}https://c3s.satproj.klima.dwd.de/data/data/c3s_312b_lot1/srb/{{ origin }}/{{ climate_data_record_type }}/{{ variable }}_MM_{{ sensor_on_satellite }}_CLARA/{{ version }}/{{ year }}/{{ month }}/{{ variable }}mm{{ year }}{{ month }}01000000219AVPOS01GL.nc{% endif %}{% endif %}{% endif %}",
+                    "{% if variable == 'esa_cci' and time_aggregation == 'MM' and product_family == 'CCI' %}{% if (day is not defined or day is none) and (version is not defined or version is none) %}{% if origin == 'c3s' and climate_data_record_type == 'icdr' and year in ['2017','2018','2019','2020'] and sensor_on_satellite in ['SLSTR_ORAC_Sentinel-3a','SLSTR_ORAC_Sentinel-3b'] %}http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/data/srb/{{ origin }}/{{ climate_data_record_type }}/r01/monthly/{{ year }}/{{ month }}/C3S-312bL1-L3C-MONTHLY-SRB-{{ sensor_on_satellite }}_{{ year }}{{ month }}_fv3.1.nc{% endif %}{% endif %}{% endif %}",
+                    "{% if variable == 'esa_cci' and time_aggregation == 'MM' and product_family == 'CCI' %}{% if (day is not defined or day is none) and (version is not defined or version is none) %}{% if origin == 'esa_cci' and climate_data_record_type == 'tcdr' and year in ['1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012'] and sensor_on_satellite in ['AATSR_ORAC_ENVISAT','ATSR2_ORAC_ERS2'] %}http://gws-access.ceda.ac.uk/public/cds_c3s_cloud/c3s_312b_lot1/data/srb/{{ origin }}/{{ climate_data_record_type }}/r01/monthly/{{ year }}/{{ month }}/C3S-312bL1-L3C-MONTHLY-SRB-{{ sensor_on_satellite }}_{{ year }}{{ month }}_fv3.0.nc{% endif %}{% endif %}{% endif %}"
+                ]
+            }
+        },
+        "mapping": {
+            "options": {
+                "wants_ymd": true
+            },
+            "remap": {
+                "climate_data_record_type": {
+                    "interim_climate_data_record": "icdr",
+                    "thematic_climate_data_record": "tcdr"
+                },
+                "origin": {
+                    "esa": "esa_cci",
+                    "eumetsat": "cmsaf"
+                },
+                "product_family": {
+                    "cci": "CCI",
+                    "clara": "CLARA"
+                },
+                "sensor_on_satellite": {
+                    "aatsr_on_envisat": "AATSR_ORAC_ENVISAT",
+                    "atsr2_on_ers2": "ATSR2_ORAC_ERS2",
+                    "avhrr_on_multiple_satellites": "AVHRR",
+                    "slstr_on_sentinel_3a_is_under_investigation": "SLSTR_ORAC_Sentinel-3a",
+                    "slstr_on_sentinel_3b_is_under_investigation": "SLSTR_ORAC_Sentinel-3b"
+                },
+                "time_aggregation": {
+                    "daily_mean": "DM",
+                    "monthly_mean": "MM"
+                },
+                "variable": {
+                    "all_variables": "esa_cci",
+                    "surface_downwelling_longwave_flux": "SDL",
+                    "surface_downwelling_shortwave_flux": "SIS",
+                    "surface_net_downward_longwave_flux": "SNL",
+                    "surface_net_downward_radiative_flux": "SRB",
+                    "surface_net_downward_shortwave_flux": "SNS",
+                    "surface_upwelling_longwave_flux": "SOL",
+                    "surface_upwelling_shortwave_flux": "SRS"
+                },
+                "version": {
+                    "v2_0": "v2.0",
+                    "v2_0_1": "v2.0.1",
+                    "v2_1": "v2.1",
+                    "v2_2": "v2.2"
+                }
+            },
+            "rename": {
+                "format": "resultcombiner"
+            },
+            "selection_limit": 1200,
+            "selection_limit_ignore": [
+                "area"
+            ]
+        },
         "geo_extent": {
             "bboxN": 89,
             "bboxS": -89,
@@ -428,9 +622,10 @@
         "begin_date": "1982-01-01",
         "end_date": "2021-12-01",
         "publication_date": "2020-10-20",
-        "record_update": "2022-11-24 13:01:03.227989+01:00",
+        "record_update": "2022-12-02 10:18:19.659621+01:00",
         "resource_update": null,
         "abstract": "",
+        "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
         "documentation": [

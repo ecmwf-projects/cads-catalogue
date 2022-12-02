@@ -60,12 +60,12 @@ class Resource(BaseModel):
     constraints = sa.Column(sa.String)
     form = sa.Column(sa.String)
     layout = sa.Column(sa.String)
-    mapping = sa.Column(sa.String)
     previewimage = sa.Column(sa.String)
 
     # internal functionality related
     adaptor = sa.Column(sa.String)
     adaptor_configuration = sa.Column(sa.JSON)
+    mapping = sa.Column(sa.JSON)
 
     # geo extent
     geo_extent = sa.Column(sa.JSON)

@@ -34,8 +34,7 @@ OBJECT_STORAGE_UPLOAD_FILES = [
     # (file_name, "db_field_name),
     ("constraints.json", "constraints"),
     ("form.json", "form"),
-    ("layout.json", "layout"),  # FIXME: or use the static file?
-    ("mapping.json", "mapping"),
+    ("layout.json", "layout"),
     ("overview.png", "previewimage"),
     ("overview.jpg", "previewimage"),
 ]
@@ -234,17 +233,20 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """
     metadata = dict()
     json_folder_path = os.path.join(folder_path, "json-config")
-    adaptor_file_path = os.path.join(json_folder_path, "adaptor.json")
-    adaptor_config_file_path = os.path.join(
-        json_folder_path, "adaptor_configuration.json"
-    )
-    for file_path, db_field in [
-        (adaptor_file_path, "adaptor"),
-        (adaptor_config_file_path, "adaptor_configuration"),
-    ]:
+    json_files_db_map = [
+        ("adaptor.json", "adaptor_configuration"),
+        ("mapping.json", "mapping"),
+    ]
+    for file_name, db_field in json_files_db_map:
+        file_path = os.path.join(json_folder_path, file_name)
         if os.path.isfile(file_path):
             with open(file_path) as fp:
-                metadata[db_field] = fp.read()
+                metadata[db_field] = json.load(fp)
+
+    adaptor_code_path = os.path.join(json_folder_path, "adaptor.py")
+    if os.path.isfile(adaptor_code_path):
+        with open(adaptor_code_path) as fp:
+            metadata["adaptor"] = fp.read()
     return metadata
 
 
@@ -482,6 +484,7 @@ def store_dataset(
     """
     dataset = dataset_md.copy()
     licence_uids = dataset.pop("licence_uids", [])
+    _ = dataset.pop("related_resources_keywords", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
     for db_field in set(dict(OBJECT_STORAGE_UPLOAD_FILES).values()):
         file_path = dataset[db_field]
@@ -516,9 +519,9 @@ def find_related_resources(
 
     Each input resources is a python dictionary as returned by the function
     load_resource_from_folder.
-    At the moment the current implementation filters input resources in this way:
-     - look for resources with the same (not empty) list of "keywords" metadata
-    It assumes that the relationship is commutative.
+    Links from a resource A to resource B created this way:
+     - B has a (not empty) list of "keywords" metadata completely included in A's keywords
+     - B has at least one common element in the "related_resources_keywords"
 
     Parameters
     ----------
@@ -526,17 +529,18 @@ def find_related_resources(
 
     Returns
     -------
-    list: list of tuples (res1, res2), when res1 and res2 are related input resources.
+    list: list of tuples [(res1, res2), ...], where (res1, res2) means: res1 has a link to res2
     """
     relationships_found = []
-    all_possible_related_resources = itertools.combinations(resources, 2)
-    for (res1, res2) in all_possible_related_resources:
-        res1_keywords = res1.get("keywords", [])
-        res2_keywords = res2.get("keywords", [])
-        if set(res1_keywords) == set(res2_keywords) and len(res1_keywords) > 0:
+    all_possible_relationships = itertools.permutations(resources, 2)
+    for (res1, res2) in all_possible_relationships:
+        res1_keywords = set(res1.get("keywords", []))
+        res2_keywords = set(res2.get("keywords", []))
+        if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
-        res1_rel_res_kws = res1.get("related_resources_keywords", [])
-        res2_rel_res_kws = res2.get("related_resources_keywords", [])
-        if set(res1_rel_res_kws) & set(res2_rel_res_kws):
+            continue
+        res1_rel_res_kws = set(res1.get("related_resources_keywords", []))
+        res2_rel_res_kws = set(res2.get("related_resources_keywords", []))
+        if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found
