@@ -16,84 +16,59 @@
               "image": "overview/overview.png"
             },
             {
-              "type": "table",
+              "type": "table-vertical",
               "id": "data-description",
               "caption": "Data-description",
-              "structure": {
-                "headings": [
+              "tableStructure": {
+                "columns": [
                   {
-                    "id": "file-format",
-                    "label": "File-format"
+                    "id": "header"
                   },
                   {
-                    "id": "data-type",
-                    "label": "Data-type"
-                  },
-                  {
-                    "id": "projection",
-                    "label": "Projection"
-                  },
-                  {
-                    "id": "horizontal-coverage",
-                    "label": "Horizontal-coverage"
-                  },
-                  {
-                    "id": "horizontal-resolution",
-                    "label": "Horizontal-resolution"
-                  },
-                  {
-                    "id": "vertical-coverage",
-                    "label": "Vertical-coverage"
-                  },
-                  {
-                    "id": "vertical-resolution",
-                    "label": "Vertical-resolution"
-                  },
-                  {
-                    "id": "temporal-coverage",
-                    "label": "Temporal-coverage"
-                  },
-                  {
-                    "id": "temporal-resolution",
-                    "label": "Temporal-resolution"
-                  },
-                  {
-                    "id": "update-frequency",
-                    "label": "Update-frequency"
+                    "id": "content"
                   }
-                ],
-                "orientation": "horizontal"
+                ]
               },
-              "content": [
+              "tableContent": [
                 {
-                  "file-format": "GRIB"
+                  "header": "File-format",
+                  "content": "GRIB"
                 },
                 {
-                  "data-type": "Gridded"
+                  "header": "Data-type",
+                  "content": "Gridded"
                 },
                 {
-                  "projection": "Regular latitude-longitude grid"
+                  "header": "Projection",
+                  "content": "Regular latitude-longitude grid"
                 },
                 {
-                  "horizontal-coverage": "Global"
+                  "header": "Horizontal-coverage",
+                  "content": "Global"
                 },
                 {
-                  "horizontal-resolution": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
+                  "header": "Horizontal-resolution",
+                  "content": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
                 },
                 {
-                  "vertical-coverage": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
+                  "header": "Vertical-coverage",
+                  "content": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
                 },
                 {
-                  "vertical-resolution": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
+                  "header": "Vertical-resolution",
+                  "content": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
                 },
                 {
-                  "temporal-coverage": "January 1950 to present"
+                  "header": "Temporal-coverage",
+                  "content": "January 1950 to present"
                 },
                 {
-                  "temporal-resolution": "Hourly"
+                  "header": "Temporal-resolution",
+                  "content": "Hourly"
                 },
                 {
-                  "update-frequency": "Monthly with a delay of about three months relatively to actual date."
+                  "header": "Update-frequency",
+                  "content": "Monthly with a delay of about three months relatively to actual date."
                 }
               ]
             },
@@ -101,24 +76,10 @@
               "type": "table",
               "id": "main-variables",
               "caption": "Main-variables",
-              "structure": {
-                "orientation": "vertical",
-                "headings": [
-                  {
-                    "id": "name",
-                    "label": "Name"
-                  },
-                  {
-                    "id": "units",
-                    "label": "Units"
-                  },
-                  {
-                    "id": "description",
-                    "label": "Description"
-                  }
-                ]
+              "tableStructure": {
+                "columns": []
               },
-              "content": [
+              "tableContent": [
                 {
                   "name": "10m u-component of wind",
                   "description": "Eastward component of the 10m wind. It is the horizontal speed of air moving towards the east, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the V component of 10m wind to give the speed and direction of the horizontal 10m wind.",
@@ -379,11 +340,11 @@
           "blocks": []
         },
         {
-          "title": "Documentation",
+          "title": "documentation",
           "id": "documentation",
           "blocks": [
             {
-              "id": "all_docs-0",
+              "id": "online_documentation",
               "type": "link",
               "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
               "title": "ERA5-Land online documentation",
@@ -454,7 +415,7 @@
             {
               "id": "update_date-markdown",
               "type": "markdown",
-              "content": "gecko_run_date"
+              "content": "2022-11-20"
             }
           ]
         },
