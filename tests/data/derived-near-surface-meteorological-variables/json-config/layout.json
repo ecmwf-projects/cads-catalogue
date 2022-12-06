@@ -278,13 +278,13 @@
         },
         {
           "id": "related_applications",
-          "type": "related_artefacts",
+          "type": "related_entries",
           "title": "Related applications",
           "content": "applications"
         },
         {
           "id": "related_dataset",
-          "type": "related_artefacts",
+          "type": "related_entries",
           "title": "Related datasets",
           "content": "datasets"
         }

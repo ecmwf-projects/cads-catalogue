@@ -3,8 +3,8 @@
         "class": [
             "l5"
         ],
-        "dataset": [
-            "reanalysis"
+        "day": [
+            "01"
         ],
         "expect": [
             "any"
@@ -20,6 +20,10 @@
         "wants_dates": true
     },
     "remap": {
+        "product_type": {
+            "monthly_averaged_reanalysis": "reanalysis-monthly-means-of-daily-means",
+            "monthly_averaged_reanalysis_by_hour_of_day": "reanalysis-synoptic-monthly-means"
+        },
         "time": {
             "00:00": "00:00:00",
             "01:00": "01:00:00",
