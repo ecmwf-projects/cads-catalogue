@@ -212,7 +212,7 @@ def load_resource_abstract(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """
     metadata = dict()
     metadata["abstract"] = ""
-    overview_file_path = os.path.join(folder_path, "overview", "overview.md")
+    overview_file_path = os.path.join(folder_path, "content", "overview", "overview.md")
     if not os.path.isfile(overview_file_path):
         return metadata
     with open(overview_file_path) as fp:
@@ -376,7 +376,7 @@ def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
     variable_id_map = load_variable_id_map(form_json_path, mapping_json_path)
     variables: list[dict[str, str]] = []
     for variable_name, properties in variables_data.get(
-        "main-variables", dict()
+        "main variables", dict()
     ).items():
         variable_item = {
             "id": variable_id_map[variable_name],

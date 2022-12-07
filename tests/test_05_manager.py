@@ -257,7 +257,40 @@ def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(TESTDATA_PATH, "reanalysis-era5-land")
     resource = manager.load_resource_from_folder(resource_folder_path)
     expected_resource = {
-        "abstract": "",
+        "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view "
+                    "of the evolution of land variables over several decades at an "
+                    "enhanced resolution compared to ERA5. ERA5-Land has been produced "
+                    "by replaying the land component of the ECMWF ERA5 climate reanalysis. "
+                    "Reanalysis combines model data with observations from across the world "
+                    "into a globally complete and consistent dataset using the laws of physics. "
+                    "Reanalysis produces data that goes several decades back in time, "
+                    "providing an accurate description of the climate of the past. \n\n"
+                    "ERA5-Land uses as input to control the simulated land fields ERA5 "
+                    "atmospheric variables, such as air temperature and air humidity. "
+                    "This is called the atmospheric forcing. Without the constraint of "
+                    "the atmospheric forcing, the model-based estimates can rapidly deviate "
+                    "from reality. Therefore, while observations are not directly used in "
+                    "the production of ERA5-Land, they have an indirect influence through "
+                    "the atmospheric forcing used to run the simulation. In addition, the "
+                    "input air temperature, air humidity and pressure used to run ERA5-Land"
+                    " are corrected to account for the altitude difference between the grid"
+                    " of the forcing and the higher resolution grid of ERA5-Land. This "
+                    "correction is called 'lapse rate correction'.    \n\n"
+                    "The ERA5-Land dataset, as any other simulation, provides estimates"
+                    " which have some degree of uncertainty. Numerical models can only "
+                    "provide a more or less accurate representation of the real physical "
+                    "processes governing different components of the Earth System. In general, "
+                    "the uncertainty of model estimates grows as we go back in time, "
+                    "because the number of observations available to create a good "
+                    "quality atmospheric forcing is lower. ERA5-land parameter fields "
+                    "can currently be used in combination with the uncertainty of the "
+                    "equivalent ERA5 fields. \n\nThe temporal and spatial resolutions "
+                    "of ERA5-Land makes this dataset very useful for all kind of land "
+                    "surface applications such as flood or drought forecasting. The "
+                    "temporal and spatial resolution of this dataset, the period covered"
+                    " in time, as well as the fixed grid used for the data distribution "
+                    "at any period enables decisions makers, businesses and individuals"
+                    " to access and use more accurate information on land states.\n\n\n",
         "adaptor_configuration": {
             "format_conversion": {
                 "netcdf.zip": {
@@ -290,13 +323,8 @@ def test_load_resource_from_folder() -> None:
         ),
         "contactemail": "https://support.ecmwf.int",
         "description": [
-            {"id": "file-format", "label": "File format", "value": "GRIB"},
             {"id": "data-type", "label": "Data type", "value": "Gridded"},
-            {
-                "id": "projection",
-                "label": "Projection",
-                "value": "Regular latitude-longitude grid",
-            },
+            {"id": "file-format", "label": "File format", "value": "GRIB"},
             {
                 "id": "horizontal-coverage",
                 "label": "Horizontal coverage",
@@ -308,18 +336,9 @@ def test_load_resource_from_folder() -> None:
                 "value": "0.1° x 0.1°; Native resolution is 9 km.",
             },
             {
-                "id": "vertical-coverage",
-                "label": "Vertical coverage",
-                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n",
-            },
-            {
-                "id": "vertical-resolution",
-                "label": "Vertical resolution",
-                "value": "4 levels of the ECMWF surface model: Layer 1: 0 "
-                "-7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer "
-                "4: 100-289cm\n"
-                "Some parameters are defined at 2 m over the "
-                "surface.\n",
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid",
             },
             {
                 "id": "temporal-coverage",
@@ -334,8 +353,19 @@ def test_load_resource_from_folder() -> None:
             {
                 "id": "update-frequency",
                 "label": "Update frequency",
-                "value": "Monthly with a delay of about three months "
-                "relatively to actual date.",
+                "value": "Monthly with a delay of about three months relatively to actual date.",
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n",
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, "
+                "Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\n"
+                "Some parameters are defined at 2 m over the surface.\n",
             },
         ],
         "documentation": [
@@ -352,7 +382,7 @@ def test_load_resource_from_folder() -> None:
         "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
         "ds_responsible_organisation_role": "publisher",
-        "end_date": "2022-09-01",
+        "end_date": "2022-10-01",
         "file_format": "grib",
         "form": os.path.join(resource_folder_path, "json-config", "form.json"),
         "format_version": None,
@@ -473,7 +503,7 @@ def test_load_resource_from_folder() -> None:
         "related_resources_keywords": [],
         "representative_fraction": 0.25,
         "resource_uid": "reanalysis-era5-land",
-        "resource_update": "2022-11-21",
+        "resource_update": "2022-12-02",
         "responsible_organisation": "ECMWF",
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",

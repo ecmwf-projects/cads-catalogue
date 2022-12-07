@@ -79,7 +79,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert spy_initdb.call_count == 1
-    assert patch.call_count == 15
+    assert patch.call_count == 21
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
     assert patch.mock_calls[0].kwargs == {
@@ -148,7 +148,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         "SELECT related_resource_id, parent_resource_id, child_resource_id"
         " FROM related_resources ORDER BY related_resource_id"
     ).all()
-    assert res == []
+    assert res == [(1, 4, 2), (2, 2, 4), (3, 5, 3), (4, 3, 5)]
     session.close()
 
     # spy_initdb.reset_mock()
