@@ -30,6 +30,12 @@ from cads_catalogue import database, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 DATA_PATH = os.path.join(THIS_PATH, "db_data")
+TEST_LICENCES_DATA_PATH = os.path.abspath(
+    os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
+)
+TEST_RESOURCES_DATA_PATH = os.path.abspath(
+    os.path.join(THIS_PATH, "..", "tests", "data")
+)
 
 
 def object_as_dict(obj: Any) -> dict[str, Any]:

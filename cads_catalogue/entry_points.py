@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os.path
+import pathlib
 from typing import Any
 
 import sqlalchemy as sa
@@ -70,7 +71,14 @@ DATASETS = [
 
 @app.command()
 def setup_test_database(
-    connection_string: str | None = None, force: bool = False
+    connection_string: str | None = None,
+    force: bool = False,
+    resources_folder_path: pathlib.Path = typer.Option(
+        manager.TEST_RESOURCES_DATA_PATH, exists=True, file_okay=False
+    ),
+    licences_folder_path: pathlib.Path = typer.Option(
+        manager.TEST_LICENCES_DATA_PATH, exists=True, file_okay=False
+    ),
 ) -> None:
     """Fill the database with some test data.
 
@@ -82,6 +90,8 @@ def setup_test_database(
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     force: if True, create db from scratch also if already existing (default False)
+    resources_folder_path: path to the root folder containing metadata files for resources
+    licences_folder_path: path to the root folder containing metadata files for licences
     """
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
@@ -113,10 +123,6 @@ def setup_test_database(
         "secure": False,
     }
     # load test data
-    this_path = os.path.abspath(os.path.dirname(__file__))
-    licences_folder_path = os.path.abspath(
-        os.path.join(this_path, "../tests/data/cds-licences")
-    )
     licences = manager.load_licences_from_folder(licences_folder_path)
     session_obj = sa.orm.sessionmaker(engine)
     with session_obj() as session:
@@ -124,11 +130,15 @@ def setup_test_database(
         try:
             manager.store_licences(session, licences, object_storage_url, **storage_kws)
             resources = []
+            # TODO: move resources_folder_path in a folder that not include cds-licences;
+            #       then, do not use DATASETS but datasets found inside
             for dataset in DATASETS:
-                resource_folder_path = os.path.abspath(
-                    os.path.join(this_path, "../tests/data", dataset)
+                current_resource_folder_path = os.path.abspath(
+                    os.path.join(resources_folder_path, dataset)
                 )
-                resource = manager.load_resource_from_folder(resource_folder_path)
+                resource = manager.load_resource_from_folder(
+                    current_resource_folder_path
+                )
                 resources.append(resource)
             related_resources = manager.find_related_resources(resources)
             for resource in resources:
