@@ -209,7 +209,8 @@
         },
         "contact": "copernicus-support@ecmwf.int",
         "doi": null,
-        "form": [
+        "form": "an url",
+        "form_data": [
             {
                 "details": {
                     "id": 0,
@@ -1252,7 +1253,7 @@
             "collection_id": "cams-global-reanalysis-eac4-monthly"
         },
         "adaptor": null,
-        "record_update": "2022-12-15 11:34:24.844018+01:00",
+        "record_update": "2022-12-15 12:18:47.954303+01:00",
         "references": [],
         "resource_update": null,
         "use_eqc": null
@@ -1359,7 +1360,8 @@
         },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.20d54e34",
-        "form": [
+        "form": "an url",
+        "form_data": [
             {
                 "css": "todo",
                 "details": {
@@ -1727,7 +1729,7 @@
             ]
         },
         "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    data_format = request.pop(\"format\", \"zip\")\n\n    if data_format not in {\"zip\", \"tgz\"}:\n        raise ValueError(f\"{data_format=} is not supported\")\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls(\n        [ru[\"url\"] for ru in requests_urls],\n        data_format=data_format\n    )\n    return open(path, \"rb\")\n",
-        "record_update": "2022-12-15 11:34:24.819195+01:00",
+        "record_update": "2022-12-15 12:18:47.913906+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -1919,7 +1921,8 @@
         },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.e2161bac",
-        "form": [
+        "form": "an url",
+        "form_data": [
             {
                 "css": "todo",
                 "details": {
@@ -2873,7 +2876,7 @@
         "publication_date": "2019-07-12",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-12-15 11:34:24.830492+01:00",
+        "record_update": "2022-12-15 12:18:47.934011+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -3062,7 +3065,8 @@
         },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.68d2bb30",
-        "form": [
+        "form": "an url",
+        "form_data": [
             {
                 "css": "todo",
                 "details": {
@@ -3965,7 +3969,7 @@
         "publication_date": "2019-06-23",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-12-15 11:34:24.823652+01:00",
+        "record_update": "2022-12-15 12:18:47.921220+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -4113,7 +4117,8 @@
         },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.bd0915c6",
-        "form": [
+        "form": "an url",
+        "form_data": [
             {
                 "css": "todo",
                 "details": {
@@ -4829,7 +4834,7 @@
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-12-15 11:34:24.827563+01:00",
+        "record_update": "2022-12-15 12:18:47.928964+01:00",
         "references": [
             {
                 "title": "Citation",
@@ -5225,7 +5230,8 @@
         },
         "contact": "https://support.ecmwf.int",
         "doi": "10.24381/cds.adbb2d47",
-        "form": [
+        "form": "an url",
+        "form_data": [
             {
                 "css": "todo",
                 "details": {
@@ -7984,7 +7990,7 @@
         "publication_date": "2018-06-14",
         "adaptor_configuration": null,
         "adaptor": null,
-        "record_update": "2022-12-15 11:34:24.833888+01:00",
+        "record_update": "2022-12-15 12:18:47.940526+01:00",
         "references": [
             {
                 "title": "Citation",

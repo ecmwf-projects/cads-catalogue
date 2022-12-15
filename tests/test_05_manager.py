@@ -126,7 +126,8 @@ def test_load_resource_from_folder() -> None:
                 "dataset can be found in the Copernicus Knowledge Base web link above.",
             }
         ],
-        "form": json.load(form_fp),
+        "form": os.path.join(resource_folder_path, "form.json"),
+        "form_data": json.load(form_fp),
         "constraints": os.path.join(resource_folder_path, "constraints.json"),
         "doi": "10.24381/cds.68d2bb30",
         "keywords": [
@@ -902,12 +903,13 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         session, resource, object_storage_url, **storage_kws
     )
     session.commit()
-    assert patch.call_count == 4
+    assert patch.call_count == 5
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land-monthly-means"
     kwargs["force"] = True
     effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
     for file_name in [
+        "form.json",
         "layout.json",
         "overview.png",
         "constraints.json",
@@ -923,11 +925,13 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     for column, value in stored_record.items():
         if column not in [
             "record_update",
+            "form",
             "constraints",
             "previewimage",
             "layout",
         ]:
             assert resource.get(column) == value
+    assert stored_record["form"] == "an url"
     assert stored_record["constraints"] == "an url"
     assert stored_record["previewimage"] == "an url"
     assert stored_record["layout"] == "an url"
