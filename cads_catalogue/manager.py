@@ -223,6 +223,9 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     if "mapping.json" in file_names:
         with open(os.path.join(folder_path, "mapping.json")) as fp:
             metadata["mapping"] = json.load(fp)
+    if "form.json" in file_names:
+        with open(os.path.join(folder_path, "form.json")) as fp:
+            metadata["form"] = json.load(fp)
     if "dataset.yaml" in file_names:
         with open(os.path.join(folder_path, "dataset.yaml")) as fp:
             data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
@@ -245,7 +248,6 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
                 os.path.join(folder_path, candidate_name)
             )
     for file_name, db_field_name in [
-        ("form.json", "form"),
         ("constraints.json", "constraints"),
         ("layout.json", "layout"),
     ]:
@@ -376,7 +378,7 @@ def store_dataset(
     dataset = dataset_md.copy()
     licence_uids = dataset.pop("licence_uids", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
-    obj_storage_fields = ["form", "previewimage", "constraints", "layout"]
+    obj_storage_fields = ["previewimage", "constraints", "layout"]
     for field in obj_storage_fields:
         file_path = dataset[field]
         dataset[field] = object_storage.store_file(

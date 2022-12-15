@@ -61,7 +61,7 @@ class Resource(BaseModel):
     mapping = sa.Column(sa.JSON)
     contact = sa.Column(sa.String)
     doi = sa.Column(sa.String)
-    form = sa.Column(sa.String)
+    form = sa.Column(sa.JSON)
     constraints = sa.Column(sa.String)
     keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     version = sa.Column(sa.VARCHAR(300))
