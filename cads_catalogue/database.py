@@ -103,19 +103,13 @@ class Licence(BaseModel):
     __tablename__ = "licences"
 
     licence_id = sa.Column(sa.Integer, primary_key=True)
-    licence_uid = sa.Column(sa.String, index=True, nullable=False)
+    licence_uid = sa.Column(sa.String, index=True, nullable=False, unique=True)
     revision = sa.Column(sa.Integer, index=True, nullable=False)
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
 
     resources = sa.orm.relationship(
         "Resource", secondary="resources_licences", back_populates="licences"
-    )
-
-    __table_args__ = (
-        sa.schema.UniqueConstraint(
-            "licence_uid", "revision", name="licence_uid_revision_uc"
-        ),
     )
 
 

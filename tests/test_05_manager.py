@@ -11,23 +11,39 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def test_load_metadata_licences() -> None:
+def test_load_licences_from_folder(capsys) -> None:
     # test data taken from repository "https://git.ecmwf.int/projects/CDS/repos/cds-licences"
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     expected_licences = [
         {
+            "licence_uid": "igra-data-policy",
+            "revision": 1,
+            "title": "IGRA data policy",
             "download_filename": os.path.join(
-                licences_folder_path, "licence-to-use-copernicus-products.pdf"
+                licences_folder_path, "igra-data-policy.pdf"
             ),
+        },
+        {
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
-        }
+            "download_filename": os.path.join(
+                licences_folder_path, "licence-to-use-copernicus-products.pdf"
+            ),
+        },
     ]
 
     licences = manager.load_licences_from_folder(licences_folder_path)
 
     assert licences == expected_licences
+
+    # test no load of old revisions
+    captured = capsys.readouterr()
+    licences = manager.load_licences_from_folder(
+        licences_folder_path, exclude_strings=()
+    )
+    assert licences == expected_licences
+    assert captured.out == "hello\n"
 
 
 def test_load_resource_from_folder() -> None:

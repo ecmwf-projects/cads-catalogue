@@ -20,7 +20,7 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any
+from typing import Any, Iterable
 
 import yaml
 from sqlalchemy import inspect
@@ -43,37 +43,57 @@ def object_as_dict(obj: Any) -> dict[str, Any]:
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
-def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
-    """Load licences metadata from json files contained in a folder.
+def load_licences_from_folder(
+    folder_path: str | pathlib.Path,
+    exclude_strings: Iterable[str] = ("deprecated", "decomised"),
+) -> list[dict[str, str]]:
+    """Load a list of metadata of licences from a cds_licences-like folder.
 
     Parameters
     ----------
-    folder_path: the folder path where to look for json files
+    folder_path: a folder containing metadata of licences
+    exclude_strings: lowered list of strings to consider to exclude some json file names
 
     Returns
     -------
-    list: list of dictionaries of metadata collected
+    List of metadata of licences, as dictionaries of kind {'licence_uid': ..., ...}
     """
-    licences = []
     json_filepaths = glob.glob(os.path.join(folder_path, "*.json"))
+    loaded_licences = dict()
     for json_filepath in json_filepaths:
-        if "deprecated" in os.path.basename(json_filepath).lower():
+        json_filename = os.path.basename(json_filepath).lower()
+        excluded = [r for r in exclude_strings if r in json_filename]
+        if excluded:
             continue
         with open(json_filepath) as fp:
             json_data = json.load(fp)
             try:
-                licence = {
+                licence_md = {
                     "licence_uid": json_data["id"],
-                    "revision": json_data["revision"],
+                    "revision": int(json_data["revision"]),
                     "title": json_data["title"],
                     "download_filename": os.path.abspath(
                         os.path.join(folder_path, json_data["downloadableFilename"])
                     ),
                 }
-            except KeyError:
-                continue
-            licences.append(licence)
-    return licences
+                assert os.path.isfile(licence_md["download_filename"])
+            except (KeyError, ValueError, TypeError, AssertionError):
+                print("error: wrong licence metadata at path %r" % json_filepath)
+                raise
+            licence_uid = licence_md["licence_uid"]
+            current_revision = licence_md["revision"]
+            if licence_uid not in loaded_licences:
+                # new licence found: store metadata
+                loaded_licences[licence_uid] = licence_md
+            else:
+                # there is a duplicated slug
+                print("warning: the licence_uid %r is used in more than 1 file, "
+                      "older licences will be ignored" % licence_uid)
+                if loaded_licences[licence_uid]["revision"] <= current_revision:
+                    # new version: update metadata
+                    loaded_licences[licence_uid] = licence_md
+    ret_value = [loaded_licences[k] for k in sorted(loaded_licences.keys())]
+    return ret_value
 
 
 def build_description(data: dict[str, Any]) -> list[dict[str, Any]]:
