@@ -87,8 +87,10 @@ def load_licences_from_folder(
                 loaded_licences[licence_uid] = licence_md
             else:
                 # there is a duplicated slug
-                print("warning: the licence_uid %r is used in more than 1 file, "
-                      "older licences will be ignored" % licence_uid)
+                print(
+                    "warning: the licence_uid %r is used in more than 1 file, "
+                    "older licences will be ignored" % licence_uid
+                )
                 if loaded_licences[licence_uid]["revision"] <= current_revision:
                     # new version: update metadata
                     loaded_licences[licence_uid] = licence_md

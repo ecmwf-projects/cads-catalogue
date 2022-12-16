@@ -43,9 +43,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     sqlalchemy_utils.drop_database(connection_string)
     engine = sa.create_engine(connection_string)
     session_obj = sessionmaker(engine)
-    licence_path = os.path.join(
-        TESTDATA_PATH, "cds-licences/licence-to-use-copernicus-products.pdf"
-    )
+    licence_path = os.path.join(TESTDATA_PATH, "cds-licences/igra-data-policy.pdf")
     object_storage_url = "http://myobject-storage:myport/"
     object_storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
@@ -54,14 +52,20 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     }
     expected_licences = [
         {
-            "download_filename": "an url",
             "licence_id": 1,
+            "licence_uid": "igra-data-policy",
+            "revision": 1,
+            "title": "IGRA data policy",
+            "download_filename": "an url",
+        },
+        {
+            "licence_id": 2,
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
-        }
+            "download_filename": "an url",
+        },
     ]
-
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
@@ -80,12 +84,12 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert spy_initdb.call_count == 1
-    assert patch.call_count == 33
+    assert patch.call_count == 34
     # store of pdf of licence
     assert patch.mock_calls[0].args == (licence_path, object_storage_url)
     assert patch.mock_calls[0].kwargs == {
         "force": True,
-        "subpath": "licences/licence-to-use-copernicus-products",
+        "subpath": "licences/igra-data-policy",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,

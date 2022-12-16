@@ -38,12 +38,12 @@ def test_load_licences_from_folder(capsys) -> None:
     assert licences == expected_licences
 
     # test no load of old revisions
-    captured = capsys.readouterr()
     licences = manager.load_licences_from_folder(
         licences_folder_path, exclude_strings=()
     )
     assert licences == expected_licences
-    assert captured.out == "hello\n"
+    captured = capsys.readouterr()
+    assert "licence_uid 'licence-to-use-copernicus-products'" in captured.out
 
 
 def test_load_resource_from_folder() -> None:
@@ -867,12 +867,12 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     session.commit()
     assert patch.call_count == len(licences)
     assert patch.mock_calls[0].args == (
-        os.path.join(licences_folder_path, "licence-to-use-copernicus-products.pdf"),
+        os.path.join(licences_folder_path, "igra-data-policy.pdf"),
         object_storage_url,
     )
     assert patch.mock_calls[0].kwargs == {
         "force": True,
-        "subpath": "licences/licence-to-use-copernicus-products",
+        "subpath": "licences/igra-data-policy",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,
@@ -907,7 +907,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
         TESTDATA_PATH, "reanalysis-era5-land-monthly-means"
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
-    assert resource["licence_uids"] == [licences[0]["licence_uid"]]
+    assert resource["licence_uids"] == [licences[1]["licence_uid"]]
     res = session.query(database.Resource).all()
     assert res == []
 
@@ -953,7 +953,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     assert stored_record["layout"] == "an url"
     expected_many2many_record = {
         "resource_id": 1,
-        "licence_id": 1,
+        "licence_id": 2,
     }
     assert (
         manager.object_as_dict(session.query(database.ResourceLicence).first())
