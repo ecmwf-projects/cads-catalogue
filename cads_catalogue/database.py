@@ -52,39 +52,51 @@ class Resource(BaseModel):
 
     __tablename__ = "resources"
 
+    # primary/surrogate keys
     resource_id = sa.Column(sa.Integer, primary_key=True)
     resource_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
-    title = sa.Column(sa.String)
-    description = sa.Column(sa.JSON, nullable=False)
-    abstract = sa.Column(sa.TEXT, nullable=False)
-    layout = sa.Column(sa.String)
-    mapping = sa.Column(sa.JSON)
-    contact = sa.Column(sa.String)
-    doi = sa.Column(sa.String)
-    form = sa.Column(sa.String)
-    form_data = sa.Column(sa.JSON)
+
+    # file urls
     constraints = sa.Column(sa.String)
-    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
-    version = sa.Column(sa.VARCHAR(300))
-    variables = sa.Column(sa.JSON)
-    providers = sa.Column(sa.JSON)
-    summaries = sa.Column(sa.JSON, nullable=True)
+    form = sa.Column(sa.String)
+    layout = sa.Column(sa.String)
+    previewimage = sa.Column(sa.String)
+
+    # internal functionality related
+    adaptor = sa.Column(sa.Text)
+    adaptor_configuration = sa.Column(sa.JSON)
+    mapping = sa.Column(sa.JSON)
+
+    # geo extent
+    geo_extent = sa.Column(sa.JSON)
+
+    # date/time
     begin_date = sa.Column(sa.Date)
     end_date = sa.Column(sa.Date)
-    geo_extent = sa.Column(sa.JSON)
-    documentation = sa.Column(sa.JSON)
-    type = sa.Column(sa.VARCHAR(300), nullable=False)
-    previewimage = sa.Column(sa.String)
     publication_date = sa.Column(sa.DATE)
-    adaptor_configuration = sa.Column(sa.JSON)
-    adaptor = sa.Column(sa.Text)
     record_update = sa.Column(
         sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
-    references = sa.Column(sa.JSON)
     resource_update = sa.Column(sa.DATE)
-    use_eqc = sa.Column(sa.Boolean)
 
+    # other metadata
+    abstract = sa.Column(sa.TEXT, nullable=False)
+    contact = sa.Column(sa.String)
+    description = sa.Column(sa.JSON, nullable=False)
+    documentation = sa.Column(sa.JSON)
+    doi = sa.Column(sa.String)
+    form_data = sa.Column(sa.JSON)
+    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
+    providers = sa.Column(sa.JSON)
+    references = sa.Column(sa.JSON)
+    summaries = sa.Column(sa.JSON, nullable=True)
+    title = sa.Column(sa.String)
+    type = sa.Column(sa.VARCHAR(300), nullable=False)
+    use_eqc = sa.Column(sa.Boolean)
+    variables = sa.Column(sa.JSON)
+    version = sa.Column(sa.VARCHAR(300))
+
+    # relationship attributes
     licences = sa.orm.relationship(
         "Licence", secondary="resources_licences", back_populates="resources"
     )
