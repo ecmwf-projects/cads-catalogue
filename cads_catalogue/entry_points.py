@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import os.path
-import pathlib
 from typing import Any
 
 import sqlalchemy as sa
@@ -73,12 +72,8 @@ DATASETS = [
 def setup_test_database(
     connection_string: str | None = None,
     force: bool = False,
-    resources_folder_path: pathlib.Path = typer.Option(
-        manager.TEST_RESOURCES_DATA_PATH, exists=True, file_okay=False
-    ),
-    licences_folder_path: pathlib.Path = typer.Option(
-        manager.TEST_LICENCES_DATA_PATH, exists=True, file_okay=False
-    ),
+    resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
+    licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
 ) -> None:
     """Fill the database with some test data.
 
@@ -96,6 +91,10 @@ def setup_test_database(
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
+    if not os.path.isdir(resources_folder_path):
+        raise ValueError("%r is not a folder" % resources_folder_path)
+    if not os.path.isdir(licences_folder_path):
+        raise ValueError("%r is not a folder" % licences_folder_path)
     engine = sa.create_engine(connection_string)
     structure_exists = True
     if not sqlalchemy_utils.database_exists(engine.url):
