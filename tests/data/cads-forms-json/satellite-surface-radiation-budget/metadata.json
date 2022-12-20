@@ -1,0 +1,51 @@
+{
+  "abstract": "This dataset provides the Surface Radiation Budget (SRB)  Essential Climate Variable (ECV). SRB represents the balance between the heating of the surface through incoming solar radiation and cooling through emission of infra-red radiation which is a fundamental component of the surface energy budget. Small changes in the surface radiation budget can lead to large climatological responses, which makes a permanent and precise monitoring indispensable. Accurate understanding of the surface radiation budget at regional and global scales can improve the understanding of the Earth’s climate system and supports research on current and anticipated climate change, as well as the evaluation of radiative processes in climate models. Better knowledge of the global and regional surface radiation budget is also required for a successful utilization of renewable energy sources, such as solar power plants.\n\n\nThe ECV Surface Radiation Budget contains seven variables which can be separated into the solar (shortwave) and the thermal (longwave) surface radiation components. Both components include the incoming (downwelling), the outgoing (upwelling), and the net radiation fluxes.  These variables were produced by two “product families”, based on the data from different sensors and algorithms cover the same seven variables.\nThe two families follow somewhat different nomenclatures. To help the user to navigate the different names,  a table relating the names used in the download form with the names used within the files and in other datasets distributed by the Climate Data Store is added at the end of this overview.  The fact that the naming is different reflects the fact that each family was originated by different projects within different organisations at different times. However, the third organisation, the Copernicus Climate Change Service (C3S) is not associated with a different product family in this dataset. In fact it is associated with both product families to which it provides a continuation of their production chain. This means that the datasets contains three organisation but just two product families.\n\nThe “CLARA product family” and “CCI product family” provide two complementary Thematic Climate Data Records (TCDRs), differing in temporal and horizontal resolution. These TCDR timeseries are intended to have sufficient length, consistency, and continuity to detect climate variability and change. They are frequently updated with Interim Climate Data Records (ICDRs) or simply extensions, generated using the same software and algorithms to cover more recent periods. Further details on algorithms, data description, and extensive validation results are given in the Documentation section.",
+  "bboxN": 89,
+  "bboxW": 0,
+  "bboxS": -89,
+  "bboxE": 360,
+  "begin_date": "1982-01-01",
+  "citation": [
+    "Copernicus Climate Change Service (C3S), (2022): Surface radiation budget from 1982 to present derived from satellite observations.",
+    "Copernicus Climate Change Service (C3S) Climate Data Store (CDS), accessed on DD-MM-YYYY, DOI: 10.24381/cds.cea58b5a"
+  ],
+  "contactemail": "https://support.ecmwf.int",
+  "data_type": "grid",
+  "doi": null,
+  "ds_contactemail": "https://support.ecmwf.int/",
+  "ds_responsible_organisation": "ECMWF",
+  "ds_responsible_organisation_role": "publisher",
+  "end_date": "2021-12-01",
+  "file_format": "NetCDF",
+  "keywords": [
+    "Product type: Satellite observations",
+    "Temporal coverage: Past",
+    "Variable domain: Atmosphere (surface)",
+    "Spatial coverage: Global",
+    "Provider: EUMETSAT SAF",
+    "Provider: Copernicus C3S",
+    "Provider: ESA CCI"
+  ],
+  "inspire_theme": "Atmospheric conditions",
+  "licences": [
+    "eumetsat-cm-saf",
+    "licence-to-use-copernicus-products",
+    "CCI-data-policy-for-satellite-surface-radiation-budget"
+  ],
+  "lineage": "EC Copernicus program",
+  "publication_date": "2020-10-20",
+  "related_resources_keywords": [
+    "satellite-radiation-related-datasets"
+  ],
+  "representative_fraction": 0.25,
+  "resource_type": "dataset",
+  "responsible_individual": "Copernicus Climate Change Service",
+  "responsible_organisation": "ECMWF",
+  "responsible_organisation_role": "pointOfContact",
+  "responsible_organisation_website": "https://www.ecmwf.int/",
+  "title": "Surface radiation budget from 1982 to present derived from satellite observations",
+  "topic": "climatologyMeteorologyAtmosphere",
+  "unit_measure": "dd",
+  "update_date": "2022-12-02",
+  "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource."
+}

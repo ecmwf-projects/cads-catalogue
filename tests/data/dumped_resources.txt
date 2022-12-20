@@ -1,12 +1,2167 @@
 [
     {
-        "resource_id": 1,
+        "resource_id": 2,
+        "resource_uid": "cams-global-reanalysis-eac4",
+        "constraints": "an url",
+        "form": "an url",
+        "layout": "an url",
+        "previewimage": "an url",
+        "adaptor": null,
+        "adaptor_configuration": {
+            "format_conversion": {
+                "netcdf": {
+                    "legacy_basetime_splitting": false
+                },
+                "netcdf_cdm": {
+                    "split_on": [
+                        "dataset",
+                        "origin"
+                    ],
+                    "system_call": [
+                        "cdscdm-translate",
+                        "-o",
+                        "{{outfile}}",
+                        "--product",
+                        "{{product}}",
+                        "--merge_datasets",
+                        "true",
+                        "{{infile}}"
+                    ]
+                },
+                "netcdf_zip": {
+                    "legacy_basetime_splitting": false
+                }
+            },
+            "mars_external_force": {
+                "grid": "0.75/0.75"
+            },
+            "mars_internal_fields": [
+                {
+                    "param": [
+                        "surface_129",
+                        "surface_134",
+                        "surface_137",
+                        "surface_151",
+                        "surface_165",
+                        "surface_166",
+                        "surface_167",
+                        "surface_168",
+                        "surface_172",
+                        "surface_210072",
+                        "surface_210073",
+                        "surface_210074",
+                        "surface_210125",
+                        "surface_210126",
+                        "surface_210127",
+                        "surface_210128",
+                        "surface_210206",
+                        "surface_210207",
+                        "surface_210208",
+                        "surface_210209",
+                        "surface_210210",
+                        "surface_210211",
+                        "surface_210212",
+                        "surface_210213",
+                        "surface_210214",
+                        "surface_210215",
+                        "surface_210216",
+                        "surface_218003",
+                        "surface_218004",
+                        "surface_218006",
+                        "surface_218013",
+                        "surface_218016",
+                        "surface_218027",
+                        "surface_218030",
+                        "surface_218045",
+                        "surface_218047",
+                        "multilev_130",
+                        "multilev_133",
+                        "multilev_210001",
+                        "multilev_210002",
+                        "multilev_210003",
+                        "multilev_210004",
+                        "multilev_210005",
+                        "multilev_210006",
+                        "multilev_210007",
+                        "multilev_210008",
+                        "multilev_210009",
+                        "multilev_210010",
+                        "multilev_210011",
+                        "multilev_210121",
+                        "multilev_210122",
+                        "multilev_210123",
+                        "multilev_210124",
+                        "multilev_210203",
+                        "multilev_217003",
+                        "multilev_217006",
+                        "multilev_217013",
+                        "multilev_217016",
+                        "multilev_217027",
+                        "multilev_217030",
+                        "multilev_217045",
+                        "multilev_217047"
+                    ],
+                    "type": [
+                        "an"
+                    ]
+                }
+            ]
+        },
+        "mapping": {
+            "force": {
+                "class": [
+                    "mc"
+                ],
+                "dataset": [
+                    "reanalysis"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "expver": [
+                    "eac4"
+                ],
+                "number": [
+                    "all"
+                ],
+                "stream": [
+                    "oper"
+                ],
+                "type": [
+                    "an"
+                ]
+            },
+            "multi_levtype": {
+                "level_groups": [
+                    {
+                        "label_prefix": "",
+                        "levtypes": [
+                            "pl",
+                            "ml"
+                        ],
+                        "param_prefix": "multilev_"
+                    },
+                    {
+                        "label_prefix": "Surface ",
+                        "levtypes": [
+                            "sfc"
+                        ],
+                        "param_prefix": "surface_"
+                    }
+                ],
+                "levelist_names": {
+                    "ml": "model_level",
+                    "pl": "pressure_level"
+                }
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "time": {
+                    "00:00": "00:00:00",
+                    "03:00": "03:00:00",
+                    "06:00": "06:00:00",
+                    "09:00": "09:00:00",
+                    "12:00": "12:00:00",
+                    "15:00": "15:00:00",
+                    "18:00": "18:00:00",
+                    "21:00": "21:00:00"
+                },
+                "type": {
+                    "analysis": "an"
+                },
+                "variable": {
+                    "10m_u_component_of_wind": "surface_165",
+                    "10m_v_component_of_wind": "surface_166",
+                    "2m_dewpoint_temperature": "surface_168",
+                    "2m_temperature": "surface_167",
+                    "acetone": "multilev_217052",
+                    "acetone_product": "multilev_217053",
+                    "aldehydes": "multilev_217012",
+                    "amine": "multilev_217040",
+                    "ammonia": "multilev_217019",
+                    "ammonium": "multilev_217021",
+                    "black_carbon_aerosol_optical_depth_550nm": "surface_210211",
+                    "carbon_monoxide": "multilev_210123",
+                    "dimethyl_sulfide": "multilev_217018",
+                    "dinitrogen_pentoxide": "multilev_217033",
+                    "dust_aerosol_0.03-0.55um_mixing_ratio": "multilev_210004",
+                    "dust_aerosol_0.55-0.9um_mixing_ratio": "multilev_210005",
+                    "dust_aerosol_0.9-20um_mixing_ratio": "multilev_210006",
+                    "dust_aerosol_optical_depth_550nm": "surface_210209",
+                    "ethane": "multilev_217045",
+                    "ethanol": "multilev_217046",
+                    "ethene": "multilev_217010",
+                    "formaldehyde": "multilev_210124",
+                    "formic_acid": "multilev_217043",
+                    "fraction_of_cloud_cover": "multilev_248",
+                    "geopotential": "multilev_129",
+                    "high_cloud_cover": "surface_188",
+                    "high_vegetation_cover": "surface_28",
+                    "hydrogen_peroxide": "multilev_217003",
+                    "hydroperoxy_radical": "multilev_217028",
+                    "hydrophilic_black_carbon_aerosol_mixing_ratio": "multilev_210009",
+                    "hydrophilic_organic_matter_aerosol_mixing_ratio": "multilev_210007",
+                    "hydrophobic_black_carbon_aerosol_mixing_ratio": "multilev_210010",
+                    "hydrophobic_organic_matter_aerosol_mixing_ratio": "multilev_210008",
+                    "hydroxyl_radical": "multilev_217030",
+                    "isoprene": "multilev_217016",
+                    "lake_cover": "surface_26",
+                    "land_sea_mask": "surface_172",
+                    "lead": "multilev_217026",
+                    "leaf_area_index_high_vegetation": "surface_67",
+                    "leaf_area_index_low_vegetation": "surface_66",
+                    "lifting_threshold_speed": "surface_210053",
+                    "low_cloud_cover": "surface_186",
+                    "low_vegetation_cover": "surface_27",
+                    "mean_altitude_of_maximum_injection": "surface_210119",
+                    "mean_sea_level_pressure": "surface_151",
+                    "medium_cloud_cover": "surface_187",
+                    "methacrolein_mvk": "multilev_217050",
+                    "methacrylic_acid": "multilev_217044",
+                    "methane_chemistry": "multilev_217004",
+                    "methane_sulfonic_acid": "multilev_217022",
+                    "methanol": "multilev_217042",
+                    "methyl_glyoxal": "multilev_217023",
+                    "methyl_peroxide": "multilev_217007",
+                    "methylperoxy_radical": "multilev_217029",
+                    "near_ir_albedo_for_diffuse_radiation": "surface_18",
+                    "near_ir_albedo_for_direct_radiation": "surface_17",
+                    "nitrate": "multilev_217051",
+                    "nitrate_radical": "multilev_217032",
+                    "nitric_acid": "multilev_217006",
+                    "nitrogen_dioxide": "multilev_210121",
+                    "nitrogen_monoxide": "multilev_217027",
+                    "olefins": "multilev_217011",
+                    "organic_ethers": "multilev_217036",
+                    "organic_matter_aerosol_optical_depth_550nm": "surface_210210",
+                    "organic_nitrates": "multilev_217015",
+                    "ozone": "multilev_210203",
+                    "paraffins": "multilev_217009",
+                    "particulate_matter_10um": "surface_210074",
+                    "particulate_matter_1um": "surface_210072",
+                    "particulate_matter_2.5um": "surface_210073",
+                    "pernitric_acid": "multilev_217034",
+                    "peroxides": "multilev_217014",
+                    "peroxy_acetyl_radical": "multilev_217035",
+                    "peroxyacetyl_nitrate": "multilev_217013",
+                    "potential_vorticity": "multilev_60",
+                    "propane": "multilev_217047",
+                    "propene": "multilev_217048",
+                    "radon": "multilev_210181",
+                    "relative_humidity": "multilev_157",
+                    "sea_ice_cover": "surface_31",
+                    "sea_salt_aerosol_0.03-0.5um_mixing_ratio": "multilev_210001",
+                    "sea_salt_aerosol_0.5-5um_mixing_ratio": "multilev_210002",
+                    "sea_salt_aerosol_5-20um_mixing_ratio": "multilev_210003",
+                    "sea_salt_aerosol_optical_depth_550nm": "surface_210208",
+                    "sea_surface_temperature": "surface_34",
+                    "skin_reservoir_content": "surface_198",
+                    "skin_temperature": "surface_235",
+                    "snow_albedo": "surface_32",
+                    "snow_depth": "surface_141",
+                    "soil_clay_content": "surface_210054",
+                    "soil_type": "surface_43",
+                    "specific_cloud_ice_water_content": "multilev_247",
+                    "specific_cloud_liquid_water_content": "multilev_246",
+                    "specific_humidity": "multilev_133",
+                    "specific_rain_water_content": "multilev_75",
+                    "specific_snow_water_content": "multilev_76",
+                    "stratospheric_ozone_tracer": "multilev_217024",
+                    "sulphate_aerosol_mixing_ratio": "multilev_210011",
+                    "sulphate_aerosol_optical_depth_550nm": "surface_210212",
+                    "sulphur_dioxide": "multilev_210122",
+                    "surface_geopotential": "surface_129",
+                    "surface_pressure": "surface_134",
+                    "surface_roughness": "surface_173",
+                    "temperature": "multilev_130",
+                    "terpenes": "multilev_217049",
+                    "total_aerosol_optical_depth_1240nm": "surface_210216",
+                    "total_aerosol_optical_depth_469nm": "surface_210213",
+                    "total_aerosol_optical_depth_550nm": "surface_210207",
+                    "total_aerosol_optical_depth_670nm": "surface_210214",
+                    "total_aerosol_optical_depth_865nm": "surface_210215",
+                    "total_cloud_cover": "surface_164",
+                    "total_column_acetone": "surface_218052",
+                    "total_column_aldehydes": "surface_218012",
+                    "total_column_carbon_monoxide": "surface_210127",
+                    "total_column_ethane": "surface_218045",
+                    "total_column_ethanol": "surface_218046",
+                    "total_column_ethene": "surface_218010",
+                    "total_column_formaldehyde": "surface_210128",
+                    "total_column_formic_acid": "surface_218043",
+                    "total_column_hydrogen_peroxide": "surface_218003",
+                    "total_column_hydroxyl_radical": "surface_218030",
+                    "total_column_isoprene": "surface_218016",
+                    "total_column_methane": "surface_218004",
+                    "total_column_methanol": "surface_218042",
+                    "total_column_methyl_peroxide": "surface_218007",
+                    "total_column_nitric_acid": "surface_218006",
+                    "total_column_nitrogen_dioxide": "surface_210125",
+                    "total_column_nitrogen_monoxide": "surface_218027",
+                    "total_column_olefins": "surface_218011",
+                    "total_column_organic_nitrates": "surface_218015",
+                    "total_column_ozone": "surface_210206",
+                    "total_column_paraffins": "surface_218009",
+                    "total_column_peroxyacetyl_nitrate": "surface_218013",
+                    "total_column_propane": "surface_218047",
+                    "total_column_sulphur_dioxide": "surface_210126",
+                    "total_column_water": "surface_136",
+                    "total_column_water_vapour": "surface_137",
+                    "type_of_high_vegetation": "surface_30",
+                    "type_of_low_vegetation": "surface_29",
+                    "u_component_of_wind": "multilev_131",
+                    "uv_visible_albedo_for_diffuse_radiation": "surface_16",
+                    "uv_visible_albedo_for_direct_radiation": "surface_15",
+                    "v_component_of_wind": "multilev_132",
+                    "vertical_velocity": "multilev_135",
+                    "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um": "surface_215043",
+                    "vertically_integrated_mass_of_dust_aerosol_0.55-9um": "surface_215044",
+                    "vertically_integrated_mass_of_dust_aerosol_9-20um": "surface_215045",
+                    "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol": "surface_215078",
+                    "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol": "surface_215062",
+                    "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol": "surface_215077",
+                    "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol": "surface_215061",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um": "surface_215019",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um": "surface_215020",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_5-20um": "surface_215021",
+                    "vertically_integrated_mass_of_sulphate_aerosol": "surface_215087"
+                }
+            },
+            "rename": {
+                "variable": "param"
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
+        "geo_extent": {
+            "bboxN": null,
+            "bboxS": null,
+            "bboxE": null,
+            "bboxW": null
+        },
+        "begin_date": "2003-01-01",
+        "end_date": "2021-06-30",
+        "publication_date": "2020-02-06",
+        "record_update": "2022-12-20 09:28:59.599787+01:00",
+        "resource_update": null,
+        "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window.",
+        "citation": "{\"Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/\"}",
+        "contactemail": "copernicus-support@ecmwf.int",
+        "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB (optional conversion to netCDF)"
+            },
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "0.75\u00b0x0.75\u00b0"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "2003 to 2021"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "3-hourly"
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "Surface, total column, model levels and pressure levels."
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "60 model levels. Pressure levels: 1000, 950, 925, 900, 850, 800, 700, 600, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10, 7, 5, 3, 2, 1 hPa"
+            },
+            {
+                "id": "update-frequency",
+                "label": "Update frequency",
+                "value": "Twice a year with 4-6 month delay"
+            },
+            {
+                "id": "versions",
+                "label": "Versions",
+                "value": "Only one version"
+            }
+        ],
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/x/OIX4B",
+                "title": "CAMS Reanalysis data documentation",
+                "description": "Overall description of CAMS Reanalysis dataset."
+            },
+            {
+                "url": "https://confluence.ecmwf.int/x/OIX4B#CAMS:Reanalysisdatadocumentation-Knownissues",
+                "title": "Known issues",
+                "description": "Information about known issues found within the CAMS global reanalysis dataset"
+            },
+            {
+                "url": "https://atmosphere.copernicus.eu/node/325#fe56bdb4-1bdf-4d47-b46b-261a1ea57243",
+                "title": "Evaluation and quality assurance (EQA) reports",
+                "description": "Detailed validation reports"
+            },
+            {
+                "url": "http://www.atmos-chem-phys.net/19/3515/2019/",
+                "title": "Data citation",
+                "description": "Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/"
+            }
+        ],
+        "doi": null,
+        "ds_contactemail": "copernicus-support@ecmwf.int",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": null,
+        "file_format": null,
+        "format_version": "1",
+        "keywords": [
+            "Variable domain: Atmosphere (composition)",
+            "Variable domain: Atmosphere (meteorology)",
+            "Parameter family: Aerosol",
+            "Parameter family: Reactive gas",
+            "Spatial coverage: Global",
+            "Product type: Reanalysis",
+            "Temporal coverage: Past"
+        ],
+        "lineage": "Copernicus Atmospheric Monitoring Service",
+        "representative_fraction": null,
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
+        "title": "CAMS global reanalysis (EAC4)",
+        "topic": "climatologyMeteorologyAtmosphere",
+        "type": "dataset",
+        "unit_measure": null,
+        "use_limitation": "Content accessible through the ADS may only be used under the terms of the licenses attributed to each particular resource.",
+        "variables": [
+            {
+                "id": "10m_u_component_of_wind",
+                "label": "10m u-component of wind",
+                "description": null,
+                "units": "m s^-1"
+            },
+            {
+                "id": "10m_v_component_of_wind",
+                "label": "10m v-component of wind",
+                "description": null,
+                "units": "m s^-1"
+            },
+            {
+                "id": "2m_dewpoint_temperature",
+                "label": "2m dewpoint temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "2m_temperature",
+                "label": "2m temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "acetone",
+                "label": "Acetone",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "acetone_product",
+                "label": "Acetone product",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "aldehydes",
+                "label": "Aldehydes",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "amine",
+                "label": "Amine",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ammonia",
+                "label": "Ammonia",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ammonium",
+                "label": "Ammonium",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "black_carbon_aerosol_optical_depth_550nm",
+                "label": "Black carbon aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "carbon_monoxide",
+                "label": "Carbon monoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dimethyl_sulfide",
+                "label": "Dimethyl sulfide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dinitrogen_pentoxide",
+                "label": "Dinitrogen pentoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.03-0.55um_mixing_ratio",
+                "label": "Dust aerosol (0.03 - 0.55 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.55-0.9um_mixing_ratio",
+                "label": "Dust aerosol (0.55 - 0.9 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.9-20um_mixing_ratio",
+                "label": "Dust aerosol (0.9 - 20 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_optical_depth_550nm",
+                "label": "Dust aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "ethane",
+                "label": "Ethane",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ethanol",
+                "label": "Ethanol",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ethene",
+                "label": "Ethene",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "formaldehyde",
+                "label": "Formaldehyde",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "formic_acid",
+                "label": "Formic acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "fraction_of_cloud_cover",
+                "label": "Fraction of cloud cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "geopotential",
+                "label": "Geopotential",
+                "description": null,
+                "units": "m^2 s^-2"
+            },
+            {
+                "id": "high_cloud_cover",
+                "label": "High cloud cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "high_vegetation_cover",
+                "label": "High vegetation cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "hydrogen_peroxide",
+                "label": "Hydrogen peroxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydroperoxy_radical",
+                "label": "Hydroperoxy radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophilic_black_carbon_aerosol_mixing_ratio",
+                "label": "Hydrophilic black carbon aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophilic_organic_matter_aerosol_mixing_ratio",
+                "label": "Hydrophilic organic matter aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophobic_black_carbon_aerosol_mixing_ratio",
+                "label": "Hydrophobic black carbon aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophobic_organic_matter_aerosol_mixing_ratio",
+                "label": "Hydrophobic organic matter aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydroxyl_radical",
+                "label": "Hydroxyl radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "isoprene",
+                "label": "Isoprene",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "lake_cover",
+                "label": "Lake cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "land_sea_mask",
+                "label": "Land-sea mask",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "lead",
+                "label": "Lead",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "leaf_area_index_high_vegetation",
+                "label": "Leaf area index, high vegetation",
+                "description": null,
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "leaf_area_index_low_vegetation",
+                "label": "Leaf area index, low vegetation",
+                "description": null,
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "lifting_threshold_speed",
+                "label": "Lifting threshold speed",
+                "description": null,
+                "units": "m s^-1"
+            },
+            {
+                "id": "low_cloud_cover",
+                "label": "Low cloud cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "low_vegetation_cover",
+                "label": "Low vegetation cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "mean_altitude_of_maximum_injection",
+                "label": "Mean altitude of maximum injection",
+                "description": null,
+                "units": "m"
+            },
+            {
+                "id": "mean_sea_level_pressure",
+                "label": "Mean sea level pressure",
+                "description": null,
+                "units": "Pa"
+            },
+            {
+                "id": "medium_cloud_cover",
+                "label": "Medium cloud cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "methacrolein_mvk",
+                "label": "Methacrolein MVK",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methacrylic_acid",
+                "label": "Methacrylic acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methane_chemistry",
+                "label": "Methane (chemistry)",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methane_sulfonic_acid",
+                "label": "Methane sulfonic acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methanol",
+                "label": "Methanol",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methyl_glyoxal",
+                "label": "Methyl glyoxal",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methyl_peroxide",
+                "label": "Methyl peroxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "methylperoxy_radical",
+                "label": "Methylperoxy radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "near_ir_albedo_for_diffuse_radiation",
+                "label": "Near IR albedo for diffuse radiation",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "near_ir_albedo_for_direct_radiation",
+                "label": "Near IR albedo for direct radiation",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "nitrate",
+                "label": "Nitrate",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrate_radical",
+                "label": "Nitrate radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitric_acid",
+                "label": "Nitric acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrogen_dioxide",
+                "label": "Nitrogen dioxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrogen_monoxide",
+                "label": "Nitrogen monoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "olefins",
+                "label": "Olefins",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "organic_ethers",
+                "label": "Organic ethers",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "organic_matter_aerosol_optical_depth_550nm",
+                "label": "Organic matter aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "organic_nitrates",
+                "label": "Organic nitrates",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ozone",
+                "label": "Ozone",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "paraffins",
+                "label": "Paraffins",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "particulate_matter_1um",
+                "label": "Particulate matter d < 1 \u00b5m (PM1)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "particulate_matter_10um",
+                "label": "Particulate matter d < 10 \u00b5m (PM10)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "particulate_matter_2.5um",
+                "label": "Particulate matter d < 2.5 \u00b5m (PM2.5)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "pernitric_acid",
+                "label": "Pernitric acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "peroxides",
+                "label": "Peroxides",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "peroxy_acetyl_radical",
+                "label": "Peroxy acetyl radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "peroxyacetyl_nitrate",
+                "label": "Peroxyacetyl nitrate",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "potential_vorticity",
+                "label": "Potential vorticity",
+                "description": null,
+                "units": "K m^2 kg^-1 s^-1"
+            },
+            {
+                "id": "propane",
+                "label": "Propane",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "propene",
+                "label": "Propene",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "radon",
+                "label": "Radon",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "relative_humidity",
+                "label": "Relative humidity",
+                "description": null,
+                "units": "%"
+            },
+            {
+                "id": "sea_salt_aerosol_0.03-0.5um_mixing_ratio",
+                "label": "Sea salt aerosol (0.03 - 0.5 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_0.5-5um_mixing_ratio",
+                "label": "Sea salt aerosol (0.5 - 5 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_5-20um_mixing_ratio",
+                "label": "Sea salt aerosol (5 - 20 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_optical_depth_550nm",
+                "label": "Sea salt aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "sea_surface_temperature",
+                "label": "Sea surface temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "sea_ice_cover",
+                "label": "Sea-ice cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "skin_reservoir_content",
+                "label": "Skin reservoir content",
+                "description": null,
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "skin_temperature",
+                "label": "Skin temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "snow_albedo",
+                "label": "Snow albedo",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "snow_depth",
+                "label": "Snow depth",
+                "description": null,
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "soil_clay_content",
+                "label": "Soil clay content",
+                "description": null,
+                "units": "%"
+            },
+            {
+                "id": "soil_type",
+                "label": "Soil type",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "specific_cloud_ice_water_content",
+                "label": "Specific cloud ice water content",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_cloud_liquid_water_content",
+                "label": "Specific cloud liquid water content",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_humidity",
+                "label": "Specific humidity",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_rain_water_content",
+                "label": "Specific rain water content",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_snow_water_content",
+                "label": "Specific snow water content",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "stratospheric_ozone_tracer",
+                "label": "Stratospheric ozone tracer",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sulphate_aerosol_mixing_ratio",
+                "label": "Sulphate aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sulphate_aerosol_optical_depth_550nm",
+                "label": "Sulphate aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "sulphur_dioxide",
+                "label": "Sulphur dioxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "surface_geopotential",
+                "label": "Surface Geopotential",
+                "description": null,
+                "units": "m^2 s^-2"
+            },
+            {
+                "id": "surface_pressure",
+                "label": "Surface pressure",
+                "description": null,
+                "units": "Pa"
+            },
+            {
+                "id": "surface_roughness",
+                "label": "Surface roughness",
+                "description": null,
+                "units": "m"
+            },
+            {
+                "id": "temperature",
+                "label": "Temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "terpenes",
+                "label": "Terpenes",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "total_aerosol_optical_depth_1240nm",
+                "label": "Total aerosol optical depth at 1240 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_aerosol_optical_depth_469nm",
+                "label": "Total aerosol optical depth at 469 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_aerosol_optical_depth_550nm",
+                "label": "Total aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_aerosol_optical_depth_670nm",
+                "label": "Total aerosol optical depth at 670 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_aerosol_optical_depth_865nm",
+                "label": "Total aerosol optical depth at 865 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_cloud_cover",
+                "label": "Total cloud cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "total_column_acetone",
+                "label": "Total column acetone",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_aldehydes",
+                "label": "Total column aldehydes",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_carbon_monoxide",
+                "label": "Total column carbon monoxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ethane",
+                "label": "Total column ethane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ethanol",
+                "label": "Total column ethanol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ethene",
+                "label": "Total column ethene",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_formaldehyde",
+                "label": "Total column formaldehyde",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_formic_acid",
+                "label": "Total column formic acid",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_hydrogen_peroxide",
+                "label": "Total column hydrogen peroxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_hydroxyl_radical",
+                "label": "Total column hydroxyl radical",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_isoprene",
+                "label": "Total column isoprene",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_methane",
+                "label": "Total column methane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_methanol",
+                "label": "Total column methanol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_methyl_peroxide",
+                "label": "Total column methyl peroxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitric_acid",
+                "label": "Total column nitric acid",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitrogen_dioxide",
+                "label": "Total column nitrogen dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitrogen_monoxide",
+                "label": "Total column nitrogen monoxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_olefins",
+                "label": "Total column olefins",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_organic_nitrates",
+                "label": "Total column organic nitrates",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ozone",
+                "label": "Total column ozone",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_paraffins",
+                "label": "Total column paraffins",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_peroxyacetyl_nitrate",
+                "label": "Total column peroxyacetyl nitrate",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_propane",
+                "label": "Total column propane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_sulphur_dioxide",
+                "label": "Total column sulphur dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_water",
+                "label": "Total column water",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_water_vapour",
+                "label": "Total column water vapour",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "type_of_high_vegetation",
+                "label": "Type of high vegetation",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "type_of_low_vegetation",
+                "label": "Type of low vegetation",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "u_component_of_wind",
+                "label": "U-component of wind",
+                "description": null,
+                "units": "m s^-1"
+            },
+            {
+                "id": "uv_visible_albedo_for_diffuse_radiation",
+                "label": "UV visible albedo for diffuse radiation",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "uv_visible_albedo_for_direct_radiation",
+                "label": "UV visible albedo for direct radiation",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "v_component_of_wind",
+                "label": "V-component of wind",
+                "description": null,
+                "units": "m s^-1"
+            },
+            {
+                "id": "vertical_velocity",
+                "label": "Vertical velocity",
+                "description": null,
+                "units": "Pa s^-1"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um",
+                "label": "Vertically integrated mass of dust aerosol (0.03 - 0.55 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_0.55-9um",
+                "label": "Vertically integrated mass of dust aerosol (0.55 - 9 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_9-20um",
+                "label": "Vertically integrated mass of dust aerosol (9 - 20 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol",
+                "label": "Vertically integrated mass of hydrophilic black carbon aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol",
+                "label": "Vertically integrated mass of hydrophilic organic matter aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol",
+                "label": "Vertically integrated mass of hydrophobic black carbon aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol",
+                "label": "Vertically integrated mass of hydrophobic organic matter aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um",
+                "label": "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um",
+                "label": "Vertically integrated mass of sea salt aerosol (0.5 - 5 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_5-20um",
+                "label": "Vertically integrated mass of sea salt aerosol (5 - 20 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sulphate_aerosol",
+                "label": "Vertically integrated mass of sulphate aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            }
+        ]
+    },
+    {
+        "resource_id": 3,
+        "resource_uid": "cams-global-reanalysis-eac4-monthly",
+        "constraints": "an url",
+        "form": "an url",
+        "layout": "an url",
+        "previewimage": "an url",
+        "adaptor": null,
+        "adaptor_configuration": {
+            "format_conversion": {
+                "netcdf": {
+                    "legacy_basetime_splitting": false
+                },
+                "netcdf_zip": {
+                    "legacy_basetime_splitting": false
+                }
+            }
+        },
+        "mapping": {
+            "force": {
+                "class": [
+                    "mc"
+                ],
+                "day": [
+                    "01"
+                ],
+                "expect": [
+                    "any"
+                ],
+                "number": [
+                    "all"
+                ]
+            },
+            "multi_levtype": {
+                "level_groups": [
+                    {
+                        "label_prefix": "",
+                        "levtypes": [
+                            "pl",
+                            "ml"
+                        ],
+                        "param_prefix": "multilev_"
+                    },
+                    {
+                        "label_prefix": "Surface ",
+                        "levtypes": [
+                            "sfc"
+                        ],
+                        "param_prefix": "surface_"
+                    }
+                ],
+                "levelist_names": {
+                    "ml": "model_level",
+                    "pl": "pressure_level"
+                }
+            },
+            "options": {
+                "wants_dates": true
+            },
+            "remap": {
+                "product_type": {
+                    "monthly_mean": "reanalysis-monthly-means-of-daily-means",
+                    "monthly_mean_by_hour_of_day": "reanalysis-synoptic-monthly-means"
+                },
+                "time": {
+                    "00:00": "00:00:00",
+                    "03:00": "03:00:00",
+                    "06:00": "06:00:00",
+                    "09:00": "09:00:00",
+                    "12:00": "12:00:00",
+                    "15:00": "15:00:00",
+                    "18:00": "18:00:00",
+                    "21:00": "21:00:00"
+                },
+                "variable": {
+                    "2m_dewpoint_temperature": "surface_168",
+                    "2m_temperature": "surface_167",
+                    "black_carbon_aerosol_optical_depth_550nm": "surface_210211",
+                    "carbon_monoxide": "multilev_210123",
+                    "charnock": "surface_148",
+                    "dust_aerosol_0.03-0.55um_mixing_ratio": "multilev_210004",
+                    "dust_aerosol_0.55-0.9um_mixing_ratio": "multilev_210005",
+                    "dust_aerosol_0.9-20um_mixing_ratio": "multilev_210006",
+                    "dust_aerosol_optical_depth_550nm": "surface_210209",
+                    "ethane": "multilev_217045",
+                    "formaldehyde": "multilev_210124",
+                    "geopotential": "multilev_129",
+                    "hydrophilic_black_carbon_aerosol_mixing_ratio": "multilev_210009",
+                    "hydrophilic_organic_matter_aerosol_mixing_ratio": "multilev_210007",
+                    "hydrophobic_black_carbon_aerosol_mixing_ratio": "multilev_210010",
+                    "hydrophobic_organic_matter_aerosol_mixing_ratio": "multilev_210008",
+                    "hydroxyl_radical": "multilev_217030",
+                    "ice_temperature_layer_1": "surface_35",
+                    "isoprene": "multilev_217016",
+                    "leaf_area_index_high_vegetation": "surface_67",
+                    "leaf_area_index_low_vegetation": "surface_66",
+                    "mean_sea_level_pressure": "surface_151",
+                    "methane_chemistry": "multilev_217004",
+                    "nitric_acid": "multilev_217006",
+                    "nitrogen_dioxide": "multilev_210121",
+                    "nitrogen_monoxide": "multilev_217027",
+                    "organic_matter_aerosol_optical_depth_550nm": "surface_210210",
+                    "ozone": "multilev_210203",
+                    "particulate_matter_10um": "surface_210074",
+                    "particulate_matter_2.5um": "surface_210073",
+                    "peroxyacetyl_nitrate": "multilev_217013",
+                    "potential_vorticity": "multilev_60",
+                    "propane": "multilev_217047",
+                    "relative_humidity": "multilev_157",
+                    "sea_ice_cover": "surface_31",
+                    "sea_salt_aerosol_0.03-0.5um_mixing_ratio": "multilev_210001",
+                    "sea_salt_aerosol_0.5-5um_mixing_ratio": "multilev_210002",
+                    "sea_salt_aerosol_5-20um_mixing_ratio": "multilev_210003",
+                    "sea_salt_aerosol_optical_depth_550nm": "surface_210208",
+                    "sea_surface_temperature": "surface_34",
+                    "snow_albedo": "surface_32",
+                    "snow_density": "surface_33",
+                    "snow_depth": "surface_141",
+                    "so2_precursor_mixing_ratio": "multilev_210012",
+                    "soil_temperature_level_1": "surface_139",
+                    "specific_humidity": "multilev_133",
+                    "sulphate_aerosol_mixing_ratio": "multilev_210011",
+                    "sulphate_aerosol_optical_depth_550nm": "surface_210212",
+                    "sulphur_dioxide": "multilev_210122",
+                    "surface_pressure": "surface_134",
+                    "temperature": "multilev_130",
+                    "temperature_of_snow_layer": "surface_238",
+                    "total_aerosol_optical_depth_550nm": "surface_210207",
+                    "total_column_carbon_monoxide": "surface_210127",
+                    "total_column_ethane": "surface_218045",
+                    "total_column_formaldehyde": "surface_210128",
+                    "total_column_hydroxyl_radical": "surface_218030",
+                    "total_column_isoprene": "surface_218016",
+                    "total_column_methane": "surface_218004",
+                    "total_column_nitric_acid": "surface_218006",
+                    "total_column_nitrogen_dioxide": "surface_210125",
+                    "total_column_nitrogen_monoxide": "surface_218027",
+                    "total_column_ozone": "surface_210206",
+                    "total_column_peroxyacetyl_nitrate": "surface_218013",
+                    "total_column_propane": "surface_218047",
+                    "total_column_sulphur_dioxide": "surface_210126",
+                    "total_column_water": "surface_136",
+                    "total_column_water_vapour": "surface_137",
+                    "vertical_velocity": "multilev_135",
+                    "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um": "surface_215043",
+                    "vertically_integrated_mass_of_dust_aerosol_0.55-9um": "surface_215044",
+                    "vertically_integrated_mass_of_dust_aerosol_9-20um": "surface_215045",
+                    "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol": "surface_215078",
+                    "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol": "surface_215062",
+                    "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol": "surface_215077",
+                    "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol": "surface_215061",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um": "surface_215019",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um": "surface_215020",
+                    "vertically_integrated_mass_of_sea_salt_aerosol_5-20um": "surface_215021",
+                    "vertically_integrated_mass_of_sulphate_aerosol": "surface_215087",
+                    "vertically_integrated_mass_of_sulphur_dioxide": "surface_215174"
+                }
+            },
+            "rename": {
+                "product_type": "dataset",
+                "variable": "param"
+            },
+            "selection_limit": 100000,
+            "selection_limit_ignore": [
+                "area",
+                "grid"
+            ]
+        },
+        "geo_extent": {
+            "bboxN": null,
+            "bboxS": null,
+            "bboxE": null,
+            "bboxW": null
+        },
+        "begin_date": "2003-01-01",
+        "end_date": "2021-06-30",
+        "publication_date": "2020-02-06",
+        "record_update": "2022-12-20 09:28:59.604098+01:00",
+        "resource_update": null,
+        "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\\n\\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\\n\\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\\n\\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window.",
+        "citation": "{\"Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019\"}",
+        "contactemail": "copernicus-support@ecmwf.int",
+        "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB (optional conversion to netCDF)"
+            },
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "0.75\u00b0x0.75\u00b0"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "2003 to 2022"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "monthly"
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "Surface, total column, 1 model level and 25 pressure levels."
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "The lowest model level, Pressure levels: 1000, 950, 925, 900, 850, 800, 700, 600, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10, 7, 5, 3, 2, 1 hPa"
+            },
+            {
+                "id": "update-frequency",
+                "label": "Update frequency",
+                "value": "Twice a year with 4-6 month delay"
+            },
+            {
+                "id": "versions",
+                "label": "Versions",
+                "value": "Only one version"
+            }
+        ],
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/x/OIX4B",
+                "title": "CAMS Reanalysis data documentation",
+                "description": "Overall description of CAMS Reanalysis dataset."
+            },
+            {
+                "url": "https://confluence.ecmwf.int/x/OIX4B#CAMS:Reanalysisdatadocumentation-Knownissues",
+                "title": "Known issues",
+                "description": "Information about known issues found within the CAMS global reanalysis dataset."
+            },
+            {
+                "url": "https://atmosphere.copernicus.eu/node/325#fe56bdb4-1bdf-4d47-b46b-261a1ea57243",
+                "title": "Evaluation and quality assurance (EQA) reports",
+                "description": "Detailed validation reports"
+            },
+            {
+                "url": "http://www.atmos-chem-phys.net/19/3515/2019/",
+                "title": "Data citation",
+                "description": "Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019"
+            }
+        ],
+        "doi": null,
+        "ds_contactemail": "copernicus-support@ecmwf.int",
+        "ds_responsible_organisation": "ECMWF",
+        "ds_responsible_organisation_role": null,
+        "file_format": null,
+        "format_version": "1",
+        "keywords": [
+            "Variable domain: Atmosphere (composition)",
+            "Variable domain: Atmosphere (meteorology)",
+            "Parameter family: Aerosol",
+            "Parameter family: Reactive gas",
+            "Spatial coverage: Global",
+            "Product type: Reanalysis",
+            "Temporal coverage: Past"
+        ],
+        "lineage": "Copernicus Atmospheric Monitoring Service",
+        "representative_fraction": null,
+        "responsible_organisation": "ECMWF",
+        "responsible_organisation_role": "pointOfContact",
+        "responsible_organisation_website": "https://www.ecmwf.int/",
+        "title": "CAMS global reanalysis (EAC4) monthly averaged fields",
+        "topic": "climatologyMeteorologyAtmosphere",
+        "type": "dataset",
+        "unit_measure": null,
+        "use_limitation": "Content accessible through the ADS may only be used under the terms of the licenses attributed to each particular resource.",
+        "variables": [
+            {
+                "id": "2m_dewpoint_temperature",
+                "label": "2m dewpoint temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "2m_temperature",
+                "label": "2m temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "black_carbon_aerosol_optical_depth_550nm",
+                "label": "Black carbon aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "carbon_monoxide",
+                "label": "Carbon monoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "charnock",
+                "label": "Charnock",
+                "description": null,
+                "units": "~"
+            },
+            {
+                "id": "dust_aerosol_0.03-0.55um_mixing_ratio",
+                "label": "Dust aerosol (0.03 - 0.55 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.55-0.9um_mixing_ratio",
+                "label": "Dust aerosol (0.55 - 0.9 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_0.9-20um_mixing_ratio",
+                "label": "Dust aerosol (0.9 - 20 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "dust_aerosol_optical_depth_550nm",
+                "label": "Dust aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "ethane",
+                "label": "Ethane",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "formaldehyde",
+                "label": "Formaldehyde",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "geopotential",
+                "label": "Geopotential",
+                "description": null,
+                "units": "m^2 s^-2"
+            },
+            {
+                "id": "hydrophilic_black_carbon_aerosol_mixing_ratio",
+                "label": "Hydrophilic black carbon aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophilic_organic_matter_aerosol_mixing_ratio",
+                "label": "Hydrophilic organic matter aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophobic_black_carbon_aerosol_mixing_ratio",
+                "label": "Hydrophobic black carbon aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydrophobic_organic_matter_aerosol_mixing_ratio",
+                "label": "Hydrophobic organic matter aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "hydroxyl_radical",
+                "label": "Hydroxyl radical",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "ice_temperature_layer_1",
+                "label": "Ice temperature layer 1",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "isoprene",
+                "label": "Isoprene",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "leaf_area_index_high_vegetation",
+                "label": "Leaf area index, high vegetation",
+                "description": null,
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "leaf_area_index_low_vegetation",
+                "label": "Leaf area index, low vegetation",
+                "description": null,
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "mean_sea_level_pressure",
+                "label": "Mean sea level pressure",
+                "description": null,
+                "units": "Pa"
+            },
+            {
+                "id": "methane_chemistry",
+                "label": "Methane (chemistry)",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitric_acid",
+                "label": "Nitric acid",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrogen_dioxide",
+                "label": "Nitrogen dioxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "nitrogen_monoxide",
+                "label": "Nitrogen monoxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "organic_matter_aerosol_optical_depth_550nm",
+                "label": "Organic matter aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "ozone",
+                "label": "Ozone",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "particulate_matter_10um",
+                "label": "Particulate matter d < 10 \u00b5m (PM10)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "particulate_matter_2.5um",
+                "label": "Particulate matter d < 2.5 \u00b5m (PM2.5)",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "peroxyacetyl_nitrate",
+                "label": "Peroxyacetyl nitrate",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "potential_vorticity",
+                "label": "Potential vorticity",
+                "description": null,
+                "units": "K m^2 kg^-1 s^-1"
+            },
+            {
+                "id": "propane",
+                "label": "Propane",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "relative_humidity",
+                "label": "Relative humidity",
+                "description": null,
+                "units": "%"
+            },
+            {
+                "id": "so2_precursor_mixing_ratio",
+                "label": "SO2 precursor mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_0.03-0.5um_mixing_ratio",
+                "label": "Sea salt aerosol (0.03 - 0.5 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_0.5-5um_mixing_ratio",
+                "label": "Sea salt aerosol (0.5 - 5 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_5-20um_mixing_ratio",
+                "label": "Sea salt aerosol (5 - 20 \u00b5m) mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sea_salt_aerosol_optical_depth_550nm",
+                "label": "Sea salt aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "sea_surface_temperature",
+                "label": "Sea surface temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "sea_ice_cover",
+                "label": "Sea-ice cover",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "snow_albedo",
+                "label": "Snow albedo",
+                "description": null,
+                "units": "(0 - 1)"
+            },
+            {
+                "id": "snow_density",
+                "label": "Snow density",
+                "description": null,
+                "units": "kg m^-3"
+            },
+            {
+                "id": "snow_depth",
+                "label": "Snow depth",
+                "description": null,
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "soil_temperature_level_1",
+                "label": "Soil temperature level 1",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "specific_humidity",
+                "label": "Specific humidity",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sulphate_aerosol_mixing_ratio",
+                "label": "Sulphate aerosol mixing ratio",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "sulphate_aerosol_optical_depth_550nm",
+                "label": "Sulphate aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "sulphur_dioxide",
+                "label": "Sulphur dioxide",
+                "description": null,
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "surface_pressure",
+                "label": "Surface pressure",
+                "description": null,
+                "units": "Pa"
+            },
+            {
+                "id": "temperature",
+                "label": "Temperature",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "temperature_of_snow_layer",
+                "label": "Temperature of snow layer",
+                "description": null,
+                "units": "K"
+            },
+            {
+                "id": "total_aerosol_optical_depth_550nm",
+                "label": "Total aerosol optical depth at 550 nm",
+                "description": null,
+                "units": "dimensionless"
+            },
+            {
+                "id": "total_column_carbon_monoxide",
+                "label": "Total column carbon monoxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ethane",
+                "label": "Total column ethane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_formaldehyde",
+                "label": "Total column formaldehyde",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_hydroxyl_radical",
+                "label": "Total column hydroxyl radical",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_isoprene",
+                "label": "Total column isoprene",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_methane",
+                "label": "Total column methane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitric_acid",
+                "label": "Total column nitric acid",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitrogen_dioxide",
+                "label": "Total column nitrogen dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_nitrogen_monoxide",
+                "label": "Total column nitrogen monoxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_ozone",
+                "label": "Total column ozone",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_peroxyacetyl_nitrate",
+                "label": "Total column peroxyacetyl nitrate",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_propane",
+                "label": "Total column propane",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_sulphur_dioxide",
+                "label": "Total column sulphur dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_water",
+                "label": "Total column water",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "total_column_water_vapour",
+                "label": "Total column water vapour",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertical_velocity",
+                "label": "Vertical velocity",
+                "description": null,
+                "units": "Pa s^-1"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um",
+                "label": "Vertically integrated mass of dust aerosol (0.03 - 0.55 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_0.55-9um",
+                "label": "Vertically integrated mass of dust aerosol (0.55 - 9 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_dust_aerosol_9-20um",
+                "label": "Vertically integrated mass of dust aerosol (9 - 20 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol",
+                "label": "Vertically integrated mass of hydrophilic black carbon aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol",
+                "label": "Vertically integrated mass of hydrophilic organic matter aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol",
+                "label": "Vertically integrated mass of hydrophobic black carbon aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol",
+                "label": "Vertically integrated mass of hydrophobic organic matter aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um",
+                "label": "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um",
+                "label": "Vertically integrated mass of sea salt aerosol (0.5 - 5 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sea_salt_aerosol_5-20um",
+                "label": "Vertically integrated mass of sea salt aerosol (5 - 20 \u00b5m)",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sulphate_aerosol",
+                "label": "Vertically integrated mass of sulphate aerosol",
+                "description": null,
+                "units": "kg m^-2"
+            },
+            {
+                "id": "vertically_integrated_mass_of_sulphur_dioxide",
+                "label": "Vertically integrated mass of sulphur dioxide",
+                "description": null,
+                "units": "kg m^-2"
+            }
+        ]
+    },
+    {
+        "resource_id": 4,
         "resource_uid": "derived-near-surface-meteorological-variables",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
-        "previewimage": null,
-        "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    data_format = request.pop(\"format\", \"zip\")\n\n    if data_format not in {\"zip\", \"tgz\"}:\n        raise ValueError(f\"{data_format=} is not supported\")\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls(\n        [ru[\"url\"] for ru in requests_urls],\n        data_format=data_format\n    )\n    return open(path, \"rb\")",
+        "previewimage": "an url",
+        "adaptor": null,
         "adaptor_configuration": {
             "adaptor.url": {
                 "pattern": [
@@ -56,21 +2211,21 @@
         "begin_date": "1979-01-01",
         "end_date": "2018-12-31",
         "publication_date": "2020-02-11",
-        "record_update": "2022-12-07 09:05:29.918654+01:00",
-        "resource_update": null,
-        "abstract": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models. \n\nThe dataset has been obtained using the same methodology used to derive the widely used water, energy and climate change (WATCH) forcing data, and is thus also referred to as WATCH Forcing Data methodology applied to ERA5 (WFDE5). The data are derived from the ERA5 reanalysis product that have been re-gridded to a half-degree resolution. Data have been adjusted using an elevation correction and monthly-scale bias corrections based on Climatic Research Unit (CRU) data (for temperature, diurnal temperature range, cloud-cover, wet days number and precipitation fields) and Global Precipitation Climatology Centre (GPCC) data (for precipitation fields only). Additional corrections are included for varying atmospheric aerosol-loading and separate precipitation gauge observations. For full details please refer to the product user-guide.\n\nThis dataset was produced on behalf of Copernicus Climate Change Service (C3S) and was generated entirely within the Climate Data Store (CDS) Toolbox. The toolbox source code is provided in the documentation tab.\n\n\n",
-        "citation": null,
+        "record_update": "2022-12-20 09:28:59.607651+01:00",
+        "resource_update": "2022-12-02",
+        "abstract": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models. \\n\\nThe dataset has been obtained using the same methodology used to derive the widely used water, energy and climate change (WATCH) forcing data, and is thus also referred to as WATCH Forcing Data methodology applied to ERA5 (WFDE5). The data are derived from the ERA5 reanalysis product that have been re-gridded to a half-degree resolution. Data have been adjusted using an elevation correction and monthly-scale bias corrections based on Climatic Research Unit (CRU) data (for temperature, diurnal temperature range, cloud-cover, wet days number and precipitation fields) and Global Precipitation Climatology Centre (GPCC) data (for precipitation fields only). Additional corrections are included for varying atmospheric aerosol-loading and separate precipitation gauge observations. For full details please refer to the product user-guide.\\n\\nThis dataset was produced on behalf of Copernicus Climate Change Service (C3S) and was generated entirely within the Climate Data Store (CDS) Toolbox. The toolbox source code is provided in the documentation tab.",
+        "citation": "{\"Cucchi M., Weedon G. P., Amici A., Bellouin N., Lange S., M\u00fcller Schmied H., Hersbach H. and Buontempo C. (2020): Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis, version 1.1. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), (Accessed on DD-MMM-YYYY), 10.24381/cds.20d54e34\n\n\",\"Cucchi M., Weedon G. P., Amici A., Bellouin N., Lange S., M\u00fcller Schmied H., Hersbach H., Cagnazzo, C. and Buontempo C. (2021): Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis, version 2.0. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), (Accessed on DD-MMM-YYYY), 10.24381/cds.20d54e34\",\"Cucchi M., Weedon G. P., Amici A., Bellouin N., Lange S., M\u00fcller Schmied H., Hersbach H., Cagnazzo, C. and Buontempo C. (2022): Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis, version 2.1. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), (Accessed on DD-MMM-YYYY), 10.24381/cds.20d54e34\"}",
         "contactemail": "https://support.ecmwf.int",
         "description": [
-            {
-                "id": "conventions",
-                "label": "Conventions",
-                "value": "Climate and Forecast (CF) Metadata Convention v1.7"
-            },
             {
                 "id": "data-type",
                 "label": "Data type",
                 "value": "Gridded"
+            },
+            {
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid"
             },
             {
                 "id": "file-format",
@@ -88,9 +2243,14 @@
                 "value": "0.5\u00b0 x 0.5\u00b0"
             },
             {
-                "id": "projection",
-                "label": "Projection",
-                "value": "Regular latitude-longitude grid"
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "Surface"
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "Single level"
             },
             {
                 "id": "temporal-coverage",
@@ -108,19 +2268,14 @@
                 "value": "No updates expected"
             },
             {
+                "id": "conventions",
+                "label": "Conventions",
+                "value": "Climate and Forecast (CF) Metadata Convention v1.7"
+            },
+            {
                 "id": "versions",
                 "label": "Versions",
                 "value": "1.0 (deprecated), 1.1, 2.0 and 2.1"
-            },
-            {
-                "id": "vertical-coverage",
-                "label": "Vertical coverage",
-                "value": "Surface"
-            },
-            {
-                "id": "vertical-resolution",
-                "label": "Vertical resolution",
-                "value": "Single level"
             }
         ],
         "documentation": [
@@ -181,10 +2336,65 @@
         "type": "dataset",
         "unit_measure": "dd",
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
-        "variables": []
+        "variables": [
+            {
+                "id": "grid_point_altitude",
+                "label": "Grid-point altitude",
+                "description": "The altitude of each grid-point. Values correspond to altitudes of CRU grid-points.",
+                "units": "m"
+            },
+            {
+                "id": "near_surface_wind_speed",
+                "label": "Near-surface wind speed",
+                "description": "The horizontal speed of the wind, or movement of air, at a height of 10 metres above the surface of the Earth. Values are derived from ERA5 near-surface wind speed.",
+                "units": "m s^-1"
+            },
+            {
+                "id": "near_surface_air_temperature",
+                "label": "Near-surface air temperature",
+                "description": "The temperature of air at 2 metres above the surface of land, sea or inland waters. Values are derived from ERA5 2m air temperature with an elevation correction and bias correction using CRU mean monthly temperature and mean diurnal temperature range.",
+                "units": "K"
+            },
+            {
+                "id": "surface_air_pressure",
+                "label": "Surface air pressure",
+                "description": "The pressure (force per unit area) of the atmosphere at the surface of land, sea and inland water. Values are derived from ERA5 surface air pressure with an elevation correction.",
+                "units": "Pa"
+            },
+            {
+                "id": "near_surface_specific_humidity",
+                "label": "Near-surface specific humidity",
+                "description": "The amount of moisture in the air divided by amount of air plus moisture at that location. Values are derived from ERA5 vapor pressure and saturation vapor pressure with an elevation correction.",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "surface_downwelling_longwave_radiation",
+                "label": "Surface downwelling longwave radiation",
+                "description": "The amount of thermal (also known as longwave or terrestrial) radiation emitted by the atmosphere and clouds that reaches a horizontal plane at the surface of the Earth. Values are derived from ERA5 surface downwelling longwave radiation with an elevation correction.",
+                "units": "W m^-2"
+            },
+            {
+                "id": "surface_downwelling_shortwave_radiation",
+                "label": "Surface downwelling shortwave radiation",
+                "description": "The amount of solar radiation (also known as shortwave radiation) that reaches a horizontal plane at the surface of the Earth. This parameter comprises both direct and diffuse solar radiation. Values are derived from ERA5 surface downwelling shortwave radiation and bias corrected using CRU cloud cover and effects of inter-annual changes in atmospheric aerosol loading.",
+                "units": "W m^-2"
+            },
+            {
+                "id": "rainfall_flux",
+                "label": "Rainfall flux",
+                "description": "The rate of rain that falls to the Earth's surface. Values are derived from ERA5 total precipitation and snowfall and are bias corrected primarily using precipitation data from CRU and GPCC.",
+                "units": "kg m^-2 s^-1"
+            },
+            {
+                "id": "snowfall_flux",
+                "label": "Snowfall flux",
+                "description": "The rate of snow that falls to the Earth's surface. Values are derived from ERA5 total precipitation and snowfall and are bias corrected primarily using precipitation data from CRU and GPCC.",
+                "units": "kg m^-2 s^-1"
+            }
+        ]
     },
     {
-        "resource_id": 4,
+        "resource_id": 1,
         "resource_uid": "reanalysis-era5-land",
         "constraints": "an url",
         "form": "an url",
@@ -192,6 +2402,10 @@
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_configuration": {
+            "embargo": {
+                "days": 5,
+                "hours": 0
+            },
             "format_conversion": {
                 "netcdf.zip": {
                     "always_zip": [
@@ -338,24 +2552,29 @@
             "bboxE": 360,
             "bboxW": 0
         },
-        "begin_date": "1982-01-01",
+        "begin_date": "1950-01-01",
         "end_date": "2022-10-01",
         "publication_date": "2019-07-12",
-        "record_update": "2022-12-07 09:05:29.928281+01:00",
+        "record_update": "2022-12-20 09:28:59.591288+01:00",
         "resource_update": "2022-12-02",
-        "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past. \n\nERA5-Land uses as input to control the simulated land fields ERA5 atmospheric variables, such as air temperature and air humidity. This is called the atmospheric forcing. Without the constraint of the atmospheric forcing, the model-based estimates can rapidly deviate from reality. Therefore, while observations are not directly used in the production of ERA5-Land, they have an indirect influence through the atmospheric forcing used to run the simulation. In addition, the input air temperature, air humidity and pressure used to run ERA5-Land are corrected to account for the altitude difference between the grid of the forcing and the higher resolution grid of ERA5-Land. This correction is called 'lapse rate correction'.    \n\nThe ERA5-Land dataset, as any other simulation, provides estimates which have some degree of uncertainty. Numerical models can only provide a more or less accurate representation of the real physical processes governing different components of the Earth System. In general, the uncertainty of model estimates grows as we go back in time, because the number of observations available to create a good quality atmospheric forcing is lower. ERA5-land parameter fields can currently be used in combination with the uncertainty of the equivalent ERA5 fields. \n\nThe temporal and spatial resolutions of ERA5-Land makes this dataset very useful for all kind of land surface applications such as flood or drought forecasting. The temporal and spatial resolution of this dataset, the period covered in time, as well as the fixed grid used for the data distribution at any period enables decisions makers, businesses and individuals to access and use more accurate information on land states.\n\n\n",
-        "citation": null,
+        "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past. \n\nERA5-Land uses as input to control the simulated land fields ERA5 atmospheric variables, such as air temperature and air humidity. This is called the atmospheric forcing. Without the constraint of the atmospheric forcing, the model-based estimates can rapidly deviate from reality. Therefore, while observations are not directly used in the production of ERA5-Land, they have an indirect influence through the atmospheric forcing used to run the simulation. In addition, the input air temperature, air humidity and pressure used to run ERA5-Land are corrected to account for the altitude difference between the grid of the forcing and the higher resolution grid of ERA5-Land. This correction is called 'lapse rate correction'.    \n\nThe ERA5-Land dataset, as any other simulation, provides estimates which have some degree of uncertainty. Numerical models can only provide a more or less accurate representation of the real physical processes governing different components of the Earth System. In general, the uncertainty of model estimates grows as we go back in time, because the number of observations available to create a good quality atmospheric forcing is lower. ERA5-land parameter fields can currently be used in combination with the uncertainty of the equivalent ERA5 fields. \n\nThe temporal and spatial resolutions of ERA5-Land makes this dataset very useful for all kind of land surface applications such as flood or drought forecasting. The temporal and spatial resolution of this dataset, the period covered in time, as well as the fixed grid used for the data distribution at any period enables decisions makers, businesses and individuals to access and use more accurate information on land states.",
+        "citation": "{\"Mu\u00f1oz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\",\"Mu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\"}",
         "contactemail": "https://support.ecmwf.int",
         "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB"
+            },
             {
                 "id": "data-type",
                 "label": "Data type",
                 "value": "Gridded"
             },
             {
-                "id": "file-format",
-                "label": "File format",
-                "value": "GRIB"
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid"
             },
             {
                 "id": "horizontal-coverage",
@@ -368,9 +2587,14 @@
                 "value": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
             },
             {
-                "id": "projection",
-                "label": "Projection",
-                "value": "Regular latitude-longitude grid"
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
             },
             {
                 "id": "temporal-coverage",
@@ -386,16 +2610,6 @@
                 "id": "update-frequency",
                 "label": "Update frequency",
                 "value": "Monthly with a delay of about three months relatively to actual date."
-            },
-            {
-                "id": "vertical-coverage",
-                "label": "Vertical coverage",
-                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
-            },
-            {
-                "id": "vertical-resolution",
-                "label": "Vertical resolution",
-                "value": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
             }
         ],
         "documentation": [
@@ -409,7 +2623,7 @@
         "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
         "ds_responsible_organisation_role": "publisher",
-        "file_format": "grib",
+        "file_format": "{grib,netcdf}",
         "format_version": null,
         "keywords": [
             "Product type: Reanalysis",
@@ -734,12 +2948,12 @@
         ]
     },
     {
-        "resource_id": 2,
+        "resource_id": 6,
         "resource_uid": "reanalysis-era5-land-monthly-means",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
-        "previewimage": null,
+        "previewimage": "an url",
         "adaptor": null,
         "adaptor_configuration": {
             "format_conversion": {
@@ -912,13 +3126,70 @@
         "begin_date": "1981-01-01",
         "end_date": "2022-09-01",
         "publication_date": "2019-06-23",
-        "record_update": "2022-12-07 09:05:29.923068+01:00",
+        "record_update": "2022-12-20 09:28:59.613899+01:00",
         "resource_update": "2022-12-02",
-        "abstract": "",
-        "citation": null,
+        "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.\n\nERA5-Land provides a consistent view of the water and energy cycles at surface level during several decades.\nIt contains a detailed record from 1950 onwards, with a temporal resolution of 1 hour. The native spatial resolution of the ERA5-Land reanalysis dataset is 9km on a reduced Gaussian grid (TCo1279). The data in the CDS has been regridded to a regular lat-lon grid of 0.1x0.1 degrees.\n\nThe data presented here is a post-processed subset of the full ERA5-Land dataset. Monthly-mean averages have been pre-calculated to facilitate many applications requiring easy and fast access to the data, when sub-monthly fields are not required.\n\nHourly fields can be found in the [ERA5-Land hourly fields CDS page](https://cds-dev.copernicus-climate.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview \"ERA5-Land hourly data\"). Documentation can be found in the online ERA5-Land documentation (https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation)",
+        "citation": "{\"Mu\u00f1oz Sabater, J., (2019): ERA5-Land monthly averaged data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.68d2bb3\",\"Mu\u00f1oz Sabater, J., (2021): ERA5-Land monthly averaged data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.68d2bb3\"}",
         "contactemail": "https://support.ecmwf.int",
-        "description": [],
-        "documentation": [],
+        "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB"
+            },
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid"
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "January 1950 to present"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "Monthly"
+            },
+            {
+                "id": "update-frequency",
+                "label": "Update frequency",
+                "value": "Monthly with a delay of 2-3 months relatively to the actual date."
+            }
+        ],
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
+                "title": "ERA5-Land online documentation",
+                "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above."
+            }
+        ],
         "doi": "10.24381/cds.68d2bb30",
         "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
@@ -944,15 +3215,316 @@
         "type": "dataset",
         "unit_measure": "dd",
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
-        "variables": []
+        "variables": [
+            {
+                "id": "10m_u_component_of_wind",
+                "label": "10m u-component of wind",
+                "description": "Eastward component of the 10m wind. It is the horizontal speed of air moving towards the east, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the V component of 10m wind to give the speed and direction of the horizontal 10m wind.",
+                "units": "m s^-1"
+            },
+            {
+                "id": "10m_v_component_of_wind",
+                "label": "10m v-component of wind",
+                "description": "Northward component of the 10m wind. It is the horizontal speed of air moving towards the north, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the U component of 10m wind to give the speed and direction of the horizontal 10m wind.",
+                "units": "m s^-1"
+            },
+            {
+                "id": "2m_dewpoint_temperature",
+                "label": "2m dewpoint temperature",
+                "description": "Temperature to which the air, at 2 metres above the surface of the Earth, would have to be cooled for saturation to occur.It is a measure of the humidity of the air. Combined with temperature and pressure, it can be used to calculate the relative humidity. 2m dew point temperature is calculated by interpolating between the lowest model level and the Earth's surface, taking account of the atmospheric conditions. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "2m_temperature",
+                "label": "2m temperature",
+                "description": "Temperature of air at 2m above the surface of land, sea or in-land waters. 2m temperature is calculated by interpolating between the lowest model level and the Earth's surface, taking account of the atmospheric conditions. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "evaporation_from_bare_soil",
+                "label": "Evaporation from bare soil",
+                "description": "The amount of evaporation from bare soil at the top of the land surface. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "evaporation_from_open_water_surfaces_excluding_oceans",
+                "label": "Evaporation from open water surfaces excluding oceans",
+                "description": "Amount of evaporation from surface water storage like lakes and inundated areas but excluding oceans. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "evaporation_from_the_top_of_canopy",
+                "label": "Evaporation from the top of canopy",
+                "description": "The amount of evaporation from the canopy interception reservoir at the top of the canopy. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "evaporation_from_vegetation_transpiration",
+                "label": "Evaporation from vegetation transpiration",
+                "description": "Amount of evaporation from vegetation transpiration. This has the same meaning as root extraction i.e. the amount of water extracted from the different soil layers. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "forecast_albedo",
+                "label": "Forecast albedo",
+                "description": "Is a measure of the reflectivity of the Earth's surface. It is the fraction of solar (shortwave) radiation reflected by Earth's surface, across the solar spectrum, for both direct and diffuse radiation. Values are between 0 and 1. Typically, snow and ice have high reflectivity with albedo values of 0.8 and above, land has intermediate values between about 0.1 and 0.4 and the ocean has low values of 0.1 or less. Radiation from the Sun (solar, or shortwave, radiation) is partly reflected back to space by clouds and particles in the atmosphere (aerosols) and some of it is absorbed. The rest is incident on the Earth's surface, where some of it is reflected. The portion that is reflected by the Earth's surface depends on the albedo. In the ECMWF Integrated Forecasting System (IFS), a climatological background albedo (observed values averaged over a period of several years) is used, modified by the model over water, ice and snow. Albedo is often shown as a percentage (%).",
+                "units": "dimensionless"
+            },
+            {
+                "id": "lake_bottom_temperature",
+                "label": "Lake bottom temperature",
+                "description": "Temperature of water at the bottom of inland water bodies (lakes, reservoirs, rivers) and coastal waters. ECMWF implemented a lake model in May 2015 to represent the water temperature and lake ice of all the world\u2019s major inland water bodies in the Integrated Forecasting System. The model keeps lake depth and surface area (or fractional cover) constant in time.",
+                "units": "K"
+            },
+            {
+                "id": "lake_ice_depth",
+                "label": "Lake ice depth",
+                "description": "The thickness of ice on inland water bodies (lakes, reservoirs and rivers) and coastal waters. The ECMWF Integrated Forecasting System (IFS) represents the formation and melting of ice on inland water bodies (lakes, reservoirs and rivers) and coastal water. A single ice layer is represented. This parameter is the thickness of that ice layer.",
+                "units": "m"
+            },
+            {
+                "id": "lake_ice_temperature",
+                "label": "Lake ice temperature",
+                "description": "The temperature of the uppermost surface of ice on inland water bodies (lakes, reservoirs, rivers) and coastal waters. The ECMWF Integrated Forecasting System represents the formation and melting of ice on lakes. A single ice layer is represented. The temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "lake_mix_layer_depth",
+                "label": "Lake mix-layer depth",
+                "description": "The thickness of the upper most layer of an inland water body (lake, reservoirs, and rivers) or coastal waters that is well mixed and has a near constant temperature with depth (uniform distribution of temperature). The ECMWF Integrated Forecasting System represents inland water bodies with two layers in the vertical, the mixed layer above and the thermocline below. Thermoclines upper boundary is located at the mixed layer bottom, and the lower boundary at the lake bottom. Mixing within the mixed layer can occur when the density of the surface (and near-surface) water is greater than that of the water below. Mixing can also occur through the action of wind on the surface of the lake.",
+                "units": "m"
+            },
+            {
+                "id": "lake_mix_layer_temperature",
+                "label": "Lake mix-layer temperature",
+                "description": "The temperature of the upper most layer of inland water bodies (lakes, reservoirs and rivers) or coastal waters) that is well mixed. The ECMWF Integrated Forecasting System represents inland water bodies with two layers in the vertical, the mixed layer above and the thermocline below. Thermoclines upper boundary is located at the mixed layer bottom, and the lower boundary at the lake bottom. Mixing within the mixed layer can occur when the density of the surface (and near-surface) water is greater than that of the water below. Mixing can also occur through the action of wind on the surface of the lake. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "lake_shape_factor",
+                "label": "Lake shape factor",
+                "description": "This parameter describes the way that temperature changes with depth in the thermocline layer of inland water bodies (lakes, reservoirs and rivers) and coastal waters. It is used to calculate the lake bottom temperature and other lake-related parameters. The ECMWF Integrated Forecasting System represents inland and coastal water bodies with two layers in the vertical, the mixed layer above and the thermocline below where temperature changes with depth.",
+                "units": "dimensionless"
+            },
+            {
+                "id": "lake_total_layer_temperature",
+                "label": "Lake total layer temperature",
+                "description": "The mean temperature of total water column in inland water bodies (lakes, reservoirs and rivers) and coastal waters. The ECMWF Integrated Forecasting System represents inland water bodies with two layers in the vertical, the mixed layer above and the thermocline below where temperature changes with depth. This parameter is the mean over the two layers. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "leaf_area_index_high_vegetation",
+                "label": "Leaf area index, high vegetation",
+                "description": "One-half of the total green leaf area per unit horizontal ground surface area for high vegetation type.",
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "leaf_area_index_low_vegetation",
+                "label": "Leaf area index, low vegetation",
+                "description": "One-half of the total green leaf area per unit horizontal ground surface area for low vegetation type.",
+                "units": "m^2 m^-2"
+            },
+            {
+                "id": "potential_evaporation",
+                "label": "Potential evaporation",
+                "description": "Potential evaporation (pev) in the current ECMWF model is computed, by making a second call to the surface energy balance routine with the vegetation variables set to \"crops/mixed farming\" and assuming no stress from soil moisture. In other words, evaporation is computed for agricultural land as if it is well watered and assuming that the atmosphere is not affected by this artificial surface condition. The latter may not always be realistic. Although pev is meant to provide an estimate of irrigation requirements, the method can give unrealistic results in arid conditions due to too strong evaporation forced by dry air. Note that in ERA5-Land pev is computed as an open water evaporation (Pan evaporation) and assuming that the atmosphere is not affected by this artificial surface condition. The latter is different from the way pev is computed in ERA5. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m"
+            },
+            {
+                "id": "runoff",
+                "label": "Runoff",
+                "description": "Some water from rainfall, melting snow, or deep in the soil, stays stored in the soil. Otherwise, the water drains away, either over the surface (surface runoff), or under the ground (sub-surface runoff) and the sum of these two is simply called 'runoff'. This variable is the total amount of water accumulated from the beginning of the forecast time to the end of the forecast step. The units of runoff are depth in metres. This is the depth the water would have if it were spread evenly over the grid box. Care should be taken when comparing model variables with observations, because observations are often local to a particular point rather than averaged over a grid square area.  Observations are also often taken in different units, such as mm/day, rather than the accumulated metres produced here. Runoff is a measure of the availability of water in the soil, and can, for example, be used as an indicator of drought or flood. More information about how runoff is calculated is given in the IFS Physical Processes documentation.",
+                "units": "m"
+            },
+            {
+                "id": "skin_reservoir_content",
+                "label": "Skin reservoir content",
+                "description": "Amount of water in the vegetation canopy and/or in a thin layer on the soil. It represents the amount of rain intercepted by foliage, and water from dew. The maximum amount of 'skin reservoir content' a grid box can hold depends on the type of vegetation, and may be zero.  Water leaves the 'skin reservoir' by evaporation.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "skin_temperature",
+                "label": "Skin temperature",
+                "description": "Temperature of the surface of the Earth. The skin temperature is the theoretical temperature that is required to satisfy the surface energy balance. It represents the temperature of the uppermost surface layer, which has no heat capacity and so can respond instantaneously to changes in surface fluxes. Skin temperature is calculated differently over land and sea. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "snow_albedo",
+                "label": "Snow albedo",
+                "description": "It is defined as the fraction of solar (shortwave) radiation reflected by the snow, across the solar spectrum, for both direct and diffuse radiation. It is a measure of the reflectivity of the snow covered grid cells. Values vary between 0 and 1. Typically, snow and ice have high reflectivity with albedo values of 0.8 and above.",
+                "units": "dimensionless"
+            },
+            {
+                "id": "snow_cover",
+                "label": "Snow cover",
+                "description": "It represents the fraction (0-1) of the cell / grid-box occupied by snow (similar to the cloud cover fields of ERA5).",
+                "units": "%"
+            },
+            {
+                "id": "snow_density",
+                "label": "Snow density",
+                "description": "Mass of snow per cubic metre in the snow layer. The ECMWF Integrated Forecast System (IFS) model represents snow as a single additional layer over the uppermost soil level. The snow may cover all or part of the grid box.",
+                "units": "kg m^-3"
+            },
+            {
+                "id": "snow_depth",
+                "label": "Snow depth",
+                "description": "Instantaneous grib-box average of the snow thickness on the ground (excluding snow on canopy).",
+                "units": "m"
+            },
+            {
+                "id": "snow_depth_water_equivalent",
+                "label": "Snow depth water equivalent",
+                "description": "Depth of snow from the snow-covered area of a grid box. Its units are metres of water equivalent, so it is the depth the water would have if the snow melted and was spread evenly over the whole grid box. The ECMWF Integrated Forecast System represents snow as a single additional layer over the uppermost soil level. The snow may cover all or part of the grid box.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "snow_evaporation",
+                "label": "Snow evaporation",
+                "description": "Evaporation from snow averaged over the grid box (to find flux over snow, divide by snow fraction). This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "snowfall",
+                "label": "Snowfall",
+                "description": "Accumulated total snow that has fallen to the Earth's surface. It consists of snow due to the large-scale atmospheric flow (horizontal scales greater than around a few hundred metres) and convection where smaller scale areas (around 5km to a few hundred kilometres) of warm air rise. If snow has melted during the period over which this variable was accumulated, then it will be higher than the snow depth. This variable is the total amount of water accumulated from the beginning of the forecast time to the end of the forecast step. The units given measure the depth the water would have if the snow melted and was spread evenly over the grid box. Care should be taken when comparing model variables with observations, because observations are often local to a particular point in space and time, rather than representing averages over a model grid box and model time step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "snowmelt",
+                "label": "Snowmelt",
+                "description": "Melting of snow averaged over the grid box (to find melt over snow, divide by snow fraction). This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "soil_temperature_level_1",
+                "label": "Soil temperature level 1",
+                "description": "Temperature of the soil in layer 1 (0 - 7 cm) of the ECMWF Integrated Forecasting System. The surface is at 0 cm. Soil temperature is set at the middle of each layer, and heat transfer is calculated at the interfaces between them. It is assumed that there is no heat transfer out of the bottom of the lowest layer. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "soil_temperature_level_2",
+                "label": "Soil temperature level 2",
+                "description": "Temperature of the soil in layer 2 (7 -28cm) of the ECMWF Integrated Forecasting System.",
+                "units": "K"
+            },
+            {
+                "id": "soil_temperature_level_3",
+                "label": "Soil temperature level 3",
+                "description": "Temperature of the soil in layer 3 (28-100cm) of the ECMWF Integrated Forecasting System.",
+                "units": "K"
+            },
+            {
+                "id": "soil_temperature_level_4",
+                "label": "Soil temperature level 4",
+                "description": "Temperature of the soil in layer 4 (100-289 cm) of the ECMWF Integrated Forecasting System.",
+                "units": "K"
+            },
+            {
+                "id": "sub_surface_runoff",
+                "label": "Sub-surface runoff",
+                "description": "Some water from rainfall, melting snow, or deep in the soil, stays stored in the soil. Otherwise, the water drains away, either over the surface (surface runoff), or under the ground (sub-surface runoff) and the sum of these two is simply called 'runoff'. This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units of runoff are depth in metres. This is the depth the water would have if it were spread evenly over the grid box. Care should be taken when comparing model variables with observations, because observations are often local to a particular point rather than averaged over a grid square area.  Observations are also often taken in different units, such as mm/day, rather than the accumulated metres produced here. Runoff is a measure of the availability of water in the soil, and can, for example, be used as an indicator of drought or flood. More information about how runoff is calculated is given in the IFS Physical Processes documentation.",
+                "units": "m"
+            },
+            {
+                "id": "surface_latent_heat_flux",
+                "label": "Surface latent heat flux",
+                "description": "Exchange of latent heat with the surface through turbulent diffusion. This variables is accumulated from the beginning of the forecast time to the end of the forecast step. By model convention, downward fluxes are positive.",
+                "units": "J m^-2"
+            },
+            {
+                "id": "surface_net_solar_radiation",
+                "label": "Surface net solar radiation",
+                "description": "Amount of solar radiation (also known as shortwave radiation) reaching the surface of the Earth (both direct and diffuse) minus the amount reflected by the Earth's surface (which is governed by the albedo).Radiation from the Sun (solar, or shortwave, radiation) is partly reflected back to space by clouds and particles in the atmosphere (aerosols) and some of it is absorbed. The rest is incident on the Earth's surface, where some of it is reflected. The difference between downward and reflected solar radiation is the surface net solar radiation. This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
+                "units": "J m^-2"
+            },
+            {
+                "id": "surface_net_thermal_radiation",
+                "label": "Surface net thermal radiation",
+                "description": "Net thermal radiation at the surface. Accumulated field from the beginning of the forecast time to the end of the forecast step. By model convention downward fluxes are positive.",
+                "units": "J m^-2"
+            },
+            {
+                "id": "surface_pressure",
+                "label": "Surface pressure",
+                "description": "Pressure (force per unit area) of the atmosphere on the surface of land, sea and in-land water. It is a measure of the weight of all the air in a column vertically above the area of the Earth's surface represented at a fixed point. Surface pressure is often used in combination with temperature to calculate air density. The strong variation of pressure with altitude makes it difficult to see the low and high pressure systems over mountainous areas, so mean sea level pressure, rather than surface pressure, is normally used for this purpose. The units of this variable are Pascals (Pa). Surface pressure is often measured in hPa and sometimes is presented in the old units of millibars, mb (1 hPa = 1 mb = 100 Pa).",
+                "units": "Pa"
+            },
+            {
+                "id": "surface_runoff",
+                "label": "Surface runoff",
+                "description": "Some water from rainfall, melting snow, or deep in the soil, stays stored in the soil. Otherwise, the water drains away, either over the surface (surface runoff), or under the ground (sub-surface runoff) and the sum of these two is simply called 'runoff'. This variable is the total amount of water accumulated from the beginning of the forecast time to the end of the forecast step. The units of runoff are depth in metres. This is the depth the water would have if it were spread evenly over the grid box. Care should be taken when comparing model variables with observations, because observations are often local to a particular point rather than averaged over a grid square area. Observations are also often taken in different units, such as mm/day, rather than the accumulated metres produced here. Runoff is a measure of the availability of water in the soil, and can, for example, be used as an indicator of drought or flood. More information about how runoff is calculated is given in the IFS Physical Processes documentation.",
+                "units": "m"
+            },
+            {
+                "id": "surface_sensible_heat_flux",
+                "label": "Surface sensible heat flux",
+                "description": "Transfer of heat between the Earth's surface and the atmosphere through the effects of turbulent air motion (but excluding any heat transfer resulting from condensation or evaporation). The magnitude of the sensible heat flux is governed by the difference in temperature between the surface and the overlying atmosphere, wind speed and the surface roughness. For example, cold air overlying a warm surface would produce a sensible heat flux from the land (or ocean) into the atmosphere. This is a single level variable and it is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
+                "units": "J m^-2"
+            },
+            {
+                "id": "surface_solar_radiation_downwards",
+                "label": "Surface solar radiation downwards",
+                "description": "Amount of solar radiation (also known as shortwave radiation) reaching the surface of the Earth. This variable comprises both direct and diffuse solar radiation. Radiation from the Sun (solar, or shortwave, radiation) is partly reflected back to space by clouds and particles in the atmosphere (aerosols) and some of it is absorbed.  The rest is incident on the Earth's surface (represented by this variable). To a reasonably good approximation, this variable is the model equivalent of what would be measured by a pyranometer (an instrument used for measuring solar radiation) at the surface. However, care should be taken when comparing model variables with observations, because observations are often local to a particular point in space and time, rather than representing averages over a  model grid box and model time step. This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
+                "units": "J m-2"
+            },
+            {
+                "id": "surface_thermal_radiation_downwards",
+                "label": "Surface thermal radiation downwards",
+                "description": "Amount of thermal (also known as longwave or terrestrial) radiation emitted by the atmosphere and clouds that reaches the Earth's surface. The surface of the Earth emits thermal radiation, some of which is absorbed by the atmosphere and clouds. The atmosphere and clouds likewise emit thermal radiation in all directions, some of which reaches the surface (represented by this variable). This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
+                "units": "J m-2"
+            },
+            {
+                "id": "temperature_of_snow_layer",
+                "label": "Temperature of snow layer",
+                "description": "This variable gives the temperature of the snow layer from the ground to the snow-air interface. The ECMWF Integrated Forecast System (IFS) model represents snow as a single additional layer over the uppermost soil level. The snow may cover all or part of the  grid box. Temperature measured in kelvin can be converted to degrees Celsius (\u00b0C) by subtracting 273.15.",
+                "units": "K"
+            },
+            {
+                "id": "total_evaporation",
+                "label": "Total evaporation",
+                "description": "Accumulated amount of water that has evaporated from the Earth's surface, including a simplified representation of transpiration (from vegetation), into vapour in the air above. This variable is accumulated from the beginning of the forecast to the end of the forecast step. The ECMWF Integrated Forecasting System convention is that downward fluxes are positive. Therefore, negative values indicate evaporation and positive values indicate condensation.",
+                "units": "m of water equivalent"
+            },
+            {
+                "id": "total_precipitation",
+                "label": "Total precipitation",
+                "description": "Accumulated liquid and frozen water, including rain and snow, that falls to the Earth's surface. It is the sum of large-scale precipitation (that precipitation which is generated by large-scale weather patterns, such as troughs and cold fronts) and convective precipitation (generated by convection which occurs when air at lower levels in the atmosphere is warmer and less dense than the air above, so it rises). Precipitation variables do not include fog, dew or the precipitation that evaporates in the atmosphere before it lands at the surface of the Earth. This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units of precipitation are depth in metres. It is the depth the water would have if it were spread evenly over the grid box. Care should be taken when comparing model variables with observations, because observations are often local to a particular point in space and time, rather than representing averages over a model grid box and  model time step.",
+                "units": "m"
+            },
+            {
+                "id": "volumetric_soil_water_layer_1",
+                "label": "Volumetric soil water layer 1",
+                "description": "Volume of water in soil layer 1 (0 - 7 cm) of the ECMWF Integrated Forecasting System. The surface is at 0 cm. The volumetric soil water is associated with the soil texture (or classification), soil depth, and the underlying groundwater level.",
+                "units": "m^3 m^-3"
+            },
+            {
+                "id": "volumetric_soil_water_layer_2",
+                "label": "Volumetric soil water layer 2",
+                "description": "Volume of water in soil layer 2 (7 -28 cm) of the ECMWF Integrated Forecasting System.",
+                "units": "m^3 m^-3"
+            },
+            {
+                "id": "volumetric_soil_water_layer_3",
+                "label": "Volumetric soil water layer 3",
+                "description": "Volume of water in soil layer 3 (28-100 cm) of the ECMWF Integrated Forecasting System.",
+                "units": "m^3 m^-3"
+            },
+            {
+                "id": "volumetric_soil_water_layer_4",
+                "label": "Volumetric soil water layer 4",
+                "description": "Volume of water in soil layer 4 (100-289 cm) of the ECMWF Integrated Forecasting System.",
+                "units": "m^3 m^-3"
+            }
+        ]
     },
     {
-        "resource_id": 3,
+        "resource_id": 5,
         "resource_uid": "reanalysis-era5-pressure-levels",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
-        "previewimage": null,
+        "previewimage": "an url",
         "adaptor": null,
         "adaptor_configuration": {
             "embargo": {
@@ -1066,15 +3638,79 @@
             "bboxW": 0
         },
         "begin_date": "1979-01-01",
-        "end_date": "2022-11-28",
+        "end_date": "2022-12-09",
         "publication_date": "2018-06-14",
-        "record_update": "2022-12-07 09:05:29.925931+01:00",
-        "resource_update": "2022-12-04",
-        "abstract": "",
-        "citation": null,
+        "record_update": "2022-12-20 09:28:59.610567+01:00",
+        "resource_update": "2022-12-15",
+        "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.",
+        "citation": "{\"Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Hor\u00e1nyi, A., Mu\u00f1oz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Th\u00e9paut, J-N. (2018): ERA5 hourly data on pressure levels from 1959 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.bd0915c6\"}",
         "contactemail": "https://support.ecmwf.int",
-        "description": [],
-        "documentation": [],
+        "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB"
+            },
+            {
+                "id": "data-type",
+                "label": "Data type",
+                "value": "Gridded"
+            },
+            {
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid."
+            },
+            {
+                "id": "horizontal-coverage",
+                "label": "Horizontal coverage",
+                "value": "Global"
+            },
+            {
+                "id": "horizontal-resolution",
+                "label": "Horizontal resolution",
+                "value": "\nReanalysis: 0.25\u00b0 x 0.25\u00b0\n\nMean, spread and members: 0.5\u00b0 x 0.5\u00b0"
+            },
+            {
+                "id": "temporal-coverage",
+                "label": "Temporal coverage",
+                "value": "1959 to present"
+            },
+            {
+                "id": "temporal-resolution",
+                "label": "Temporal resolution",
+                "value": "Hourly"
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "37 pressure levels"
+            },
+            {
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "1000 hPa to 1 hPa"
+            }
+        ],
+        "documentation": [
+            {
+                "url": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
+                "title": "ERA5 data documentation",
+                "description": "Detailed information relating to the ERA5 data archive can be found in the web link above."
+            },
+            {
+                "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174",
+                "title": "The ERA5 global reanalysis: Preliminary extension to 1950",
+                "description": "Journal article describing the ERA5 preliminary extension.",
+                "kind": ""
+            },
+            {
+                "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803",
+                "title": "The ERA5 global reanalysis",
+                "description": "Journal article describing ERA5.",
+                "kind": ""
+            }
+        ],
         "doi": "10.24381/cds.bd0915c6",
         "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
@@ -1099,15 +3735,112 @@
         "type": "dataset",
         "unit_measure": "dd",
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
-        "variables": []
+        "variables": [
+            {
+                "id": "divergence",
+                "label": "Divergence",
+                "description": "This parameter is the horizontal divergence of velocity. It is the rate at which  air is spreading out horizontally from a point, per square metre. This parameter  is positive for air that is spreading out, or diverging, and negative for the  opposite, for air that is concentrating, or converging (convergence).",
+                "units": "s^-1"
+            },
+            {
+                "id": "fraction_of_cloud_cover",
+                "label": "Fraction of cloud cover",
+                "description": "This parameter is the proportion of a grid box covered by cloud (liquid or ice)  and varies between zero and one. This parameter is available on multiple levels through the atmosphere.",
+                "units": "Dimensionless"
+            },
+            {
+                "id": "geopotential",
+                "label": "Geopotential",
+                "description": "This parameter is the gravitational potential energy of a unit mass, at a  particular location, relative to mean sea level. It is also the amount of work  that would have to be done, against the force of gravity, to lift a unit mass to  that location from mean sea level.\nThe geopotential height can be calculated by dividing the geopotential by the  Earth's gravitational acceleration, g (=9.80665 m s-2). The geopotential height  plays an important role in synoptic meteorology (analysis of weather patterns).  Charts of geopotential height plotted at constant pressure levels (e.g., 300,  500 or 850 hPa) can be used to identify weather systems such as cyclones,  anticyclones, troughs and ridges.\nAt the surface of the Earth, this parameter shows the variations in geopotential  (height) of the surface, and is often referred to as the orography.",
+                "units": "m^2 s^-2"
+            },
+            {
+                "id": "ozone_mass_mixing_ratio",
+                "label": "Ozone mass mixing ratio",
+                "description": "This parameter is the mass of ozone per kilogram of air.\nIn the ECMWF Integrated Forecasting System (IFS), there is a simplified  representation of ozone chemistry (including representation of the chemistry  which has caused the ozone hole). Ozone is also transported around in the  atmosphere through the motion of air.\nNaturally occurring ozone in the stratosphere helps protect organisms at the  surface of the Earth from the harmful effects of ultraviolet (UV) radiation from  the Sun. Ozone near the surface, often produced because of pollution, is harmful  to organisms.\nMost of the IFS chemical species are archived as mass mixing ratios [kg kg-1].",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "potential_vorticity",
+                "label": "Potential vorticity",
+                "description": "Potential vorticity is a measure of the capacity for air to rotate in the  atmosphere. If we ignore the effects of heating and friction, potential vorticity  is conserved following an air parcel. It is used to look for places where large  wind storms are likely to originate and develop. Potential vorticity increases  strongly above the tropopause and therefore, it can also be used in studies related  to the stratosphere and stratosphere-troposphere exchanges.\nLarge wind storms develop when a column of air in the atmosphere starts to rotate.  Potential vorticity is calculated from the wind, temperature and pressure across a  column of air in the atmosphere. ",
+                "units": "K m^2 kg^-1 s^-1"
+            },
+            {
+                "id": "relative_humidity",
+                "label": "Relative humidity",
+                "description": "This parameter is the water vapour pressure as a percentage of the value at which  the air becomes saturated (the point at which water vapour begins to condense into  liquid water or deposition into ice).\nFor temperatures over 0\u00b0C (273.15 K) it is calculated for saturation over water. At  temperatures below -23\u00b0C it is calculated for saturation over ice. Between -23\u00b0C  and 0\u00b0C this parameter is calculated by interpolating between the ice and water  values using a quadratic function. ",
+                "units": "%"
+            },
+            {
+                "id": "specific_cloud_ice_water_content",
+                "label": "Specific cloud ice water content",
+                "description": "This parameter is the mass of cloud ice particles per kilogram of the total mass of  moist air. The 'total mass of moist air' is the sum of the dry air, water vapour,  cloud liquid, cloud ice, rain and falling snow. This parameter represents the  average value for a grid box.\nWater within clouds can be liquid or ice, or a combination of the two. Note that  'cloud frozen water' is the same as 'cloud ice water'.",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_cloud_liquid_water_content",
+                "label": "Specific cloud liquid water content",
+                "description": "This parameter is the mass of cloud liquid water droplets per kilogram of the total  mass of moist air. The 'total mass of moist air' is the sum of the dry air, water  vapour, cloud liquid, cloud ice, rain and falling snow. This parameter represents  the average value for a grid box.\nWater within clouds can be liquid or ice, or a combination of the two. ",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_humidity",
+                "label": "Specific humidity",
+                "description": "This parameter is the mass of water vapour per kilogram of moist air.\nThe total mass of moist air is the sum of the dry air, water vapour, cloud liquid,  cloud ice, rain and falling snow.",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_rain_water_content",
+                "label": "Specific rain water content",
+                "description": "The mass of water produced from large-scale clouds that is of raindrop size and so  can fall to the surface as precipitation.\nLarge-scale clouds are generated by the cloud scheme in the ECMWF Integrated  Forecasting System (IFS). The cloud scheme represents the formation and dissipation  of clouds and large-scale precipitation due to changes in atmospheric quantities  (such as pressure, temperature and moisture) predicted directly by the IFS at spatial  scales of a grid box or larger.\nThe quantity is expressed in kilograms per kilogram of the total mass of moist air.  The 'total mass of moist air' is the sum of the dry air, water vapour, cloud liquid,  cloud ice, rain and falling snow. This parameter represents the average value for a  grid box.\nClouds contain a continuum of different sized water droplets and ice particles. The  IFS cloud scheme simplifies this to represent a number of discrete cloud  droplets/particles including cloud water droplets, raindrops, ice crystals and snow  (aggregated ice crystals). The processes of droplet formation, phase transition and  aggregation are also highly simplified in the IFS.",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "specific_snow_water_content",
+                "label": "Specific snow water content",
+                "description": "The mass of snow (aggregated ice crystals) produced from large-scale clouds that can  fall to the surface as precipitation.\nLarge-scale clouds are generated by the cloud scheme in the ECMWF Integrated  Forecasting System (IFS). The cloud scheme represents the formation and dissipation  of clouds and large-scale precipitation due to changes in atmospheric quantities (such  as pressure, temperature and moisture) predicted directly by the IFS at spatial scales  of a grid box or larger.\nThe mass is expressed in kilograms per kilogram of the total mass of moist air. The  'total mass of moist air' is the sum of the dry air, water vapour, cloud liquid, cloud  ice, rain and falling snow. This parameter represents the average value for a grid box.\nClouds contain a continuum of different sized water droplets and ice particles. The IFS  cloud scheme simplifies this to represent a number of discrete cloud droplets/particles  including cloud water droplets, raindrops, ice crystals and snow (aggregated ice  crystals). The processes of droplet formation, phase transition and aggregation are also  highly simplified in the IFS.",
+                "units": "kg kg^-1"
+            },
+            {
+                "id": "temperature",
+                "label": "Temperature",
+                "description": "This parameter is the temperature in the atmosphere.\nIt has units of kelvin (K). Temperature measured in kelvin can be converted to degrees  Celsius (\u00b0C) by subtracting 273.15.\nThis parameter is available on multiple levels through the atmosphere.",
+                "units": "K"
+            },
+            {
+                "id": "u_component_of_wind",
+                "label": "U-component of wind",
+                "description": "This parameter is the eastward component of the wind. It is the horizontal speed of air  moving towards the east. A negative sign indicates air moving towards the west.\nThis parameter can be combined with the V component of wind to give the speed and  direction of the horizontal wind.",
+                "units": "m s^-1"
+            },
+            {
+                "id": "v_component_of_wind",
+                "label": "V-component of wind",
+                "description": "This parameter is the northward component of the wind. It is the horizontal speed of air  moving towards the north. A negative sign indicates air moving towards the south.\nThis parameter can be combined with the U component of wind to give the speed and  direction of the horizontal wind.",
+                "units": "m s^-1"
+            },
+            {
+                "id": "vertical_velocity",
+                "label": "Vertical velocity",
+                "description": "This parameter is the speed of air motion in the upward or downward direction. The ECMWF  Integrated Forecasting System (IFS) uses a pressure based vertical co-ordinate system and  pressure decreases with height, therefore negative values of vertical velocity indicate  upward motion.\nVertical velocity can be useful to understand the large-scale dynamics of the atmosphere,  including areas of upward motion/ascent (negative values) and downward motion/subsidence  (positive values).",
+                "units": "Pa s^-1"
+            },
+            {
+                "id": "vorticity",
+                "label": "Vorticity (relative)",
+                "description": "This parameter is a measure of the rotation of air in the horizontal, around a vertical  axis, relative to a fixed point on the surface of the Earth.\nOn the scale of weather systems, troughs (weather features that can include rain) are  associated with anticlockwise rotation (in the northern hemisphere), and ridges (weather  features that bring light or still winds) are associated with clockwise rotation.\nAdding the effect of rotation of the Earth, the Coriolis parameter, to the relative  vorticity produces the absolute vorticity.",
+                "units": "s^-1"
+            }
+        ]
     },
     {
-        "resource_id": 5,
+        "resource_id": 8,
         "resource_uid": "reanalysis-era5-single-levels",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
-        "previewimage": null,
+        "previewimage": "an url",
         "adaptor": null,
         "adaptor_configuration": {
             "embargo": {
@@ -1467,23 +4200,28 @@
             "bboxW": 0
         },
         "begin_date": "1979-01-01",
-        "end_date": "2022-11-27",
+        "end_date": "2022-12-09",
         "publication_date": "2018-06-14",
-        "record_update": "2022-12-07 09:05:29.931813+01:00",
-        "resource_update": "2022-12-04",
-        "abstract": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on single levels from 1959 to present\".\n",
-        "citation": null,
+        "record_update": "2022-12-20 09:28:59.623206+01:00",
+        "resource_update": "2022-12-15",
+        "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5.\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on single levels from 1959 to present\"",
+        "citation": "{\"Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Hor\u00e1nyi, A., Mu\u00f1oz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Th\u00e9paut, J-N. (2018): ERA5 hourly data on single levels from 1959 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.adbb2d47\"}",
         "contactemail": "https://support.ecmwf.int",
         "description": [
+            {
+                "id": "file-format",
+                "label": "File format",
+                "value": "GRIB"
+            },
             {
                 "id": "data-type",
                 "label": "Data type",
                 "value": "Gridded"
             },
             {
-                "id": "file-format",
-                "label": "File format",
-                "value": "GRIB"
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid"
             },
             {
                 "id": "horizontal-coverage",
@@ -1494,11 +4232,6 @@
                 "id": "horizontal-resolution",
                 "label": "Horizontal resolution",
                 "value": "\nReanalysis: 0.25\u00b0 x 0.25\u00b0 (atmosphere), 0.5\u00b0 x 0.5\u00b0 (ocean waves)\n\nMean, spread and members: 0.5\u00b0 x 0.5\u00b0 (atmosphere), 1\u00b0 x 1\u00b0 (ocean waves)"
-            },
-            {
-                "id": "projection",
-                "label": "Projection",
-                "value": "Regular latitude-longitude grid"
             },
             {
                 "id": "temporal-coverage",
@@ -1774,12 +4507,6 @@
                 "label": "Friction velocity",
                 "description": "Air flowing over a surface exerts a stress that transfers momentum to the surface and  slows the wind. This parameter is a theoretical wind speed at the Earth's surface that  expresses the magnitude of stress. It is calculated by dividing the surface stress by  air density and taking its square root. For turbulent flow, the friction velocity is  approximately constant in the lowest few metres of the atmosphere.\nThis parameter increases with the roughness of the surface. It is used to calculate  the way wind changes with height in the lowest levels of the atmosphere.",
                 "units": "m s^-1"
-            },
-            {
-                "id": "geopotential",
-                "label": "Geopotential",
-                "description": "This parameter is the gravitational potential energy of a unit mass, at a particular location at the surface of the Earth, relative to mean sea level. It is also the amount of work that would have to be done, against the force of gravity, to lift a unit mass to that location from mean sea level.\nThe (surface) geopotential height (orography) can be calculated by dividing the (surface) geopotential by the Earth's gravitational acceleration, g (=9.80665 m s^-2 ).\nThis parameter does not vary in time.",
-                "units": "m^2 s^-2"
             },
             {
                 "id": "gravity_wave_dissipation",
@@ -2440,6 +5167,12 @@
                 "label": "Ocean surface stress equivalent 10m neutral wind speed",
                 "description": "This parameter is the horizontal speed of the \"neutral wind\", at a height of ten metres  above the surface of the Earth. The units of this parameter are metres per second.\nThe neutral wind is calculated from the surface stress and roughness length by assuming  that the air is neutrally stratified. The neutral wind is, by definition, in the direction  of the surface stress. The size of the roughness length depends on the sea state.\nThis parameter is the wind speed used to force the wave model, therefore it is only  calculated over water bodies represented in the ocean wave model. It is interpolated from  the atmospheric model's horizontal grid onto the horizontal grid used by the ocean wave model.",
                 "units": "m s^-1"
+            },
+            {
+                "id": "geopotential",
+                "label": "Geopotential",
+                "description": "This parameter is the gravitational potential energy of a unit mass, at a particular location at the surface of the Earth, relative to mean sea level. It is also the amount of work that would have to be done, against the force of gravity, to lift a unit mass to that location from mean sea level.\nThe (surface) geopotential height (orography) can be calculated by dividing the (surface) geopotential by the Earth's gravitational acceleration, g (=9.80665 m s^-2 ).\nThis parameter does not vary in time.",
+                "units": "m^2 s^-2"
             },
             {
                 "id": "peak_wave_period",
@@ -3140,7 +5873,7 @@
         ]
     },
     {
-        "resource_id": 6,
+        "resource_id": 7,
         "resource_uid": "satellite-surface-radiation-budget",
         "constraints": "an url",
         "form": "an url",
@@ -3220,92 +5953,19 @@
         "begin_date": "1982-01-01",
         "end_date": "2021-12-01",
         "publication_date": "2020-10-20",
-        "record_update": "2022-12-07 09:05:29.942567+01:00",
-        "resource_update": null,
-        "abstract": "\n\nThis dataset provides the Surface Radiation Budget (SRB)  Essential Climate Variable (ECV). SRB represents the balance between the heating of the surface through incoming solar radiation and cooling through emission of infra-red radiation which is a fundamental component of the surface energy budget. Small changes in the surface radiation budget can lead to large climatological responses, which makes a permanent and precise monitoring indispensable. Accurate understanding of the surface radiation budget at regional and global scales can improve the understanding of the Earth\u2019s climate system and supports research on current and anticipated climate change, as well as the evaluation of radiative processes in climate models. Better knowledge of the global and regional surface radiation budget is also required for a successful utilization of renewable energy sources, such as solar power plants.\n\n\nThe ECV Surface Radiation Budget contains seven variables which can be separated into the solar (shortwave) and the thermal (longwave) surface radiation components. Both components include the incoming (downwelling), the outgoing (upwelling), and the net radiation fluxes.  These variables were produced by two \u201cproduct families\u201d, based on the data from different sensors and algorithms cover the same seven variables.\nThe two families follow somewhat different nomenclatures. To help the user to navigate the different names,  a table relating the names used in the download form with the names used within the files and in other datasets distributed by the Climate Data Store is added at the end of this overview.  The fact that the naming is different reflects the fact that each family was originated by different projects within different organisations at different times. However, the third organisation, the Copernicus Climate Change Service (C3S) is not associated with a different product family in this dataset. In fact it is associated with both product families to which it provides a continuation of their production chain. This means that the datasets contains three organisation but just two product families.\n\nThe \u201cCLARA product family\u201d and \u201cCCI product family\u201d provide two complementary Thematic Climate Data Records (TCDRs), differing in temporal and horizontal resolution. These TCDR timeseries are intended to have sufficient length, consistency, and continuity to detect climate variability and change. They are frequently updated with Interim Climate Data Records (ICDRs) or simply extensions, generated using the same software and algorithms to cover more recent periods. Further details on algorithms, data description, and extensive validation results are given in the Documentation section.  \n\n\n",
-        "citation": null,
+        "record_update": "2022-12-20 09:28:59.617890+01:00",
+        "resource_update": "2022-12-02",
+        "abstract": "This dataset provides the Surface Radiation Budget (SRB)  Essential Climate Variable (ECV). SRB represents the balance between the heating of the surface through incoming solar radiation and cooling through emission of infra-red radiation which is a fundamental component of the surface energy budget. Small changes in the surface radiation budget can lead to large climatological responses, which makes a permanent and precise monitoring indispensable. Accurate understanding of the surface radiation budget at regional and global scales can improve the understanding of the Earth\u2019s climate system and supports research on current and anticipated climate change, as well as the evaluation of radiative processes in climate models. Better knowledge of the global and regional surface radiation budget is also required for a successful utilization of renewable energy sources, such as solar power plants.\n\n\nThe ECV Surface Radiation Budget contains seven variables which can be separated into the solar (shortwave) and the thermal (longwave) surface radiation components. Both components include the incoming (downwelling), the outgoing (upwelling), and the net radiation fluxes.  These variables were produced by two \u201cproduct families\u201d, based on the data from different sensors and algorithms cover the same seven variables.\nThe two families follow somewhat different nomenclatures. To help the user to navigate the different names,  a table relating the names used in the download form with the names used within the files and in other datasets distributed by the Climate Data Store is added at the end of this overview.  The fact that the naming is different reflects the fact that each family was originated by different projects within different organisations at different times. However, the third organisation, the Copernicus Climate Change Service (C3S) is not associated with a different product family in this dataset. In fact it is associated with both product families to which it provides a continuation of their production chain. This means that the datasets contains three organisation but just two product families.\n\nThe \u201cCLARA product family\u201d and \u201cCCI product family\u201d provide two complementary Thematic Climate Data Records (TCDRs), differing in temporal and horizontal resolution. These TCDR timeseries are intended to have sufficient length, consistency, and continuity to detect climate variability and change. They are frequently updated with Interim Climate Data Records (ICDRs) or simply extensions, generated using the same software and algorithms to cover more recent periods. Further details on algorithms, data description, and extensive validation results are given in the Documentation section.",
+        "citation": "{\"Copernicus Climate Change Service (C3S), (2022): Surface radiation budget from 1982 to present derived from satellite observations.\",\"Copernicus Climate Change Service (C3S) Climate Data Store (CDS), accessed on DD-MM-YYYY, DOI: 10.24381/cds.cea58b5a\"}",
         "contactemail": "https://support.ecmwf.int",
         "description": [],
-        "documentation": [
-            {
-                "title": "Algorithm Theoretical Basis Document, v2.3, CM SAF documentation",
-                "description": "This CM SAF  report provides  information  on  the validation of the surface  radiation  products  from  the  CM SAF  CLARA Edition 2.0 (CLARA-A2) data records  derived  from  AVHRR sensors onboard the series of NOAA satellites and the METOP satellites ",
-                "url": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_atbd_gac_rad_2_3_pdf.pdf",
-                "widget": "first"
-            },
-            {
-                "title": "Product User Manual, v2.1 CM SAF documentation",
-                "description": "Provides information on the features, quality and usage of the dataset  ",
-                "url": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_pum_gac_rad_2_1_pdf.pdf",
-                "widget": "first"
-            },
-            {
-                "title": "Validation Report, v2.1, CM SAF documentation",
-                "description": "Provides information on the validation and intercomparison of both the cloud and radiation products ",
-                "url": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_val_gac_rad_2_1_pdf.pdf",
-                "widget": "first"
-            },
-            {
-                "title": "Product User Guide, v1.0, C3S documentation",
-                "description": "Provides information on the features, quality and usage of the dataset, including the latest ICDR updates",
-                "datastore": "satellite-surface-radiation-budget/C3S_D312b_Lot1.3.5.2-v3.2_202101_PUGS_CCISurfaceRadiationBudget_v1.0.pdf",
-                "widget": "second"
-            },
-            {
-                "title": "Product User Guide, v5.1, ESA Cloud CCI documentation ",
-                "description": "Provides information on the features, quality and usage of the dataset of the original ESA Cloud CCI dataset v3.0",
-                "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_cci_D3.3_PUG_v5.1.pdf ",
-                "widget": "second"
-            },
-            {
-                "title": "Algorithm Theoretical Basis Document, v1.0, C3S documentation",
-                "description": "Provides information on the processing algorithm implemented for the retrieval of the surface radiation budget variables; it lists differences of the brokered to the C3S dataset compared to the original ",
-                "datastore": "satellite-surface-radiation-budget/C3S_D312b_Lot1.1.2.2-v3.1_202010_ATBD_CCISurfaceRadiationBudget_v1.0.pdf",
-                "widget": "second"
-            },
-            {
-                "title": "Algorithm Theoretical Basis Document, CC4CL TOA FLUX v1.1, ESA Cloud CCI documentation",
-                "description": "Provides information on the calculation of radiative flux products from cloud properties of the original ESA Cloud CCI dataset v3.0",
-                "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_CCI_D2.1.1_ATBD_CC4CL-TOAFLUX_v1.1.pdf",
-                "widget": "second"
-            },
-            {
-                "title": "Algorithm Theoretical Baseline Document, CC4CL v6.2, ESA Cloud CCI documentation",
-                "description": "Provides information on the processing algorithm, module Community Cloud retrieval for Climate (CC4CL) ",
-                "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_CCI_D2.1a3_ATBD_v6.2_cc4cl.pdf",
-                "widget": "second"
-            },
-            {
-                "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.2.2.5-v3.2_202103_PQAD_CCISurfaceRadiationBudget_v1.0.pdf",
-                "description": "This document describes the data quality assurance process applied by the data producer before release of the dataset.",
-                "widget": "second",
-                "title": "Product Quality Assurance Document, v1.0, C3S documentation"
-            },
-            {
-                "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.2.2.6-v3.2_202103_PQAR_CCISurfaceRadiationBudget_v1.0.pdf",
-                "description": "Provides the latest report on data quality obtained according to methodologies described in the product quality assurance document.",
-                "widget": "second",
-                "title": "Product Quality Assessment Report, v1.0, C3S documentation"
-            },
-            {
-                "title": "Product Validation and Intercomparison Report, v6.1, ESA Cloud CCI documentation ",
-                "description": "Provides information on the validation and intercomparison of both the cloud and radiation products of the original ESA Cloud CCI dataset v3.0",
-                "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_cci_D4.1_PVIR_v6.1.pdf",
-                "widget": "second"
-            },
-            {
-                "title": "Tutorial on the Essential Climate Variable Surface Radiation Budget",
-                "description": "The following tutorial describes the Essential Climate Variable \u201cSurface Radiation Budget\u201d and presents different surface radiation fluxes as well as their estimation methods from satellite observations. The related datasets are the CM SAF Cloud, Albedo and Radiation from the AVHRR data record, Edition 2 & E2.1 (CLARA-A2 & CLARA-A2.1) and the ESA Cloud_cci ATSR2-AATSRv3 dataset.",
-                "datastore": "satellite-surface-radiation-budget/C3S_D312b_Lot1.4.2.2_201902_Tutorial_ECVSurfaceRadiationBudget_v1.4.mp4",
-                "widget": "tutorial"
-            }
-        ],
+        "documentation": [],
         "doi": null,
         "ds_contactemail": "https://support.ecmwf.int/",
         "ds_responsible_organisation": "ECMWF",
         "ds_responsible_organisation_role": "publisher",
         "file_format": "NetCDF",
-        "format_version": "3",
+        "format_version": null,
         "keywords": [
             "Product type: Satellite observations",
             "Temporal coverage: Past",

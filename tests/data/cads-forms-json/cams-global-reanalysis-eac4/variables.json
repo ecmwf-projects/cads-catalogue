@@ -1,0 +1,467 @@
+{
+    "10m u-component of wind": {
+        "units": "m s^-1"
+    },
+    "10m v-component of wind": {
+        "units": "m s^-1"
+    },
+    "2m dewpoint temperature": {
+        "units": "K"
+    },
+    "2m temperature": {
+        "units": "K"
+    },
+    "Acetone": {
+        "units": "kg kg^-1"
+    },
+    "Acetone product": {
+        "units": "kg kg^-1"
+    },
+    "Aldehydes": {
+        "units": "kg kg^-1"
+    },
+    "Amine": {
+        "units": "kg kg^-1"
+    },
+    "Ammonia": {
+        "units": "kg kg^-1"
+    },
+    "Ammonium": {
+        "units": "kg kg^-1"
+    },
+    "Black carbon aerosol optical depth at 550 nm": {
+        "units": "dimensionless"
+    },
+    "Carbon monoxide": {
+        "units": "kg kg^-1"
+    },
+    "Dimethyl sulfide": {
+        "units": "kg kg^-1"
+    },
+    "Dinitrogen pentoxide": {
+        "units": "kg kg^-1"
+    },
+    "Dust aerosol (0.03 - 0.55 \u00b5m) mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Dust aerosol (0.55 - 0.9 \u00b5m) mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Dust aerosol (0.9 - 20 \u00b5m) mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Dust aerosol optical depth at 550 nm": {
+        "units": "dimensionless"
+    },
+    "Ethane": {
+        "units": "kg kg^-1"
+    },
+    "Ethanol": {
+        "units": "kg kg^-1"
+    },
+    "Ethene": {
+        "units": "kg kg^-1"
+    },
+    "Formaldehyde": {
+        "units": "kg kg^-1"
+    },
+    "Formic acid": {
+        "units": "kg kg^-1"
+    },
+    "Fraction of cloud cover": {
+        "units": "(0 - 1)"
+    },
+    "Geopotential": {
+        "units": "m^2 s^-2"
+    },
+    "High cloud cover": {
+        "units": "(0 - 1)"
+    },
+    "High vegetation cover": {
+        "units": "(0 - 1)"
+    },
+    "Hydrogen peroxide": {
+        "units": "kg kg^-1"
+    },
+    "Hydroperoxy radical": {
+        "units": "kg kg^-1"
+    },
+    "Hydrophilic black carbon aerosol mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Hydrophilic organic matter aerosol mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Hydrophobic black carbon aerosol mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Hydrophobic organic matter aerosol mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Hydroxyl radical": {
+        "units": "kg kg^-1"
+    },
+    "Isoprene": {
+        "units": "kg kg^-1"
+    },
+    "Lake cover": {
+        "units": "(0 - 1)"
+    },
+    "Land-sea mask": {
+        "units": "(0 - 1)"
+    },
+    "Lead": {
+        "units": "kg kg^-1"
+    },
+    "Leaf area index, high vegetation": {
+        "units": "m^2 m^-2"
+    },
+    "Leaf area index, low vegetation": {
+        "units": "m^2 m^-2"
+    },
+    "Lifting threshold speed": {
+        "units": "m s^-1"
+    },
+    "Low cloud cover": {
+        "units": "(0 - 1)"
+    },
+    "Low vegetation cover": {
+        "units": "(0 - 1)"
+    },
+    "Mean altitude of maximum injection": {
+        "units": "m"
+    },
+    "Mean sea level pressure": {
+        "units": "Pa"
+    },
+    "Medium cloud cover": {
+        "units": "(0 - 1)"
+    },
+    "Methacrolein MVK": {
+        "units": "kg kg^-1"
+    },
+    "Methacrylic acid": {
+        "units": "kg kg^-1"
+    },
+    "Methane (chemistry)": {
+        "units": "kg kg^-1"
+    },
+    "Methane sulfonic acid": {
+        "units": "kg kg^-1"
+    },
+    "Methanol": {
+        "units": "kg kg^-1"
+    },
+    "Methyl glyoxal": {
+        "units": "kg kg^-1"
+    },
+    "Methyl peroxide": {
+        "units": "kg kg^-1"
+    },
+    "Methylperoxy radical": {
+        "units": "kg kg^-1"
+    },
+    "Near IR albedo for diffuse radiation": {
+        "units": "(0 - 1)"
+    },
+    "Near IR albedo for direct radiation": {
+        "units": "(0 - 1)"
+    },
+    "Nitrate": {
+        "units": "kg kg^-1"
+    },
+    "Nitrate radical": {
+        "units": "kg kg^-1"
+    },
+    "Nitric acid": {
+        "units": "kg kg^-1"
+    },
+    "Nitrogen dioxide": {
+        "units": "kg kg^-1"
+    },
+    "Nitrogen monoxide": {
+        "units": "kg kg^-1"
+    },
+    "Olefins": {
+        "units": "kg kg^-1"
+    },
+    "Organic ethers": {
+        "units": "kg kg^-1"
+    },
+    "Organic matter aerosol optical depth at 550 nm": {
+        "units": "dimensionless"
+    },
+    "Organic nitrates": {
+        "units": "kg kg^-1"
+    },
+    "Ozone": {
+        "units": "kg kg^-1"
+    },
+    "Paraffins": {
+        "units": "kg kg^-1"
+    },
+    "Particulate matter d < 1 \u00b5m (PM1)": {
+        "units": "kg m^-3"
+    },
+    "Particulate matter d < 10 \u00b5m (PM10)": {
+        "units": "kg m^-3"
+    },
+    "Particulate matter d < 2.5 \u00b5m (PM2.5)": {
+        "units": "kg m^-3"
+    },
+    "Pernitric acid": {
+        "units": "kg kg^-1"
+    },
+    "Peroxides": {
+        "units": "kg kg^-1"
+    },
+    "Peroxy acetyl radical": {
+        "units": "kg kg^-1"
+    },
+    "Peroxyacetyl nitrate": {
+        "units": "kg kg^-1"
+    },
+    "Potential vorticity": {
+        "units": "K m^2 kg^-1 s^-1"
+    },
+    "Propane": {
+        "units": "kg kg^-1"
+    },
+    "Propene": {
+        "units": "kg kg^-1"
+    },
+    "Radon": {
+        "units": "kg kg^-1"
+    },
+    "Relative humidity": {
+        "units": "%"
+    },
+    "Sea salt aerosol (0.03 - 0.5 \u00b5m) mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Sea salt aerosol (0.5 - 5 \u00b5m) mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Sea salt aerosol (5 - 20 \u00b5m) mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Sea salt aerosol optical depth at 550 nm": {
+        "units": "dimensionless"
+    },
+    "Sea surface temperature": {
+        "units": "K"
+    },
+    "Sea-ice cover": {
+        "units": "(0 - 1)"
+    },
+    "Skin reservoir content": {
+        "units": "m of water equivalent"
+    },
+    "Skin temperature": {
+        "units": "K"
+    },
+    "Snow albedo": {
+        "units": "(0 - 1)"
+    },
+    "Snow depth": {
+        "units": "m of water equivalent"
+    },
+    "Soil clay content": {
+        "units": "%"
+    },
+    "Soil type": {
+        "units": "dimensionless"
+    },
+    "Specific cloud ice water content": {
+        "units": "kg kg^-1"
+    },
+    "Specific cloud liquid water content": {
+        "units": "kg kg^-1"
+    },
+    "Specific humidity": {
+        "units": "kg kg^-1"
+    },
+    "Specific rain water content": {
+        "units": "kg kg^-1"
+    },
+    "Specific snow water content": {
+        "units": "kg kg^-1"
+    },
+    "Stratospheric ozone tracer": {
+        "units": "kg kg^-1"
+    },
+    "Sulphate aerosol mixing ratio": {
+        "units": "kg kg^-1"
+    },
+    "Sulphate aerosol optical depth at 550 nm": {
+        "units": "dimensionless"
+    },
+    "Sulphur dioxide": {
+        "units": "kg kg^-1"
+    },
+    "Surface Geopotential": {
+        "units": "m^2 s^-2"
+    },
+    "Surface pressure": {
+        "units": "Pa"
+    },
+    "Surface roughness": {
+        "units": "m"
+    },
+    "Temperature": {
+        "units": "K"
+    },
+    "Terpenes": {
+        "units": "kg kg^-1"
+    },
+    "Total aerosol optical depth at 1240 nm": {
+        "units": "dimensionless"
+    },
+    "Total aerosol optical depth at 469 nm": {
+        "units": "dimensionless"
+    },
+    "Total aerosol optical depth at 550 nm": {
+        "units": "dimensionless"
+    },
+    "Total aerosol optical depth at 670 nm": {
+        "units": "dimensionless"
+    },
+    "Total aerosol optical depth at 865 nm": {
+        "units": "dimensionless"
+    },
+    "Total cloud cover": {
+        "units": "(0 - 1)"
+    },
+    "Total column acetone": {
+        "units": "kg m^-2"
+    },
+    "Total column aldehydes": {
+        "units": "kg m^-2"
+    },
+    "Total column carbon monoxide": {
+        "units": "kg m^-2"
+    },
+    "Total column ethane": {
+        "units": "kg m^-2"
+    },
+    "Total column ethanol": {
+        "units": "kg m^-2"
+    },
+    "Total column ethene": {
+        "units": "kg m^-2"
+    },
+    "Total column formaldehyde": {
+        "units": "kg m^-2"
+    },
+    "Total column formic acid": {
+        "units": "kg m^-2"
+    },
+    "Total column hydrogen peroxide": {
+        "units": "kg m^-2"
+    },
+    "Total column hydroxyl radical": {
+        "units": "kg m^-2"
+    },
+    "Total column isoprene": {
+        "units": "kg m^-2"
+    },
+    "Total column methane": {
+        "units": "kg m^-2"
+    },
+    "Total column methanol": {
+        "units": "kg m^-2"
+    },
+    "Total column methyl peroxide": {
+        "units": "kg m^-2"
+    },
+    "Total column nitric acid": {
+        "units": "kg m^-2"
+    },
+    "Total column nitrogen dioxide": {
+        "units": "kg m^-2"
+    },
+    "Total column nitrogen monoxide": {
+        "units": "kg m^-2"
+    },
+    "Total column olefins": {
+        "units": "kg m^-2"
+    },
+    "Total column organic nitrates": {
+        "units": "kg m^-2"
+    },
+    "Total column ozone": {
+        "units": "kg m^-2"
+    },
+    "Total column paraffins": {
+        "units": "kg m^-2"
+    },
+    "Total column peroxyacetyl nitrate": {
+        "units": "kg m^-2"
+    },
+    "Total column propane": {
+        "units": "kg m^-2"
+    },
+    "Total column sulphur dioxide": {
+        "units": "kg m^-2"
+    },
+    "Total column water": {
+        "units": "kg m^-2"
+    },
+    "Total column water vapour": {
+        "units": "kg m^-2"
+    },
+    "Type of high vegetation": {
+        "units": "dimensionless"
+    },
+    "Type of low vegetation": {
+        "units": "dimensionless"
+    },
+    "U-component of wind": {
+        "units": "m s^-1"
+    },
+    "UV visible albedo for diffuse radiation": {
+        "units": "(0 - 1)"
+    },
+    "UV visible albedo for direct radiation": {
+        "units": "(0 - 1)"
+    },
+    "V-component of wind": {
+        "units": "m s^-1"
+    },
+    "Vertical velocity": {
+        "units": "Pa s^-1"
+    },
+    "Vertically integrated mass of dust aerosol (0.03 - 0.55 \u00b5m)": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of dust aerosol (0.55 - 9 \u00b5m)": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of dust aerosol (9 - 20 \u00b5m)": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of hydrophilic black carbon aerosol": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of hydrophilic organic matter aerosol": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of hydrophobic black carbon aerosol": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of hydrophobic organic matter aerosol": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \u00b5m)": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of sea salt aerosol (0.5 - 5 \u00b5m)": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of sea salt aerosol (5 - 20 \u00b5m)": {
+        "units": "kg m^-2"
+    },
+    "Vertically integrated mass of sulphate aerosol": {
+        "units": "kg m^-2"
+    }
+}

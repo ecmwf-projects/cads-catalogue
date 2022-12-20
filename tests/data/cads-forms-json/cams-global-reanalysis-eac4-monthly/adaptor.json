@@ -1,0 +1,10 @@
+{
+  "format_conversion": {
+    "netcdf": {
+      "legacy_basetime_splitting": false
+    },
+    "netcdf_zip": {
+      "legacy_basetime_splitting": false
+    }
+  }
+}

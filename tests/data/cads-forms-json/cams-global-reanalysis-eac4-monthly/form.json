@@ -1,0 +1,540 @@
+[
+  {
+    "details": {
+      "id": 0,
+      "text": "To obtain surface values of three dimensional (multi-level) variables, select the variable required and model level 60."
+    },
+    "label": "Surface data",
+    "name": "surface_help",
+    "type": "FreeEditionWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "accordionGroups": true,
+      "accordionOptions": {
+        "openGroups": [],
+        "searchable": false
+      },
+      "columns": 2,
+      "displayaslist": false,
+      "groups": [
+        {
+          "columns": 2,
+          "label": "Single level",
+          "labels": {
+            "2m_dewpoint_temperature": "2m dewpoint temperature",
+            "2m_temperature": "2m temperature",
+            "black_carbon_aerosol_optical_depth_550nm": "Black carbon aerosol optical depth at 550 nm",
+            "charnock": "Charnock",
+            "dust_aerosol_optical_depth_550nm": "Dust aerosol optical depth at 550 nm",
+            "ice_temperature_layer_1": "Ice temperature layer 1",
+            "leaf_area_index_high_vegetation": "Leaf area index, high vegetation",
+            "leaf_area_index_low_vegetation": "Leaf area index, low vegetation",
+            "mean_sea_level_pressure": "Mean sea level pressure",
+            "organic_matter_aerosol_optical_depth_550nm": "Organic matter aerosol optical depth at 550 nm",
+            "particulate_matter_10um": "Particulate matter d < 10 \u00b5m (PM10)",
+            "particulate_matter_2.5um": "Particulate matter d < 2.5 \u00b5m (PM2.5)",
+            "sea_ice_cover": "Sea-ice cover",
+            "sea_salt_aerosol_optical_depth_550nm": "Sea salt aerosol optical depth at 550 nm",
+            "sea_surface_temperature": "Sea surface temperature",
+            "snow_albedo": "Snow albedo",
+            "snow_density": "Snow density",
+            "snow_depth": "Snow depth",
+            "soil_temperature_level_1": "Soil temperature level 1",
+            "sulphate_aerosol_optical_depth_550nm": "Sulphate aerosol optical depth at 550 nm",
+            "surface_pressure": "Surface pressure",
+            "temperature_of_snow_layer": "Temperature of snow layer",
+            "total_aerosol_optical_depth_550nm": "Total aerosol optical depth at 550 nm",
+            "total_column_carbon_monoxide": "Total column carbon monoxide",
+            "total_column_ethane": "Total column ethane",
+            "total_column_formaldehyde": "Total column formaldehyde",
+            "total_column_hydroxyl_radical": "Total column hydroxyl radical",
+            "total_column_isoprene": "Total column isoprene",
+            "total_column_methane": "Total column methane",
+            "total_column_nitric_acid": "Total column nitric acid",
+            "total_column_nitrogen_dioxide": "Total column nitrogen dioxide",
+            "total_column_nitrogen_monoxide": "Total column nitrogen monoxide",
+            "total_column_ozone": "Total column ozone",
+            "total_column_peroxyacetyl_nitrate": "Total column peroxyacetyl nitrate",
+            "total_column_propane": "Total column propane",
+            "total_column_sulphur_dioxide": "Total column sulphur dioxide",
+            "total_column_water": "Total column water",
+            "total_column_water_vapour": "Total column water vapour",
+            "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um": "Vertically integrated mass of dust aerosol (0.03 - 0.55 \u00b5m)",
+            "vertically_integrated_mass_of_dust_aerosol_0.55-9um": "Vertically integrated mass of dust aerosol (0.55 - 9 \u00b5m)",
+            "vertically_integrated_mass_of_dust_aerosol_9-20um": "Vertically integrated mass of dust aerosol (9 - 20 \u00b5m)",
+            "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol": "Vertically integrated mass of hydrophilic black carbon aerosol",
+            "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol": "Vertically integrated mass of hydrophilic organic matter aerosol",
+            "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol": "Vertically integrated mass of hydrophobic black carbon aerosol",
+            "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol": "Vertically integrated mass of hydrophobic organic matter aerosol",
+            "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um": "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \u00b5m)",
+            "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um": "Vertically integrated mass of sea salt aerosol (0.5 - 5 \u00b5m)",
+            "vertically_integrated_mass_of_sea_salt_aerosol_5-20um": "Vertically integrated mass of sea salt aerosol (5 - 20 \u00b5m)",
+            "vertically_integrated_mass_of_sulphate_aerosol": "Vertically integrated mass of sulphate aerosol",
+            "vertically_integrated_mass_of_sulphur_dioxide": "Vertically integrated mass of sulphur dioxide"
+          },
+          "values": [
+            "2m_dewpoint_temperature",
+            "2m_temperature",
+            "black_carbon_aerosol_optical_depth_550nm",
+            "charnock",
+            "dust_aerosol_optical_depth_550nm",
+            "ice_temperature_layer_1",
+            "leaf_area_index_high_vegetation",
+            "leaf_area_index_low_vegetation",
+            "mean_sea_level_pressure",
+            "organic_matter_aerosol_optical_depth_550nm",
+            "particulate_matter_2.5um",
+            "particulate_matter_10um",
+            "sea_salt_aerosol_optical_depth_550nm",
+            "sea_surface_temperature",
+            "sea_ice_cover",
+            "snow_albedo",
+            "snow_density",
+            "snow_depth",
+            "soil_temperature_level_1",
+            "sulphate_aerosol_optical_depth_550nm",
+            "surface_pressure",
+            "temperature_of_snow_layer",
+            "total_aerosol_optical_depth_550nm",
+            "total_column_carbon_monoxide",
+            "total_column_ethane",
+            "total_column_formaldehyde",
+            "total_column_hydroxyl_radical",
+            "total_column_isoprene",
+            "total_column_methane",
+            "total_column_nitric_acid",
+            "total_column_nitrogen_dioxide",
+            "total_column_nitrogen_monoxide",
+            "total_column_ozone",
+            "total_column_peroxyacetyl_nitrate",
+            "total_column_propane",
+            "total_column_sulphur_dioxide",
+            "total_column_water",
+            "total_column_water_vapour",
+            "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um",
+            "vertically_integrated_mass_of_dust_aerosol_0.55-9um",
+            "vertically_integrated_mass_of_dust_aerosol_9-20um",
+            "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol",
+            "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol",
+            "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol",
+            "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol",
+            "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um",
+            "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um",
+            "vertically_integrated_mass_of_sea_salt_aerosol_5-20um",
+            "vertically_integrated_mass_of_sulphate_aerosol",
+            "vertically_integrated_mass_of_sulphur_dioxide"
+          ]
+        },
+        {
+          "columns": 2,
+          "label": "Multi level",
+          "labels": {
+            "carbon_monoxide": "Carbon monoxide",
+            "dust_aerosol_0.03-0.55um_mixing_ratio": "Dust aerosol (0.03 - 0.55 \u00b5m) mixing ratio",
+            "dust_aerosol_0.55-0.9um_mixing_ratio": "Dust aerosol (0.55 - 0.9 \u00b5m) mixing ratio",
+            "dust_aerosol_0.9-20um_mixing_ratio": "Dust aerosol (0.9 - 20 \u00b5m) mixing ratio",
+            "ethane": "Ethane",
+            "formaldehyde": "Formaldehyde",
+            "geopotential": "Geopotential",
+            "hydrophilic_black_carbon_aerosol_mixing_ratio": "Hydrophilic black carbon aerosol mixing ratio",
+            "hydrophilic_organic_matter_aerosol_mixing_ratio": "Hydrophilic organic matter aerosol mixing ratio",
+            "hydrophobic_black_carbon_aerosol_mixing_ratio": "Hydrophobic black carbon aerosol mixing ratio",
+            "hydrophobic_organic_matter_aerosol_mixing_ratio": "Hydrophobic organic matter aerosol mixing ratio",
+            "hydroxyl_radical": "Hydroxyl radical",
+            "isoprene": "Isoprene",
+            "methane_chemistry": "Methane (chemistry)",
+            "nitric_acid": "Nitric acid",
+            "nitrogen_dioxide": "Nitrogen dioxide",
+            "nitrogen_monoxide": "Nitrogen monoxide",
+            "ozone": "Ozone",
+            "peroxyacetyl_nitrate": "Peroxyacetyl nitrate",
+            "potential_vorticity": "Potential vorticity",
+            "propane": "Propane",
+            "relative_humidity": "Relative humidity",
+            "sea_salt_aerosol_0.03-0.5um_mixing_ratio": "Sea salt aerosol (0.03 - 0.5 \u00b5m) mixing ratio",
+            "sea_salt_aerosol_0.5-5um_mixing_ratio": "Sea salt aerosol (0.5 - 5 \u00b5m) mixing ratio",
+            "sea_salt_aerosol_5-20um_mixing_ratio": "Sea salt aerosol (5 - 20 \u00b5m) mixing ratio",
+            "so2_precursor_mixing_ratio": "SO2 precursor mixing ratio",
+            "specific_humidity": "Specific humidity",
+            "sulphate_aerosol_mixing_ratio": "Sulphate aerosol mixing ratio",
+            "sulphur_dioxide": "Sulphur dioxide",
+            "temperature": "Temperature",
+            "vertical_velocity": "Vertical velocity"
+          },
+          "values": [
+            "carbon_monoxide",
+            "dust_aerosol_0.03-0.55um_mixing_ratio",
+            "dust_aerosol_0.55-0.9um_mixing_ratio",
+            "dust_aerosol_0.9-20um_mixing_ratio",
+            "ethane",
+            "formaldehyde",
+            "geopotential",
+            "hydrophilic_black_carbon_aerosol_mixing_ratio",
+            "hydrophilic_organic_matter_aerosol_mixing_ratio",
+            "hydrophobic_black_carbon_aerosol_mixing_ratio",
+            "hydrophobic_organic_matter_aerosol_mixing_ratio",
+            "hydroxyl_radical",
+            "isoprene",
+            "methane_chemistry",
+            "nitric_acid",
+            "nitrogen_dioxide",
+            "nitrogen_monoxide",
+            "ozone",
+            "peroxyacetyl_nitrate",
+            "potential_vorticity",
+            "propane",
+            "relative_humidity",
+            "so2_precursor_mixing_ratio",
+            "sea_salt_aerosol_0.03-0.5um_mixing_ratio",
+            "sea_salt_aerosol_0.5-5um_mixing_ratio",
+            "sea_salt_aerosol_5-20um_mixing_ratio",
+            "specific_humidity",
+            "sulphate_aerosol_mixing_ratio",
+            "sulphur_dioxide",
+            "temperature",
+            "vertical_velocity"
+          ]
+        }
+      ],
+      "id": 1
+    },
+    "help": "Please, consult the product user guide in the documentation section for more information on these variables.",
+    "label": "Variable",
+    "name": "variable",
+    "required": true,
+    "type": "StringListArrayWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 4,
+      "id": 2,
+      "labels": {
+        "1": "1 hPa",
+        "10": "10 hPa",
+        "100": "100 hPa",
+        "1000": "1000 hPa",
+        "150": "150 hPa",
+        "2": "2 hPa",
+        "20": "20 hPa",
+        "200": "200 hPa",
+        "250": "250 hPa",
+        "3": "3 hPa",
+        "30": "30 hPa",
+        "300": "300 hPa",
+        "400": "400 hPa",
+        "5": "5 hPa",
+        "50": "50 hPa",
+        "500": "500 hPa",
+        "600": "600 hPa",
+        "7": "7 hPa",
+        "70": "70 hPa",
+        "700": "700 hPa",
+        "800": "800 hPa",
+        "850": "850 hPa",
+        "900": "900 hPa",
+        "925": "925 hPa",
+        "950": "950 hPa"
+      },
+      "values": [
+        "1",
+        "2",
+        "3",
+        "5",
+        "7",
+        "10",
+        "20",
+        "30",
+        "50",
+        "70",
+        "100",
+        "150",
+        "200",
+        "250",
+        "300",
+        "400",
+        "500",
+        "600",
+        "700",
+        "800",
+        "850",
+        "900",
+        "925",
+        "950",
+        "1000"
+      ]
+    },
+    "help": null,
+    "label": "Pressure level",
+    "name": "pressure_level",
+    "required": false,
+    "type": "StringListWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 4,
+      "id": 3,
+      "labels": {
+        "60": "60"
+      },
+      "values": [
+        "60"
+      ]
+    },
+    "help": "Level 60 is the surface level",
+    "label": "Model level",
+    "name": "model_level",
+    "required": false,
+    "type": "StringListWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 8,
+      "id": 4,
+      "labels": {
+        "2003": "2003",
+        "2004": "2004",
+        "2005": "2005",
+        "2006": "2006",
+        "2007": "2007",
+        "2008": "2008",
+        "2009": "2009",
+        "2010": "2010",
+        "2011": "2011",
+        "2012": "2012",
+        "2013": "2013",
+        "2014": "2014",
+        "2015": "2015",
+        "2016": "2016",
+        "2017": "2017",
+        "2018": "2018",
+        "2019": "2019",
+        "2020": "2020",
+        "2021": "2021",
+        "2022": "2022"
+      },
+      "values": [
+        "2003",
+        "2004",
+        "2005",
+        "2006",
+        "2007",
+        "2008",
+        "2009",
+        "2010",
+        "2011",
+        "2012",
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "2021",
+        "2022"
+      ]
+    },
+    "help": null,
+    "label": "Year",
+    "name": "year",
+    "required": true,
+    "type": "StringListWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 6,
+      "id": 5,
+      "labels": {
+        "01": "January",
+        "02": "February",
+        "03": "March",
+        "04": "April",
+        "05": "May",
+        "06": "June",
+        "07": "July",
+        "08": "August",
+        "09": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December"
+      },
+      "values": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12"
+      ]
+    },
+    "help": null,
+    "label": "Month",
+    "name": "month",
+    "required": true,
+    "type": "StringListWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 4,
+      "id": 6,
+      "labels": {
+        "monthly_mean": "Monthly mean",
+        "monthly_mean_by_hour_of_day": "Monthly mean by hour of day"
+      },
+      "values": [
+        "monthly_mean",
+        "monthly_mean_by_hour_of_day"
+      ]
+    },
+    "help": null,
+    "label": "Product type",
+    "name": "product_type",
+    "required": true,
+    "type": "StringListWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 6,
+      "id": 7,
+      "labels": {
+        "00:00": "00:00",
+        "03:00": "03:00",
+        "06:00": "06:00",
+        "09:00": "09:00",
+        "12:00": "12:00",
+        "15:00": "15:00",
+        "18:00": "18:00",
+        "21:00": "21:00"
+      },
+      "values": [
+        "00:00",
+        "03:00",
+        "06:00",
+        "09:00",
+        "12:00",
+        "15:00",
+        "18:00",
+        "21:00"
+      ]
+    },
+    "help": "Model base time as HH:MM (UTC)",
+    "label": "Time",
+    "name": "time",
+    "required": true,
+    "type": "StringListWidget"
+  },
+  {
+    "details": {
+      "id": 8
+    },
+    "label": "Area",
+    "name": "subarea_switch",
+    "required": false,
+    "type": "ExclusiveFrameWidget",
+    "widgets": [
+      "full_area",
+      "area"
+    ]
+  },
+  {
+    "details": {
+      "id": 9
+    },
+    "label": "Full model area",
+    "name": "full_area",
+    "type": "LabelWidget"
+  },
+  {
+    "details": {
+      "accordion": false,
+      "default": [
+        90,
+        -180,
+        -90,
+        180
+      ],
+      "extentlabels": [
+        "North",
+        "West",
+        "South",
+        "East"
+      ],
+      "id": 10,
+      "precision": 2,
+      "range": {
+        "e": 180,
+        "n": 90,
+        "s": -90,
+        "w": -180
+      },
+      "withmap": false,
+      "wrapping": true
+    },
+    "help": "Longitude values must be between +180 and -180 degrees",
+    "label": "Restricted area",
+    "name": "area",
+    "required": false,
+    "type": "GeographicExtentMapWidget"
+  },
+  {
+    "details": {
+      "id": 11,
+      "text": "Please note that if selecting netCDF and variables on more than one level type (single level / pressure level / model level) then the result will be a zip file containing a separate netCDF file for each type.<P>Please also note that a limitation of the netCDF3 format is that all but the last variable in the file must require less than 4GiB of storage. Since the values are packed into 2-byte integers and there are 115680 (480 longitude x 241 latitude, assuming the full area) values per horizontal field, it means the product of the number of levels, dates and times you select must not exceed 18564 or netCDF file creation will fail. This limit does not apply to the last variable in the file so can be disregarded if you have only selected one variable. The limit increases in proportion to any reduction in the area retrieved."
+    },
+    "label": "NetCDF conversion",
+    "name": "netcdf_info",
+    "type": "FreeEditionWidget"
+  },
+  {
+    "css": "todo",
+    "details": {
+      "columns": 2,
+      "default": [
+        "grib"
+      ],
+      "id": 12,
+      "labels": {
+        "grib": "GRIB",
+        "netcdf": "NetCDF (experimental)"
+      },
+      "values": [
+        "grib",
+        "netcdf"
+      ]
+    },
+    "help": "Note: if selecting netCDF and variables on more than one level type (single level, pressure level, model level) then the result will be a zip file containing a separate netCDF file for each type",
+    "label": "Format",
+    "name": "format",
+    "required": true,
+    "type": "StringChoiceWidget"
+  },
+  {
+    "type": "LicenceWidget",
+    "name": "licences",
+    "label": "Terms of use",
+    "help": null,
+    "details": {
+      "licences": [
+        {
+          "id": "licence-to-use-copernicus-products",
+          "revision": "latest"
+        }
+      ]
+    }
+  }
+]

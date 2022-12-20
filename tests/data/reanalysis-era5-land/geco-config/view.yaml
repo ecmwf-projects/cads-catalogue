@@ -1,4 +1,0 @@
-blocks:
-  era5-explorer:
-    type: application
-    content: app-era5-explorer

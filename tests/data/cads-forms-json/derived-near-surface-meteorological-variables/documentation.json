@@ -1,0 +1,36 @@
+[
+    {
+        "url": "https://confluence.ecmwf.int/x/YzmaE",
+        "description": "Provides documentation on the algorithms used to derive the dataset as well as on the filename conventions and metedata.",
+        "title": "Product user guide"
+    },
+    {
+        "url": "https://doi.org/10.5194/essd-12-2097-2020",
+        "title": "WFDE5: bias-adjusted ERA5 reanalysis data for impact studies",
+        "description": "A peer reviewed article which describes the methods used in the generation of this dataset and the results of the validation experiments."
+    },
+    {
+        "datastore": "derived-near-surface-meteorological-variables/source_code.zip",
+        "title": "Version 1.0",
+        "description": "Source code used to generate version 1.0 of the dataset. The workflows are for use in the CDS toolbox.",
+        "widget": "code"
+    },
+    {
+        "datastore": "derived-near-surface-meteorological-variables/source_code_v1.1.zip",
+        "title": "Version 1.1",
+        "description": "Source code used to generate version 1.1 of the dataset. The workflows are for use in the CDS toolbox.",
+        "widget": "code"
+    },
+    {
+        "datastore": "derived-near-surface-meteorological-variables/source_code_v2.0.zip",
+        "title": "Version 2.0",
+        "description": "Source code used to generate version 2.0 of the dataset. The workflows are for use in the CDS toolbox.",
+        "widget": "code"
+    },
+    {
+        "datastore": "derived-near-surface-meteorological-variables/source_code_v2.1.zip",
+        "title": "Version 2.1",
+        "description": "Source code used to generate version 2.1 of the dataset. The workflows are for use in the CDS toolbox.",
+        "widget": "code"
+    }
+]

@@ -1,8 +1,0 @@
-blocks:
-  references:
-    type: section
-    id: references
-    blocks:
-      citation:
-        type: popup
-        source: sidepanel/citation.md

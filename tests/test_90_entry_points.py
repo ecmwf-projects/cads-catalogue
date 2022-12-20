@@ -54,12 +54,26 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     }
     expected_licences = [
         {
-            "download_filename": "an url",
             "licence_id": 1,
+            "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+            "revision": 4,
+            "title": "CCI product licence",
+            "download_filename": "an url",
+        },
+        {
+            "licence_id": 2,
+            "licence_uid": "eumetsat-cm-saf",
+            "revision": 1,
+            "title": "EUMETSAT CM SAF products licence",
+            "download_filename": "an url",
+        },
+        {
+            "licence_id": 3,
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
-        }
+            "download_filename": "an url",
+        },
     ]
 
     patch = mocker.patch(
@@ -79,10 +93,12 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert spy_initdb.call_count == 1
-    assert patch.call_count == 21
+    assert (
+        patch.call_count == 35
+    )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
-    assert patch.mock_calls[0].args == (licence_path, object_storage_url)
-    assert patch.mock_calls[0].kwargs == {
+    assert patch.mock_calls[2].args == (licence_path, object_storage_url)
+    assert patch.mock_calls[2].kwargs == {
         "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
@@ -106,8 +122,8 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         unittest.mock.call(
             os.path.join(
                 TESTDATA_PATH,
+                "cads-forms-json",
                 "satellite-surface-radiation-budget",
-                "json-config",
                 "layout.json",
             ),
             object_storage_url,
@@ -148,7 +164,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         "SELECT related_resource_id, parent_resource_id, child_resource_id"
         " FROM related_resources ORDER BY related_resource_id"
     ).all()
-    assert res == [(1, 4, 2), (2, 2, 4), (3, 5, 3), (4, 3, 5)]
+    assert res == [(1, 6, 1), (2, 1, 6), (3, 3, 2), (4, 2, 3), (5, 8, 5), (6, 5, 8)]
     session.close()
 
     # spy_initdb.reset_mock()

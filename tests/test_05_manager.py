@@ -23,7 +23,10 @@ def test_recursive_search():
     res1 = manager.recursive_key_search(obj1, key="a")
     assert res1 == [1, 2, 3, 4, 5, 6]
     form_json_path = os.path.join(
-        TESTDATA_PATH, "satellite-surface-radiation-budget", "json-config", "form.json"
+        TESTDATA_PATH,
+        "cads-forms-json",
+        "satellite-surface-radiation-budget",
+        "form.json",
     )
     with open(form_json_path) as fp:
         form_data = json.load(fp)
@@ -163,38 +166,52 @@ def test_load_metadata_licences() -> None:
     expected_licences = [
         {
             "download_filename": os.path.join(
+                licences_folder_path,
+                "CCI-data-policy-for-satellite-surface-radiation-budget.pdf",
+            ),
+            "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+            "revision": 4,
+            "title": "CCI product licence",
+        },
+        {
+            "download_filename": os.path.join(
+                licences_folder_path, "eumetsat-cm-saf.pdf"
+            ),
+            "licence_uid": "eumetsat-cm-saf",
+            "revision": 1,
+            "title": "EUMETSAT CM SAF products licence",
+        },
+        {
+            "download_filename": os.path.join(
                 licences_folder_path, "licence-to-use-copernicus-products.pdf"
             ),
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
-        }
+        },
     ]
-
     licences = manager.load_licences_from_folder(licences_folder_path)
 
     assert licences == expected_licences
 
 
 def test_load_resource_for_object_storage() -> None:
-    folder_path = os.path.join(TESTDATA_PATH, "reanalysis-era5-land")
+    folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land")
     res = manager.load_resource_for_object_storage(folder_path)
     assert res == {
-        "constraints": os.path.join(folder_path, "json-config", "constraints.json"),
-        "form": os.path.join(folder_path, "json-config", "form.json"),
-        "layout": os.path.join(folder_path, "json-config", "layout.json"),
-        "previewimage": os.path.join(
-            folder_path, "content", "overview", "overview.png"
-        ),
+        "constraints": os.path.join(folder_path, "constraints.json"),
+        "form": os.path.join(folder_path, "form.json"),
+        "layout": os.path.join(folder_path, "layout.json"),
+        "previewimage": os.path.join(folder_path, "overview.png"),
     }
 
 
 def test_load_variable_id_map() -> None:
     form_json_path = os.path.join(
-        TESTDATA_PATH, "reanalysis-era5-land", "json-config", "form.json"
+        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land", "form.json"
     )
     mapping_json_path = os.path.join(
-        TESTDATA_PATH, "reanalysis-era5-land", "json-config", "mapping.json"
+        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land", "mapping.json"
     )
     res = manager.load_variable_id_map(form_json_path, mapping_json_path)
     assert res == {
@@ -254,7 +271,9 @@ def test_load_variable_id_map() -> None:
 
 
 def test_load_resource_from_folder() -> None:
-    resource_folder_path = os.path.join(TESTDATA_PATH, "reanalysis-era5-land")
+    resource_folder_path = os.path.join(
+        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
+    )
     resource = manager.load_resource_from_folder(resource_folder_path)
     expected_resource = {
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view "
@@ -290,8 +309,9 @@ def test_load_resource_from_folder() -> None:
         "temporal and spatial resolution of this dataset, the period covered"
         " in time, as well as the fixed grid used for the data distribution "
         "at any period enables decisions makers, businesses and individuals"
-        " to access and use more accurate information on land states.\n\n\n",
+        " to access and use more accurate information on land states.",
         "adaptor_configuration": {
+            "embargo": {"days": 5, "hours": 0},
             "format_conversion": {
                 "netcdf.zip": {
                     "always_zip": [True],
@@ -314,17 +334,27 @@ def test_load_resource_from_folder() -> None:
                         "{{infile}}",
                     ]
                 },
-            }
+            },
         },
-        "begin_date": "1982-01-01",
-        "citation": None,
-        "constraints": os.path.join(
-            resource_folder_path, "json-config", "constraints.json"
-        ),
+        "begin_date": "1950-01-01",
+        "citation": [
+            "Muñoz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. "
+            "Copernicus Climate Change Service (C3S) Climate Data Store (CDS). "
+            "(Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac",
+            "Muñoz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. "
+            "Copernicus Climate Change Service (C3S) Climate Data Store (CDS). "
+            "(Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac",
+        ],
+        "constraints": os.path.join(resource_folder_path, "constraints.json"),
         "contactemail": "https://support.ecmwf.int",
         "description": [
-            {"id": "data-type", "label": "Data type", "value": "Gridded"},
             {"id": "file-format", "label": "File format", "value": "GRIB"},
+            {"id": "data-type", "label": "Data type", "value": "Gridded"},
+            {
+                "id": "projection",
+                "label": "Projection",
+                "value": "Regular latitude-longitude grid",
+            },
             {
                 "id": "horizontal-coverage",
                 "label": "Horizontal coverage",
@@ -336,9 +366,16 @@ def test_load_resource_from_folder() -> None:
                 "value": "0.1° x 0.1°; Native resolution is 9 km.",
             },
             {
-                "id": "projection",
-                "label": "Projection",
-                "value": "Regular latitude-longitude grid",
+                "id": "vertical-coverage",
+                "label": "Vertical coverage",
+                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n",
+            },
+            {
+                "id": "vertical-resolution",
+                "label": "Vertical resolution",
+                "value": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, "
+                "Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at "
+                "2 m over the surface.\n",
             },
             {
                 "id": "temporal-coverage",
@@ -354,18 +391,6 @@ def test_load_resource_from_folder() -> None:
                 "id": "update-frequency",
                 "label": "Update frequency",
                 "value": "Monthly with a delay of about three months relatively to actual date.",
-            },
-            {
-                "id": "vertical-coverage",
-                "label": "Vertical coverage",
-                "value": "From 2 m above the surface level, to a soil depth of 289 cm.\n",
-            },
-            {
-                "id": "vertical-resolution",
-                "label": "Vertical resolution",
-                "value": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, "
-                "Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\n"
-                "Some parameters are defined at 2 m over the surface.\n",
             },
         ],
         "documentation": [
@@ -383,8 +408,8 @@ def test_load_resource_from_folder() -> None:
         "ds_responsible_organisation": "ECMWF",
         "ds_responsible_organisation_role": "publisher",
         "end_date": "2022-10-01",
-        "file_format": "grib",
-        "form": os.path.join(resource_folder_path, "json-config", "form.json"),
+        "file_format": ["grib", "netcdf"],
+        "form": os.path.join(resource_folder_path, "form.json"),
         "format_version": None,
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
         "keywords": [
@@ -396,7 +421,7 @@ def test_load_resource_from_folder() -> None:
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S",
         ],
-        "layout": os.path.join(resource_folder_path, "json-config", "layout.json"),
+        "layout": os.path.join(resource_folder_path, "layout.json"),
         "licence_uids": ["licence-to-use-copernicus-products"],
         "lineage": "EC Copernicus program",
         "mapping": {
@@ -496,9 +521,7 @@ def test_load_resource_from_folder() -> None:
             "selection_limit": 100000,
             "selection_limit_ignore": ["area", "grid"],
         },
-        "previewimage": os.path.join(
-            resource_folder_path, "content", "overview", "overview.png"
-        ),
+        "previewimage": os.path.join(resource_folder_path, "overview.png"),
         "publication_date": "2019-07-12",
         "related_resources_keywords": [],
         "representative_fraction": 0.25,
@@ -1326,12 +1349,15 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     session.commit()
     assert patch.call_count == len(licences)
     assert patch.mock_calls[0].args == (
-        os.path.join(licences_folder_path, "licence-to-use-copernicus-products.pdf"),
+        os.path.join(
+            licences_folder_path,
+            "CCI-data-policy-for-satellite-surface-radiation-budget.pdf",
+        ),
         object_storage_url,
     )
     assert patch.mock_calls[0].kwargs == {
         "force": True,
-        "subpath": "licences/licence-to-use-copernicus-products",
+        "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,
@@ -1362,9 +1388,12 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     licences = manager.load_licences_from_folder(licences_folder_path)
     session = session_obj()
     manager.store_licences(session, licences, object_storage_url, **storage_kws)
-    resource_folder_path = os.path.join(TESTDATA_PATH, "reanalysis-era5-land")
+    resource_folder_path = os.path.join(
+        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
+    )
     resource = manager.load_resource_from_folder(resource_folder_path)
-    assert resource["licence_uids"] == [licences[0]["licence_uid"]]
+    assert resource["licence_uids"][0] in [r["licence_uid"] for r in licences]
+    assert resource["licence_uids"] == ["licence-to-use-copernicus-products"]
     assert resource["related_resources_keywords"] == []
     res = session.query(database.Resource).all()
     assert res == []
@@ -1412,7 +1441,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     assert stored_record["layout"] == "an url"
     expected_many2many_record = {
         "resource_id": 1,
-        "licence_id": 1,
+        "licence_id": 3,
     }
     assert (
         manager.object_as_dict(session.query(database.ResourceLicence).first())
