@@ -1,70 +1,230 @@
 {
-  "uid": "reanalysis-era5-single-levels",
-  "title": "ERA5 hourly data on single levels from 1959 to present",
-  "description": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades. Currently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page). ERA5 replaces the ERA-Interim reanalysis.",
+  "uid": "reanalysis-era5-pressure-levels",
+  "title": "ERA5 hourly data on pressure levels from 1959 to present",
+  "description": "",
   "body": {
     "main": {
       "sections": [
         {
-          "id": "overview",
           "title": "Overview",
+          "id": "overview",
           "blocks": [
             {
               "id": "abstract",
               "type": "thumb-markdown",
-              "content": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\n",
-              "image": "https://datastore.copernicus-climate.eu/c3s/published-forms-v2/c3sprod/reanalysis-era5-pressure-levels/overview.jpg"
+              "content": "**ERA5** is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on pressure levels from 1959 to present\".\n",
+              "image": "overview/overview.png"
             },
             {
-              "type": "markdown",
-              "content": "ERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in [these guidelines](https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5 \"How to download ERA5\").\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on pressure levels from 1959 to present\".\n"
+              "type": "table",
+              "id": "data-description",
+              "caption": "Data-description",
+              "structure": {
+                "headings": [
+                  {
+                    "id": "data-type",
+                    "label": "Data-type"
+                  },
+                  {
+                    "id": "file-format",
+                    "label": "File-format"
+                  },
+                  {
+                    "id": "horizontal-coverage",
+                    "label": "Horizontal-coverage"
+                  },
+                  {
+                    "id": "horizontal-resolution",
+                    "label": "Horizontal-resolution"
+                  },
+                  {
+                    "id": "projection",
+                    "label": "Projection"
+                  },
+                  {
+                    "id": "temporal-coverage",
+                    "label": "Temporal-coverage"
+                  },
+                  {
+                    "id": "temporal-resolution",
+                    "label": "Temporal-resolution"
+                  },
+                  {
+                    "id": "vertical-coverage",
+                    "label": "Vertical-coverage"
+                  },
+                  {
+                    "id": "vertical-resolution",
+                    "label": "Vertical-resolution"
+                  }
+                ],
+                "orientation": "horizontal"
+              },
+              "content": [
+                {
+                  "data-type": "Gridded"
+                },
+                {
+                  "file-format": "GRIB"
+                },
+                {
+                  "horizontal-coverage": "Global"
+                },
+                {
+                  "horizontal-resolution": "\nReanalysis: 0.25\u00b0 x 0.25\u00b0\n\nMean, spread and members: 0.5\u00b0 x 0.5\u00b0"
+                },
+                {
+                  "projection": "Regular latitude-longitude grid."
+                },
+                {
+                  "temporal-coverage": "1959 to present"
+                },
+                {
+                  "temporal-resolution": "Hourly"
+                },
+                {
+                  "vertical-coverage": "1000 hPa to 1 hPa"
+                },
+                {
+                  "vertical-resolution": "37 pressure levels"
+                }
+              ]
             },
             {
               "type": "table",
               "id": "main-variables",
               "caption": "Main variables",
               "structure": {
-                "columns": [
+                "orientation": "vertical",
+                "headings": [
                   {
                     "id": "name",
-                    "header": "Name"
+                    "label": "Name"
                   },
                   {
                     "id": "units",
-                    "header": "Units"
+                    "label": "Units"
                   },
                   {
                     "id": "description",
-                    "header": "Description"
+                    "label": "Description"
                   }
                 ]
               },
               "content": [
                 {
                   "name": "Divergence",
-                  "units": "s⁻¹",
-                  "description": "This parameter is the horizontal divergence of velocity. It is the rate at which air is spreading out horizontally from a point, per square metre. This parameter is positive for air that is spreading out, or diverging, and negative for the opposite, for air that is concentrating, or converging (convergence)."
+                  "description": "This parameter is the horizontal divergence of velocity. It is the rate at which  air is spreading out horizontally from a point, per square metre. This parameter  is positive for air that is spreading out, or diverging, and negative for the  opposite, for air that is concentrating, or converging (convergence).",
+                  "units": "s<sup>-1</sup>"
                 },
                 {
                   "name": "Fraction of cloud cover",
-                  "units": "Dimensionless",
-                  "description": "This parameter is the proportion of a grid box covered by cloud (liquid or ice) and varies between zero and one. This parameter is available on multiple levels through the atmosphere."
+                  "description": "This parameter is the proportion of a grid box covered by cloud (liquid or ice)  and varies between zero and one. This parameter is available on multiple levels through the atmosphere.",
+                  "units": "Dimensionless"
+                },
+                {
+                  "name": "Geopotential",
+                  "description": "This parameter is the gravitational potential energy of a unit mass, at a  particular location, relative to mean sea level. It is also the amount of work  that would have to be done, against the force of gravity, to lift a unit mass to  that location from mean sea level.\nThe geopotential height can be calculated by dividing the geopotential by the  Earth's gravitational acceleration, g (=9.80665 m s-2). The geopotential height  plays an important role in synoptic meteorology (analysis of weather patterns).  Charts of geopotential height plotted at constant pressure levels (e.g., 300,  500 or 850 hPa) can be used to identify weather systems such as cyclones,  anticyclones, troughs and ridges.\nAt the surface of the Earth, this parameter shows the variations in geopotential  (height) of the surface, and is often referred to as the orography.",
+                  "units": "m<sup>2</sup>s<sup>-2</sup>"
+                },
+                {
+                  "name": "Ozone mass mixing ratio",
+                  "description": "This parameter is the mass of ozone per kilogram of air.\nIn the ECMWF Integrated Forecasting System (IFS), there is a simplified  representation of ozone chemistry (including representation of the chemistry  which has caused the ozone hole). Ozone is also transported around in the  atmosphere through the motion of air.\nNaturally occurring ozone in the stratosphere helps protect organisms at the  surface of the Earth from the harmful effects of ultraviolet (UV) radiation from  the Sun. Ozone near the surface, often produced because of pollution, is harmful  to organisms.\nMost of the IFS chemical species are archived as mass mixing ratios [kg kg-1].",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Potential vorticity",
+                  "description": "Potential vorticity is a measure of the capacity for air to rotate in the  atmosphere. If we ignore the effects of heating and friction, potential vorticity  is conserved following an air parcel. It is used to look for places where large  wind storms are likely to originate and develop. Potential vorticity increases  strongly above the tropopause and therefore, it can also be used in studies related  to the stratosphere and stratosphere-troposphere exchanges.\nLarge wind storms develop when a column of air in the atmosphere starts to rotate.  Potential vorticity is calculated from the wind, temperature and pressure across a  column of air in the atmosphere. ",
+                  "units": "Km<sup>2</sup>kg<sup>-1</sup>s<sup>-1</sup>"
+                },
+                {
+                  "name": "Relative humidity",
+                  "description": "This parameter is the water vapour pressure as a percentage of the value at which  the air becomes saturated (the point at which water vapour begins to condense into  liquid water or deposition into ice).\nFor temperatures over 0\u00b0C (273.15 K) it is calculated for saturation over water. At  temperatures below -23\u00b0C it is calculated for saturation over ice. Between -23\u00b0C  and 0\u00b0C this parameter is calculated by interpolating between the ice and water  values using a quadratic function. ",
+                  "units": ""
+                },
+                {
+                  "name": "Specific cloud ice water content",
+                  "description": "This parameter is the mass of cloud ice particles per kilogram of the total mass of  moist air. The 'total mass of moist air' is the sum of the dry air, water vapour,  cloud liquid, cloud ice, rain and falling snow. This parameter represents the  average value for a grid box.\nWater within clouds can be liquid or ice, or a combination of the two. Note that  'cloud frozen water' is the same as 'cloud ice water'.",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific cloud liquid water content",
+                  "description": "This parameter is the mass of cloud liquid water droplets per kilogram of the total  mass of moist air. The 'total mass of moist air' is the sum of the dry air, water  vapour, cloud liquid, cloud ice, rain and falling snow. This parameter represents  the average value for a grid box.\nWater within clouds can be liquid or ice, or a combination of the two. ",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific humidity",
+                  "description": "This parameter is the mass of water vapour per kilogram of moist air.\nThe total mass of moist air is the sum of the dry air, water vapour, cloud liquid,  cloud ice, rain and falling snow.",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific rain water content",
+                  "description": "The mass of water produced from large-scale clouds that is of raindrop size and so  can fall to the surface as precipitation.\nLarge-scale clouds are generated by the cloud scheme in the ECMWF Integrated  Forecasting System (IFS). The cloud scheme represents the formation and dissipation  of clouds and large-scale precipitation due to changes in atmospheric quantities  (such as pressure, temperature and moisture) predicted directly by the IFS at spatial  scales of a grid box or larger.\nThe quantity is expressed in kilograms per kilogram of the total mass of moist air.  The 'total mass of moist air' is the sum of the dry air, water vapour, cloud liquid,  cloud ice, rain and falling snow. This parameter represents the average value for a  grid box.\nClouds contain a continuum of different sized water droplets and ice particles. The  IFS cloud scheme simplifies this to represent a number of discrete cloud  droplets/particles including cloud water droplets, raindrops, ice crystals and snow  (aggregated ice crystals). The processes of droplet formation, phase transition and  aggregation are also highly simplified in the IFS.",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific snow water content",
+                  "description": "The mass of snow (aggregated ice crystals) produced from large-scale clouds that can  fall to the surface as precipitation.\nLarge-scale clouds are generated by the cloud scheme in the ECMWF Integrated  Forecasting System (IFS). The cloud scheme represents the formation and dissipation  of clouds and large-scale precipitation due to changes in atmospheric quantities (such  as pressure, temperature and moisture) predicted directly by the IFS at spatial scales  of a grid box or larger.\nThe mass is expressed in kilograms per kilogram of the total mass of moist air. The  'total mass of moist air' is the sum of the dry air, water vapour, cloud liquid, cloud  ice, rain and falling snow. This parameter represents the average value for a grid box.\nClouds contain a continuum of different sized water droplets and ice particles. The IFS  cloud scheme simplifies this to represent a number of discrete cloud droplets/particles  including cloud water droplets, raindrops, ice crystals and snow (aggregated ice  crystals). The processes of droplet formation, phase transition and aggregation are also  highly simplified in the IFS.",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Temperature",
+                  "description": "This parameter is the temperature in the atmosphere.\nIt has units of kelvin (K). Temperature measured in kelvin can be converted to degrees  Celsius (\u00b0C) by subtracting 273.15.\nThis parameter is available on multiple levels through the atmosphere.",
+                  "units": "K"
+                },
+                {
+                  "name": "U-component of wind",
+                  "description": "This parameter is the eastward component of the wind. It is the horizontal speed of air  moving towards the east. A negative sign indicates air moving towards the west.\nThis parameter can be combined with the V component of wind to give the speed and  direction of the horizontal wind.",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "V-component of wind",
+                  "description": "This parameter is the northward component of the wind. It is the horizontal speed of air  moving towards the north. A negative sign indicates air moving towards the south.\nThis parameter can be combined with the U component of wind to give the speed and  direction of the horizontal wind.",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "Vertical velocity",
+                  "description": "This parameter is the speed of air motion in the upward or downward direction. The ECMWF  Integrated Forecasting System (IFS) uses a pressure based vertical co-ordinate system and  pressure decreases with height, therefore negative values of vertical velocity indicate  upward motion.\nVertical velocity can be useful to understand the large-scale dynamics of the atmosphere,  including areas of upward motion/ascent (negative values) and downward motion/subsidence  (positive values).",
+                  "units": "Pas<sup>-1</sup>"
+                },
+                {
+                  "name": "Vorticity (relative)",
+                  "description": "This parameter is a measure of the rotation of air in the horizontal, around a vertical  axis, relative to a fixed point on the surface of the Earth.\nOn the scale of weather systems, troughs (weather features that can include rain) are  associated with anticlockwise rotation (in the northern hemisphere), and ridges (weather  features that bring light or still winds) are associated with clockwise rotation.\nAdding the effect of rotation of the Earth, the Coriolis parameter, to the relative  vorticity produces the absolute vorticity.",
+                  "units": "s<sup>-1</sup>"
                 }
               ]
             }
           ]
         },
         {
+          "title": "Download",
           "id": "download",
-          "title": "Download"
+          "blocks": []
         },
         {
-          "id": "documentation",
           "title": "Documentation",
+          "id": "documentation",
           "blocks": [
             {
-              "type": "markdown",
-              "content": "### [ERA5 data documentation](https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation)\n\nDetailed information relating to the ERA5 data archive can be found in the web link above.\n\n### [The ERA5 global reanalysis: Preliminary extension to 1950](https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174)\n\nJournal article describing the ERA5 preliminary extension.\n\n### [The ERA5 global reanalysis](https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803)\n\nJournal article describing ERA5.\n"
+              "id": "all_docs-0",
+              "type": "link",
+              "url": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
+              "title": "ERA5 data documentation",
+              "description": "Detailed information relating to the ERA5 data archive can be found in the web link above."
+            },
+            {
+              "id": "all_docs-1",
+              "type": "link",
+              "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174",
+              "title": "The ERA5 global reanalysis: Preliminary extension to 1950",
+              "description": "Journal article describing the ERA5 preliminary extension."
+            },
+            {
+              "id": "all_docs-2",
+              "type": "link",
+              "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803",
+              "title": "The ERA5 global reanalysis",
+              "description": "Journal article describing ERA5."
             }
           ]
         }
@@ -73,8 +233,66 @@
     "aside": {
       "blocks": [
         {
-          "type": "markdown",
-          "content": "## Contact\n\n[ECMWF Support Portal](https://support.ecmwf.int/)\n"
+          "id": "contact",
+          "title": "Contact",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "portal",
+              "type": "link",
+              "url": "https://support.ecmwf.int",
+              "title": "ECMWF Support Portal"
+            }
+          ]
+        },
+        {
+          "id": "licence",
+          "title": "Licence",
+          "type": "button",
+          "scope": "licence",
+          "action": "modal",
+          "licences": [
+            "licence-to-use-copernicus-products"
+          ]
+        },
+        {
+          "id": "publication_date-section",
+          "title": "Publication date",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "publication_date-markdown",
+              "type": "markdown",
+              "content": "2018-06-14"
+            }
+          ]
+        },
+        {
+          "id": "update_date-section",
+          "title": "Update date",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "update_date-markdown",
+              "type": "markdown",
+              "content": "2022-12-15"
+            }
+          ]
+        },
+        {
+          "id": "related_applications",
+          "type": "related_entries",
+          "title": "Related applications",
+          "content": "applications"
+        },
+        {
+          "id": "related_dataset",
+          "type": "related_entries",
+          "title": "Related datasets",
+          "content": "datasets"
         }
       ]
     }
