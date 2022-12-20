@@ -1,8 +1,0 @@
-{
-  "adaptor.url": {
-    "pattern": [
-      "http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_{{ year }}{{ month }}_v{{ version }}.nc",
-      "{% if (year is not defined or year is none) and (month is not defined or month is none) %}http://hydrology-era5.copernicus-climate.eu/WFDE5/v{{ version }}/{{ variable }}/{{ reference_dataset }}/{{ variable }}_WFDE5_{{ reference_dataset }}_v{{ version }}.nc{% endif %}"
-    ]
-  }
-}

@@ -58,20 +58,12 @@ def init_db(connection_string: str | None = None) -> None:
     print("successfully created the catalogue database structure.")
 
 
-DATASETS = [
-    "derived-near-surface-meteorological-variables",
-    "reanalysis-era5-land-monthly-means",
-    "reanalysis-era5-pressure-levels",
-    "reanalysis-era5-land",
-    "reanalysis-era5-single-levels",
-    # "cams-global-reanalysis-eac4-monthly",
-    "satellite-surface-radiation-budget",
-]
-
-
 @app.command()
 def setup_test_database(
-    connection_string: str | None = None, force: bool = False
+    connection_string: str | None = None,
+    force: bool = False,
+    resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
+    licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
 ) -> None:
     """Fill the database with some test data.
 
@@ -83,10 +75,16 @@ def setup_test_database(
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     force: if True, create db from scratch also if already existing (default False)
+    resources_folder_path: path to the root folder containing metadata files for resources
+    licences_folder_path: path to the root folder containing metadata files for licences
     """
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
+    if not os.path.isdir(resources_folder_path):
+        raise ValueError("%r is not a folder" % resources_folder_path)
+    if not os.path.isdir(licences_folder_path):
+        raise ValueError("%r is not a folder" % licences_folder_path)
     engine = sa.create_engine(connection_string)
     structure_exists = True
     if not sqlalchemy_utils.database_exists(engine.url):
@@ -125,9 +123,9 @@ def setup_test_database(
         try:
             manager.store_licences(session, licences, object_storage_url, **storage_kws)
             resources = []
-            for dataset in DATASETS:
+            for resource_slug in os.listdir(resources_folder_path):
                 resource_folder_path = os.path.abspath(
-                    os.path.join(this_path, "../tests/data", dataset)
+                    os.path.join(resources_folder_path, resource_slug)
                 )
                 resource = manager.load_resource_from_folder(resource_folder_path)
                 resources.append(resource)

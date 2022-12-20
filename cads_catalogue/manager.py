@@ -22,7 +22,6 @@ import os
 import pathlib
 from typing import Any
 
-import yaml
 from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 
@@ -30,13 +29,18 @@ from cads_catalogue import database, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 DATA_PATH = os.path.join(THIS_PATH, "db_data")
+TEST_LICENCES_DATA_PATH = os.path.abspath(
+    os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
+)
+TEST_RESOURCES_DATA_PATH = os.path.abspath(
+    os.path.join(THIS_PATH, "..", "tests", "data", "cads-forms-json")
+)
 OBJECT_STORAGE_UPLOAD_FILES = [
     # (file_name, "db_field_name),
     ("constraints.json", "constraints"),
     ("form.json", "form"),
     ("layout.json", "layout"),
     ("overview.png", "previewimage"),
-    ("overview.jpg", "previewimage"),
 ]
 
 
@@ -188,35 +192,12 @@ def load_resource_documentation(folder_path: str | pathlib.Path) -> dict[str, An
     """
     metadata: dict[str, Any] = dict()
     metadata["documentation"] = []
-    doc_file_path = os.path.join(
-        folder_path, "content", "documentation", "documentation.yaml"
-    )
+    doc_file_path = os.path.join(folder_path, "documentation.json")
     if not os.path.isfile(doc_file_path):
         return metadata
     with open(doc_file_path) as fp:
-        data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-    metadata["documentation"] = data.get("documentation", [])
-    return metadata
-
-
-def load_resource_abstract(folder_path: str | pathlib.Path) -> dict[str, Any]:
-    """Load a resource's abstract metadata.
-
-    Parameters
-    ----------
-    folder_path: root folder path where to collect metadata of a resource
-
-    Returns
-    -------
-    dict: dictionary of metadata collected
-    """
-    metadata = dict()
-    metadata["abstract"] = ""
-    overview_file_path = os.path.join(folder_path, "content", "overview", "overview.md")
-    if not os.path.isfile(overview_file_path):
-        return metadata
-    with open(overview_file_path) as fp:
-        metadata["abstract"] = fp.read()
+        data = json.load(fp)
+        metadata["documentation"] = data or []
     return metadata
 
 
@@ -232,53 +213,20 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     dict: dictionary of metadata collected
     """
     metadata = dict()
-    json_folder_path = os.path.join(folder_path, "json-config")
     json_files_db_map = [
         ("adaptor.json", "adaptor_configuration"),
         ("mapping.json", "mapping"),
     ]
     for file_name, db_field in json_files_db_map:
-        file_path = os.path.join(json_folder_path, file_name)
+        file_path = os.path.join(folder_path, file_name)
         if os.path.isfile(file_path):
             with open(file_path) as fp:
                 metadata[db_field] = json.load(fp)
 
-    adaptor_code_path = os.path.join(json_folder_path, "adaptor.py")
+    adaptor_code_path = os.path.join(folder_path, "adaptor.py")
     if os.path.isfile(adaptor_code_path):
         with open(adaptor_code_path) as fp:
             metadata["adaptor"] = fp.read()
-    return metadata
-
-
-def load_resource_description(folder_path: str | pathlib.Path) -> dict[str, Any]:
-    """Load a resource's description metadata.
-
-    Parameters
-    ----------
-    folder_path: root folder path where to collect metadata of a resource
-
-    Returns
-    -------
-    dict: dictionary of metadata collected
-    """
-    metadata: dict[str, Any] = dict()
-    metadata["description"] = []
-    desc_file_path = os.path.join(
-        folder_path, "content", "overview", "description.yaml"
-    )
-    if not os.path.isfile(desc_file_path):
-        return metadata
-    with open(desc_file_path) as fp:
-        data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
-    description: list[dict[str, str]] = []
-    for key, value in data.get("data-description", dict()).items():
-        item = {
-            "id": key,
-            "label": key.replace("-", " ").capitalize(),
-            "value": value,
-        }
-        description.append(item)
-    metadata["description"] = description
     return metadata
 
 
@@ -294,17 +242,25 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     dict: dictionary of metadata collected
     """
     metadata = dict()
-    json_folder_path = os.path.join(folder_path, "json-config")
-    metadata_file_path = os.path.join(json_folder_path, "metadata.json")
+    metadata_file_path = os.path.join(folder_path, "metadata.json")
     if not os.path.isfile(metadata_file_path):
         # some fields are required
-        raise ValueError("'metadata.json' not found in %r" % json_folder_path)
+        raise ValueError("'metadata.json' not found in %r" % folder_path)
     with open(metadata_file_path) as fp:
         data = json.load(fp)
 
+    metadata["abstract"] = data["abstract"]  # required
     metadata["begin_date"] = data.get("begin_date")
     metadata["citation"] = data.get("citation")
     metadata["contactemail"] = data.get("contactemail")
+    metadata["description"] = []
+    for key, value in data.get("description", dict()).items():
+        item = {
+            "id": key,
+            "label": key.replace("-", " ").capitalize(),
+            "value": value,
+        }
+        metadata["description"].append(item)
     metadata["doi"] = data.get("doi")
     metadata["ds_contactemail"] = data.get("ds_contactemail")
     metadata["ds_responsible_organisation"] = data.get("ds_responsible_organisation")
@@ -363,21 +319,17 @@ def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """
     metadata: dict[str, Any] = dict()
     metadata["variables"] = []
-    variables_file_path = os.path.join(
-        folder_path, "content", "overview", "variables.yaml"
-    )
+    variables_file_path = os.path.join(folder_path, "variables.json")
     if not os.path.isfile(variables_file_path):
         return metadata
     with open(variables_file_path) as fp:
-        variables_data = yaml.load(fp, Loader=yaml.loader.SafeLoader)
+        variables_data = json.load(fp)
 
-    form_json_path = os.path.join(folder_path, "json-config", "form.json")
-    mapping_json_path = os.path.join(folder_path, "json-config", "mapping.json")
+    form_json_path = os.path.join(folder_path, "form.json")
+    mapping_json_path = os.path.join(folder_path, "mapping.json")
     variable_id_map = load_variable_id_map(form_json_path, mapping_json_path)
     variables: list[dict[str, str]] = []
-    for variable_name, properties in variables_data.get(
-        "main variables", dict()
-    ).items():
+    for variable_name, properties in variables_data.items():
         variable_item = {
             "id": variable_id_map[variable_name],
             "label": variable_name,
@@ -409,8 +361,6 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
         load_resource_for_object_storage,
         load_adaptor_information,
         load_resource_documentation,
-        load_resource_description,
-        load_resource_abstract,
         load_resource_metadata_file,
         load_resource_variables,
     ]
