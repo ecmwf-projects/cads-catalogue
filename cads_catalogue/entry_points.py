@@ -112,10 +112,6 @@ def setup_test_database(
         "secure": False,
     }
     # load test data
-    this_path = os.path.abspath(os.path.dirname(__file__))
-    licences_folder_path = os.path.abspath(
-        os.path.join(this_path, "../tests/data/cds-licences")
-    )
     licences = manager.load_licences_from_folder(licences_folder_path)
     session_obj = sa.orm.sessionmaker(engine)
     with session_obj() as session:
@@ -124,9 +120,12 @@ def setup_test_database(
             manager.store_licences(session, licences, object_storage_url, **storage_kws)
             resources = []
             for resource_slug in os.listdir(resources_folder_path):
-                resource_folder_path = os.path.abspath(
-                    os.path.join(resources_folder_path, resource_slug)
+                resource_folder_path = os.path.join(
+                    resources_folder_path, resource_slug
                 )
+                if not manager.is_valid_resource(resource_folder_path):
+                    print("warning: folder %r ignored: not a valid resource folder")
+                    continue
                 resource = manager.load_resource_from_folder(resource_folder_path)
                 resources.append(resource)
             related_resources = manager.find_related_resources(resources)
