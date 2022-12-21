@@ -338,12 +338,7 @@
                 "grid"
             ]
         },
-        "geo_extent": {
-            "bboxN": null,
-            "bboxS": null,
-            "bboxE": null,
-            "bboxW": null
-        },
+        "geo_extent": null,
         "begin_date": "2003-01-01",
         "end_date": "2021-06-30",
         "publication_date": "2020-02-06",
@@ -1552,12 +1547,7 @@
                 "grid"
             ]
         },
-        "geo_extent": {
-            "bboxN": null,
-            "bboxS": null,
-            "bboxE": null,
-            "bboxW": null
-        },
+        "geo_extent": null,
         "begin_date": "2003-01-01",
         "end_date": "2021-06-30",
         "publication_date": "2020-02-06",

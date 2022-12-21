@@ -272,12 +272,16 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         metadata["end_date"] = end_date
     metadata["file_format"] = data.get("file_format")
     metadata["format_version"] = data.get("format_version")
-    metadata["geo_extent"] = {
-        "bboxN": data.get("bboxN"),
-        "bboxS": data.get("bboxS"),
-        "bboxE": data.get("bboxE"),
-        "bboxW": data.get("bboxW"),
-    }
+    bboxes = ("bboxN", "bboxS", "bboxE", "bboxW")
+    if [data.get(box) for box in bboxes] == [None] * 4:
+        metadata["geo_extent"] = None
+    else:
+        metadata["geo_extent"] = {
+            "bboxN": data.get("bboxN"),
+            "bboxS": data.get("bboxS"),
+            "bboxE": data.get("bboxE"),
+            "bboxW": data.get("bboxW"),
+        }
     metadata["keywords"] = data.get("keywords")
 
     # NOTE: licence_uids is for relationship, not a db field
