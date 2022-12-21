@@ -25,7 +25,6 @@ except ImportError:  # pragma: no cover
 from .database import Licence, Resource, ResourceLicence, init_database
 from .entry_points import info, main, setup_test_database
 from .manager import (
-    DATA_PATH,
     load_licences_from_folder,
     load_resource_from_folder,
     store_dataset,
@@ -45,5 +44,4 @@ __all__ = [
     "info",
     "setup_test_database",
     "main",
-    "DATA_PATH",
 ]
