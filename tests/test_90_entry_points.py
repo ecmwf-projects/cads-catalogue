@@ -54,12 +54,26 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     }
     expected_licences = [
         {
-            "download_filename": "an url",
             "licence_id": 1,
+            "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+            "revision": 4,
+            "title": "CCI product licence",
+            "download_filename": "an url",
+        },
+        {
+            "licence_id": 2,
+            "licence_uid": "eumetsat-cm-saf",
+            "revision": 1,
+            "title": "EUMETSAT CM SAF products licence",
+            "download_filename": "an url",
+        },
+        {
+            "licence_id": 3,
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
-        }
+            "download_filename": "an url",
+        },
     ]
 
     patch = mocker.patch(
@@ -67,7 +81,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         return_value=("an url", "a version"),
     )
     # only load basic datasets
-    tested_datasets = entry_points.DATASETS
     spy_initdb = mocker.spy(database, "init_database")
     # run the script to load test data
     result = runner.invoke(
@@ -80,10 +93,12 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert spy_initdb.call_count == 1
-    assert patch.call_count == 33
+    assert (
+        patch.call_count == 35
+    )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
-    assert patch.mock_calls[0].args == (licence_path, object_storage_url)
-    assert patch.mock_calls[0].kwargs == {
+    assert patch.mock_calls[2].args == (licence_path, object_storage_url)
+    assert patch.mock_calls[2].kwargs == {
         "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
@@ -94,52 +109,30 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     # check no errors
     assert result.exit_code == 0
     # check object storage calls
-    kwargs = dict()
-    for dataset in tested_datasets:
-        for filename in [
-            "overview.png",
-            "constraints.json",
-            "citation.html",
-        ]:
-            file_path = os.path.join(TESTDATA_PATH, dataset, filename)
-            kwargs = object_storage_kws.copy()
-            kwargs["subpath"] = "resources/%s" % dataset
-            if (
-                dataset
-                in (
-                    "derived-near-surface-meteorological-variables",
-                    "reanalysis-era5-pressure-levels",
-                    "reanalysis-era5-single-levels",
-                )
-                and filename == "overview.png"
-            ):
-                file_path = os.path.join(TESTDATA_PATH, dataset, "overview.jpg")
-            if (
-                dataset in ("derived-near-surface-meteorological-variables",)
-                and filename == "citation.html"
-            ):
-                file_path = os.path.join(TESTDATA_PATH, dataset, "citation.md")
-            if (
-                dataset in ("cams-global-reanalysis-eac4-monthly",)
-                and filename == "citation.html"
-            ):
-                continue
-            expected_call = unittest.mock.call(
-                file_path, object_storage_url, force=True, **kwargs
-            )
-            assert expected_call in patch.mock_calls
-    for dataset in [
-        "reanalysis-era5-pressure-levels",
-        "reanalysis-era5-single-levels",
-        "derived-near-surface-meteorological-variables",
-    ]:
-        kwargs["subpath"] = "resources/%s" % dataset
-        kwargs["force"] = True
-        expected_call = unittest.mock.call(
-            os.path.join(TESTDATA_PATH, dataset, "acknowledgement.html"),
+    expected_calls = [  # these are only some
+        unittest.mock.call(
+            os.path.join(
+                TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
+            ),
             object_storage_url,
-            **kwargs,
-        )
+            force=True,
+            subpath="licences/licence-to-use-copernicus-products",
+            **object_storage_kws,
+        ),
+        unittest.mock.call(
+            os.path.join(
+                TESTDATA_PATH,
+                "cads-forms-json",
+                "satellite-surface-radiation-budget",
+                "layout.json",
+            ),
+            object_storage_url,
+            force=True,
+            subpath="resources/satellite-surface-radiation-budget",
+            **object_storage_kws,
+        ),
+    ]
+    for expected_call in expected_calls:
         assert expected_call in patch.mock_calls
 
     # check db content
@@ -150,7 +143,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             database.Resource.resource_uid
         )
     ]
-    # with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt"), "w") as fp:
+    # with open(os.path.join(TESTDATA_PATH, 'dumped_resources.txt'), 'w') as fp:
     #     json.dump(resources, fp, default=str, indent=4)
     with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt")) as fp:
         expected_resources: list[dict[str, Any]] = json.load(fp)
@@ -171,7 +164,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         "SELECT related_resource_id, parent_resource_id, child_resource_id"
         " FROM related_resources ORDER BY related_resource_id"
     ).all()
-    assert res == [(1, 4, 2), (2, 2, 4), (3, 5, 3), (4, 3, 5)]
+    assert res == [(1, 6, 1), (2, 1, 6), (3, 3, 2), (4, 2, 3), (5, 8, 5), (6, 5, 8)]
     session.close()
 
     # spy_initdb.reset_mock()

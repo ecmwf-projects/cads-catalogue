@@ -1,0 +1,100 @@
+{
+  "format_conversion": {
+    "netcdf": {
+      "legacy_basetime_splitting": false
+    },
+    "netcdf_cdm": {
+      "split_on": [
+        "dataset",
+        "origin"
+      ],
+      "system_call": [
+        "cdscdm-translate",
+        "-o",
+        "{{outfile}}",
+        "--product",
+        "{{product}}",
+        "--merge_datasets",
+        "true",
+        "{{infile}}"
+      ]
+    },
+    "netcdf_zip": {
+      "legacy_basetime_splitting": false
+    }
+  },
+  "mars_external_force": {
+    "grid": "0.75/0.75"
+  },
+  "mars_internal_fields": [
+    {
+      "param": [
+        "surface_129",
+        "surface_134",
+        "surface_137",
+        "surface_151",
+        "surface_165",
+        "surface_166",
+        "surface_167",
+        "surface_168",
+        "surface_172",
+        "surface_210072",
+        "surface_210073",
+        "surface_210074",
+        "surface_210125",
+        "surface_210126",
+        "surface_210127",
+        "surface_210128",
+        "surface_210206",
+        "surface_210207",
+        "surface_210208",
+        "surface_210209",
+        "surface_210210",
+        "surface_210211",
+        "surface_210212",
+        "surface_210213",
+        "surface_210214",
+        "surface_210215",
+        "surface_210216",
+        "surface_218003",
+        "surface_218004",
+        "surface_218006",
+        "surface_218013",
+        "surface_218016",
+        "surface_218027",
+        "surface_218030",
+        "surface_218045",
+        "surface_218047",
+        "multilev_130",
+        "multilev_133",
+        "multilev_210001",
+        "multilev_210002",
+        "multilev_210003",
+        "multilev_210004",
+        "multilev_210005",
+        "multilev_210006",
+        "multilev_210007",
+        "multilev_210008",
+        "multilev_210009",
+        "multilev_210010",
+        "multilev_210011",
+        "multilev_210121",
+        "multilev_210122",
+        "multilev_210123",
+        "multilev_210124",
+        "multilev_210203",
+        "multilev_217003",
+        "multilev_217006",
+        "multilev_217013",
+        "multilev_217016",
+        "multilev_217027",
+        "multilev_217030",
+        "multilev_217045",
+        "multilev_217047"
+      ],
+      "type": [
+        "an"
+      ]
+    }
+  ]
+}

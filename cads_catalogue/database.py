@@ -65,6 +65,7 @@ class Resource(BaseModel):
     # internal functionality related
     adaptor = sa.Column(sa.Text)
     adaptor_configuration = sa.Column(sa.JSON)
+    form_data = sa.Column(sa.JSON)
     mapping = sa.Column(sa.JSON)
 
     # geo extent
@@ -77,24 +78,32 @@ class Resource(BaseModel):
     record_update = sa.Column(
         sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
-    resource_update = sa.Column(sa.DATE)
+    resource_update = sa.Column(sa.DATE)  # update_date of the source file
 
     # other metadata
     abstract = sa.Column(sa.TEXT, nullable=False)
-    contact = sa.Column(sa.String)
+    citation = sa.Column(sa.String)
+    contactemail = sa.Column(sa.String)
     description = sa.Column(sa.JSON, nullable=False)
     documentation = sa.Column(sa.JSON)
     doi = sa.Column(sa.String)
-    form_data = sa.Column(sa.JSON)
+    ds_contactemail = sa.Column(sa.String)
+    ds_responsible_organisation = sa.Column(sa.String)
+    ds_responsible_organisation_role = sa.Column(sa.String)
+    file_format = sa.Column(sa.String)
+    format_version = sa.Column(sa.String)
     keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
-    providers = sa.Column(sa.JSON)
-    references = sa.Column(sa.JSON)
-    summaries = sa.Column(sa.JSON, nullable=True)
+    lineage = sa.Column(sa.String)
+    representative_fraction = sa.Column(sa.Float)
+    responsible_organisation = sa.Column(sa.String)
+    responsible_organisation_role = sa.Column(sa.String)
+    responsible_organisation_website = sa.Column(sa.String)
     title = sa.Column(sa.String)
+    topic = sa.Column(sa.String)
     type = sa.Column(sa.VARCHAR(300), nullable=False)
-    use_eqc = sa.Column(sa.Boolean)
+    unit_measure = sa.Column(sa.String)
+    use_limitation = sa.Column(sa.String)
     variables = sa.Column(sa.JSON)
-    version = sa.Column(sa.VARCHAR(300))
 
     # relationship attributes
     licences = sa.orm.relationship(

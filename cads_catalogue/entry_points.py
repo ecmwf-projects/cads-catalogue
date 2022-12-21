@@ -58,16 +58,6 @@ def init_db(connection_string: str | None = None) -> None:
     print("successfully created the catalogue database structure.")
 
 
-DATASETS = [
-    "derived-near-surface-meteorological-variables",
-    "reanalysis-era5-land-monthly-means",
-    "reanalysis-era5-pressure-levels",
-    "reanalysis-era5-land",
-    "reanalysis-era5-single-levels",
-    "cams-global-reanalysis-eac4-monthly",
-]
-
-
 @app.command()
 def setup_test_database(
     connection_string: str | None = None,
@@ -129,15 +119,14 @@ def setup_test_database(
         try:
             manager.store_licences(session, licences, object_storage_url, **storage_kws)
             resources = []
-            # TODO: move resources_folder_path in a folder that not include cds-licences;
-            #       then, do not use DATASETS but datasets found inside
-            for dataset in DATASETS:
-                current_resource_folder_path = os.path.abspath(
-                    os.path.join(resources_folder_path, dataset)
+            for resource_slug in os.listdir(resources_folder_path):
+                resource_folder_path = os.path.join(
+                    resources_folder_path, resource_slug
                 )
-                resource = manager.load_resource_from_folder(
-                    current_resource_folder_path
-                )
+                if not manager.is_valid_resource(resource_folder_path):
+                    print("warning: folder %r ignored: not a valid resource folder")
+                    continue
+                resource = manager.load_resource_from_folder(resource_folder_path)
                 resources.append(resource)
             related_resources = manager.find_related_resources(resources)
             for resource in resources:

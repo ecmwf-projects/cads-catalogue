@@ -1,9 +1,0 @@
-{
-    "format": "tgz",
-    "reference_dataset": "cru",
-    "variable": "grid_point_altitude",
-    "version": [
-        "deprecated (1.0)",
-        "2.0"
-    ]
-}

@@ -1,0 +1,22 @@
+[
+    {
+        "url": "https://confluence.ecmwf.int/x/OIX4B",
+        "title": "CAMS Reanalysis data documentation",
+        "description": "Overall description of CAMS Reanalysis dataset."
+    },
+    {
+        "url": "https://confluence.ecmwf.int/x/OIX4B#CAMS:Reanalysisdatadocumentation-Knownissues",
+        "title": "Known issues",
+        "description": "Information about known issues found within the CAMS global reanalysis dataset."
+    },
+    {
+        "url": "https://atmosphere.copernicus.eu/node/325#fe56bdb4-1bdf-4d47-b46b-261a1ea57243",
+        "title": "Evaluation and quality assurance (EQA) reports",
+        "description": "Detailed validation reports"
+    },
+    {
+        "url": "http://www.atmos-chem-phys.net/19/3515/2019/",
+        "title": "Data citation",
+        "description": "Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019"
+    }
+]

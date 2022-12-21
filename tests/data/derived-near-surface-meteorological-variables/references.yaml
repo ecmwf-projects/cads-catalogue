@@ -1,9 +1,0 @@
----
-references:
-   - id: citation
-     content: citation.md
-     title: Citation
-     copy: true
-   - id: acknowledgement
-     content: acknowledgement.html
-     title: Acknowledgement

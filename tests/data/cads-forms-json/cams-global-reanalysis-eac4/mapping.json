@@ -1,0 +1,231 @@
+{
+    "force": {
+        "class": [
+            "mc"
+        ],
+        "dataset": [
+            "reanalysis"
+        ],
+        "expect": [
+            "any"
+        ],
+        "expver": [
+            "eac4"
+        ],
+        "number": [
+            "all"
+        ],
+        "stream": [
+            "oper"
+        ],
+        "type": [
+            "an"
+        ]
+    },
+    "multi_levtype": {
+        "level_groups": [
+            {
+                "label_prefix": "",
+                "levtypes": [
+                    "pl",
+                    "ml"
+                ],
+                "param_prefix": "multilev_"
+            },
+            {
+                "label_prefix": "Surface ",
+                "levtypes": [
+                    "sfc"
+                ],
+                "param_prefix": "surface_"
+            }
+        ],
+        "levelist_names": {
+            "ml": "model_level",
+            "pl": "pressure_level"
+        }
+    },
+    "options": {
+        "wants_dates": true
+    },
+    "remap": {
+        "time": {
+            "00:00": "00:00:00",
+            "03:00": "03:00:00",
+            "06:00": "06:00:00",
+            "09:00": "09:00:00",
+            "12:00": "12:00:00",
+            "15:00": "15:00:00",
+            "18:00": "18:00:00",
+            "21:00": "21:00:00"
+        },
+        "type": {
+            "analysis": "an"
+        },
+        "variable": {
+            "10m_u_component_of_wind": "surface_165",
+            "10m_v_component_of_wind": "surface_166",
+            "2m_dewpoint_temperature": "surface_168",
+            "2m_temperature": "surface_167",
+            "acetone": "multilev_217052",
+            "acetone_product": "multilev_217053",
+            "aldehydes": "multilev_217012",
+            "amine": "multilev_217040",
+            "ammonia": "multilev_217019",
+            "ammonium": "multilev_217021",
+            "black_carbon_aerosol_optical_depth_550nm": "surface_210211",
+            "carbon_monoxide": "multilev_210123",
+            "dimethyl_sulfide": "multilev_217018",
+            "dinitrogen_pentoxide": "multilev_217033",
+            "dust_aerosol_0.03-0.55um_mixing_ratio": "multilev_210004",
+            "dust_aerosol_0.55-0.9um_mixing_ratio": "multilev_210005",
+            "dust_aerosol_0.9-20um_mixing_ratio": "multilev_210006",
+            "dust_aerosol_optical_depth_550nm": "surface_210209",
+            "ethane": "multilev_217045",
+            "ethanol": "multilev_217046",
+            "ethene": "multilev_217010",
+            "formaldehyde": "multilev_210124",
+            "formic_acid": "multilev_217043",
+            "fraction_of_cloud_cover": "multilev_248",
+            "geopotential": "multilev_129",
+            "high_cloud_cover": "surface_188",
+            "high_vegetation_cover": "surface_28",
+            "hydrogen_peroxide": "multilev_217003",
+            "hydroperoxy_radical": "multilev_217028",
+            "hydrophilic_black_carbon_aerosol_mixing_ratio": "multilev_210009",
+            "hydrophilic_organic_matter_aerosol_mixing_ratio": "multilev_210007",
+            "hydrophobic_black_carbon_aerosol_mixing_ratio": "multilev_210010",
+            "hydrophobic_organic_matter_aerosol_mixing_ratio": "multilev_210008",
+            "hydroxyl_radical": "multilev_217030",
+            "isoprene": "multilev_217016",
+            "lake_cover": "surface_26",
+            "land_sea_mask": "surface_172",
+            "lead": "multilev_217026",
+            "leaf_area_index_high_vegetation": "surface_67",
+            "leaf_area_index_low_vegetation": "surface_66",
+            "lifting_threshold_speed": "surface_210053",
+            "low_cloud_cover": "surface_186",
+            "low_vegetation_cover": "surface_27",
+            "mean_altitude_of_maximum_injection": "surface_210119",
+            "mean_sea_level_pressure": "surface_151",
+            "medium_cloud_cover": "surface_187",
+            "methacrolein_mvk": "multilev_217050",
+            "methacrylic_acid": "multilev_217044",
+            "methane_chemistry": "multilev_217004",
+            "methane_sulfonic_acid": "multilev_217022",
+            "methanol": "multilev_217042",
+            "methyl_glyoxal": "multilev_217023",
+            "methyl_peroxide": "multilev_217007",
+            "methylperoxy_radical": "multilev_217029",
+            "near_ir_albedo_for_diffuse_radiation": "surface_18",
+            "near_ir_albedo_for_direct_radiation": "surface_17",
+            "nitrate": "multilev_217051",
+            "nitrate_radical": "multilev_217032",
+            "nitric_acid": "multilev_217006",
+            "nitrogen_dioxide": "multilev_210121",
+            "nitrogen_monoxide": "multilev_217027",
+            "olefins": "multilev_217011",
+            "organic_ethers": "multilev_217036",
+            "organic_matter_aerosol_optical_depth_550nm": "surface_210210",
+            "organic_nitrates": "multilev_217015",
+            "ozone": "multilev_210203",
+            "paraffins": "multilev_217009",
+            "particulate_matter_10um": "surface_210074",
+            "particulate_matter_1um": "surface_210072",
+            "particulate_matter_2.5um": "surface_210073",
+            "pernitric_acid": "multilev_217034",
+            "peroxides": "multilev_217014",
+            "peroxy_acetyl_radical": "multilev_217035",
+            "peroxyacetyl_nitrate": "multilev_217013",
+            "potential_vorticity": "multilev_60",
+            "propane": "multilev_217047",
+            "propene": "multilev_217048",
+            "radon": "multilev_210181",
+            "relative_humidity": "multilev_157",
+            "sea_ice_cover": "surface_31",
+            "sea_salt_aerosol_0.03-0.5um_mixing_ratio": "multilev_210001",
+            "sea_salt_aerosol_0.5-5um_mixing_ratio": "multilev_210002",
+            "sea_salt_aerosol_5-20um_mixing_ratio": "multilev_210003",
+            "sea_salt_aerosol_optical_depth_550nm": "surface_210208",
+            "sea_surface_temperature": "surface_34",
+            "skin_reservoir_content": "surface_198",
+            "skin_temperature": "surface_235",
+            "snow_albedo": "surface_32",
+            "snow_depth": "surface_141",
+            "soil_clay_content": "surface_210054",
+            "soil_type": "surface_43",
+            "specific_cloud_ice_water_content": "multilev_247",
+            "specific_cloud_liquid_water_content": "multilev_246",
+            "specific_humidity": "multilev_133",
+            "specific_rain_water_content": "multilev_75",
+            "specific_snow_water_content": "multilev_76",
+            "stratospheric_ozone_tracer": "multilev_217024",
+            "sulphate_aerosol_mixing_ratio": "multilev_210011",
+            "sulphate_aerosol_optical_depth_550nm": "surface_210212",
+            "sulphur_dioxide": "multilev_210122",
+            "surface_geopotential": "surface_129",
+            "surface_pressure": "surface_134",
+            "surface_roughness": "surface_173",
+            "temperature": "multilev_130",
+            "terpenes": "multilev_217049",
+            "total_aerosol_optical_depth_1240nm": "surface_210216",
+            "total_aerosol_optical_depth_469nm": "surface_210213",
+            "total_aerosol_optical_depth_550nm": "surface_210207",
+            "total_aerosol_optical_depth_670nm": "surface_210214",
+            "total_aerosol_optical_depth_865nm": "surface_210215",
+            "total_cloud_cover": "surface_164",
+            "total_column_acetone": "surface_218052",
+            "total_column_aldehydes": "surface_218012",
+            "total_column_carbon_monoxide": "surface_210127",
+            "total_column_ethane": "surface_218045",
+            "total_column_ethanol": "surface_218046",
+            "total_column_ethene": "surface_218010",
+            "total_column_formaldehyde": "surface_210128",
+            "total_column_formic_acid": "surface_218043",
+            "total_column_hydrogen_peroxide": "surface_218003",
+            "total_column_hydroxyl_radical": "surface_218030",
+            "total_column_isoprene": "surface_218016",
+            "total_column_methane": "surface_218004",
+            "total_column_methanol": "surface_218042",
+            "total_column_methyl_peroxide": "surface_218007",
+            "total_column_nitric_acid": "surface_218006",
+            "total_column_nitrogen_dioxide": "surface_210125",
+            "total_column_nitrogen_monoxide": "surface_218027",
+            "total_column_olefins": "surface_218011",
+            "total_column_organic_nitrates": "surface_218015",
+            "total_column_ozone": "surface_210206",
+            "total_column_paraffins": "surface_218009",
+            "total_column_peroxyacetyl_nitrate": "surface_218013",
+            "total_column_propane": "surface_218047",
+            "total_column_sulphur_dioxide": "surface_210126",
+            "total_column_water": "surface_136",
+            "total_column_water_vapour": "surface_137",
+            "type_of_high_vegetation": "surface_30",
+            "type_of_low_vegetation": "surface_29",
+            "u_component_of_wind": "multilev_131",
+            "uv_visible_albedo_for_diffuse_radiation": "surface_16",
+            "uv_visible_albedo_for_direct_radiation": "surface_15",
+            "v_component_of_wind": "multilev_132",
+            "vertical_velocity": "multilev_135",
+            "vertically_integrated_mass_of_dust_aerosol_0.03-0.55um": "surface_215043",
+            "vertically_integrated_mass_of_dust_aerosol_0.55-9um": "surface_215044",
+            "vertically_integrated_mass_of_dust_aerosol_9-20um": "surface_215045",
+            "vertically_integrated_mass_of_hydrophilic_black_carbon_aerosol": "surface_215078",
+            "vertically_integrated_mass_of_hydrophilic_organic_matter_aerosol": "surface_215062",
+            "vertically_integrated_mass_of_hydrophobic_black_carbon_aerosol": "surface_215077",
+            "vertically_integrated_mass_of_hydrophobic_organic_matter_aerosol": "surface_215061",
+            "vertically_integrated_mass_of_sea_salt_aerosol_0.03-0.5um": "surface_215019",
+            "vertically_integrated_mass_of_sea_salt_aerosol_0.5-5um": "surface_215020",
+            "vertically_integrated_mass_of_sea_salt_aerosol_5-20um": "surface_215021",
+            "vertically_integrated_mass_of_sulphate_aerosol": "surface_215087"
+        }
+    },
+    "rename": {
+        "variable": "param"
+    },
+    "selection_limit": 100000,
+    "selection_limit_ignore": [
+        "area",
+        "grid"
+    ]
+}

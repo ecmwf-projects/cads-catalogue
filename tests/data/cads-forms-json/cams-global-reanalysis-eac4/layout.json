@@ -1,0 +1,837 @@
+{
+  "uid": "cams-global-reanalysis-eac4",
+  "title": "CAMS global reanalysis (EAC4)",
+  "description": "",
+  "body": {
+    "main": {
+      "sections": [
+        {
+          "title": "Overview",
+          "id": "overview",
+          "blocks": [
+            {
+              "id": "abstract",
+              "type": "thumb-markdown",
+              "content": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window. \n",
+              "image": "overview/overview.png"
+            },
+            {
+              "type": "table",
+              "id": "data-description",
+              "caption": "Data-description",
+              "structure": {
+                "headings": [
+                  {
+                    "id": "data-type",
+                    "label": "Data-type"
+                  },
+                  {
+                    "id": "file-format",
+                    "label": "File-format"
+                  },
+                  {
+                    "id": "horizontal-coverage",
+                    "label": "Horizontal-coverage"
+                  },
+                  {
+                    "id": "horizontal-resolution",
+                    "label": "Horizontal-resolution"
+                  },
+                  {
+                    "id": "temporal-coverage",
+                    "label": "Temporal-coverage"
+                  },
+                  {
+                    "id": "temporal-resolution",
+                    "label": "Temporal-resolution"
+                  },
+                  {
+                    "id": "update-frequency",
+                    "label": "Update-frequency"
+                  },
+                  {
+                    "id": "versions",
+                    "label": "Versions"
+                  },
+                  {
+                    "id": "vertical-coverage",
+                    "label": "Vertical-coverage"
+                  },
+                  {
+                    "id": "vertical-resolution",
+                    "label": "Vertical-resolution"
+                  }
+                ],
+                "orientation": "horizontal"
+              },
+              "content": [
+                {
+                  "data-type": "Gridded"
+                },
+                {
+                  "file-format": "GRIB (optional conversion to netCDF)"
+                },
+                {
+                  "horizontal-coverage": "Global"
+                },
+                {
+                  "horizontal-resolution": "0.75\u00b0x0.75\u00b0"
+                },
+                {
+                  "temporal-coverage": "2003 to 2022"
+                },
+                {
+                  "temporal-resolution": "3-hourly"
+                },
+                {
+                  "update-frequency": "Twice a year with 4-6 month delay"
+                },
+                {
+                  "versions": "Only one version"
+                },
+                {
+                  "vertical-coverage": "Surface, total column, model levels and pressure levels."
+                },
+                {
+                  "vertical-resolution": "60 model levels. Pressure levels: 1000, 950, 925, 900, 850, 800, 700, 600, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10, 7, 5, 3, 2, 1 hPa"
+                }
+              ]
+            },
+            {
+              "type": "table",
+              "id": "variables",
+              "caption": "Variables",
+              "structure": {
+                "orientation": "vertical",
+                "headings": [
+                  {
+                    "id": "name",
+                    "label": "Name"
+                  },
+                  {
+                    "id": "units",
+                    "label": "Units"
+                  }
+                ]
+              },
+              "content": [
+                {
+                  "name": "10m u-component of wind",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "10m v-component of wind",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "2m dewpoint temperature",
+                  "units": "K"
+                },
+                {
+                  "name": "2m temperature",
+                  "units": "K"
+                },
+                {
+                  "name": "Acetone",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Acetone product",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Aldehydes",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Amine",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Ammonia",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Ammonium",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Black carbon aerosol optical depth at 550 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Carbon monoxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Dimethyl sulfide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Dinitrogen pentoxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Dust aerosol (0.03 - 0.55 \u00b5m) mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Dust aerosol (0.55 - 0.9 \u00b5m) mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Dust aerosol (0.9 - 20 \u00b5m) mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Dust aerosol optical depth at 550 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Ethane",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Ethanol",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Ethene",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Formaldehyde",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Formic acid",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Fraction of cloud cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Geopotential",
+                  "units": "m<sup>2</sup>s<sup>-2</sup>"
+                },
+                {
+                  "name": "High cloud cover",
+                  "units": "01"
+                },
+                {
+                  "name": "High vegetation cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Hydrogen peroxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Hydroperoxy radical",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Hydrophilic black carbon aerosol mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Hydrophilic organic matter aerosol mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Hydrophobic black carbon aerosol mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Hydrophobic organic matter aerosol mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Hydroxyl radical",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Isoprene",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Lake cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Land-sea mask",
+                  "units": "01"
+                },
+                {
+                  "name": "Lead",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Leaf area index, high vegetation",
+                  "units": "m<sup>2</sup>m<sup>-2</sup>"
+                },
+                {
+                  "name": "Leaf area index, low vegetation",
+                  "units": "m<sup>2</sup>m<sup>-2</sup>"
+                },
+                {
+                  "name": "Lifting threshold speed",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "Low cloud cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Low vegetation cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Mean altitude of maximum injection",
+                  "units": "m"
+                },
+                {
+                  "name": "Mean sea level pressure",
+                  "units": "Pa"
+                },
+                {
+                  "name": "Medium cloud cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Methacrolein mvk",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methacrylic acid",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methane (chemistry)",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methane sulfonic acid",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methanol",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methyl glyoxal",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methyl peroxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Methylperoxy radical",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Near ir albedo for diffuse radiation",
+                  "units": "01"
+                },
+                {
+                  "name": "Near ir albedo for direct radiation",
+                  "units": "01"
+                },
+                {
+                  "name": "Nitrate",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Nitrate radical",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Nitric acid",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Nitrogen dioxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Nitrogen monoxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Olefins",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Organic ethers",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Organic matter aerosol optical depth at 550 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Organic nitrates",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Ozone",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Paraffins",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Particulate matter d < 1 \u00b5m (pm1)",
+                  "units": "kgm<sup>-3</sup>"
+                },
+                {
+                  "name": "Particulate matter d < 10 \u00b5m (pm10)",
+                  "units": "kgm<sup>-3</sup>"
+                },
+                {
+                  "name": "Particulate matter d < 2.5 \u00b5m (pm2.5)",
+                  "units": "kgm<sup>-3</sup>"
+                },
+                {
+                  "name": "Pernitric acid",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Peroxides",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Peroxy acetyl radical",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Peroxyacetyl nitrate",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Potential vorticity",
+                  "units": "Km<sup>2</sup>kg<sup>-1</sup>s<sup>-1</sup>"
+                },
+                {
+                  "name": "Propane",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Propene",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Radon",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Relative humidity",
+                  "units": ""
+                },
+                {
+                  "name": "Sea salt aerosol (0.03 - 0.5 \u00b5m) mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Sea salt aerosol (0.5 - 5 \u00b5m) mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Sea salt aerosol (5 - 20 \u00b5m) mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Sea salt aerosol optical depth at 550 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Sea surface temperature",
+                  "units": "K"
+                },
+                {
+                  "name": "Sea-ice cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Skin reservoir content",
+                  "units": "mofwaterequivalent"
+                },
+                {
+                  "name": "Skin temperature",
+                  "units": "K"
+                },
+                {
+                  "name": "Snow albedo",
+                  "units": "01"
+                },
+                {
+                  "name": "Snow depth",
+                  "units": "mofwaterequivalent"
+                },
+                {
+                  "name": "Soil clay content",
+                  "units": ""
+                },
+                {
+                  "name": "Soil type",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Specific cloud ice water content",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific cloud liquid water content",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific humidity",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific rain water content",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Specific snow water content",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Stratospheric ozone tracer",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Sulphate aerosol mixing ratio",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Sulphate aerosol optical depth at 550 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Sulphur dioxide",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Surface geopotential",
+                  "units": "m<sup>2</sup>s<sup>-2</sup>"
+                },
+                {
+                  "name": "Surface pressure",
+                  "units": "Pa"
+                },
+                {
+                  "name": "Surface roughness",
+                  "units": "m"
+                },
+                {
+                  "name": "Temperature",
+                  "units": "K"
+                },
+                {
+                  "name": "Terpenes",
+                  "units": "kgkg<sup>-1</sup>"
+                },
+                {
+                  "name": "Total aerosol optical depth at 1240 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Total aerosol optical depth at 469 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Total aerosol optical depth at 550 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Total aerosol optical depth at 670 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Total aerosol optical depth at 865 nm",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Total cloud cover",
+                  "units": "01"
+                },
+                {
+                  "name": "Total column acetone",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column aldehydes",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column carbon monoxide",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column ethane",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column ethanol",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column ethene",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column formaldehyde",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column formic acid",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column hydrogen peroxide",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column hydroxyl radical",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column isoprene",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column methane",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column methanol",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column methyl peroxide",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column nitric acid",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column nitrogen dioxide",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column nitrogen monoxide",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column olefins",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column organic nitrates",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column ozone",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column paraffins",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column peroxyacetyl nitrate",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column propane",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column sulphur dioxide",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column water",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Total column water vapour",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Type of high vegetation",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "Type of low vegetation",
+                  "units": "dimensionless"
+                },
+                {
+                  "name": "U-component of wind",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "Uv visible albedo for diffuse radiation",
+                  "units": "01"
+                },
+                {
+                  "name": "Uv visible albedo for direct radiation",
+                  "units": "01"
+                },
+                {
+                  "name": "V-component of wind",
+                  "units": "ms<sup>-1</sup>"
+                },
+                {
+                  "name": "Vertical velocity",
+                  "units": "Pas<sup>-1</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of dust aerosol (0.03 - 0.55 \u00b5m)",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of dust aerosol (0.55 - 9 \u00b5m)",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of dust aerosol (9 - 20 \u00b5m)",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of hydrophilic black carbon aerosol",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of hydrophilic organic matter aerosol",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of hydrophobic black carbon aerosol",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of hydrophobic organic matter aerosol",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of sea salt aerosol (0.03 - 0.5 \u00b5m)",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of sea salt aerosol (0.5 - 5 \u00b5m)",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of sea salt aerosol (5 - 20 \u00b5m)",
+                  "units": "kgm<sup>-2</sup>"
+                },
+                {
+                  "name": "Vertically integrated mass of sulphate aerosol",
+                  "units": "kgm<sup>-2</sup>"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Download",
+          "id": "download",
+          "blocks": []
+        },
+        {
+          "title": "Documentation",
+          "id": "documentation",
+          "blocks": [
+            {
+              "id": "all_docs-0",
+              "type": "link",
+              "url": "https://confluence.ecmwf.int/x/OIX4B",
+              "title": "CAMS Reanalysis data documentation",
+              "description": "Overall description of CAMS Reanalysis dataset."
+            },
+            {
+              "id": "all_docs-1",
+              "type": "link",
+              "url": "https://confluence.ecmwf.int/x/OIX4B#CAMS:Reanalysisdatadocumentation-Knownissues",
+              "title": "Known issues",
+              "description": "Information about known issues found within the CAMS global reanalysis dataset"
+            },
+            {
+              "id": "all_docs-2",
+              "type": "link",
+              "url": "https://atmosphere.copernicus.eu/node/325#fe56bdb4-1bdf-4d47-b46b-261a1ea57243",
+              "title": "Evaluation and quality assurance (EQA) reports",
+              "description": "Detailed validation reports"
+            },
+            {
+              "id": "all_docs-3",
+              "type": "link",
+              "url": "http://www.atmos-chem-phys.net/19/3515/2019/",
+              "title": "Data citation",
+              "description": "Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/"
+            }
+          ]
+        }
+      ]
+    },
+    "aside": {
+      "blocks": [
+        {
+          "id": "contact",
+          "title": "Contact",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "portal",
+              "type": "link",
+              "url": "https://support.ecmwf.int",
+              "title": "ECMWF Support Portal"
+            }
+          ]
+        },
+        {
+          "id": "licence",
+          "title": "Licence",
+          "type": "button",
+          "scope": "licence",
+          "action": "modal",
+          "licences": [
+            "licence-to-use-copernicus-products"
+          ]
+        },
+        {
+          "id": "publication_date-section",
+          "title": "Publication date",
+          "type": "section",
+          "open": true,
+          "blocks": [
+            {
+              "id": "publication_date-markdown",
+              "type": "markdown",
+              "content": "2020-02-06"
+            }
+          ]
+        },
+        {
+          "id": "related_applications",
+          "type": "related_entries",
+          "title": "Related applications",
+          "content": "applications"
+        },
+        {
+          "id": "related_dataset",
+          "type": "related_entries",
+          "title": "Related datasets",
+          "content": "datasets"
+        }
+      ]
+    }
+  }
+}
