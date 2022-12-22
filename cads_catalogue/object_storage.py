@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import json
 import os
 import pathlib
@@ -162,8 +163,24 @@ def store_file(
             )
     file_name = os.path.basename(file_path)
     object_name = os.path.join(subpath, file_name)
-    res = client.fput_object(bucket_name, object_name, file_path)
-    version_id = res.version_id
+
+    with open(file_path, 'rb') as fp:
+        text = fp.read()
+        source_sha256 = hashlib.sha256(text).hexdigest()
+
+    # check if destination already exists under some version
+    existing_objects = client.list_objects(
+        bucket_name, object_name, include_user_meta=True, include_version=True)
+    for existing_object in existing_objects:
+        destination_sha256 = existing_object.metadata.get("sha256")
+        if destination_sha256 and destination_sha256 == source_sha256:
+            # already on the object storage: do not upload
+            version_id = existing_object.version_id
+            break
+    else:  # never gone on break: effective upload
+        res = client.fput_object(
+            bucket_name, object_name, file_path, metadata={"My-Project": "one"})  #metadata={"sha256": source_sha256})
+        version_id = res.version_id
     download_url = "%s/%s?versionId=%s" % (bucket_name, object_name, version_id)
     ret_value = (download_url, version_id)
     return ret_value
