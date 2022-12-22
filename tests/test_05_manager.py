@@ -278,6 +278,7 @@ def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
+    constraints_fp = open(os.path.join(resource_folder_path, "constraints.json"))
     form_fp = open(os.path.join(resource_folder_path, "form.json"))
     mapping_fp = open(os.path.join(resource_folder_path, "mapping.json"))
     resource = manager.load_resource_from_folder(resource_folder_path)
@@ -326,6 +327,7 @@ def test_load_resource_from_folder() -> None:
             "(Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac",
         ],
         "constraints": os.path.join(resource_folder_path, "constraints.json"),
+        "constraints_data": json.load(constraints_fp),
         "contactemail": "https://support.ecmwf.int",
         "description": [
             {"id": "file-format", "label": "File format", "value": "GRIB"},
@@ -1212,6 +1214,7 @@ def test_load_resource_from_folder() -> None:
     }
     assert resource == expected_resource
 
+    constraints_fp.close()
     form_fp.close()
     mapping_fp.close()
 
