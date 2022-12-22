@@ -1262,20 +1262,21 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     manager.store_licences(session, licences, object_storage_url, **storage_kws)
     session.commit()
     assert patch.call_count == len(licences)
-    assert patch.mock_calls[0].args == (
+    assert (
         os.path.join(
             licences_folder_path,
             "CCI-data-policy-for-satellite-surface-radiation-budget.pdf",
         ),
         object_storage_url,
-    )
-    assert patch.mock_calls[0].kwargs == {
+    ) in [pm.args for pm in patch.mock_calls]
+
+    assert {
         "force": True,
         "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,
-    }
+    } in [pm.kwargs for pm in patch.mock_calls]
     res = session.query(database.Licence).all()
     assert len(res) == len(licences)
     db_obj_as_dict = manager.object_as_dict(res[0])
@@ -1353,14 +1354,14 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     assert stored_record["constraints"] == "an url"
     assert stored_record["previewimage"] == "an url"
     assert stored_record["layout"] == "an url"
-    expected_many2many_record = {
-        "resource_id": 1,
-        "licence_id": 3,
-    }
-    assert (
-        manager.object_as_dict(session.query(database.ResourceLicence).first())
-        == expected_many2many_record
+
+    era5land = (
+        session.query(database.Resource)
+        .filter_by(resource_uid="reanalysis-era5-land")
+        .one()
     )
+    assert era5land.licences
+    assert era5land.licences[0].licence_uid == "licence-to-use-copernicus-products"
 
     session.close()
     # reset globals for tests following

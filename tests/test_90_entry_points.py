@@ -97,15 +97,14 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         patch.call_count == 35
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
-    assert patch.mock_calls[2].args == (licence_path, object_storage_url)
-    assert patch.mock_calls[2].kwargs == {
+    assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
+    assert {
         "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,
-    }
-
+    } in [mp.kwargs for mp in patch.mock_calls]
     # check no errors
     assert result.exit_code == 0
     # check object storage calls
