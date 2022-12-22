@@ -149,8 +149,17 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     licences = [
         manager.object_as_dict(ll) for ll in session.query(database.Licence).all()
     ]
+    assert len(licences) == len(expected_licences)
+    for expected_licence in expected_licences:
+        effective_found = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=expected_licence["licence_uid"])
+            .all()
+        )
+        assert effective_found
+        for field in ["revision", "title", "download_filename"]:
+            assert getattr(effective_found[0], field) == expected_licence[field]
 
-    assert licences == expected_licences
     for i, resource in enumerate(resources):
         for key in resource:
             if key == "record_update":
