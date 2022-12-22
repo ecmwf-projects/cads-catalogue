@@ -124,7 +124,10 @@ def setup_test_database(
                     resources_folder_path, resource_slug
                 )
                 if not manager.is_valid_resource(resource_folder_path):
-                    print("warning: folder %r ignored: not a valid resource folder")
+                    print(
+                        "warning: folder %r ignored: not a valid resource folder"
+                        % resource_folder_path
+                    )
                     continue
                 resource = manager.load_resource_from_folder(resource_folder_path)
                 resources.append(resource)
