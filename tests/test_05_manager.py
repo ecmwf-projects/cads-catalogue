@@ -1,4 +1,5 @@
 import json
+import operator
 import os.path
 from typing import Any
 
@@ -190,7 +191,10 @@ def test_load_metadata_licences() -> None:
             "title": "Licence to use Copernicus Products",
         },
     ]
-    licences = manager.load_licences_from_folder(licences_folder_path)
+    licences = sorted(
+        manager.load_licences_from_folder(licences_folder_path),
+        key=operator.itemgetter("licence_uid"),
+    )
 
     assert licences == expected_licences
 
