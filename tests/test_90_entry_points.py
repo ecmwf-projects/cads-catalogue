@@ -142,7 +142,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             database.Resource.resource_uid
         )
     ]
-    # with open(os.path.join(TESTDATA_PATH, 'dumped_resources.txt'), 'w') as fp:
+    # with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt"), "w") as fp:
     #     json.dump(resources, fp, default=str, indent=4)
     with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt")) as fp:
         expected_resources: list[dict[str, Any]] = json.load(fp)
@@ -162,17 +162,25 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
 
     for i, resource in enumerate(resources):
         for key in resource:
-            if key == "record_update":
+            if key in ("record_update", "resource_id"):
                 continue
+            expected_resource = [
+                r
+                for r in expected_resources
+                if r["resource_uid"] == resource["resource_uid"]
+            ][0]
             value = resource[key]
             if isinstance(value, datetime.date):
                 value = value.isoformat()
-            assert value == expected_resources[i][key]
-    res = session.execute(
-        "SELECT related_resource_id, parent_resource_id, child_resource_id"
-        " FROM related_resources ORDER BY related_resource_id"
-    ).all()
-    assert res == [(1, 6, 1), (2, 1, 6), (3, 3, 2), (4, 2, 3), (5, 8, 5), (6, 5, 8)]
+            assert value == expected_resource[key], key
+
+    resl = (
+        session.query(database.Resource)
+        .filter_by(resource_uid="reanalysis-era5-single-levels")
+        .one()
+    )
+    assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+
     session.close()
 
     # spy_initdb.reset_mock()
