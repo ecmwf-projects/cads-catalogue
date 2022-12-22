@@ -66,6 +66,7 @@ class Resource(BaseModel):
     adaptor = sa.Column(sa.Text)
     adaptor_configuration = sa.Column(sa.JSON)
     form_data = sa.Column(sa.JSON)
+    constraints_data = sa.Column(sa.JSON)
     mapping = sa.Column(sa.JSON)
 
     # geo extent
