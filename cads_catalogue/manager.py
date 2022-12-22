@@ -227,6 +227,7 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     metadata = dict()
     json_files_db_map = [
         ("adaptor.json", "adaptor_configuration"),
+        ("constraints.json", "constraints_data"),
         ("form.json", "form_data"),
         ("mapping.json", "mapping"),
     ]
