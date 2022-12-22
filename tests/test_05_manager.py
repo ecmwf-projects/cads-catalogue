@@ -316,32 +316,6 @@ def test_load_resource_from_folder() -> None:
         " in time, as well as the fixed grid used for the data distribution "
         "at any period enables decisions makers, businesses and individuals"
         " to access and use more accurate information on land states.",
-        "adaptor_configuration": {
-            "embargo": {"days": 5, "hours": 0},
-            "format_conversion": {
-                "netcdf.zip": {
-                    "always_zip": [True],
-                    "system_call": [
-                        "/opt/ecmwf/eccodes/bin/grib_to_netcdf",
-                        "-S",
-                        "param",
-                        "-o",
-                        "{{outfile}}",
-                        "{{infile}}",
-                    ],
-                    "zip_compression_kwargs": {"compression": "ZIP_DEFLATED"},
-                },
-                "netcdf4": {
-                    "system_call": [
-                        "cfgrib",
-                        "to_netcdf",
-                        "-o",
-                        "{{outfile}}",
-                        "{{infile}}",
-                    ]
-                },
-            },
-        },
         "begin_date": "1950-01-01",
         "citation": [
             "Muñoz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. "
