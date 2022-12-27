@@ -1,7 +1,6 @@
 import json
 import os
 from typing import Any
-import unittest
 
 import minio  # type: ignore
 import pytest
@@ -66,8 +65,12 @@ def test_store_file(mocker) -> None:
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
-        bucket_name, "licence-to-use-copernicus-products.pdf", file_path,
-        metadata={'sha256': 'b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18'}
+        bucket_name,
+        "licence-to-use-copernicus-products.pdf",
+        file_path,
+        metadata={
+            "sha256": "b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18"
+        },
     )
     patch7.assert_called_once_with(bucket_name, ro_policy)
 
@@ -97,7 +100,11 @@ def test_store_file(mocker) -> None:
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
-        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf", file_path,
-        metadata={'sha256': 'b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18'}
+        bucket_name,
+        "licences/mypath/licence-to-use-copernicus-products.pdf",
+        file_path,
+        metadata={
+            "sha256": "b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18"
+        },
     )
     patch7.assert_called_once_with(bucket_name, ro_policy)
