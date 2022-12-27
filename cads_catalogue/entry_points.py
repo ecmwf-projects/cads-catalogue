@@ -114,48 +114,35 @@ def setup_test_database(
     # load test data
     licences = manager.load_licences_from_folder(licences_folder_path)
     session_obj = sa.orm.sessionmaker(engine)
-    with session_obj() as session:
-        session.begin()
-        try:
-            manager.store_licences(session, licences, object_storage_url, **storage_kws)
-            resources = []
-            for resource_slug in os.listdir(resources_folder_path):
-                resource_folder_path = os.path.join(
-                    resources_folder_path, resource_slug
+    with session_obj.begin() as session:  # type: ignore
+        manager.store_licences(session, licences, object_storage_url, **storage_kws)
+        resources = []
+        for resource_slug in os.listdir(resources_folder_path):
+            resource_folder_path = os.path.join(resources_folder_path, resource_slug)
+            if not manager.is_valid_resource(resource_folder_path):
+                print(
+                    "warning: folder %r ignored: not a valid resource folder"
+                    % resource_folder_path
                 )
-                if not manager.is_valid_resource(resource_folder_path):
-                    print(
-                        "warning: folder %r ignored: not a valid resource folder"
-                        % resource_folder_path
-                    )
-                    continue
-                resource = manager.load_resource_from_folder(resource_folder_path)
-                resources.append(resource)
-            related_resources = manager.find_related_resources(resources)
-            for resource in resources:
-                manager.store_dataset(
-                    session, resource, object_storage_url, **storage_kws
-                )
-            for res1, res2 in related_resources:
-                res1_obj = (
-                    session.query(database.Resource)
-                    .filter_by(resource_uid=res1["resource_uid"])
-                    .one()
-                )
-                res2_obj = (
-                    session.query(database.Resource)
-                    .filter_by(resource_uid=res2["resource_uid"])
-                    .one()
-                )
-                res1_obj.related_resources.append(res2_obj)
-                res2_obj.related_resources.append(res1_obj)
-        except Exception:
-            session.rollback()
-            raise
-        else:
-            session.commit()
-        finally:
-            session.close()
+                continue
+            resource = manager.load_resource_from_folder(resource_folder_path)
+            resources.append(resource)
+        related_resources = manager.find_related_resources(resources)
+        for resource in resources:
+            manager.store_dataset(session, resource, object_storage_url, **storage_kws)
+        for res1, res2 in related_resources:
+            res1_obj = (
+                session.query(database.Resource)
+                .filter_by(resource_uid=res1["resource_uid"])
+                .one()
+            )
+            res2_obj = (
+                session.query(database.Resource)
+                .filter_by(resource_uid=res2["resource_uid"])
+                .one()
+            )
+            res1_obj.related_resources.append(res2_obj)
+            res2_obj.related_resources.append(res1_obj)
 
 
 def main() -> None:
