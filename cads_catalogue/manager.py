@@ -81,15 +81,24 @@ def object_as_dict(obj: Any) -> dict[str, Any]:
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
-def is_valid_resource(resource_folder_path: str | pathlib.Path) -> bool:
+def is_valid_resource(
+    resource_folder_path: str | pathlib.Path, licences: list[dict[str, Any]]
+) -> bool:
     """Return True if input folders seems a valid resource folder, False otherwise.
 
     Parameters
     ----------
     resource_folder_path: the folder path where to look for json files of the resource
+    licences: list of loaded licences, as returned from `load_licences_from_folder`
     """
     metadata_path = os.path.join(resource_folder_path, "metadata.json")
     if not os.path.isfile(metadata_path):
+        return False
+    allowed_licence_uids = set([r["licence_uid"] for r in licences])
+    resource_licences = set(load_resource_metadata_file(resource_folder_path)["licence_uids"])
+    not_found_licences = list(resource_licences - allowed_licence_uids)
+    if not_found_licences:
+        print("error: not found required licences: %r" % not_found_licences)
         return False
     return True
 

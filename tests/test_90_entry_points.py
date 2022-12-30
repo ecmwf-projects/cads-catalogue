@@ -80,8 +80,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
-    # only load basic datasets
-    spy_initdb = mocker.spy(database, "init_database")
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
@@ -92,7 +90,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
         },
     )
-    assert spy_initdb.call_count == 1
     assert (
         patch.call_count == 35
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
@@ -183,20 +180,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
 
     session.close()
 
-    # spy_initdb.reset_mock()
-    # result = runner.invoke(
-    #     entry_points.app,
-    #     ["setup-test-database", "--connection-string", connection_string],
-    #     env={
-    #         "OBJECT_STORAGE_URL": object_storage_url,
-    #         "STORAGE_ADMIN": object_storage_kws["access_key"],
-    #         "STORAGE_PASSWORD": object_storage_kws["secret_key"],
-    #     },
-    # )
-    # assert spy_initdb.call_count == 0
-    # assert result.exit_code == 1
-
-    spy_initdb.reset_mock()
     result = runner.invoke(
         entry_points.app,
         ["setup-test-database", "--connection-string", connection_string, "--force"],
@@ -206,7 +189,6 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
         },
     )
-    assert spy_initdb.call_count == 1
     assert result.exit_code == 0
 
     # reset globals for tests following
@@ -225,19 +207,22 @@ def test_transaction_setup_test_database(postgresql: Connection[str], mocker) ->
         "secret_key": "storage_password",
         "secure": False,
     }
-    sqlalchemy_utils.drop_database(connection_string)
-    engine = sa.create_engine(connection_string)
+    # create the db empty
+    engine = database.init_database(connection_string)
+    # add some data
+    engine.execute("INSERT INTO licences (licence_uid, revision, title, download_filename) "
+                   "VALUES ('a-licence', 1, 'a licence', 'a file.pdf')")
     session_obj = sessionmaker(engine)
     # simulate the object storage working...
     mocker.patch(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
-    # ... but the store_dataset fails to work
+    # ... but impose the store_dataset fails to work...
     mocker.patch.object(
         manager, "store_dataset", side_effect=Exception("dataset error")
     )
-    # the entry point execution should fail
+    # ....so the entry point execution should fail...
     result = runner.invoke(
         entry_points.app,
         ["setup-test-database", "--connection-string", connection_string, "--force"],
@@ -248,8 +233,10 @@ def test_transaction_setup_test_database(postgresql: Connection[str], mocker) ->
         },
     )
     assert result.exit_code != 0
-    # but db must stay unchanged (empty)
+    # ...but db content must stay unchanged
     session = session_obj()
     assert session.query(database.Resource).all() == []
-    assert session.query(database.Licence).all() == []
+    licences = session.query(database.Licence).all()
+    assert len(licences) == 1
+    assert licences[0].title == "a licence"
     session.close()

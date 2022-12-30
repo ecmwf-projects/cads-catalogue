@@ -78,25 +78,11 @@ def setup_test_database(
     resources_folder_path: path to the root folder containing metadata files for resources
     licences_folder_path: path to the root folder containing metadata files for licences
     """
-    if not connection_string:
-        dbsettings = config.ensure_settings(config.dbsettings)
-        connection_string = dbsettings.connection_string
+    # validation
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
-    engine = sa.create_engine(connection_string)
-    structure_exists = True
-    if not sqlalchemy_utils.database_exists(engine.url):
-        sqlalchemy_utils.create_database(connection_string)
-        structure_exists = False
-    else:
-        conn = engine.connect()
-        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
-            structure_exists = False
-    if not structure_exists or force:
-        init_db(connection_string)
     # get storage parameters from environment
     for key in ("OBJECT_STORAGE_URL", "STORAGE_ADMIN", "STORAGE_PASSWORD"):
         if key not in os.environ:
@@ -111,27 +97,45 @@ def setup_test_database(
         "secret_key": os.environ["STORAGE_PASSWORD"],
         "secure": False,
     }
-    # load test data
+    # load metadata of licences and resources
     licences = manager.load_licences_from_folder(licences_folder_path)
-    session_obj = sa.orm.sessionmaker(engine)
-    with session_obj() as session:
-        session.begin()
-        try:
+    resources = []
+    for resource_slug in os.listdir(resources_folder_path):
+        resource_folder_path = os.path.join(resources_folder_path, resource_slug)
+        if not manager.is_valid_resource(resource_folder_path, licences=licences):
+            print(
+                "warning: folder %r ignored: not a valid resource folder"
+                % resource_folder_path
+            )
+            continue
+        resource = manager.load_resource_from_folder(resource_folder_path)
+        resources.append(resource)
+    related_resources = manager.find_related_resources(resources)
+    # create empty db if not existing, else inspect the structure
+    if not connection_string:
+        dbsettings = config.ensure_settings(config.dbsettings)
+        connection_string = dbsettings.connection_string
+    engine = sa.create_engine(connection_string)
+    structure_exists = True
+    if not sqlalchemy_utils.database_exists(engine.url):
+        sqlalchemy_utils.create_database(connection_string)
+        structure_exists = False
+        conn = engine.connect()
+    else:
+        conn = engine.connect()
+        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
+        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
+            structure_exists = False
+
+    with conn.begin() as transaction:
+        # create the structure if required
+        if not structure_exists or force:
+            database.metadata.drop_all(conn)
+            database.metadata.create_all(conn)
+        # store metadata collected into the structure
+        session_obj = sa.orm.sessionmaker(bind=conn)
+        with session_obj.begin() as session:  # type: ignore
             manager.store_licences(session, licences, object_storage_url, **storage_kws)
-            resources = []
-            for resource_slug in os.listdir(resources_folder_path):
-                resource_folder_path = os.path.join(
-                    resources_folder_path, resource_slug
-                )
-                if not manager.is_valid_resource(resource_folder_path):
-                    print(
-                        "warning: folder %r ignored: not a valid resource folder"
-                        % resource_folder_path
-                    )
-                    continue
-                resource = manager.load_resource_from_folder(resource_folder_path)
-                resources.append(resource)
-            related_resources = manager.find_related_resources(resources)
             for resource in resources:
                 manager.store_dataset(
                     session, resource, object_storage_url, **storage_kws
@@ -149,13 +153,6 @@ def setup_test_database(
                 )
                 res1_obj.related_resources.append(res2_obj)
                 res2_obj.related_resources.append(res1_obj)
-        except Exception:
-            session.rollback()
-            raise
-        else:
-            session.commit()
-        finally:
-            session.close()
 
 
 def main() -> None:

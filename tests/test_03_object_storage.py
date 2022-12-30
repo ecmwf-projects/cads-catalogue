@@ -40,6 +40,7 @@ def test_store_file(mocker) -> None:
     patch6 = mocker.patch("minio.Minio.fput_object")
     patch6.return_value.version_id = expected_version_id
     patch7 = mocker.patch.object(minio.Minio, "set_bucket_policy")
+    mocker.patch.object(minio.Minio, "list_objects", return_value=[])
 
     # run for a not existing file/not absolute path
     with pytest.raises(ValueError):
@@ -64,7 +65,12 @@ def test_store_file(mocker) -> None:
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
-        bucket_name, "licence-to-use-copernicus-products.pdf", file_path
+        bucket_name,
+        "licence-to-use-copernicus-products.pdf",
+        file_path,
+        metadata={
+            "sha256": "b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18"
+        },
     )
     patch7.assert_called_once_with(bucket_name, ro_policy)
 
@@ -94,6 +100,11 @@ def test_store_file(mocker) -> None:
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
-        bucket_name, "licences/mypath/licence-to-use-copernicus-products.pdf", file_path
+        bucket_name,
+        "licences/mypath/licence-to-use-copernicus-products.pdf",
+        file_path,
+        metadata={
+            "sha256": "b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18"
+        },
     )
     patch7.assert_called_once_with(bucket_name, ro_policy)
