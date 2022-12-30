@@ -127,7 +127,7 @@ def setup_test_database(
         if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
             structure_exists = False
 
-    with conn.begin() as transaction:
+    with conn.begin():
         # create the structure if required
         if not structure_exists or force:
             database.metadata.drop_all(conn)

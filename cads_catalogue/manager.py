@@ -95,7 +95,9 @@ def is_valid_resource(
     if not os.path.isfile(metadata_path):
         return False
     allowed_licence_uids = set([r["licence_uid"] for r in licences])
-    resource_licences = set(load_resource_metadata_file(resource_folder_path)["licence_uids"])
+    resource_licences = set(
+        load_resource_metadata_file(resource_folder_path)["licence_uids"]
+    )
     not_found_licences = list(resource_licences - allowed_licence_uids)
     if not_found_licences:
         print("error: not found required licences: %r" % not_found_licences)

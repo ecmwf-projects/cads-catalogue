@@ -210,8 +210,10 @@ def test_transaction_setup_test_database(postgresql: Connection[str], mocker) ->
     # create the db empty
     engine = database.init_database(connection_string)
     # add some data
-    engine.execute("INSERT INTO licences (licence_uid, revision, title, download_filename) "
-                   "VALUES ('a-licence', 1, 'a licence', 'a file.pdf')")
+    engine.execute(
+        "INSERT INTO licences (licence_uid, revision, title, download_filename) "
+        "VALUES ('a-licence', 1, 'a licence', 'a file.pdf')"
+    )
     session_obj = sessionmaker(engine)
     # simulate the object storage working...
     mocker.patch(
