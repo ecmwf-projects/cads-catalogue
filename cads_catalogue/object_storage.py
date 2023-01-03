@@ -115,7 +115,7 @@ def set_bucket_policy(client: minio.api.Minio, bucket_name: str, policy: str) ->
 def store_file(
     file_path: str | pathlib.Path,
     object_storage_url: str,
-    bucket_name: str = "cads-catalogue-bucket",
+    bucket_name: str = "cads-catalogue",
     subpath: str = "",
     force: bool = False,
     **storage_kws: Any,
