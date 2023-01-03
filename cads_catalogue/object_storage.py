@@ -163,7 +163,8 @@ def store_file(
             )
     file_name = os.path.basename(file_path)
     object_name = os.path.join(subpath, file_name)
-
+    print("debug: BEGIN process to save file %s on object storage with name %s"
+          % (file_name, object_name))
     with open(file_path, "rb") as fp:
         text = fp.read()
         source_sha256 = hashlib.sha256(text).hexdigest()
@@ -182,8 +183,10 @@ def store_file(
         destination_sha256 = obj_with_metadata.metadata.get("x-amz-meta-sha256")
         if destination_sha256 and destination_sha256 == source_sha256:
             # already on the object storage: do not upload
+            print("debug: NOT SAVING file: already found on object storage")
             break
     else:  # never gone on break: effective upload
+        print("debug: confirm SAVING file: not found on object storage")
         res = client.fput_object(
             bucket_name, object_name, file_path, metadata={"sha256": source_sha256}
         )
