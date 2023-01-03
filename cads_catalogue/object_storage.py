@@ -163,8 +163,10 @@ def store_file(
             )
     file_name = os.path.basename(file_path)
     object_name = os.path.join(subpath, file_name)
-    print("debug: BEGIN process to save file %s on object storage with name %s"
-          % (file_name, object_name))
+    print(
+        "debug: BEGIN process to save file %s on object storage with name %s"
+        % (file_name, object_name)
+    )
     with open(file_path, "rb") as fp:
         text = fp.read()
         source_sha256 = hashlib.sha256(text).hexdigest()
