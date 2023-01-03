@@ -16,7 +16,7 @@ TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 def test_store_file(mocker) -> None:
     expected_version_id = "dfbd25b3-abec-4184-a4e8-5a35a5c1174d"
     object_storage_url = "http://myobject-storage:myport/"
-    bucket_name = "cads-catalogue-bucket"
+    bucket_name = "cads-catalogue"
     expected_url = "%s/licence-to-use-copernicus-products.pdf?versionId=%s" % (
         bucket_name,
         expected_version_id,
@@ -60,8 +60,8 @@ def test_store_file(mocker) -> None:
     assert res == (expected_url, expected_version_id)
     patch1.assert_called_once_with("myobject-storage:myport", **storage_kws)
     patch2.assert_called_once()
-    patch3.assert_called_once_with("cads-catalogue-bucket")
-    assert patch5.call_args_list[0][0][0] == "cads-catalogue-bucket"
+    patch3.assert_called_once_with("cads-catalogue")
+    assert patch5.call_args_list[0][0][0] == "cads-catalogue"
     assert isinstance(patch5.call_args_list[0][0][1], versioningconfig.VersioningConfig)
     assert patch5.call_args_list[0][0][1].status == commonconfig.ENABLED
     patch6.assert_called_once_with(
