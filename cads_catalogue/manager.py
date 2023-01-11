@@ -20,6 +20,8 @@ import itertools
 import json
 import os
 import pathlib
+import tempfile
+import urllib.parse
 from typing import Any
 
 from sqlalchemy import inspect
@@ -398,6 +400,57 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     return metadata
 
 
+def manage_upload_image_and_layout(
+    dataset: dict[str, Any], object_storage_url: str, **storage_kws: Any
+) -> dict[str, Any]:
+    """Store the preview image and a layout.json modified in the object storage.
+
+    Parameters
+    ----------
+    dataset: resource dictionary (as returned by `load_resource_from_folder`)
+    object_storage_url: endpoint URL of the object storage
+    storage_kws: dictionary of parameters used to pass to the storage client
+
+    Returns
+    -------
+    dict: the resource dictionary modified with the upload urls
+    """
+    # store "previewimage"
+    subpath = os.path.join("resources", dataset["resource_uid"])
+    image_path = dataset.get("previewimage")
+    if image_path:
+        dataset["previewimage"] = object_storage.store_file(
+            image_path,
+            object_storage_url,
+            subpath=subpath,
+            force=True,
+            **storage_kws,
+        )[0]
+    else:
+        dataset["previewimage"] = ""
+    # upload a modified version of layout data, that included the previewimage url
+    layout_original_path = dataset["layout"]
+    with open(layout_original_path) as fp:
+        layout_data = json.load(fp)
+    layout_data["image"] = urllib.parse.urljoin(
+        object_storage_url, dataset["previewimage"]
+    )
+    with tempfile.NamedTemporaryFile("w", delete=False) as new_layout_fp:
+        json.dump(layout_data, fp=new_layout_fp)
+        layout_temp_path = new_layout_fp.name
+        try:
+            dataset["layout"] = object_storage.store_file(
+                layout_temp_path,
+                object_storage_url,
+                subpath=subpath,
+                force=True,
+                **storage_kws,
+            )[0]
+        finally:
+            os.remove(layout_temp_path)
+    return dataset
+
+
 def store_licences(
     session: Session,
     licences: list[Any],
@@ -465,7 +518,14 @@ def store_dataset(
     licence_uids = dataset.pop("licence_uids", [])
     _ = dataset.pop("related_resources_keywords", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
-    for db_field in set(dict(OBJECT_STORAGE_UPLOAD_FILES).values()):
+    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
+    if "layout" in object_storage_fields and "previewimage" in object_storage_fields:
+        dataset = manage_upload_image_and_layout(
+            dataset, object_storage_url, **storage_kws
+        )
+        object_storage_fields.remove("layout")
+        object_storage_fields.remove("previewimage")
+    for db_field in object_storage_fields:
         file_path = dataset.get(db_field)
         if not file_path:
             continue

@@ -1276,6 +1276,7 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     mocker.patch.object(
         object_storage, "store_file", return_value=("an url", "a version")
     )
+    spy1 = mocker.spy(manager, "manage_upload_image_and_layout")
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
     session = session_obj()
@@ -1306,11 +1307,13 @@ def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
     kwargs["force"] = True
     effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
     for file_name, db_field in manager.OBJECT_STORAGE_UPLOAD_FILES:
-        expected_call_pars = (
-            (resource[db_field], object_storage_url),
-            kwargs,
-        )
-        assert expected_call_pars in effective_calls_pars
+        if file_name != "layout.json":
+            expected_call_pars = (
+                (resource[db_field], object_storage_url),
+                kwargs,
+            )
+            assert expected_call_pars in effective_calls_pars
+    spy1.assert_called_once()
     # assert (
     #     (os.path.join(DATA_PATH, "layout.json"), object_storage_url),
     #     kwargs,
