@@ -20,6 +20,7 @@ import itertools
 import json
 import os
 import pathlib
+import shutil
 import tempfile
 import urllib.parse
 from typing import Any
@@ -432,12 +433,18 @@ def manage_upload_image_and_layout(
     layout_original_path = dataset["layout"]
     with open(layout_original_path) as fp:
         layout_data = json.load(fp)
-    layout_data["image"] = urllib.parse.urljoin(
-        object_storage_url, dataset["previewimage"]
-    )
-    with tempfile.NamedTemporaryFile("w", delete=False) as new_layout_fp:
-        json.dump(layout_data, fp=new_layout_fp)
-        layout_temp_path = new_layout_fp.name
+    # TODO: decide where to put the preview image URL
+    try:
+        layout_data["body"]["main"]["sections"][0]["blocks"][0][
+            "image"
+        ] = urllib.parse.urljoin(object_storage_url, dataset["previewimage"])
+    except (IndexError, TypeError):
+        # no change of json
+        pass
+    tempdir_path = tempfile.mkdtemp()
+    layout_temp_path = os.path.join(tempdir_path, "layout.json")
+    with open(layout_temp_path, "w") as new_layout_fp:
+        json.dump(layout_data, new_layout_fp)
         try:
             dataset["layout"] = object_storage.store_file(
                 layout_temp_path,
@@ -447,7 +454,7 @@ def manage_upload_image_and_layout(
                 **storage_kws,
             )[0]
         finally:
-            os.remove(layout_temp_path)
+            shutil.rmtree(tempdir_path)
     return dataset
 
 
