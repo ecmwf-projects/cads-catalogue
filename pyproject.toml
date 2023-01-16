@@ -58,6 +58,9 @@ ignore = [
   "D417"
 ]
 
+[tool.setuptools]
+packages = ["cads_catalogue"]
+
 [tool.setuptools_scm]
 write_to = "cads_catalogue/version.py"
 write_to_template = '''
