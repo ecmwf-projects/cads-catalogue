@@ -3,6 +3,7 @@ import operator
 import os.path
 from typing import Any
 
+import pytest_mock
 from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import config, database, manager, object_storage
@@ -11,7 +12,7 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def test_recursive_search():
+def test_recursive_search() -> None:
     obj1 = {
         "a": 1,
         "b": [
@@ -1219,7 +1220,9 @@ def test_load_resource_from_folder() -> None:
     mapping_fp.close()
 
 
-def test_store_licences(session_obj: sessionmaker, mocker) -> None:
+def test_store_licences(
+    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+) -> None:
     object_storage_url = "http://myobject-storage:myport/"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
@@ -1265,7 +1268,9 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     config.dbsettings = None
 
 
-def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
+def test_store_dataset(
+    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+) -> None:
     object_storage_url = "http://myobject-storage:myport/"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
