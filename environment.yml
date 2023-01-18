@@ -1,32 +1,19 @@
-# environment.yml: Mandatory dependencies only.
 channels:
 - conda-forge
 - nodefaults
-dependencies:
-- make
-- mypy
-- myst-parser
-- pre-commit
-- pydata-sphinx-theme
-- pytest
-- pytest-cov
-- sphinx
-- sphinx-autoapi
+# EXAMPLE:
+# dependencies:
+# - package1
+# - package2
+# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW AS SHOWN IN THE EXAMPLE
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
+dependencies:
 - minio
-- pip
 - postgresql
 - psycopg
 - psycopg2
 - pydantic
-- pytest-mock
 - pyyaml
-- setuptools
 - sqlalchemy==1.4*
 - sqlalchemy-utils
-- sqlalchemy-stubs
 - typer
-- pip:
-  - pytest-postgresql
-  - types-PyYAML
-  - types-sqlalchemy-utils
