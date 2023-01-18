@@ -4,6 +4,7 @@ from typing import Any
 
 import minio  # type: ignore
 import pytest
+import pytest_mock
 from minio import commonconfig, versioningconfig
 
 from cads_catalogue import object_storage
@@ -13,7 +14,7 @@ TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
 @pytest.mark.filterwarnings("ignore:Exception ignored")
-def test_store_file(mocker) -> None:
+def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
     expected_version_id = "dfbd25b3-abec-4184-a4e8-5a35a5c1174d"
     object_storage_url = "http://myobject-storage:myport/"
     bucket_name = "cads-catalogue"

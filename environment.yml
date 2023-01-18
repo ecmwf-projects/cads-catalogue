@@ -1,31 +1,18 @@
 channels:
 - conda-forge
 - nodefaults
+# EXAMPLE:
+# dependencies:
+# - package1
+# - package2
+# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW AS SHOWN IN THE EXAMPLE
 dependencies:
-- make
-- mypy
-- myst-parser
-- pre-commit
-- pydata-sphinx-theme
-- pytest
-- pytest-cov
-- sphinx
-- sphinx-autoapi
-# DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
 - minio
-- pip
 - postgresql
 - psycopg
 - psycopg2
 - pydantic
-- pytest-mock
 - pyyaml
-- setuptools
 - sqlalchemy==1.4*
 - sqlalchemy-utils
-- sqlalchemy-stubs
 - typer
-- pip:
-  - pytest-postgresql
-  - types-PyYAML
-  - types-sqlalchemy-utils

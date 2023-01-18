@@ -44,7 +44,9 @@ OBJECT_STORAGE_UPLOAD_FILES = [
 
 
 def recursive_key_search(
-    obj, key: str, current_result: list[Any] | None = None
+    obj: Any,
+    key: str,
+    current_result: list[Any] | None = None,
 ) -> list[Any]:
     """Crowl inside input dictionary/list searching for all keys=key for each dictionary found.
 
