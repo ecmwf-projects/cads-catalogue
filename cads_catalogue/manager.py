@@ -18,6 +18,7 @@ import functools
 import glob
 import itertools
 import json
+import logging
 import os
 import pathlib
 from typing import Any
@@ -27,6 +28,7 @@ from sqlalchemy.orm.session import Session
 
 from cads_catalogue import database, object_storage
 
+logger = logging.getLogger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
@@ -102,7 +104,7 @@ def is_valid_resource(
     )
     not_found_licences = list(resource_licences - allowed_licence_uids)
     if not_found_licences:
-        print("error: not found required licences: %r" % not_found_licences)
+        logger.error("not found required licences: %r" % not_found_licences)
         return False
     return True
 

@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os.path
 from typing import Any
 
@@ -24,6 +25,7 @@ import typer
 from cads_catalogue import config, database, manager
 
 app = typer.Typer()
+logger = logging.getLogger(__name__)
 
 
 @app.command()
@@ -40,7 +42,7 @@ def info(connection_string: str | None = None) -> None:
     engine = sa.create_engine(connection_string)
     connection = engine.connect()
     connection.close()
-    print("successfully connected to the catalogue database.")
+    logger.info("successfully connected to the catalogue database.")
 
 
 @app.command()
@@ -55,7 +57,7 @@ def init_db(connection_string: str | None = None) -> None:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     database.init_database(connection_string)
-    print("successfully created the catalogue database structure.")
+    logger.info("successfully created the catalogue database structure.")
 
 
 @app.command()
@@ -86,11 +88,10 @@ def setup_test_database(
     # get storage parameters from environment
     for key in ("OBJECT_STORAGE_URL", "STORAGE_ADMIN", "STORAGE_PASSWORD"):
         if key not in os.environ:
-            msg = (
+            raise KeyError(
                 "key %r must be defined in the environment in order to use the object storage"
                 % key
             )
-            raise KeyError(msg)
     object_storage_url = os.environ["OBJECT_STORAGE_URL"]
     storage_kws: dict[str, Any] = {
         "access_key": os.environ["STORAGE_ADMIN"],
@@ -103,9 +104,8 @@ def setup_test_database(
     for resource_slug in os.listdir(resources_folder_path):
         resource_folder_path = os.path.join(resources_folder_path, resource_slug)
         if not manager.is_valid_resource(resource_folder_path, licences=licences):
-            print(
-                "warning: folder %r ignored: not a valid resource folder"
-                % resource_folder_path
+            logger.warning(
+                "folder %r ignored: not a valid resource folder" % resource_folder_path
             )
             continue
         resource = manager.load_resource_from_folder(resource_folder_path)
