@@ -22,8 +22,6 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
-import logging
-
 from .database import Licence, Resource, ResourceLicence, init_database
 from .entry_points import info, main, setup_test_database
 from .manager import (
@@ -32,9 +30,6 @@ from .manager import (
     store_dataset,
     store_licences,
 )
-
-LOGLEVEL = logging.INFO
-logging.getLogger().setLevel(LOGLEVEL)
 
 __all__ = [
     "__version__",
