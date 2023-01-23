@@ -201,7 +201,7 @@ def test_setup_test_database(
 def test_transaction_setup_test_database(
     postgresql: Connection[str], mocker: pytest_mock.MockerFixture
 ) -> None:
-    """ "here we want to test that transactions are managed outside the setup test database"""
+    """Here we want to test that transactions are managed outside the setup test database."""
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
