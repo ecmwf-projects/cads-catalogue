@@ -4,6 +4,7 @@ import os.path
 from typing import Any
 
 import pytest
+import pytest_mock
 from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import config, database, manager, object_storage
@@ -1325,7 +1326,9 @@ def test_load_layout_images_info(tmpdir) -> None:
     }
 
 
-def test_manage_upload_images_and_layout(tmpdir, mocker) -> None:
+def test_manage_upload_images_and_layout(
+    tmpdir, mocker: pytest_mock.MockerFixture
+) -> None:
     # create dummy image
     overview_path = os.path.join(str(tmpdir), "overview")
     os.mkdir(overview_path)
@@ -1410,7 +1413,9 @@ def test_manage_upload_images_and_layout(tmpdir, mocker) -> None:
     assert layout_data == expected_layout
 
 
-def test_store_licences(session_obj: sessionmaker, mocker) -> None:
+def test_store_licences(
+    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+) -> None:
     object_storage_url = "http://myobject-storage:myport/"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
@@ -1456,7 +1461,9 @@ def test_store_licences(session_obj: sessionmaker, mocker) -> None:
     config.dbsettings = None
 
 
-def test_store_dataset(session_obj: sessionmaker, mocker) -> None:
+def test_store_dataset(
+    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+) -> None:
     object_storage_url = "http://myobject-storage:myport/"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",

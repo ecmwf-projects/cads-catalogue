@@ -4,6 +4,7 @@ import os.path
 import unittest.mock
 from typing import Any
 
+import pytest_mock
 import sqlalchemy as sa
 import sqlalchemy_utils
 from psycopg import Connection
@@ -35,7 +36,9 @@ def test_init_db(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
-def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
+def test_setup_test_database(
+    postgresql: Connection[str], mocker: pytest_mock.MockerFixture
+) -> None:
     connection_string = (
         f"postgresql://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
@@ -195,7 +198,9 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
     config.dbsettings = None
 
 
-def test_transaction_setup_test_database(postgresql: Connection[str], mocker) -> None:
+def test_transaction_setup_test_database(
+    postgresql: Connection[str], mocker: pytest_mock.MockerFixture
+) -> None:
     """ "here we want to test that transactions are managed outside the setup test database"""
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
