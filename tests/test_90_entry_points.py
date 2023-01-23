@@ -94,7 +94,7 @@ def test_setup_test_database(
         },
     )
     assert (
-        patch.call_count == 35
+        patch.call_count == 42
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
@@ -122,12 +122,12 @@ def test_setup_test_database(
             os.path.join(
                 TESTDATA_PATH,
                 "cads-forms-json",
-                "satellite-surface-radiation-budget",
-                "layout.json",
+                "reanalysis-era5-land",
+                "overview.png",
             ),
             object_storage_url,
             force=True,
-            subpath="resources/satellite-surface-radiation-budget",
+            subpath="resources/reanalysis-era5-land",
             **object_storage_kws,
         ),
     ]

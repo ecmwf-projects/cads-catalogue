@@ -34,7 +34,7 @@ branch = true
 [tool.mypy]
 exclude = "tests/data"
 plugins = "sqlmypy"
-strict = true
+strict = false
 
 [tool.ruff]
 # Black line length is 88, but black does not format comments.

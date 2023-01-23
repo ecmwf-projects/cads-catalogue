@@ -21,7 +21,10 @@ import json
 import logging
 import os
 import pathlib
-from typing import Any
+import shutil
+import tempfile
+import urllib.parse
+from typing import Any, List, Tuple
 
 from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
@@ -374,6 +377,61 @@ def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
     return metadata
 
 
+def load_layout_images_info(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's layout.json metadata and collect information about referenced images.
+
+    Return a dictionary with a key 'layout_images_info' loaded with a list of tuples containing
+    information about the image files found and their positions inside the json.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata: dict[str, Any] = dict()
+    layout_file_path = os.path.join(folder_path, "layout.json")
+    if not os.path.isfile(layout_file_path):
+        return metadata
+    with open(layout_file_path) as fp:
+        layout_data = json.load(fp)
+    images_found: List[Tuple[str, str, int] | Tuple[str, str, int, int]] = []
+    # search all the images inside body/main/sections:
+    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
+    for i, section in enumerate(sections):
+        blocks = section.get("blocks", [])
+        for j, block in enumerate(blocks):
+            image_rel_path = block.get("image", {}).get("url")
+            if block.get("type") == "thumb-markdown" and image_rel_path:
+                image_abs_path = os.path.join(folder_path, block["image"]["url"])
+                if os.path.isfile(image_abs_path):
+                    image_info = (
+                        image_abs_path,
+                        "sections",
+                        i,
+                        j,
+                    )
+                    images_found.append(image_info)
+                else:
+                    raise ValueError(
+                        "image %r referenced on %r not found"
+                        % (image_rel_path, layout_file_path)
+                    )
+    # search all the images inside body/aside:
+    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
+    for i, block in enumerate(aside_blocks):
+        image_rel_path = block.get("image", {}).get("url")
+        if block.get("type") == "thumb-markdown" and image_rel_path:
+            image_abs_path = os.path.join(folder_path, block["image"]["url"])
+            if os.path.isfile(image_abs_path):
+                image_info2 = (image_abs_path, "aside", i)
+                images_found.append(image_info2)
+    metadata["layout_images_info"] = images_found
+    return metadata
+
+
 def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load metadata of a resource from an input folder.
 
@@ -396,6 +454,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
         load_resource_documentation,
         load_resource_metadata_file,
         load_resource_variables,
+        load_layout_images_info,
     ]
     for loader_function in loader_functions:
         metadata.update(loader_function(folder_path))
@@ -443,6 +502,94 @@ def store_licences(
     return all_stored
 
 
+def manage_upload_images_and_layout(
+    dataset: dict[str, Any],
+    object_storage_url: str,
+    ret_layout_data=False,
+    **storage_kws: Any,
+) -> str:
+    """Upload images referenced in the layout.json and upload a modified json with images' URLs.
+
+    Parameters
+    ----------
+    dataset: resource dictionary (as returned by `load_resource_from_folder`)
+    object_storage_url: endpoint URL of the object storage
+    ret_layout_data: True only for testing, to return modified json of layout
+    storage_kws: dictionary of parameters used to pass to the storage client
+
+    Returns
+    -------
+    str: URL of the layout.json modified with the uploaded URLs of the images.
+    """
+    layout_file_path = dataset["layout"]
+    with open(layout_file_path) as fp:
+        layout_data = json.load(fp)
+    # uploads images to object storage and modification of layout's json
+    images_stored = dict()
+    for image_info in dataset["layout_images_info"]:
+        if image_info[1] == "sections":
+            image_abs_path, _, i, j = image_info
+            image_rel_path = layout_data["body"]["main"]["sections"][i]["blocks"][j][
+                "image"
+            ]["url"]
+            subpath = os.path.dirname(
+                os.path.join("resources", dataset["resource_uid"], image_rel_path)
+            )
+            if image_abs_path not in images_stored:
+                image_rel_url = object_storage.store_file(
+                    image_abs_path,
+                    object_storage_url,
+                    subpath=subpath,
+                    force=True,
+                    **storage_kws,
+                )[0]
+                images_stored[image_abs_path] = urllib.parse.urljoin(
+                    object_storage_url, image_rel_url
+                )
+            layout_data["body"]["main"]["sections"][i]["blocks"][j]["image"][
+                "url"
+            ] = images_stored[image_abs_path]
+        else:  # image_info[1] == 'aside'
+            image_abs_path, _, i = image_info
+            image_rel_path = layout_data["body"]["aside"]["blocks"][i]["image"]["url"]
+            subpath = os.path.dirname(
+                os.path.join("resources", dataset["resource_uid"], image_rel_path)
+            )
+            if image_abs_path not in images_stored:
+                image_rel_url = object_storage.store_file(
+                    image_abs_path,
+                    object_storage_url,
+                    subpath=subpath,
+                    force=True,
+                    **storage_kws,
+                )[0]
+                images_stored[image_abs_path] = urllib.parse.urljoin(
+                    object_storage_url, image_rel_url
+                )
+            layout_data["body"]["aside"]["blocks"][i]["image"]["url"] = images_stored[
+                image_abs_path
+            ]
+    # upload of modified layout.json
+    tempdir_path = tempfile.mkdtemp()
+    subpath = os.path.join("resources", dataset["resource_uid"])
+    layout_temp_path = os.path.join(tempdir_path, "layout.json")
+    with open(layout_temp_path, "w") as new_layout_fp:
+        json.dump(layout_data, new_layout_fp)
+        try:
+            layout_url = object_storage.store_file(
+                layout_temp_path,
+                object_storage_url,
+                subpath=subpath,
+                force=True,
+                **storage_kws,
+            )[0]
+        finally:
+            shutil.rmtree(tempdir_path)
+    if ret_layout_data:
+        return layout_data
+    return layout_url
+
+
 def store_dataset(
     session: Session,
     dataset_md: dict[str, Any],
@@ -469,7 +616,14 @@ def store_dataset(
     licence_uids = dataset.pop("licence_uids", [])
     _ = dataset.pop("related_resources_keywords", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
-    for db_field in set(dict(OBJECT_STORAGE_UPLOAD_FILES).values()):
+    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
+    if "layout" in object_storage_fields:
+        dataset["layout"] = manage_upload_images_and_layout(
+            dataset, object_storage_url, **storage_kws
+        )
+        object_storage_fields.remove("layout")
+        del dataset["layout_images_info"]
+    for db_field in object_storage_fields:
         file_path = dataset.get(db_field)
         if not file_path:
             continue
