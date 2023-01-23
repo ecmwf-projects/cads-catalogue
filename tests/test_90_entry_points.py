@@ -91,7 +91,7 @@ def test_setup_test_database(postgresql: Connection[str], mocker) -> None:
         },
     )
     assert (
-        patch.call_count == 35
+        patch.call_count == 42
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
