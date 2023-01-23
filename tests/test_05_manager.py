@@ -13,7 +13,7 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def test_recursive_search():
+def test_recursive_search() -> None:
     obj1 = {
         "a": 1,
         "b": [

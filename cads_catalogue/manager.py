@@ -18,6 +18,7 @@ import functools
 import glob
 import itertools
 import json
+import logging
 import os
 import pathlib
 import shutil
@@ -30,6 +31,7 @@ from sqlalchemy.orm.session import Session
 
 from cads_catalogue import database, object_storage
 
+logger = logging.getLogger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
@@ -47,7 +49,9 @@ OBJECT_STORAGE_UPLOAD_FILES = [
 
 
 def recursive_key_search(
-    obj, key: str, current_result: list[Any] | None = None
+    obj: Any,
+    key: str,
+    current_result: list[Any] | None = None,
 ) -> list[Any]:
     """Crowl inside input dictionary/list searching for all keys=key for each dictionary found.
 
@@ -103,7 +107,7 @@ def is_valid_resource(
     )
     not_found_licences = list(resource_licences - allowed_licence_uids)
     if not_found_licences:
-        print("error: not found required licences: %r" % not_found_licences)
+        logger.error("not found required licences: %r" % not_found_licences)
         return False
     return True
 
