@@ -399,9 +399,9 @@ def load_layout_images_info(folder_path: str | pathlib.Path) -> dict[str, Any]:
     for i, section in enumerate(sections):
         blocks = section.get("blocks", [])
         for j, block in enumerate(blocks):
-            image_rel_path = block.get("image")
+            image_rel_path = block.get("image", {}).get("url")
             if block.get("type") == "thumb-markdown" and image_rel_path:
-                image_abs_path = os.path.join(folder_path, block["image"])
+                image_abs_path = os.path.join(folder_path, block["image"]["url"])
                 if os.path.isfile(image_abs_path):
                     image_info = (
                         image_abs_path,
@@ -418,9 +418,9 @@ def load_layout_images_info(folder_path: str | pathlib.Path) -> dict[str, Any]:
     # search all the images inside body/aside:
     aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
     for i, block in enumerate(aside_blocks):
-        image_rel_path = block.get("image")
+        image_rel_path = block.get("image", {}).get("url")
         if block.get("type") == "thumb-markdown" and image_rel_path:
-            image_abs_path = os.path.join(folder_path, block["image"])
+            image_abs_path = os.path.join(folder_path, block["image"]["url"])
             if os.path.isfile(image_abs_path):
                 image_info2 = (image_abs_path, "aside", i)
                 images_found.append(image_info2)
@@ -527,7 +527,7 @@ def manage_upload_images_and_layout(
             image_abs_path, _, i, j = image_info
             image_rel_path = layout_data["body"]["main"]["sections"][i]["blocks"][j][
                 "image"
-            ]
+            ]["url"]
             subpath = os.path.dirname(
                 os.path.join("resources", dataset["resource_uid"], image_rel_path)
             )
@@ -542,13 +542,12 @@ def manage_upload_images_and_layout(
                 images_stored[image_abs_path] = urllib.parse.urljoin(
                     object_storage_url, image_rel_url
                 )
-            layout_data["body"]["main"]["sections"][i]["blocks"][j]["image"] = {
-                "url": images_stored[image_abs_path],
-                "alt": "",  # TODO
-            }
+            layout_data["body"]["main"]["sections"][i]["blocks"][j]["image"][
+                "url"
+            ] = images_stored[image_abs_path]
         else:  # image_info[1] == 'aside'
             image_abs_path, _, i = image_info
-            image_rel_path = layout_data["body"]["aside"]["blocks"][i]["image"]
+            image_rel_path = layout_data["body"]["aside"]["blocks"][i]["image"]["url"]
             subpath = os.path.dirname(
                 os.path.join("resources", dataset["resource_uid"], image_rel_path)
             )
@@ -563,10 +562,9 @@ def manage_upload_images_and_layout(
                 images_stored[image_abs_path] = urllib.parse.urljoin(
                     object_storage_url, image_rel_url
                 )
-            layout_data["body"]["aside"]["blocks"][i]["image"] = {
-                "url": images_stored[image_abs_path],
-                "alt": "",  # TODO
-            }
+            layout_data["body"]["aside"]["blocks"][i]["image"]["url"] = images_stored[
+                image_abs_path
+            ]
     # upload of modified layout.json
     tempdir_path = tempfile.mkdtemp()
     subpath = os.path.join("resources", dataset["resource_uid"])

@@ -1249,7 +1249,10 @@ def test_load_layout_images_info(tmpdir) -> None:
         "id": "abstract",
         "type": "thumb-markdown",
         "content": "a content",
-        "image": "overview/overview.png",
+        "image": {
+            "url": "overview/overview.png",
+            "alt": "alternative text",
+        },
     }
     sections = [{"id": "overview", "blocks": [no_image_block, image_block]}]
     create_layout_for_test(layout_path, sections)
@@ -1335,7 +1338,10 @@ def test_manage_upload_images_and_layout(tmpdir, mocker) -> None:
         "id": "abstract",
         "type": "thumb-markdown",
         "content": "a content",
-        "image": "overview/overview.png",
+        "image": {
+            "url": "overview/overview.png",
+            "alt": "alternative text",
+        },
     }
     sections = [
         {"id": "overview", "blocks": [no_image_block, no_image_block]},
@@ -1367,7 +1373,10 @@ def test_manage_upload_images_and_layout(tmpdir, mocker) -> None:
         "id": "abstract",
         "type": "thumb-markdown",
         "content": "a content",
-        "image": {"alt": "", "url": "http://myobject-storage:myport/an url"},
+        "image": {
+            "alt": "alternative text",
+            "url": "http://myobject-storage:myport/an url",
+        },
     }
     sections = [
         {"id": "overview", "blocks": [no_image_block, no_image_block]},
