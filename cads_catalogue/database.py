@@ -47,6 +47,27 @@ related_resources = sa.Table(
 )
 
 
+class MessageSeverity(sa.Enum):
+    info = 1
+    warning = 2
+    critical = 3
+
+
+class Message(BaseModel):
+    """Message ORM Model."""
+
+    __tablename__ = "messages"
+
+    message_id = sa.Column(sa.Integer, primary_key=True)
+    message_date = sa.Column(sa.Date)
+    is_active = sa.Column(sa.BOOLEAN)
+    message_text = sa.Column(sa.Text)
+    summary = sa.Column(sa.Text)
+    severity = sa.Column(sa.Enum(MessageSeverity))
+    resource_id = sa.Column(sa.Integer, sa.ForeignKey("resources.resource_id"))
+    resource = sa.orm.relationship("Resource", back_populates="messages")
+
+
 class Resource(BaseModel):
     """Resource ORM model."""
 
@@ -117,6 +138,7 @@ class Resource(BaseModel):
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
         backref=sa.orm.backref("back_related_resources"),  # type: ignore
     )
+    messages = sa.orm.relationship("Messages", back_populates="resource",cascade="all, delete")
 
 
 class Licence(BaseModel):

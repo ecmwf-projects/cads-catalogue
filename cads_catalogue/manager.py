@@ -19,6 +19,7 @@ import glob
 import itertools
 import json
 import logging
+import markdown
 import os
 import pathlib
 import shutil
@@ -430,6 +431,34 @@ def load_layout_images_info(folder_path: str | pathlib.Path) -> dict[str, Any]:
                 images_found.append(image_info2)
     metadata["layout_images_info"] = images_found
     return metadata
+
+
+def load_messages(folder_path: str | pathlib.Path, dataset_uid=None) -> List[dict[str, str]]:
+    """Load messages from a dataset folder or at global level."""
+    # FIXME: just a draft now
+    loaded_messages = []
+    msg_folder = os.path.join(folder_path, "messages")
+    if not os.path.isdir(msg_folder):
+        logger.debug("no found messages in folder %r" % msg_folder)
+        return loaded_messages
+    for msg_filename in os.listdir(msg_folder):
+        msg_filepath = os.path.join(msg_folder, msg_filename)
+        if not os.path.isfile(msg_filepath):
+            continue
+        with open(msg_filepath) as fp:
+            text = fp.read()
+        md_obj = markdown.Markdown(extensions=['meta'])
+        msg_record = {
+            "name": msg_filename,
+            "dataset_uid": dataset_uid,
+            "active": True,
+            "text": md_obj.convert(text),
+            "date": md_obj.Meta["date"][0],
+            "summary": ' '.join(md_obj.Meta["summary"]),
+            "severity": md_obj.Meta["severity"][0],
+        }
+        loaded_messages.append(msg_record)
+    return loaded_messages
 
 
 def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
