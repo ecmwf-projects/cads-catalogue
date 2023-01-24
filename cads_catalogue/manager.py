@@ -575,16 +575,16 @@ def manage_upload_images_and_layout(
     layout_temp_path = os.path.join(tempdir_path, "layout.json")
     with open(layout_temp_path, "w") as new_layout_fp:
         json.dump(layout_data, new_layout_fp)
-        try:
-            layout_url = object_storage.store_file(
-                layout_temp_path,
-                object_storage_url,
-                subpath=subpath,
-                force=True,
-                **storage_kws,
-            )[0]
-        finally:
-            shutil.rmtree(tempdir_path)
+    try:
+        layout_url = object_storage.store_file(
+            layout_temp_path,
+            object_storage_url,
+            subpath=subpath,
+            force=True,
+            **storage_kws,
+        )[0]
+    finally:
+        shutil.rmtree(tempdir_path)
     if ret_layout_data:
         return layout_data
     return layout_url
