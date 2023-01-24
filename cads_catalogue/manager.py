@@ -465,6 +465,7 @@ def store_licences(
     session: Session,
     licences: list[Any],
     object_storage_url: str,
+    bucket_name: str = "cads-catalogue",
     **storage_kws: Any,
 ) -> list[dict[str, Any]]:
     """Store a list of licences in a database and in the object storage.
@@ -478,6 +479,7 @@ def store_licences(
     session: opened SQLAlchemy session
     licences: list of licences (as returned by `load_licences_from_folder`)
     object_storage_url: endpoint URL of the object storage
+    bucket_name: bucket name of the object storage to use
     storage_kws: dictionary of parameters used to pass to the storage client
 
     Returns
@@ -491,6 +493,7 @@ def store_licences(
         licence["download_filename"] = object_storage.store_file(
             file_path,
             object_storage_url,
+            bucket_name=bucket_name,
             subpath=subpath,
             force=True,
             **storage_kws,
@@ -505,6 +508,7 @@ def store_licences(
 def manage_upload_images_and_layout(
     dataset: dict[str, Any],
     object_storage_url: str,
+    bucket_name: str = "cads-catalogue",
     ret_layout_data=False,
     **storage_kws: Any,
 ) -> str:
@@ -514,6 +518,7 @@ def manage_upload_images_and_layout(
     ----------
     dataset: resource dictionary (as returned by `load_resource_from_folder`)
     object_storage_url: endpoint URL of the object storage
+    bucket_name: bucket name of the object storage to use
     ret_layout_data: True only for testing, to return modified json of layout
     storage_kws: dictionary of parameters used to pass to the storage client
 
@@ -539,6 +544,7 @@ def manage_upload_images_and_layout(
                 image_rel_url = object_storage.store_file(
                     image_abs_path,
                     object_storage_url,
+                    bucket_name=bucket_name,
                     subpath=subpath,
                     force=True,
                     **storage_kws,
@@ -559,6 +565,7 @@ def manage_upload_images_and_layout(
                 image_rel_url = object_storage.store_file(
                     image_abs_path,
                     object_storage_url,
+                    bucket_name=bucket_name,
                     subpath=subpath,
                     force=True,
                     **storage_kws,
@@ -579,6 +586,7 @@ def manage_upload_images_and_layout(
         layout_url = object_storage.store_file(
             layout_temp_path,
             object_storage_url,
+            bucket_name=bucket_name,
             subpath=subpath,
             force=True,
             **storage_kws,
@@ -594,6 +602,7 @@ def store_dataset(
     session: Session,
     dataset_md: dict[str, Any],
     object_storage_url: str,
+    bucket_name: str = "cads-catalogue",
     **storage_kws: Any,
 ) -> dict[str, Any]:
     """Store a resource in a database and in the object storage.
@@ -630,6 +639,7 @@ def store_dataset(
         dataset[db_field] = object_storage.store_file(
             file_path,
             object_storage_url,
+            bucket_name=bucket_name,
             subpath=subpath,
             force=True,
             **storage_kws,
