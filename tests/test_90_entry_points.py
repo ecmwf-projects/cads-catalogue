@@ -50,6 +50,7 @@ def test_setup_test_database(
         TESTDATA_PATH, "cds-licences/licence-to-use-copernicus-products.pdf"
     )
     object_storage_url = "http://myobject-storage:myport/"
+    bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -91,6 +92,7 @@ def test_setup_test_database(
             "OBJECT_STORAGE_URL": object_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
         },
     )
     assert (
@@ -99,6 +101,7 @@ def test_setup_test_database(
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
     assert {
+        "bucket_name": bucket_name,
         "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
@@ -114,6 +117,7 @@ def test_setup_test_database(
                 TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
             ),
             object_storage_url,
+            bucket_name=bucket_name,
             force=True,
             subpath="licences/licence-to-use-copernicus-products",
             **object_storage_kws,
@@ -126,6 +130,7 @@ def test_setup_test_database(
                 "overview.png",
             ),
             object_storage_url,
+            bucket_name=bucket_name,
             force=True,
             subpath="resources/reanalysis-era5-land",
             **object_storage_kws,
@@ -190,6 +195,7 @@ def test_setup_test_database(
             "OBJECT_STORAGE_URL": object_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
         },
     )
     assert result.exit_code == 0

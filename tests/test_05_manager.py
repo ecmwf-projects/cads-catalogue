@@ -1446,6 +1446,7 @@ def test_store_licences(
     assert {
         "force": True,
         "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
+        "bucket_name": "cads-catalogue",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,
@@ -1465,6 +1466,7 @@ def test_store_dataset(
     session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
     object_storage_url = "http://myobject-storage:myport/"
+    bucket_name = "my_bucket"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -1478,7 +1480,9 @@ def test_store_dataset(
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
     session = session_obj()
-    manager.store_licences(session, licences, object_storage_url, **storage_kws)
+    manager.store_licences(
+        session, licences, object_storage_url, bucket_name=bucket_name, **storage_kws
+    )
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
@@ -1494,7 +1498,7 @@ def test_store_dataset(
         return_value=("an url", "a version"),
     )
     stored_record = manager.store_dataset(
-        session, resource, object_storage_url, **storage_kws
+        session, resource, object_storage_url, bucket_name=bucket_name, **storage_kws
     )
     session.commit()
     assert (
@@ -1502,6 +1506,7 @@ def test_store_dataset(
     )  # len(OBJECT_STORAGE_UPLOAD_FILES) + 1 overview.png, cited inside layout.json
     kwargs = storage_kws.copy()
     kwargs["subpath"] = "resources/reanalysis-era5-land"
+    kwargs["bucket_name"] = bucket_name
     kwargs["force"] = True
     effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
     for file_name, db_field in manager.OBJECT_STORAGE_UPLOAD_FILES:

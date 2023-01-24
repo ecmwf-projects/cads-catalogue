@@ -86,13 +86,19 @@ def setup_test_database(
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
     # get storage parameters from environment
-    for key in ("OBJECT_STORAGE_URL", "STORAGE_ADMIN", "STORAGE_PASSWORD"):
+    for key in (
+        "OBJECT_STORAGE_URL",
+        "STORAGE_ADMIN",
+        "STORAGE_PASSWORD",
+        "CATALOGUE_BUCKET",
+    ):
         if key not in os.environ:
             raise KeyError(
                 "key %r must be defined in the environment in order to use the object storage"
                 % key
             )
     object_storage_url = os.environ["OBJECT_STORAGE_URL"]
+    bucket_name = os.environ["CATALOGUE_BUCKET"]
     storage_kws: dict[str, Any] = {
         "access_key": os.environ["STORAGE_ADMIN"],
         "secret_key": os.environ["STORAGE_PASSWORD"],
@@ -135,10 +141,20 @@ def setup_test_database(
         # store metadata collected into the structure
         session_obj = sa.orm.sessionmaker(bind=conn)
         with session_obj.begin() as session:  # type: ignore
-            manager.store_licences(session, licences, object_storage_url, **storage_kws)
+            manager.store_licences(
+                session,
+                licences,
+                object_storage_url,
+                bucket_name=bucket_name,
+                **storage_kws
+            )
             for resource in resources:
                 manager.store_dataset(
-                    session, resource, object_storage_url, **storage_kws
+                    session,
+                    resource,
+                    object_storage_url,
+                    bucket_name=bucket_name,
+                    **storage_kws
                 )
             for res1, res2 in related_resources:
                 res1_obj = (
