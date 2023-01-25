@@ -615,6 +615,7 @@ def store_dataset(
     session: opened SQLAlchemy session
     dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
     object_storage_url: endpoint URL of the object storage
+    bucket_name: bucket name of the object storage to use
     storage_kws: dictionary of parameters used to pass to the storage client
 
     Returns
@@ -628,7 +629,7 @@ def store_dataset(
     object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
     if "layout" in object_storage_fields:
         dataset["layout"] = manage_upload_images_and_layout(
-            dataset, object_storage_url, **storage_kws
+            dataset, object_storage_url, bucket_name=bucket_name, **storage_kws
         )
         object_storage_fields.remove("layout")
         del dataset["layout_images_info"]
