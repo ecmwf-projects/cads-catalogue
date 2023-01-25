@@ -19,7 +19,6 @@ import glob
 import itertools
 import json
 import logging
-import markdown
 import os
 import pathlib
 import shutil
@@ -27,6 +26,7 @@ import tempfile
 import urllib.parse
 from typing import Any, List, Tuple
 
+import markdown
 from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 
@@ -433,10 +433,12 @@ def load_layout_images_info(folder_path: str | pathlib.Path) -> dict[str, Any]:
     return metadata
 
 
-def load_messages(folder_path: str | pathlib.Path, dataset_uid=None) -> List[dict[str, str]]:
+def load_messages(
+    folder_path: str | pathlib.Path, dataset_uid=None
+) -> List[dict[str, str]]:
     """Load messages from a dataset folder or at global level."""
     # FIXME: just a draft now
-    loaded_messages = []
+    loaded_messages: List[dict[str, Any]] = []
     msg_folder = os.path.join(folder_path, "messages")
     if not os.path.isdir(msg_folder):
         logger.debug("no found messages in folder %r" % msg_folder)
@@ -447,15 +449,15 @@ def load_messages(folder_path: str | pathlib.Path, dataset_uid=None) -> List[dic
             continue
         with open(msg_filepath) as fp:
             text = fp.read()
-        md_obj = markdown.Markdown(extensions=['meta'])
+        md_obj = markdown.Markdown(extensions=["meta"])
         msg_record = {
             "name": msg_filename,
             "dataset_uid": dataset_uid,
             "active": True,
             "text": md_obj.convert(text),
-            "date": md_obj.Meta["date"][0],
-            "summary": ' '.join(md_obj.Meta["summary"]),
-            "severity": md_obj.Meta["severity"][0],
+            "date": md_obj.Meta["date"][0],  # type: ignore
+            "summary": " ".join(md_obj.Meta["summary"]),  # type: ignore
+            "severity": md_obj.Meta["severity"][0],  # type: ignore
         }
         loaded_messages.append(msg_record)
     return loaded_messages
