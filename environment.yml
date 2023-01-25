@@ -7,6 +7,7 @@ channels:
 # - package2
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW AS SHOWN IN THE EXAMPLE
 dependencies:
+- markdown
 - minio
 - postgresql
 - psycopg
