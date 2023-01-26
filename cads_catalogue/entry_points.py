@@ -91,6 +91,7 @@ def setup_test_database(
         "STORAGE_ADMIN",
         "STORAGE_PASSWORD",
         "CATALOGUE_BUCKET",
+        "DOCUMENT_STORAGE_URL",
     ):
         if key not in os.environ:
             raise KeyError(
@@ -99,6 +100,7 @@ def setup_test_database(
             )
     object_storage_url = os.environ["OBJECT_STORAGE_URL"]
     bucket_name = os.environ["CATALOGUE_BUCKET"]
+    doc_storage_url = os.environ["DOCUMENT_STORAGE_URL"]
     storage_kws: dict[str, Any] = {
         "access_key": os.environ["STORAGE_ADMIN"],
         "secret_key": os.environ["STORAGE_PASSWORD"],
@@ -154,6 +156,7 @@ def setup_test_database(
                     resource,
                     object_storage_url,
                     bucket_name=bucket_name,
+                    doc_storage_url=doc_storage_url,
                     **storage_kws
                 )
             for res1, res2 in related_resources:

@@ -1361,6 +1361,7 @@ def test_manage_upload_images_and_layout(
     }
     create_layout_for_test(layout_path, sections=sections, aside=aside)
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://public-storage/"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -1378,7 +1379,7 @@ def test_manage_upload_images_and_layout(
         "content": "a content",
         "image": {
             "alt": "alternative text",
-            "url": "http://myobject-storage:myport/an url",
+            "url": "http://public-storage/an url",
         },
     }
     sections = [
@@ -1407,7 +1408,11 @@ def test_manage_upload_images_and_layout(
         },
     }
     layout_data = manager.manage_upload_images_and_layout(
-        dataset_md, object_storage_url, ret_layout_data=True, **storage_kws
+        dataset_md,
+        object_storage_url,
+        doc_storage_url=doc_storage_url,
+        ret_layout_data=True,
+        **storage_kws
     )
 
     assert layout_data == expected_layout
@@ -1466,6 +1471,7 @@ def test_store_dataset(
     session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://public-storage/"
     bucket_name = "my_bucket"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
@@ -1498,7 +1504,12 @@ def test_store_dataset(
         return_value=("an url", "a version"),
     )
     stored_record = manager.store_dataset(
-        session, resource, object_storage_url, bucket_name=bucket_name, **storage_kws
+        session,
+        resource,
+        object_storage_url,
+        doc_storage_url=doc_storage_url,
+        bucket_name=bucket_name,
+        **storage_kws
     )
     session.commit()
     assert (

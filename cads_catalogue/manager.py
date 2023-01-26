@@ -478,7 +478,7 @@ def store_licences(
     ----------
     session: opened SQLAlchemy session
     licences: list of licences (as returned by `load_licences_from_folder`)
-    object_storage_url: endpoint URL of the object storage
+    object_storage_url: endpoint URL of the object storage (for upload)
     bucket_name: bucket name of the object storage to use
     storage_kws: dictionary of parameters used to pass to the storage client
 
@@ -508,6 +508,7 @@ def store_licences(
 def manage_upload_images_and_layout(
     dataset: dict[str, Any],
     object_storage_url: str,
+    doc_storage_url: str,
     bucket_name: str = "cads-catalogue",
     ret_layout_data=False,
     **storage_kws: Any,
@@ -517,7 +518,8 @@ def manage_upload_images_and_layout(
     Parameters
     ----------
     dataset: resource dictionary (as returned by `load_resource_from_folder`)
-    object_storage_url: endpoint URL of the object storage
+    object_storage_url: endpoint URL of the object storage (for upload)
+    doc_storage_url: public endpoint URL of the object storage (for download)
     bucket_name: bucket name of the object storage to use
     ret_layout_data: True only for testing, to return modified json of layout
     storage_kws: dictionary of parameters used to pass to the storage client
@@ -550,7 +552,7 @@ def manage_upload_images_and_layout(
                     **storage_kws,
                 )[0]
                 images_stored[image_abs_path] = urllib.parse.urljoin(
-                    object_storage_url, image_rel_url
+                    doc_storage_url, image_rel_url
                 )
             layout_data["body"]["main"]["sections"][i]["blocks"][j]["image"][
                 "url"
@@ -571,7 +573,7 @@ def manage_upload_images_and_layout(
                     **storage_kws,
                 )[0]
                 images_stored[image_abs_path] = urllib.parse.urljoin(
-                    object_storage_url, image_rel_url
+                    doc_storage_url, image_rel_url
                 )
             layout_data["body"]["aside"]["blocks"][i]["image"]["url"] = images_stored[
                 image_abs_path
@@ -602,6 +604,7 @@ def store_dataset(
     session: Session,
     dataset_md: dict[str, Any],
     object_storage_url: str,
+    doc_storage_url: str,
     bucket_name: str = "cads-catalogue",
     **storage_kws: Any,
 ) -> dict[str, Any]:
@@ -614,7 +617,8 @@ def store_dataset(
     ----------
     session: opened SQLAlchemy session
     dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
-    object_storage_url: endpoint URL of the object storage
+    object_storage_url: endpoint URL of the object storage (for upload)
+    doc_storage_url: public endpoint URL of the object storage
     bucket_name: bucket name of the object storage to use
     storage_kws: dictionary of parameters used to pass to the storage client
 
@@ -629,7 +633,11 @@ def store_dataset(
     object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
     if "layout" in object_storage_fields:
         dataset["layout"] = manage_upload_images_and_layout(
-            dataset, object_storage_url, bucket_name=bucket_name, **storage_kws
+            dataset,
+            object_storage_url,
+            doc_storage_url,
+            bucket_name=bucket_name,
+            **storage_kws,
         )
         object_storage_fields.remove("layout")
         del dataset["layout_images_info"]

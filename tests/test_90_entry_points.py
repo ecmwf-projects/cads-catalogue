@@ -50,6 +50,7 @@ def test_setup_test_database(
         TESTDATA_PATH, "cds-licences/licence-to-use-copernicus-products.pdf"
     )
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://mypublic-storage/"
     bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
@@ -90,6 +91,7 @@ def test_setup_test_database(
         ["setup-test-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
             "CATALOGUE_BUCKET": bucket_name,
@@ -193,6 +195,7 @@ def test_setup_test_database(
         ["setup-test-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
             "CATALOGUE_BUCKET": bucket_name,
