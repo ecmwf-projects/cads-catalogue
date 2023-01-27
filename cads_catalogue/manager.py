@@ -101,13 +101,19 @@ def is_valid_resource(
     metadata_path = os.path.join(resource_folder_path, "metadata.json")
     if not os.path.isfile(metadata_path):
         return False
+    try:
+        md = load_resource_from_folder(resource_folder_path)
+    except:  # noqa
+        logger.exception(
+            "resource at path %r doesn't seem a valid dataset, error follows"
+        )
+        return False
     allowed_licence_uids = set([r["licence_uid"] for r in licences])
-    resource_licences = set(
-        load_resource_metadata_file(resource_folder_path)["licence_uids"]
-    )
+    resource_licences = set(md["licence_uids"])
     not_found_licences = list(resource_licences - allowed_licence_uids)
     if not_found_licences:
-        logger.error("not found required licences: %r" % not_found_licences)
+        logger.error("resource at path %r doesn't seem a valid dataset, "
+                     "not found required licences: %r" % not_found_licences)
         return False
     return True
 
@@ -447,6 +453,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     dict: dictionary of metadata collected
     """
     metadata: dict[str, Any] = dict()
+    folder_path = str(folder_path).rstrip(os.sep)
     metadata["resource_uid"] = os.path.basename(folder_path)
     loader_functions = [
         load_resource_for_object_storage,

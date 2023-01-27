@@ -80,7 +80,6 @@ def test_setup_test_database(
             "download_filename": "an url",
         },
     ]
-
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
@@ -97,6 +96,8 @@ def test_setup_test_database(
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
+    # check no errors
+    assert result.exit_code == 0
     assert (
         patch.call_count == 42
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
@@ -110,8 +111,6 @@ def test_setup_test_database(
         "secret_key": "storage_password",
         "secure": False,
     } in [mp.kwargs for mp in patch.mock_calls]
-    # check no errors
-    assert result.exit_code == 0
     # check object storage calls
     expected_calls = [  # these are only some
         unittest.mock.call(

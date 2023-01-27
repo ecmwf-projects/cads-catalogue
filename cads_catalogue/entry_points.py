@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import logging
 import os.path
 from typing import Any
@@ -109,8 +110,7 @@ def setup_test_database(
     # load metadata of licences and resources
     licences = manager.load_licences_from_folder(licences_folder_path)
     resources = []
-    for resource_slug in os.listdir(resources_folder_path):
-        resource_folder_path = os.path.join(resources_folder_path, resource_slug)
+    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
         if not manager.is_valid_resource(resource_folder_path, licences=licences):
             logger.warning(
                 "folder %r ignored: not a valid resource folder" % resource_folder_path
