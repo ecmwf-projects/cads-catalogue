@@ -1,6 +1,6 @@
 [
     {
-        "resource_id": 2,
+        "resource_id": 5,
         "resource_uid": "cams-global-reanalysis-eac4",
         "constraints": "an url",
         "form": "an url",
@@ -1534,7 +1534,7 @@
         "begin_date": "2003-01-01",
         "end_date": "2021-06-30",
         "publication_date": "2020-02-06",
-        "record_update": "2023-01-11 16:06:38.240766+01:00",
+        "record_update": "2023-01-27 11:18:25.514284+01:00",
         "resource_update": null,
         "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window.",
         "citation": "{\"Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/\"}",
@@ -1619,6 +1619,7 @@
         "ds_responsible_organisation_role": null,
         "file_format": null,
         "format_version": "1",
+        "hidden": false,
         "keywords": [
             "Variable domain: Atmosphere (composition)",
             "Variable domain: Atmosphere (meteorology)",
@@ -2572,7 +2573,7 @@
         ]
     },
     {
-        "resource_id": 3,
+        "resource_id": 2,
         "resource_uid": "cams-global-reanalysis-eac4-monthly",
         "constraints": "an url",
         "form": "an url",
@@ -4321,7 +4322,7 @@
         "begin_date": "2003-01-01",
         "end_date": "2021-06-30",
         "publication_date": "2020-02-06",
-        "record_update": "2023-01-11 16:06:38.249571+01:00",
+        "record_update": "2023-01-27 11:18:25.477311+01:00",
         "resource_update": null,
         "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\\n\\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\\n\\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\\n\\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window.",
         "citation": "{\"Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019\"}",
@@ -4406,6 +4407,7 @@
         "ds_responsible_organisation_role": null,
         "file_format": null,
         "format_version": "1",
+        "hidden": false,
         "keywords": [
             "Variable domain: Atmosphere (composition)",
             "Variable domain: Atmosphere (meteorology)",
@@ -4915,7 +4917,7 @@
         ]
     },
     {
-        "resource_id": 4,
+        "resource_id": 1,
         "resource_uid": "derived-near-surface-meteorological-variables",
         "constraints": "an url",
         "form": "an url",
@@ -5532,7 +5534,7 @@
         "begin_date": "1979-01-01",
         "end_date": "2018-12-31",
         "publication_date": "2020-02-11",
-        "record_update": "2023-01-11 16:06:38.257729+01:00",
+        "record_update": "2023-01-27 11:18:25.472520+01:00",
         "resource_update": "2022-12-02",
         "abstract": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models. \\n\\nThe dataset has been obtained using the same methodology used to derive the widely used water, energy and climate change (WATCH) forcing data, and is thus also referred to as WATCH Forcing Data methodology applied to ERA5 (WFDE5). The data are derived from the ERA5 reanalysis product that have been re-gridded to a half-degree resolution. Data have been adjusted using an elevation correction and monthly-scale bias corrections based on Climatic Research Unit (CRU) data (for temperature, diurnal temperature range, cloud-cover, wet days number and precipitation fields) and Global Precipitation Climatology Centre (GPCC) data (for precipitation fields only). Additional corrections are included for varying atmospheric aerosol-loading and separate precipitation gauge observations. For full details please refer to the product user-guide.\\n\\nThis dataset was produced on behalf of Copernicus Climate Change Service (C3S) and was generated entirely within the Climate Data Store (CDS) Toolbox. The toolbox source code is provided in the documentation tab.",
         "citation": "{\"Cucchi M., Weedon G. P., Amici A., Bellouin N., Lange S., M\u00fcller Schmied H., Hersbach H. and Buontempo C. (2020): Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis, version 1.1. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), (Accessed on DD-MMM-YYYY), 10.24381/cds.20d54e34\n\n\",\"Cucchi M., Weedon G. P., Amici A., Bellouin N., Lange S., M\u00fcller Schmied H., Hersbach H., Cagnazzo, C. and Buontempo C. (2021): Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis, version 2.0. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), (Accessed on DD-MMM-YYYY), 10.24381/cds.20d54e34\",\"Cucchi M., Weedon G. P., Amici A., Bellouin N., Lange S., M\u00fcller Schmied H., Hersbach H., Cagnazzo, C. and Buontempo C. (2022): Near surface meteorological variables from 1979 to 2019 derived from bias-corrected reanalysis, version 2.1. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), (Accessed on DD-MMM-YYYY), 10.24381/cds.20d54e34\"}",
@@ -5641,6 +5643,7 @@
         "ds_responsible_organisation_role": "publisher",
         "file_format": "grib",
         "format_version": null,
+        "hidden": false,
         "keywords": [
             "Product type: Derived reanalysis",
             "Spatial coverage: Global",
@@ -5715,7 +5718,7 @@
         ]
     },
     {
-        "resource_id": 1,
+        "resource_id": 7,
         "resource_uid": "reanalysis-era5-land",
         "constraints": "an url",
         "form": "an url",
@@ -9105,7 +9108,7 @@
         "begin_date": "1950-01-01",
         "end_date": "2022-10-01",
         "publication_date": "2019-07-12",
-        "record_update": "2023-01-11 16:06:38.230426+01:00",
+        "record_update": "2023-01-27 11:18:25.522832+01:00",
         "resource_update": "2022-12-02",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past. \n\nERA5-Land uses as input to control the simulated land fields ERA5 atmospheric variables, such as air temperature and air humidity. This is called the atmospheric forcing. Without the constraint of the atmospheric forcing, the model-based estimates can rapidly deviate from reality. Therefore, while observations are not directly used in the production of ERA5-Land, they have an indirect influence through the atmospheric forcing used to run the simulation. In addition, the input air temperature, air humidity and pressure used to run ERA5-Land are corrected to account for the altitude difference between the grid of the forcing and the higher resolution grid of ERA5-Land. This correction is called 'lapse rate correction'.    \n\nThe ERA5-Land dataset, as any other simulation, provides estimates which have some degree of uncertainty. Numerical models can only provide a more or less accurate representation of the real physical processes governing different components of the Earth System. In general, the uncertainty of model estimates grows as we go back in time, because the number of observations available to create a good quality atmospheric forcing is lower. ERA5-land parameter fields can currently be used in combination with the uncertainty of the equivalent ERA5 fields. \n\nThe temporal and spatial resolutions of ERA5-Land makes this dataset very useful for all kind of land surface applications such as flood or drought forecasting. The temporal and spatial resolution of this dataset, the period covered in time, as well as the fixed grid used for the data distribution at any period enables decisions makers, businesses and individuals to access and use more accurate information on land states.",
         "citation": "{\"Mu\u00f1oz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\",\"Mu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\"}",
@@ -9175,6 +9178,7 @@
         "ds_responsible_organisation_role": "publisher",
         "file_format": "{grib,netcdf}",
         "format_version": null,
+        "hidden": false,
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -10943,7 +10947,7 @@
         "begin_date": "1981-01-01",
         "end_date": "2022-09-01",
         "publication_date": "2019-06-23",
-        "record_update": "2023-01-11 16:06:38.271910+01:00",
+        "record_update": "2023-01-27 11:18:25.518573+01:00",
         "resource_update": "2022-12-02",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.\n\nERA5-Land provides a consistent view of the water and energy cycles at surface level during several decades.\nIt contains a detailed record from 1950 onwards, with a temporal resolution of 1 hour. The native spatial resolution of the ERA5-Land reanalysis dataset is 9km on a reduced Gaussian grid (TCo1279). The data in the CDS has been regridded to a regular lat-lon grid of 0.1x0.1 degrees.\n\nThe data presented here is a post-processed subset of the full ERA5-Land dataset. Monthly-mean averages have been pre-calculated to facilitate many applications requiring easy and fast access to the data, when sub-monthly fields are not required.\n\nHourly fields can be found in the [ERA5-Land hourly fields CDS page](https://cds-dev.copernicus-climate.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview \"ERA5-Land hourly data\"). Documentation can be found in the online ERA5-Land documentation (https://confluence.ecmwf.int/display/CKB/ERA5-Land+data+documentation)",
         "citation": "{\"Mu\u00f1oz Sabater, J., (2019): ERA5-Land monthly averaged data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.68d2bb3\",\"Mu\u00f1oz Sabater, J., (2021): ERA5-Land monthly averaged data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.68d2bb3\"}",
@@ -11013,6 +11017,7 @@
         "ds_responsible_organisation_role": "publisher",
         "file_format": "grib",
         "format_version": null,
+        "hidden": false,
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -11336,7 +11341,7 @@
         ]
     },
     {
-        "resource_id": 5,
+        "resource_id": 8,
         "resource_uid": "reanalysis-era5-pressure-levels",
         "constraints": "an url",
         "form": "an url",
@@ -14698,7 +14703,7 @@
         "begin_date": "1979-01-01",
         "end_date": "2022-12-09",
         "publication_date": "2018-06-14",
-        "record_update": "2023-01-11 16:06:38.264108+01:00",
+        "record_update": "2023-01-27 11:18:25.528636+01:00",
         "resource_update": "2022-12-15",
         "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.",
         "citation": "{\"Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Hor\u00e1nyi, A., Mu\u00f1oz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Th\u00e9paut, J-N. (2018): ERA5 hourly data on pressure levels from 1959 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.bd0915c6\"}",
@@ -14775,6 +14780,7 @@
         "ds_responsible_organisation_role": "publisher",
         "file_format": "grib",
         "format_version": null,
+        "hidden": false,
         "keywords": [
             "Variable domain: Atmosphere (surface)",
             "Variable domain: Atmosphere (upper air)",
@@ -14893,7 +14899,7 @@
         ]
     },
     {
-        "resource_id": 8,
+        "resource_id": 3,
         "resource_uid": "reanalysis-era5-single-levels",
         "constraints": "an url",
         "form": "an url",
@@ -35805,7 +35811,7 @@
         "begin_date": "1979-01-01",
         "end_date": "2022-12-09",
         "publication_date": "2018-06-14",
-        "record_update": "2023-01-11 16:06:38.288967+01:00",
+        "record_update": "2023-01-27 11:18:25.484229+01:00",
         "resource_update": "2022-12-15",
         "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.\n\nReanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. This principle, called data assimilation, is based on the method used by numerical weather prediction centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way, but at reduced resolution to allow for the provision of a dataset spanning back several decades. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nERA5 provides hourly estimates for a large number of atmospheric, ocean-wave and land-surface quantities.\nAn uncertainty estimate is sampled by an underlying 10-member ensemble\nat three-hourly intervals. Ensemble mean and spread have been pre-computed for convenience.\nSuch uncertainty estimates are closely related to the information content of the available observing system which\nhas evolved considerably over time. They also indicate flow-dependent sensitive areas.\nTo facilitate many climate applications, monthly-mean averages have been pre-calculated too,\nthough monthly means are not available for the ensemble mean and spread.\n\nERA5 is updated daily with a latency of about 5 days. In case that serious flaws are detected in this early release (called ERA5T), this data could be different from the final release 2 to 3 months later. In case that this occurs users are notified.\n\nThe data set presented here is a regridded subset of the full ERA5 data set on native resolution.\nIt is online on spinning disk, which should ensure fast and easy access.\nIt should satisfy the requirements for most common applications.\n\nAn overview of all ERA5 datasets can be found in [this article](https://confluence.ecmwf.int/display/CKB/The+family+of+ERA5+datasets \"The family of ERA5 datasets\").\nInformation on access to ERA5 data on native resolution is provided in https://confluence.ecmwf.int/display/CKB/How+to+download+ERA5.\n\nData has been regridded to a regular lat-lon grid of 0.25 degrees for the reanalysis and 0.5 degrees for\nthe uncertainty estimate (0.5 and 1 degree respectively for ocean waves).\nThere are four main sub sets: hourly and monthly products, both on pressure levels (upper air fields) and single levels (atmospheric, ocean-wave and land surface quantities).\n\nThe present entry is \"ERA5 hourly data on single levels from 1959 to present\"",
         "citation": "{\"Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Hor\u00e1nyi, A., Mu\u00f1oz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Th\u00e9paut, J-N. (2018): ERA5 hourly data on single levels from 1959 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.adbb2d47\"}",
@@ -35882,6 +35888,7 @@
         "ds_responsible_organisation_role": "publisher",
         "file_format": "grib",
         "format_version": null,
+        "hidden": false,
         "keywords": [
             "Variable domain: Atmosphere (surface)",
             "Variable domain: Atmosphere (upper air)",
@@ -37476,7 +37483,7 @@
         ]
     },
     {
-        "resource_id": 7,
+        "resource_id": 4,
         "resource_uid": "satellite-surface-radiation-budget",
         "constraints": "an url",
         "form": "an url",
@@ -39325,7 +39332,7 @@
         "begin_date": "1982-01-01",
         "end_date": "2021-12-01",
         "publication_date": "2020-10-20",
-        "record_update": "2023-01-11 16:06:38.279983+01:00",
+        "record_update": "2023-01-27 11:18:25.508213+01:00",
         "resource_update": "2022-12-02",
         "abstract": "This dataset provides the Surface Radiation Budget (SRB)  Essential Climate Variable (ECV). SRB represents the balance between the heating of the surface through incoming solar radiation and cooling through emission of infra-red radiation which is a fundamental component of the surface energy budget. Small changes in the surface radiation budget can lead to large climatological responses, which makes a permanent and precise monitoring indispensable. Accurate understanding of the surface radiation budget at regional and global scales can improve the understanding of the Earth\u2019s climate system and supports research on current and anticipated climate change, as well as the evaluation of radiative processes in climate models. Better knowledge of the global and regional surface radiation budget is also required for a successful utilization of renewable energy sources, such as solar power plants.\n\n\nThe ECV Surface Radiation Budget contains seven variables which can be separated into the solar (shortwave) and the thermal (longwave) surface radiation components. Both components include the incoming (downwelling), the outgoing (upwelling), and the net radiation fluxes.  These variables were produced by two \u201cproduct families\u201d, based on the data from different sensors and algorithms cover the same seven variables.\nThe two families follow somewhat different nomenclatures. To help the user to navigate the different names,  a table relating the names used in the download form with the names used within the files and in other datasets distributed by the Climate Data Store is added at the end of this overview.  The fact that the naming is different reflects the fact that each family was originated by different projects within different organisations at different times. However, the third organisation, the Copernicus Climate Change Service (C3S) is not associated with a different product family in this dataset. In fact it is associated with both product families to which it provides a continuation of their production chain. This means that the datasets contains three organisation but just two product families.\n\nThe \u201cCLARA product family\u201d and \u201cCCI product family\u201d provide two complementary Thematic Climate Data Records (TCDRs), differing in temporal and horizontal resolution. These TCDR timeseries are intended to have sufficient length, consistency, and continuity to detect climate variability and change. They are frequently updated with Interim Climate Data Records (ICDRs) or simply extensions, generated using the same software and algorithms to cover more recent periods. Further details on algorithms, data description, and extensive validation results are given in the Documentation section.",
         "citation": "{\"Copernicus Climate Change Service (C3S), (2022): Surface radiation budget from 1982 to present derived from satellite observations.\",\"Copernicus Climate Change Service (C3S) Climate Data Store (CDS), accessed on DD-MM-YYYY, DOI: 10.24381/cds.cea58b5a\"}",
@@ -39338,6 +39345,7 @@
         "ds_responsible_organisation_role": "publisher",
         "file_format": "NetCDF",
         "format_version": null,
+        "hidden": false,
         "keywords": [
             "Product type: Satellite observations",
             "Temporal coverage: Past",
