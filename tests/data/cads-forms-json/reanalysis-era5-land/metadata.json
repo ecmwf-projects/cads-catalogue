@@ -32,6 +32,7 @@
     "grib",
     "netcdf"
   ],
+  "hidden": "False",
   "keywords": [
     "Product type: Reanalysis",
     "Spatial coverage: Global",

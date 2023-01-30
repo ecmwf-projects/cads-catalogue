@@ -32,6 +32,7 @@
   "ds_responsible_organisation_role": "publisher",
   "end_date": "2018-12-31",
   "file_format": "grib",
+  "hidden": false,
   "keywords": [
     "Product type: Derived reanalysis",
     "Spatial coverage: Global",
