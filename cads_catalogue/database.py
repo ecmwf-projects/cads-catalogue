@@ -54,17 +54,16 @@ class Message(BaseModel):
 
     message_id = sa.Column(sa.Integer, primary_key=True)
     message_date = sa.Column(sa.DateTime, nullable=False)
-    message_summary = sa.Column(sa.Text, nullable=False)
+    message_summary = sa.Column(sa.Text)
     message_severity = sa.Column(
-        sa.Enum("info", "warning", "critical", name="severity"), nullable=False
+        sa.Enum("info", "warning", "critical", "success", name="severity"), nullable=False, default="info"
     )
     is_active = sa.Column(sa.BOOLEAN)
-    message_text = sa.Column(sa.Text)
-
-    resource_id = sa.Column(
-        sa.Integer, sa.ForeignKey("resources.resource_id", ondelete="CASCADE")
-    )
-    resource = sa.orm.relationship("Resource", back_populates="messages")
+    is_global = sa.Column(sa.BOOLEAN)
+    message_body = sa.Column(sa.Text)
+    message_status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
+    sourcefile = sa.Column(sa.Text)
+    entries = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(80)))
 
 
 class Resource(BaseModel):
@@ -137,7 +136,6 @@ class Resource(BaseModel):
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
         backref=sa.orm.backref("back_related_resources"),  # type: ignore
     )
-    messages = sa.orm.relationship("Message", back_populates="resource")
 
 
 class Licence(BaseModel):
