@@ -334,7 +334,10 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
             "bboxW": data.get("bboxW"),
         }
     if "hidden" in data:
-        metadata["hidden"] = str2bool(data["hidden"])
+        if isinstance(data["hidden"], bool):
+            metadata["hidden"] = data["hidden"]
+        else:
+            metadata["hidden"] = str2bool(data["hidden"])
     else:
         metadata["hidden"] = False
     metadata["keywords"] = data.get("keywords")
