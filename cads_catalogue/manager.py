@@ -112,8 +112,10 @@ def is_valid_resource(
     resource_licences = set(md["licence_uids"])
     not_found_licences = list(resource_licences - allowed_licence_uids)
     if not_found_licences:
-        logger.error("resource at path %r doesn't seem a valid dataset, "
-                     "not found required licences: %r" % not_found_licences)
+        logger.error(
+            "resource at path %r doesn't seem a valid dataset, "
+            "not found required licences: %r" % not_found_licences
+        )
         return False
     return True
 
