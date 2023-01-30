@@ -56,13 +56,14 @@ class Message(BaseModel):
     message_date = sa.Column(sa.DateTime, nullable=False)
     message_summary = sa.Column(sa.Text)
     message_severity = sa.Column(
-        sa.Enum("info", "warning", "critical", "success", name="severity"), nullable=False, default="info"
+        sa.Enum("info", "warning", "critical", "success", name="severity"),
+        nullable=False,
+        default="info",
     )
     is_active = sa.Column(sa.BOOLEAN)
     is_global = sa.Column(sa.BOOLEAN)
     message_body = sa.Column(sa.Text)
     message_status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
-    sourcefile = sa.Column(sa.Text)
     entries = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(80)))
 
 
