@@ -1,0 +1,10 @@
+---
+date: 2021-01-26T11:27:13Z
+summary: a summary of the message
+live: true
+status: fixed
+---
+ 
+# main message content
+ 
+Wider **markdown syntax** allowed here. This is the full text message.
