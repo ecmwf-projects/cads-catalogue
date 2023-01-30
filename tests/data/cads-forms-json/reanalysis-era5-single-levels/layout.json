@@ -1434,28 +1434,32 @@
             {
               "id": "all_docs-0",
               "type": "link",
-              "url": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
+              "new-window": false,
+              "href": "https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation",
               "title": "ERA5 data documentation",
               "description": "Detailed information relating to the ERA5 data archive can be found in the web link above."
             },
             {
               "id": "all_docs-1",
               "type": "link",
-              "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174",
+              "new-window": false,
+              "href": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.4174",
               "title": "The ERA5 global reanalysis: Preliminary extension to 1950",
               "description": "Journal article describing the ERA5 preliminary extension."
             },
             {
               "id": "all_docs-2",
               "type": "link",
-              "url": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803",
+              "new-window": false,
+              "href": "https://rmets.onlinelibrary.wiley.com/doi/10.1002/qj.3803",
               "title": "The ERA5 global reanalysis",
               "description": "Journal article describing ERA5."
             },
             {
               "id": "all_docs-3",
               "type": "link",
-              "url": "https://confluence.ecmwf.int/x/ggleC",
+              "new-window": false,
+              "href": "https://confluence.ecmwf.int/x/ggleC",
               "title": "Renamed variable: form ocean waves 10m wind to ocean surface stress equivalent 10m neutral wind",
               "description": "The reason for the change was a parameter name clash between variables in ERA5 wind and ERA5 ocean waves."
             }
@@ -1474,7 +1478,8 @@
             {
               "id": "portal",
               "type": "link",
-              "url": "https://support.ecmwf.int",
+              "new-window": false,
+              "href": "https://support.ecmwf.int",
               "title": "ECMWF Support Portal"
             }
           ]
