@@ -47,6 +47,19 @@ related_resources = sa.Table(
 )
 
 
+class ResourceMessage(BaseModel):
+    """many-to-many ORM model for resources-messages."""
+
+    __tablename__ = "resources_messages"
+
+    resource_id = sa.Column(
+        sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
+    )
+    message_id = sa.Column(
+        sa.Integer, sa.ForeignKey("messages.message_id"), primary_key=True
+    )
+
+
 class Message(BaseModel):
     """Message ORM Model."""
 
@@ -64,7 +77,10 @@ class Message(BaseModel):
     is_global = sa.Column(sa.BOOLEAN)
     message_body = sa.Column(sa.Text)
     message_status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
-    entries = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(80)))
+
+    resources = sa.orm.relationship(
+        "Resource", secondary="resources_messages", back_populates="messages"
+    )
 
 
 class Resource(BaseModel):
@@ -129,6 +145,9 @@ class Resource(BaseModel):
     # relationship attributes
     licences = sa.orm.relationship(
         "Licence", secondary="resources_licences", back_populates="resources"
+    )
+    messages = sa.orm.relationship(
+        "Message", secondary="resources_messages", back_populates="resources"
     )
     related_resources = sa.orm.relationship(
         "Resource",

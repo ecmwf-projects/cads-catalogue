@@ -471,6 +471,7 @@ def md2message_record(msg_path, is_global) -> dict[str, Any]:
         "is_global": is_global,
         "message_body": message_body,
         "message_status": header_obj.get("status", ["ongoing"])[0],
+        # this is not a db field
         "entries": [e.strip() for e in header_obj.get("entries", [""])[0].split(",")],
     }
     # some validations
