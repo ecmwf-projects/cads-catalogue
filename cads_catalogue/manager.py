@@ -88,6 +88,17 @@ def object_as_dict(obj: Any) -> dict[str, Any]:
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
+def str2bool(value: str, raise_if_unknown=True, default=False):
+    """Return boolean parsing of the string."""
+    if value.lower() in ["t", "true", "1", "yes", "y"]:
+        return True
+    if value.lower() in ["f", "false", "0", "no", "n"]:
+        return False
+    if raise_if_unknown:
+        raise ValueError("unparsable value for boolean: %r" % value)
+    return default
+
+
 def is_valid_resource(
     resource_folder_path: str | pathlib.Path, licences: list[dict[str, Any]]
 ) -> bool:
@@ -322,6 +333,13 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
             "bboxE": data.get("bboxE"),
             "bboxW": data.get("bboxW"),
         }
+    if "hidden" in data:
+        if isinstance(data["hidden"], bool):
+            metadata["hidden"] = data["hidden"]
+        else:
+            metadata["hidden"] = str2bool(data["hidden"])
+    else:
+        metadata["hidden"] = False
     metadata["keywords"] = data.get("keywords")
 
     # NOTE: licence_uids is for relationship, not a db field

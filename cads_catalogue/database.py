@@ -93,6 +93,7 @@ class Resource(BaseModel):
     ds_responsible_organisation_role = sa.Column(sa.String)
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
+    hidden = sa.Column(sa.BOOLEAN, default=False)
     keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)

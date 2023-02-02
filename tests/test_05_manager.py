@@ -13,6 +13,26 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
+def test_str2bool() -> None:
+    true_values = ["true", "1", "t", "True", "TRUE", "Y", "yes"]
+    for value in true_values:
+        assert manager.str2bool(value) is True
+    false_values = ["false", "0", "f", "False", "FALSE", "N", "no"]
+    for value in false_values:
+        assert manager.str2bool(value) is False
+    strange_values = ["null", "", "tbd", "U"]
+    for value in strange_values:
+        with pytest.raises(ValueError):
+            assert manager.str2bool(value)
+    default = True
+    for value in strange_values:
+        assert (
+            manager.str2bool(value, raise_if_unknown=False, default=default) == default
+        )
+    for value in strange_values:
+        assert manager.str2bool(value, raise_if_unknown=False) is False
+
+
 def test_recursive_search() -> None:
     obj1 = {
         "a": 1,
@@ -397,6 +417,7 @@ def test_load_resource_from_folder() -> None:
         "form_data": json.load(form_fp),
         "format_version": None,
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
+        "hidden": False,
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
