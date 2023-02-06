@@ -11,7 +11,7 @@ from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
 from typer.testing import CliRunner
 
-from cads_catalogue import config, database, entry_points, manager
+from cads_catalogue import config, database, entry_points, manager, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -36,7 +36,7 @@ def test_init_db(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
-def test_setup_test_database(
+def test_setup_database(
     postgresql: Connection[str], mocker: pytest_mock.MockerFixture
 ) -> None:
     connection_string = (
@@ -87,7 +87,7 @@ def test_setup_test_database(
     # run the script to load test data
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        ["setup-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -143,7 +143,7 @@ def test_setup_test_database(
     # check db content
     session = session_obj()
     resources = [
-        manager.object_as_dict(r)
+        utils.object_as_dict(r)
         for r in session.query(database.Resource).order_by(
             database.Resource.resource_uid
         )
@@ -153,7 +153,7 @@ def test_setup_test_database(
     with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt")) as fp:
         expected_resources: list[dict[str, Any]] = json.load(fp)
     licences = [
-        manager.object_as_dict(ll) for ll in session.query(database.Licence).all()
+        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
     ]
     assert len(licences) == len(expected_licences)
     for expected_licence in expected_licences:
@@ -191,7 +191,7 @@ def test_setup_test_database(
 
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        ["setup-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -206,7 +206,7 @@ def test_setup_test_database(
     config.dbsettings = None
 
 
-def test_transaction_setup_test_database(
+def test_transaction_setup_database(
     postgresql: Connection[str], mocker: pytest_mock.MockerFixture
 ) -> None:
     """Here we want to test that transactions are managed outside the setup test database."""
@@ -240,7 +240,7 @@ def test_transaction_setup_test_database(
     # ....so the entry point execution should fail...
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        ["setup-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
