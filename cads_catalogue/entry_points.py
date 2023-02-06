@@ -62,7 +62,7 @@ def init_db(connection_string: str | None = None) -> None:
 
 
 @app.command()
-def setup_test_database(
+def setup_database(
     connection_string: str | None = None,
     force: bool = False,
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,

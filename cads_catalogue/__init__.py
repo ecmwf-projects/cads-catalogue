@@ -42,6 +42,6 @@ __all__ = [
     "store_licences",
     "store_dataset",
     "info",
-    "setup_test_database",
+    "setup_database",
     "main",
 ]
