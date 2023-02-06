@@ -31,6 +31,7 @@ class SqlalchemySettings(pydantic.BaseSettings):
     catalogue_db_password: str | None = None
     catalogue_db_host: str = "catalogue-db"
     catalogue_db_name: str = "catalogue"
+    pool_recycle: int = 60
 
     @pydantic.validator("catalogue_db_password")
     def password_must_be_set(cls: pydantic.BaseSettings, v: str | None) -> str | None:
