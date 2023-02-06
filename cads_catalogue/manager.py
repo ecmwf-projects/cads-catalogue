@@ -26,10 +26,9 @@ import tempfile
 import urllib.parse
 from typing import Any, List, Tuple
 
-from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 
-from cads_catalogue import database, object_storage
+from cads_catalogue import database, object_storage, utils
 
 logger = logging.getLogger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -46,57 +45,6 @@ OBJECT_STORAGE_UPLOAD_FILES = [
     ("layout.json", "layout"),
     ("overview.png", "previewimage"),
 ]
-
-
-def recursive_key_search(
-    obj: Any,
-    key: str,
-    current_result: list[Any] | None = None,
-) -> list[Any]:
-    """Crowl inside input dictionary/list searching for all keys=key for each dictionary found.
-
-    Note that it does not search inside values of the key found.
-
-    Parameters
-    ----------
-    obj: input dictionary or list
-    key: key to search
-    current_result: list of results where aggregate what found on
-
-    Returns
-    -------
-    list of found values
-    """
-    if current_result is None:
-        current_result = []
-    if isinstance(obj, dict):
-        for current_key, current_value in obj.items():
-            if current_key == key:
-                current_result.append(current_value)
-            else:
-                current_result = recursive_key_search(
-                    current_value, key, current_result
-                )
-    elif isinstance(obj, list):
-        for item in obj:
-            current_result = recursive_key_search(item, key, current_result)
-    return current_result
-
-
-def object_as_dict(obj: Any) -> dict[str, Any]:
-    """Convert a sqlalchemy object in a python dictionary."""
-    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
-
-
-def str2bool(value: str, raise_if_unknown=True, default=False):
-    """Return boolean parsing of the string."""
-    if value.lower() in ["t", "true", "1", "yes", "y"]:
-        return True
-    if value.lower() in ["f", "false", "0", "no", "n"]:
-        return False
-    if raise_if_unknown:
-        raise ValueError("unparsable value for boolean: %r" % value)
-    return default
 
 
 def is_valid_resource(
@@ -125,7 +73,7 @@ def is_valid_resource(
     if not_found_licences:
         logger.error(
             "resource at path %r doesn't seem a valid dataset, "
-            "not found required licences: %r" % not_found_licences
+            "not found required licences: %r" % (resource_folder_path, not_found_licences)
         )
         return False
     return True
@@ -218,7 +166,7 @@ def load_variable_id_map(form_json_path: str, mapping_json_path: str) -> dict[st
     with open(form_json_path) as fp:
         form_data = json.load(fp)
     # inside form.json we can find more keys 'labels' with id-value mappings
-    search_results = recursive_key_search(form_data, key="labels")
+    search_results = utils.recursive_key_search(form_data, key="labels")
     label_id_map: dict[str, str] = functools.reduce(
         lambda d, src: d.update(src) or d, search_results, {}
     )
@@ -337,7 +285,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         if isinstance(data["hidden"], bool):
             metadata["hidden"] = data["hidden"]
         else:
-            metadata["hidden"] = str2bool(data["hidden"])
+            metadata["hidden"] = utils.str2bool(data["hidden"])
     else:
         metadata["hidden"] = False
     metadata["keywords"] = data.get("keywords")
@@ -527,7 +475,7 @@ def store_licences(
         )[0]
         licence_obj = database.Licence(**licence)
         session.add(licence_obj)
-        stored_as_dict = object_as_dict(licence_obj)
+        stored_as_dict = utils.object_as_dict(licence_obj)
         all_stored.append(stored_as_dict)
     return all_stored
 
@@ -691,7 +639,7 @@ def store_dataset(
         )
         if licence_obj:
             dataset_obj.licences.append(licence_obj)  # type: ignore
-    stored_as_dict = object_as_dict(dataset_obj)
+    stored_as_dict = utils.object_as_dict(dataset_obj)
     return stored_as_dict
 
 
