@@ -2,21 +2,16 @@
 requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
 
 [project]
-name = "cads-catalogue"
-description = "CADS catalogue manager"
-readme = "README.md"
-license = {file = "LICENSE"}
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Topic :: Scientific/Engineering"
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Scientific/Engineering"
 ]
-dynamic = ["version"]
 dependencies = [
   "minio",
   "pydantic",
@@ -24,6 +19,11 @@ dependencies = [
   "sqlalchemy_utils",
   "typer"
 ]
+description = "CADS catalogue manager"
+dynamic = ["version"]
+license = {file = "LICENSE"}
+name = "cads-catalogue"
+readme = "README.md"
 
 [project.scripts]
 cads-catalogue = "cads_catalogue.entry_points:main"
@@ -37,19 +37,6 @@ plugins = "sqlmypy"
 strict = false
 
 [tool.ruff]
-# Black line length is 88, but black does not format comments.
-line-length = 110
-select = [
-  # pyflakes
-  "F",
-  # pycodestyle
-  "E",
-  "W",
-  # isort
-  "I",
-  # pydocstyle
-  "D",
-]
 ignore = [
   # pydocstyle: Missing Docstrings
   "D1",
@@ -63,6 +50,19 @@ ignore = [
   "D415",
   "D416",
   "D417"
+]
+# Black line length is 88, but black does not format comments.
+line-length = 110
+select = [
+  # pyflakes
+  "F",
+  # pycodestyle
+  "E",
+  "W",
+  # isort
+  "I",
+  # pydocstyle
+  "D"
 ]
 
 [tool.setuptools]
