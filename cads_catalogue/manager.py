@@ -28,7 +28,7 @@ from typing import Any, List, Tuple
 
 from sqlalchemy.orm.session import Session
 
-from cads_catalogue import database, object_storage, utils
+from cads_catalogue import config, database, object_storage, utils
 
 logger = logging.getLogger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -45,6 +45,48 @@ OBJECT_STORAGE_UPLOAD_FILES = [
     ("layout.json", "layout"),
     ("overview.png", "previewimage"),
 ]
+
+
+def is_db_to_update(
+    session: Session,
+    resources_folder_path: str | pathlib.Path,
+    licences_folder_path: str | pathlib.Path,
+) -> bool:
+    """
+    Compare current and last run's status of repo folders and return if the database is to update.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    resources_folder_path: the folder path where to look for metadata files of all the resources
+    licences_folder_path: the folder path where to look for metadata files of all the licences
+
+    Returns
+    -------
+    True or False
+    """
+    last_update_record = (
+        session.query(database.CatalogueUpdate)
+        .order_by(database.CatalogueUpdate.update_time.desc())
+        .first()
+    )
+    if not last_update_record:
+        logger.warning("table catalogue_updates is currently empty")
+        return True
+    for git_folder, db_field in [
+        (resources_folder_path, "catalogue_repo_commit"),
+        (licences_folder_path, "licence_repo_commit"),
+    ]:
+        try:
+            folder_commit = utils.get_last_commit_hash(git_folder)
+        except Exception:  # noqa
+            logger.exception(
+                "no check on commit hash for folder %r, error follows" % git_folder
+            )
+            return True
+        if folder_commit != getattr(last_update_record, db_field):
+            return True
+    return False
 
 
 def is_valid_resource(
@@ -80,6 +122,52 @@ def is_valid_resource(
     return True
 
 
+def licence_sync(
+    session: Session,
+    licence_uid: str,
+    licences: list[dict[str, Any]],
+    storage_settings: config.ObjectStorageSettings,
+) -> None:
+    """
+    Compare db record and file of a licence and make them the same.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    licence_uid: slag of the licence to sync with the database
+    licences: list of metadata of all loaded licences
+    storage_settings: object with settings to access the object storage
+    """
+    loaded_licences = [r for r in licences if r["licence_uid"] == licence_uid]
+    if len(loaded_licences) == 0:
+        raise ValueError("not found licence %r in loaded licences" % licence_uid)
+    elif len(loaded_licences) > 1:
+        raise ValueError("more than 1 licence for slag %r in loaded licences" % licence_uid)
+    loaded_licence = loaded_licences[0]
+    db_licence = session.query(database.Licence).filter_by(
+        licence_uid=licence_uid, revision=loaded_licence['revision']).first()
+    if not db_licence:
+        db_licence = database.Licence(**loaded_licence)
+        session.add(db_licence)
+        logger.debug("added db licence %r" % licence_uid)
+    else:
+        db_licence.update(loaded_licence)
+        logger.debug("updated db licence %r" % licence_uid)
+
+    file_path = db_licence.download_filename
+    subpath = os.path.join("licences", licence_uid)
+    storage_kws = storage_settings.storage_kws
+    db_licence["download_filename"] = object_storage.store_file(
+        file_path,
+        storage_settings.object_storage_url,
+        storage_settings.bucket_name,
+        subpath=subpath,
+        force=True,
+        **storage_kws,
+    )[0]
+    return db_licence
+
+
 def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
     """Load licences metadata from json files contained in a folder.
 
@@ -97,8 +185,8 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
         if "deprecated" in os.path.basename(json_filepath).lower():
             continue
         with open(json_filepath) as fp:
-            json_data = json.load(fp)
             try:
+                json_data = json.load(fp)
                 licence = {
                     "licence_uid": json_data["id"],
                     "revision": json_data["revision"],
@@ -107,7 +195,12 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                         os.path.join(folder_path, json_data["downloadableFilename"])
                     ),
                 }
-            except KeyError:
+                for key in licence:
+                    assert licence[key], "%r is required" % key
+            except Exception:  # noqa
+                logger.exception(
+                    "licence file %r is not compliant: ignored" % json_filepath
+                )
                 continue
             licences.append(licence)
     return licences
