@@ -52,7 +52,7 @@ class SqlalchemySettings(pydantic.BaseSettings):
 
 
 class ObjectStorageSettings(pydantic.BaseSettings):
-    """Set of settings to use the object storage with the catalogue manager
+    """Set of settings to use the object storage with the catalogue manager.
 
     - ``object_storage_url``: object storage URL (internal)
     - ``storage_admin``: object storage admin username
@@ -63,13 +63,13 @@ class ObjectStorageSettings(pydantic.BaseSettings):
 
     object_storage_url: str | None = None
     storage_admin: str | None = None
-    storage_password: str| None = None
-    catalogue_bucket: str| None = None
-    document_storage_url: str| None = None
+    storage_password: str | None = None
+    catalogue_bucket: str | None = None
+    document_storage_url: str | None = None
 
     @property
     def storage_kws(self) -> dict[str, str | bool]:
-        """Return a dictionary to be used with the storage client"""
+        """Return a dictionary to be used with the storage client."""
         return {
             "access_key": self.storage_admin,
             "secret_key": self.storage_password,
@@ -77,7 +77,9 @@ class ObjectStorageSettings(pydantic.BaseSettings):
         }
 
 
-def ensure_storage_settings(settings: ObjectStorageSettings | None = None) -> ObjectStorageSettings:
+def ensure_storage_settings(
+    settings: ObjectStorageSettings | None = None,
+) -> ObjectStorageSettings:
     """If `settings` is None, create a new ObjectStorageSettings object.
 
     Parameters
