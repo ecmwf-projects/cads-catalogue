@@ -61,11 +61,12 @@ class ObjectStorageSettings(pydantic.BaseSettings):
     - ``document_storage_url``: object storage URL (public)
     """
 
-    object_storage_url: str | None = None
-    storage_admin: str | None = None
-    storage_password: str | None = None
-    catalogue_bucket: str | None = None
-    document_storage_url: str | None = None
+    object_storage_url: str
+    storage_admin: str
+    storage_password: str
+    catalogue_bucket: str
+    document_storage_url: str
+
 
     @property
     def storage_kws(self) -> dict[str, str | bool]:

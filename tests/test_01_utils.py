@@ -1,7 +1,9 @@
 import json
 import os.path
+import subprocess
 
 import pytest
+import pytest_mock
 
 from cads_catalogue import utils
 
@@ -9,6 +11,16 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_RESOURCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cads-forms-json")
 )
+
+
+def test_get_last_commit_hash(mocker: pytest_mock.MockerFixture) -> None:
+    spy1 = mocker.spy(subprocess, "Popen")
+    ret_value = utils.get_last_commit_hash(THIS_PATH)
+    assert isinstance(ret_value, str)
+    assert len(ret_value) == 40
+    assert spy1.mock_calls[0].args == ('git log -n 1 --pretty=format:"%H"',)
+    with pytest.raises(FileNotFoundError):
+        utils.get_last_commit_hash('/not/exists')
 
 
 def test_recursive_search() -> None:

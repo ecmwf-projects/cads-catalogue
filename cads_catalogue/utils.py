@@ -22,6 +22,7 @@ from sqlalchemy import inspect
 
 
 def get_last_commit_hash(git_folder: str | pathlib.Path):
+    """return the hash of the last commit done on the repo of the input folder."""
     cmd = 'git log -n 1 --pretty=format:"%H"'
     proc = subprocess.Popen(
         cmd, cwd=git_folder, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
