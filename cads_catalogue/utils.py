@@ -23,11 +23,13 @@ from sqlalchemy import inspect
 
 def get_last_commit_hash(git_folder: str | pathlib.Path):
     cmd = 'git log -n 1 --pretty=format:"%H"'
-    proc = subprocess.Popen(cmd, cwd=git_folder, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(
+        cmd, cwd=git_folder, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     out, err = proc.communicate()
     if proc.returncode != 0:
-        raise ValueError(err.decode('utf-8'))
-    return out.decode('ascii').strip()
+        raise ValueError(err.decode("utf-8"))
+    return out.decode("ascii").strip()
 
 
 def object_as_dict(obj: Any) -> dict[str, Any]:
