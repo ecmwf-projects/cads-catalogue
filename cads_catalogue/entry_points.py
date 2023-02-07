@@ -17,7 +17,6 @@
 import glob
 import logging
 import os.path
-from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -68,110 +67,79 @@ def setup_database(
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
     licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
 ) -> None:
-    """Fill the database with some test data.
+    """Update the database with the catalogue data.
 
-    Before to fill with test data:
-      - if the database doesn't exist, it creates a new one;
-      - if the structure is not updated (or force=True), it builds up the structure from scratch
+    Before to fill the database:
+      - if the database doesn't exist, it creates the structure;
+      - check input folders has changes from the last run (if not, and force=False, no update is run)
 
     Parameters
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
-    force: if True, create db from scratch also if already existing (default False)
+    force: if True, run update regardless input folders has no changes from last update (default False)
     resources_folder_path: path to the root folder containing metadata files for resources
     licences_folder_path: path to the root folder containing metadata files for licences
     """
-    # validation
+    # input validation
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
-    # get storage parameters from environment
-    for key in (
-        "OBJECT_STORAGE_URL",
-        "STORAGE_ADMIN",
-        "STORAGE_PASSWORD",
-        "CATALOGUE_BUCKET",
-        "DOCUMENT_STORAGE_URL",
-    ):
-        if key not in os.environ:
-            raise KeyError(
-                "key %r must be defined in the environment in order to use the object storage"
-                % key
-            )
-    object_storage_url = os.environ["OBJECT_STORAGE_URL"]
-    bucket_name = os.environ["CATALOGUE_BUCKET"]
-    doc_storage_url = os.environ["DOCUMENT_STORAGE_URL"]
-    storage_kws: dict[str, Any] = {
-        "access_key": os.environ["STORAGE_ADMIN"],
-        "secret_key": os.environ["STORAGE_PASSWORD"],
-        "secure": False,
-    }
-    # load metadata of licences and resources
-    licences = manager.load_licences_from_folder(licences_folder_path)
-    resources = []
-    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
-        if not manager.is_valid_resource(resource_folder_path, licences=licences):
-            logger.warning(
-                "folder %r ignored: not a valid resource folder" % resource_folder_path
-            )
-            continue
-        resource = manager.load_resource_from_folder(resource_folder_path)
-        resources.append(resource)
-    related_resources = manager.find_related_resources(resources)
-    # create empty db if not existing, else inspect the structure
+
+    # create db if not existing
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
-    structure_exists = True
     if not sqlalchemy_utils.database_exists(engine.url):
-        sqlalchemy_utils.create_database(connection_string)
-        structure_exists = False
-        conn = engine.connect()
-    else:
-        conn = engine.connect()
-        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
-            structure_exists = False
+        sqlalchemy_utils.create_database(engine.url)
+        database.metadata.create_all(bind=engine)
 
-    with conn.begin():
-        # create the structure if required
-        if not structure_exists or force:
-            database.metadata.drop_all(conn)
-            database.metadata.create_all(conn)
-        # store metadata collected into the structure
-        session_obj = sa.orm.sessionmaker(bind=conn)
-        with session_obj.begin() as session:  # type: ignore
-            manager.store_licences(
-                session,
-                licences,
-                object_storage_url,
-                bucket_name=bucket_name,
-                **storage_kws
+    # check if source folders have changed from last registered update
+    session_obj = sa.orm.sessionmaker()
+    if not force:
+        with session_obj.begin() as session:
+            is_db_to_update = manager.is_db_to_update(
+                session, resources_folder_path, licences_folder_path
             )
-            for resource in resources:
-                manager.store_dataset(
-                    session,
-                    resource,
-                    object_storage_url,
-                    bucket_name=bucket_name,
-                    doc_storage_url=doc_storage_url,
-                    **storage_kws
+            if not is_db_to_update:
+                logger.info("no manager run: source files didn't change.")
+                return
+
+    # get storage parameters from environment
+    storage_settings = config.ensure_storage_settings(config.storagesettings)
+
+    # load metadata of licences from files and sync each licence in the db
+    licences = manager.load_licences_from_folder(licences_folder_path)
+    for licence in licences:
+        licence_uid = licence["licence_uid"]
+        with session_obj() as session:
+            session.begin()
+            try:
+                manager.licence_sync(session, licence_uid, licences, storage_settings)
+            except Exception:  # noqa
+                session.rollback()
+                logger.exception(
+                    "sync for licence %s failed, error follows." % licence_uid
                 )
-            for res1, res2 in related_resources:
-                res1_obj = (
-                    session.query(database.Resource)
-                    .filter_by(resource_uid=res1["resource_uid"])
-                    .one()
+            else:
+                session.commit()
+
+    # load metadata of each resource from files and sync each resource in the db
+    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+        with session_obj() as session:
+            session.begin()
+            try:
+                resource = manager.load_resource_from_folder(resource_folder_path)
+                manager.resource_sync(session, resource, storage_settings)
+            except Exception:  # noqa
+                session.rollback()
+                logger.exception(
+                    "sync from %s failed, error follows." % resource_folder_path
                 )
-                res2_obj = (
-                    session.query(database.Resource)
-                    .filter_by(resource_uid=res2["resource_uid"])
-                    .one()
-                )
-                res1_obj.related_resources.append(res2_obj)
-                res2_obj.related_resources.append(res1_obj)
+            else:
+                session.commit()
+    # TODO: remove licences not loaded nor related to any dataset?
 
 
 def main() -> None:

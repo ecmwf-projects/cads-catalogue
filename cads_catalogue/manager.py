@@ -127,7 +127,7 @@ def licence_sync(
     licence_uid: str,
     licences: list[dict[str, Any]],
     storage_settings: config.ObjectStorageSettings,
-) -> None:
+) -> database.Licence:
     """
     Compare db record and file of a licence and make them the same.
 
@@ -137,15 +137,24 @@ def licence_sync(
     licence_uid: slag of the licence to sync with the database
     licences: list of metadata of all loaded licences
     storage_settings: object with settings to access the object storage
+
+    Returns
+    -------
+    The created/updated db licence
     """
     loaded_licences = [r for r in licences if r["licence_uid"] == licence_uid]
     if len(loaded_licences) == 0:
         raise ValueError("not found licence %r in loaded licences" % licence_uid)
     elif len(loaded_licences) > 1:
-        raise ValueError("more than 1 licence for slag %r in loaded licences" % licence_uid)
+        raise ValueError(
+            "more than 1 licence for slag %r in loaded licences" % licence_uid
+        )
     loaded_licence = loaded_licences[0]
-    db_licence = session.query(database.Licence).filter_by(
-        licence_uid=licence_uid, revision=loaded_licence['revision']).first()
+    db_licence = (
+        session.query(database.Licence)
+        .filter_by(licence_uid=licence_uid, revision=loaded_licence["revision"])
+        .first()
+    )
     if not db_licence:
         db_licence = database.Licence(**loaded_licence)
         session.add(db_licence)
@@ -160,7 +169,7 @@ def licence_sync(
     db_licence["download_filename"] = object_storage.store_file(
         file_path,
         storage_settings.object_storage_url,
-        storage_settings.bucket_name,
+        bucket_name=storage_settings.catalogue_bucket,
         subpath=subpath,
         force=True,
         **storage_kws,
@@ -530,48 +539,85 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     return metadata
 
 
-def store_licences(
+def resource_sync(
     session: Session,
-    licences: list[Any],
-    object_storage_url: str,
-    bucket_name: str = "cads-catalogue",
-    **storage_kws: Any,
-) -> list[dict[str, Any]]:
-    """Store a list of licences in a database and in the object storage.
-
-    Store a list of licences (as returned by `load_licences_from_folder`)
-    in a database and in the object storage.
-    If `doc_storage_path` is None, it will take DOCUMENT_STORAGE from the environment.
+    resource: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings,
+) -> database.Resource:
+    """
+    Compare db record and file of a resource and make them the same.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    licences: list of licences (as returned by `load_licences_from_folder`)
-    object_storage_url: endpoint URL of the object storage (for upload)
-    bucket_name: bucket name of the object storage to use
-    storage_kws: dictionary of parameters used to pass to the storage client
+    resource: metadata of a loaded resource from files
+    storage_settings: object with settings to access the object storage
 
     Returns
     -------
-    list: list of dictionaries of records inserted.
+    The created/updated db resource
     """
-    all_stored = []
-    for licence in licences:
-        file_path = licence["download_filename"]
-        subpath = os.path.join("licences", licence["licence_uid"])
-        licence["download_filename"] = object_storage.store_file(
+    dataset = resource.copy()
+    licence_uids = dataset.pop("licence_uids", [])
+    db_licences = dict()
+    for licence_uid in licence_uids:
+        licence_obj = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=licence_uid)
+            .order_by(database.Licence.revision.desc())
+            .first()
+        )
+        if not licence_obj:
+            raise ValueError("licence_uid = %r not found" % licence_uid)
+        db_licences[licence_uid] = licence_obj
+
+    _ = dataset.pop("related_resources_keywords", [])
+    subpath = os.path.join("resources", dataset["resource_uid"])
+    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
+    if "layout" in object_storage_fields:
+        dataset["layout"] = manage_upload_images_and_layout(
+            dataset,
+            storage_settings.object_storage_url,
+            storage_settings.document_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
+            **storage_settings.storage_kws,
+        )
+        object_storage_fields.remove("layout")
+        del dataset["layout_images_info"]
+    for db_field in object_storage_fields:
+        file_path = dataset.get(db_field)
+        if not file_path:
+            continue
+        dataset[db_field] = object_storage.store_file(
             file_path,
-            object_storage_url,
-            bucket_name=bucket_name,
+            storage_settings.object_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
             subpath=subpath,
             force=True,
-            **storage_kws,
+            **storage_settings.storage_kws,
         )[0]
-        licence_obj = database.Licence(**licence)
-        session.add(licence_obj)
-        stored_as_dict = utils.object_as_dict(licence_obj)
-        all_stored.append(stored_as_dict)
-    return all_stored
+
+    dataset_obj = session.query(database.Resource).filter_by(resource_id=resource["resource_uid"]).first()
+    if not dataset_obj:
+        dataset_obj = database.Resource(**dataset)
+        session.add(dataset_obj)
+    else:
+        dataset_obj.update(dataset)
+
+    dataset.licences = []  # FIXME: is it enought to remove records from many to many table?
+    for licence_uid in licence_uids:
+        dataset_obj.licences.append(db_licences[licence_uid])
+
+    # TODO: remove all records from table related_resources with this resource_uid
+    all_db_resources = session.query(database.Resource).all()
+
+    related_resources = find_related_resources(all_db_resources, only_involving_uid=resource["resource_uid"])
+    for res1, res2 in related_resources:
+        res1_obj = session.query(database.Resource).filter_by(resource_uid=res1["resource_uid"]).one()
+        res2_obj = session.query(database.Resource).filter_by(resource_uid=res2["resource_uid"]).one()
+        res1_obj.related_resources.append(res2_obj)
+        res2_obj.related_resources.append(res1_obj)
+    return dataset_obj
 
 
 def manage_upload_images_and_layout(
@@ -669,76 +715,8 @@ def manage_upload_images_and_layout(
     return layout_url
 
 
-def store_dataset(
-    session: Session,
-    dataset_md: dict[str, Any],
-    object_storage_url: str,
-    doc_storage_url: str,
-    bucket_name: str = "cads-catalogue",
-    **storage_kws: Any,
-) -> dict[str, Any]:
-    """Store a resource in a database and in the object storage.
-
-    Store a resource (as returned by `load_resource_from_folder`) in a database and some of its
-    files in the object storage and return a dictionary of the record stored.
-
-    Parameters
-    ----------
-    session: opened SQLAlchemy session
-    dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
-    object_storage_url: endpoint URL of the object storage (for upload)
-    doc_storage_url: public endpoint URL of the object storage
-    bucket_name: bucket name of the object storage to use
-    storage_kws: dictionary of parameters used to pass to the storage client
-
-    Returns
-    -------
-    dict: a dictionary of the record stored.
-    """
-    dataset = dataset_md.copy()
-    licence_uids = dataset.pop("licence_uids", [])
-    _ = dataset.pop("related_resources_keywords", [])
-    subpath = os.path.join("resources", dataset["resource_uid"])
-    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
-    if "layout" in object_storage_fields:
-        dataset["layout"] = manage_upload_images_and_layout(
-            dataset,
-            object_storage_url,
-            doc_storage_url,
-            bucket_name=bucket_name,
-            **storage_kws,
-        )
-        object_storage_fields.remove("layout")
-        del dataset["layout_images_info"]
-    for db_field in object_storage_fields:
-        file_path = dataset.get(db_field)
-        if not file_path:
-            continue
-        dataset[db_field] = object_storage.store_file(
-            file_path,
-            object_storage_url,
-            bucket_name=bucket_name,
-            subpath=subpath,
-            force=True,
-            **storage_kws,
-        )[0]
-    dataset_obj = database.Resource(**dataset)
-    session.add(dataset_obj)
-    for licence_uid in licence_uids:
-        licence_obj = (
-            session.query(database.Licence)
-            .filter_by(licence_uid=licence_uid)
-            .order_by(database.Licence.revision.desc())
-            .first()
-        )
-        if licence_obj:
-            dataset_obj.licences.append(licence_obj)  # type: ignore
-    stored_as_dict = utils.object_as_dict(dataset_obj)
-    return stored_as_dict
-
-
 def find_related_resources(
-    resources: list[dict[str, Any]]
+    resources: list[dict[str, Any]], only_involving_uid=None,
 ) -> list[tuple[dict[str, Any], dict[str, Any]]]:
     """Return couples of resources related each other.
 
@@ -751,6 +729,7 @@ def find_related_resources(
     Parameters
     ----------
     resources: list of resources (i.e. python dictionaries of metadata)
+    only_involving_uid: if not None, filter results only involving the specified resource_uid
 
     Returns
     -------
@@ -759,6 +738,9 @@ def find_related_resources(
     relationships_found = []
     all_possible_relationships = itertools.permutations(resources, 2)
     for (res1, res2) in all_possible_relationships:
+        if only_involving_uid and res1["resource_uid"] != only_involving_uid \
+                and res2["resource_uid"] != only_involving_uid:
+            continue
         res1_keywords = set(res1.get("keywords", []))
         res2_keywords = set(res2.get("keywords", []))
         if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
