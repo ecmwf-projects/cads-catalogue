@@ -66,6 +66,7 @@ def setup_database(
     force: bool = False,
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
     licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
+    delete_orphans: bool = False
 ) -> None:
     """Update the database with the catalogue data.
 
@@ -79,6 +80,7 @@ def setup_database(
     force: if True, run update regardless input folders has no changes from last update (default False)
     resources_folder_path: path to the root folder containing metadata files for resources
     licences_folder_path: path to the root folder containing metadata files for licences
+    delete_orphans: if True, delete resources not involved in the update process (default False)
     """
     # input validation
     if not os.path.isdir(resources_folder_path):
@@ -126,8 +128,11 @@ def setup_database(
                 session.commit()
 
     # load metadata of each resource from files and sync each resource in the db
-    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
-        with session_obj() as session:
+    input_resource_uids = []
+    with session_obj() as session:
+        for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+            resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+            input_resource_uids.append(resource_uid)
             session.begin()
             try:
                 resource = manager.load_resource_from_folder(resource_folder_path)
@@ -139,7 +144,16 @@ def setup_database(
                 )
             else:
                 session.commit()
-    # TODO: remove licences not loaded nor related to any dataset?
+        if delete_orphans:
+            session.query(database.Resource).filter(
+                database.Resource.resource_uid.notin_(input_resource_uids)
+            ).delete()
+            session.commit()
+
+    # TODO? remove licences from the db if both
+    #   * not present in the licences_folder_path
+    #   and
+    #   * not cited from any dataset
 
 
 def main() -> None:
