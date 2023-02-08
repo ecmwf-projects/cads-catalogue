@@ -74,7 +74,7 @@ def test_storagesettings(temp_environ: Any) -> None:
         "storage_admin": "admin1",
         "storage_password": "secret1",
         "catalogue_bucket": "mycatalogue_bucket",
-        "document_storage_url": "my/url"
+        "document_storage_url": "my/url",
     }
     for k, v in my_settings_dict.items():
         temp_environ[k] = v
@@ -85,7 +85,9 @@ def test_storagesettings(temp_environ: Any) -> None:
     config.storagesettings = None
 
 
-def test_ensure_storage_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) -> None:
+def test_ensure_storage_settings(
+    session_obj: sa.orm.sessionmaker, temp_environ: Any
+) -> None:
     # initially global settings is importable, but it is None
     assert config.storagesettings is None
 
@@ -95,13 +97,16 @@ def test_ensure_storage_settings(session_obj: sa.orm.sessionmaker, temp_environ:
         "storage_admin": "admin1",
         "storage_password": "secret1",
         "catalogue_bucket": "mycatalogue_bucket",
-        "document_storage_url": "my/url"
+        "document_storage_url": "my/url",
     }
     for k, v in my_settings_dict.items():
         temp_environ[k] = v
     effective_settings = config.ensure_storage_settings()
-    assert effective_settings.storage_kws == \
-           {'access_key': 'admin1', 'secret_key': 'secret1', 'secure': False}
+    assert effective_settings.storage_kws == {
+        "access_key": "admin1",
+        "secret_key": "secret1",
+        "secure": False,
+    }
 
     assert config.storagesettings == effective_settings
     config.storagesettings = None
@@ -112,9 +117,13 @@ def test_ensure_storage_settings(session_obj: sa.orm.sessionmaker, temp_environ:
         "storage_admin": "admin1",
         "storage_password": "secret1",
         "catalogue_bucket": "mycatalogue_bucket",
-        "document_storage_url": "my/url"
+        "document_storage_url": "my/url",
     }
-    my_settings_storage_kws = {'access_key': 'admin1', 'secret_key': 'secret1', 'secure': False}
+    my_settings_storage_kws = {
+        "access_key": "admin1",
+        "secret_key": "secret1",
+        "secure": False,
+    }
     mysettings = config.ObjectStorageSettings(**my_settings_dict)
     effective_settings = config.ensure_storage_settings(mysettings)
 

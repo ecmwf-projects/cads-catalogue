@@ -67,7 +67,6 @@ class ObjectStorageSettings(pydantic.BaseSettings):
     catalogue_bucket: str
     document_storage_url: str
 
-
     @property
     def storage_kws(self) -> dict[str, str | bool]:
         """Return a dictionary to be used with the storage client."""
