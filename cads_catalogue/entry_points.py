@@ -110,7 +110,7 @@ def setup_database(
 
     # get storage parameters from environment
     storage_settings = config.ensure_storage_settings(config.storagesettings)
-
+    # TODO: update commit hashes on db
     # load metadata of licences from files and sync each licence in the db
     licences = manager.load_licences_from_folder(licences_folder_path)
     for licence in licences:
