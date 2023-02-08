@@ -15,7 +15,7 @@ dependencies:
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
 - pip
 - postgresql
-- psycopg2
+- psycopg
 - pytest-mock
 - sqlalchemy-stubs
 - pip:
