@@ -1450,6 +1450,10 @@ def test_resource_sync(
             licence_uid = licence["licence_uid"]
             manager.licence_sync(session, licence_uid, licences, storage_settings)
         session.commit()
+        db_licences = session.execute(
+            "select licence_uid, licence_id from licences order by licence_uid"
+        ).all()
+        uid_id_licence_map = dict(db_licences)
     patch.reset_mock()
 
     # create first dataset
@@ -1510,7 +1514,10 @@ def test_resource_sync(
         "select resource_id, licence_id "
         "from resources_licences "
         "order by resource_id, licence_id"
-    ).all() == [(1, 3), (2, 3)]
+    ).all() == [
+        (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+        (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+    ]
     assert session.execute(
         "select parent_resource_id, child_resource_id "
         "from related_resources "
@@ -1544,7 +1551,11 @@ def test_resource_sync(
         "select resource_id, licence_id "
         "from resources_licences "
         "order by resource_id, licence_id"
-    ).all() == [(1, 3), (2, 1), (2, 3)]
+    ).all() == [
+        (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+        (2, uid_id_licence_map["eumetsat-cm-saf"]),
+        (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+    ]
     assert session.execute(
         "select parent_resource_id, child_resource_id "
         "from related_resources "
