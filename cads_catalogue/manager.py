@@ -606,16 +606,16 @@ def resource_sync(
         dataset_obj = dataset_query_obj.one()
     session.flush()  # needed to use resource_id in related resources
 
-    dataset_obj.licences = []
+    dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
-        dataset_obj.licences.append(db_licences[licence_uid])
+        dataset_obj.licences.append(db_licences[licence_uid])  # type: ignore
 
     # clean related_resources
     all_db_resources = session.query(database.Resource).all()
     for db_resource in all_db_resources:
-        db_resource.related_resources = [
+        db_resource.related_resources = [  # type: ignore
             r
-            for r in db_resource.related_resources
+            for r in db_resource.related_resources  # type: ignore
             if r.resource_id != dataset_obj.resource_id
         ]
     # recompute related resources
@@ -623,7 +623,7 @@ def resource_sync(
         all_db_resources, only_involving_uid=dataset_obj.resource_uid
     )
     for res1, res2 in related_resources:
-        res1.related_resources.append(res2)
+        res1.related_resources.append(res2)  # type: ignore
     return dataset_obj
 
 
@@ -752,13 +752,13 @@ def find_related_resources(
             and res2.resource_uid != only_involving_uid
         ):
             continue
-        res1_keywords = set(res1.keywords)
-        res2_keywords = set(res2.keywords)
+        res1_keywords = set(res1.keywords)  # type: ignore
+        res2_keywords = set(res2.keywords)  # type: ignore
         if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
             continue
-        res1_rel_res_kws = set(res1.related_resources_keywords)
-        res2_rel_res_kws = set(res2.related_resources_keywords)
+        res1_rel_res_kws = set(res1.related_resources_keywords)  # type: ignore
+        res2_rel_res_kws = set(res2.related_resources_keywords)  # type: ignore
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found

@@ -32,7 +32,7 @@ def compare_resources_with_dumped_file(
     #  with open(file_path, "w") as fp:
     #      json.dump(dict_resources, fp, default=str, indent=4)
     with open(file_path) as fp:
-        expected_resources: list[dict[str, Any]] = json.load(fp)
+        expected_resources = json.load(fp)
     for i, resource in enumerate(dict_resources):
         for key in resource:
             if key in exclude_fields:

@@ -66,7 +66,7 @@ def setup_database(
     force: bool = False,
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
     licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
-    delete_orphans: bool = False
+    delete_orphans: bool = False,
 ) -> None:
     """Update the database with the catalogue data.
 
@@ -100,7 +100,7 @@ def setup_database(
     # check if source folders have changed from last registered update
     session_obj = sa.orm.sessionmaker(engine)
     if not force:
-        with session_obj.begin() as session:
+        with session_obj.begin() as session:  # type: ignore
             is_db_to_update = manager.is_db_to_update(
                 session, resources_folder_path, licences_folder_path
             )
@@ -130,7 +130,9 @@ def setup_database(
     # load metadata of each resource from files and sync each resource in the db
     input_resource_uids = []
     with session_obj() as session:
-        for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+        for resource_folder_path in glob.glob(
+            os.path.join(resources_folder_path, "*/")
+        ):
             resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
             input_resource_uids.append(resource_uid)
             session.begin()
