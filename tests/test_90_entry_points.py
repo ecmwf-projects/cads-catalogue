@@ -248,11 +248,13 @@ def test_transaction_setup_database(
         assert len([e for e in error_messages if dataset_name in e]) >= 1
     # ...anyway the licence content is updated...
     with session_obj() as session:
-        licences = session.execute("select licence_uid from licences").all()
+        licences = session.execute(
+            "select licence_uid from licences order by lower(licence_uid)"
+        ).all()
         assert licences == [
             ("a-licence",),
-            ("eumetsat-cm-saf",),
             ("CCI-data-policy-for-satellite-surface-radiation-budget",),
+            ("eumetsat-cm-saf",),
             ("licence-to-use-copernicus-products",),
         ]
         #  ....but the resources must stay unchanged
