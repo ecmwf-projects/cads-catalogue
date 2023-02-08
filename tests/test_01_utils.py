@@ -20,7 +20,7 @@ def test_get_last_commit_hash(mocker: pytest_mock.MockerFixture) -> None:
     assert len(ret_value) == 40
     assert spy1.mock_calls[0].args == ('git log -n 1 --pretty=format:"%H"',)
     with pytest.raises(FileNotFoundError):
-        utils.get_last_commit_hash('/not/exists')
+        utils.get_last_commit_hash("/not/exists")
 
 
 def test_recursive_search() -> None:

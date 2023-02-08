@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+import json
 import pathlib
 import subprocess
 from typing import Any
@@ -21,8 +23,33 @@ from typing import Any
 from sqlalchemy import inspect
 
 
+def compare_resources_with_dumped_file(
+    records, file_path, exclude_fields=("record_update", "resource_id")
+):
+    """Use for testing records with dumped versions on files."""
+    dict_resources = [object_as_dict(r) for r in records]
+    #  uncomment following 2 lines to generate the expected file
+    #  with open(file_path, "w") as fp:
+    #      json.dump(dict_resources, fp, default=str, indent=4)
+    with open(file_path) as fp:
+        expected_resources: list[dict[str, Any]] = json.load(fp)
+    for i, resource in enumerate(dict_resources):
+        for key in resource:
+            if key in exclude_fields:
+                continue
+            expected_resource = [
+                r
+                for r in expected_resources
+                if r["resource_uid"] == resource["resource_uid"]
+            ][0]
+            value = resource[key]
+            if isinstance(value, datetime.date):
+                value = value.isoformat()
+            assert value == expected_resource[key], key
+
+
 def get_last_commit_hash(git_folder: str | pathlib.Path):
-    """return the hash of the last commit done on the repo of the input folder."""
+    """Return the hash of the last commit done on the repo of the input folder."""
     cmd = 'git log -n 1 --pretty=format:"%H"'
     proc = subprocess.Popen(
         cmd, cwd=git_folder, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE

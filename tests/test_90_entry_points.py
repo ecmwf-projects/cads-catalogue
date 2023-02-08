@@ -1,9 +1,8 @@
-import datetime
-import json
 import os.path
 import unittest.mock
 from typing import Any
 
+import pytest
 import pytest_mock
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -142,16 +141,14 @@ def test_setup_database(
 
     # check db content
     session = session_obj()
-    resources = [
-        utils.object_as_dict(r)
-        for r in session.query(database.Resource).order_by(
-            database.Resource.resource_uid
-        )
-    ]
-    # with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt"), "w") as fp:
-    #     json.dump(resources, fp, default=str, indent=4)
-    with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt")) as fp:
-        expected_resources: list[dict[str, Any]] = json.load(fp)
+    resources = session.query(database.Resource).order_by(
+        database.Resource.resource_uid
+    )
+
+    utils.compare_resources_with_dumped_file(
+        resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
+    )
+
     licences = [
         utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
     ]
@@ -165,20 +162,6 @@ def test_setup_database(
         assert effective_found
         for field in ["revision", "title", "download_filename"]:
             assert getattr(effective_found[0], field) == expected_licence[field]
-
-    for i, resource in enumerate(resources):
-        for key in resource:
-            if key in ("record_update", "resource_id"):
-                continue
-            expected_resource = [
-                r
-                for r in expected_resources
-                if r["resource_uid"] == resource["resource_uid"]
-            ][0]
-            value = resource[key]
-            if isinstance(value, datetime.date):
-                value = value.isoformat()
-            assert value == expected_resource[key], key
 
     resl = (
         session.query(database.Resource)
@@ -207,7 +190,9 @@ def test_setup_database(
 
 
 def test_transaction_setup_database(
-    postgresql: Connection[str], mocker: pytest_mock.MockerFixture
+    caplog: pytest.LogCaptureFixture,
+    postgresql: Connection[str],
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     """Here we want to test that transactions are managed outside the setup test database."""
     connection_string = (
@@ -215,6 +200,8 @@ def test_transaction_setup_database(
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://mypublic-storage/"
+    bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -222,10 +209,14 @@ def test_transaction_setup_database(
     }
     # create the db empty
     engine = database.init_database(connection_string)
-    # add some data
+    # add some dummy data
     engine.execute(
         "INSERT INTO licences (licence_uid, revision, title, download_filename) "
         "VALUES ('a-licence', 1, 'a licence', 'a file.pdf')"
+    )
+    engine.execute(
+        "INSERT INTO resources (resource_uid, abstract, description, type) "
+        "VALUES ('dummy-dataset', 'a dummy ds', '[]', 'dataset')"
     )
     session_obj = sessionmaker(engine)
     # simulate the object storage working...
@@ -235,7 +226,7 @@ def test_transaction_setup_database(
     )
     # ... but impose the store_dataset fails to work...
     mocker.patch.object(
-        manager, "store_dataset", side_effect=Exception("dataset error")
+        manager, "resource_sync", side_effect=Exception("dataset error")
     )
     # ....so the entry point execution should fail...
     result = runner.invoke(
@@ -243,15 +234,30 @@ def test_transaction_setup_database(
         ["setup-database", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
         },
     )
-    assert result.exit_code != 0
-    # ...but db content must stay unchanged
-    session = session_obj()
-    assert session.query(database.Resource).all() == []
-    licences = session.query(database.Licence).all()
-    assert len(licences) == 1
-    assert licences[0].title == "a licence"
+    # ...without raising any
+    assert result.exit_code == 0
+    # ...but there is an error log for each dataset
+    error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
+    for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
+        assert len([e for e in error_messages if dataset_name in e]) >= 1
+    # ...anyway the licence content is updated...
+    with session_obj() as session:
+        licences = session.execute("select licence_uid from licences").all()
+        assert licences == [
+            ("a-licence",),
+            ("eumetsat-cm-saf",),
+            ("CCI-data-policy-for-satellite-surface-radiation-budget",),
+            ("licence-to-use-copernicus-products",),
+        ]
+        #  ....but the resources must stay unchanged
+        resources = session.execute(
+            "select resource_uid, abstract, description, type from resources"
+        ).all()
+        assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
     session.close()

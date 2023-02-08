@@ -96,7 +96,7 @@ def setup_database(
         database.metadata.create_all(bind=engine)
 
     # check if source folders have changed from last registered update
-    session_obj = sa.orm.sessionmaker()
+    session_obj = sa.orm.sessionmaker(engine)
     if not force:
         with session_obj.begin() as session:
             is_db_to_update = manager.is_db_to_update(

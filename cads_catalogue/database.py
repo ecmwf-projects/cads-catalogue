@@ -82,6 +82,9 @@ class Resource(BaseModel):
     constraints_data = sa.Column(sa.JSON)
     form_data = sa.Column(sa.JSON)
     mapping = sa.Column(sa.JSON)
+    related_resources_keywords = sa.Column(
+        sa.dialects.postgresql.ARRAY(sa.VARCHAR(300))
+    )
 
     # geo extent
     geo_extent = sa.Column(sa.JSON)

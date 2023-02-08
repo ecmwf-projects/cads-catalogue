@@ -13,7 +13,79 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def test_load_metadata_licences() -> None:
+def dummy_get_last_commit_hash1(folder):
+    """Use for testing is_db_to_update."""
+    if "cads-forms-json" in folder:
+        return "5f662d202e4084dd569567bab0957c8a56f79c0f"
+    else:
+        return "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
+
+
+def dummy_get_last_commit_hash2(folder):
+    """Use for testing is_db_to_update."""
+    if "cads-forms-json" in folder:
+        return "5f662d202e4084dd569567bab0957c8a56f79aaa"
+    else:
+        return "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
+
+
+def test_is_db_to_update(
+    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+) -> None:
+    mocker.patch.object(utils, "get_last_commit_hash", new=dummy_get_last_commit_hash1)
+    resource_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json")
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+
+    with session_obj() as session:
+        # begin with empty table
+        assert (
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
+            is True
+        )
+        # insert a catalogue update
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit="5f662d202e4084dd569567bab0957c8a56f79c0f",
+            licence_repo_commit="f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+        )
+        session.add(new_record)
+        session.commit()
+        assert (
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
+            is False
+        )
+        # simulate a new repo update
+        mocker.patch.object(
+            utils, "get_last_commit_hash", new=dummy_get_last_commit_hash2
+        )
+        assert (
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
+            is True
+        )
+        # update the db with only one repo commit
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit="5f662d202e4084dd569567bab0957c8a56f79aaa",
+            licence_repo_commit="f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+        )
+        session.add(new_record)
+        session.commit()
+        assert (
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
+            is True
+        )
+        # update the db with only both two right repo commit
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit="5f662d202e4084dd569567bab0957c8a56f79aaa",
+            licence_repo_commit="f0591ec408b59d32a46a5d08b9786641dffe5bbb",
+        )
+        session.add(new_record)
+        session.commit()
+        assert (
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
+            is False
+        )
+
+
+def test_load_licences_from_folder() -> None:
     # test data taken from repository "https://git.ecmwf.int/projects/CDS/repos/cds-licences"
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     expected_licences = [
@@ -1269,145 +1341,216 @@ def test_manage_upload_images_and_layout(
     assert layout_data == expected_layout
 
 
-def test_store_licences(
+def test_licence_sync(
     session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
-    object_storage_url = "http://myobject-storage:myport/"
-    storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+    my_settings_dict = {
+        "object_storage_url": "object/storage/url",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "my/url",
     }
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
-    session = session_obj()
-    res = session.query(database.Licence).all()
-    assert res == []
+    licence_uid = "CCI-data-policy-for-satellite-surface-radiation-budget"
+    licence_md = {
+        "licence_id": 1,
+        "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+        "revision": 4,
+        "title": "CCI product licence",
+        "download_filename": "an url",
+    }
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
+    # start without any licence in the db
+    with session_obj() as session:
+        manager.licence_sync(session, licence_uid, licences, storage_settings)
+        session.commit()
+        db_licences = session.query(database.Licence).all()
+        assert len(db_licences) == 1
+        assert utils.object_as_dict(db_licences[0]) == licence_md
 
-    manager.store_licences(session, licences, object_storage_url, **storage_kws)
-    session.commit()
-    assert patch.call_count == len(licences)
+    assert patch.call_count == 1
     assert (
         os.path.join(
             licences_folder_path,
             "CCI-data-policy-for-satellite-surface-radiation-budget.pdf",
         ),
-        object_storage_url,
+        storage_settings.object_storage_url,
     ) in [pm.args for pm in patch.mock_calls]
 
     assert {
-        "force": True,
+        "bucket_name": "mycatalogue_bucket",
         "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
-        "bucket_name": "cads-catalogue",
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
+        "force": True,
+        "access_key": "admin1",
+        "secret_key": "secret1",
         "secure": False,
     } in [pm.kwargs for pm in patch.mock_calls]
-    res = session.query(database.Licence).all()
-    assert len(res) == len(licences)
-    db_obj_as_dict = utils.object_as_dict(res[0])
-    assert 1 == db_obj_as_dict.pop("licence_id")
-    assert db_obj_as_dict == licences[0]
-    assert db_obj_as_dict["download_filename"] == "an url"
-    session.close()
+    patch.reset_mock()
+
+    # update an existing licence
+    updated_licence = [r for r in licences if r["licence_uid"] == licence_uid][0]
+    updated_licence["title"] = "CCI product licence UPDATED"
+    licence_md2 = {
+        "licence_id": 1,
+        "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+        "revision": 4,
+        "title": "CCI product licence UPDATED",
+        "download_filename": "an url",
+    }
+    licences = [updated_licence]
+    with session_obj() as session:
+        manager.licence_sync(session, licence_uid, licences, storage_settings)
+        session.commit()
+        db_licences = session.query(database.Licence).all()
+        assert len(db_licences) == 1
+        assert utils.object_as_dict(db_licences[0]) == licence_md2
+
     # reset globals for tests following
     config.dbsettings = None
+    config.storagesettings = None
 
 
-def test_store_dataset(
+def test_resource_sync(
     session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
-    object_storage_url = "http://myobject-storage:myport/"
-    doc_storage_url = "http://public-storage/"
-    bucket_name = "my_bucket"
-    storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+    my_settings_dict = {
+        "object_storage_url": "object/storage/url",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "my/url",
     }
-
-    mocker.patch.object(
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
+    patch = mocker.patch.object(
         object_storage, "store_file", return_value=("an url", "a version")
     )
     spy1 = mocker.spy(manager, "manage_upload_images_and_layout")
-    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
-    licences = manager.load_licences_from_folder(licences_folder_path)
-    session = session_obj()
-    manager.store_licences(
-        session, licences, object_storage_url, bucket_name=bucket_name, **storage_kws
-    )
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
-    assert resource["licence_uids"][0] in [r["licence_uid"] for r in licences]
-    assert resource["licence_uids"] == ["licence-to-use-copernicus-products"]
-    assert resource["related_resources_keywords"] == []
-    res = session.query(database.Resource).all()
-    assert res == []
+    # start without any licence in the db
+    with session_obj() as session:
+        with pytest.raises(ValueError):
+            manager.resource_sync(session, resource, storage_settings)
+    assert patch.call_count == 0
+    patch.reset_mock()
 
-    patch = mocker.patch(
-        "cads_catalogue.object_storage.store_file",
-        return_value=("an url", "a version"),
-    )
-    stored_record = manager.store_dataset(
-        session,
-        resource,
-        object_storage_url,
-        doc_storage_url=doc_storage_url,
-        bucket_name=bucket_name,
-        **storage_kws
-    )
-    session.commit()
-    assert (
-        patch.call_count == 5
-    )  # len(OBJECT_STORAGE_UPLOAD_FILES) + 1 overview.png, cited inside layout.json
-    kwargs = storage_kws.copy()
-    kwargs["subpath"] = "resources/reanalysis-era5-land"
-    kwargs["bucket_name"] = bucket_name
-    kwargs["force"] = True
-    effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
-    for file_name, db_field in manager.OBJECT_STORAGE_UPLOAD_FILES:
-        if file_name != "layout.json":
-            expected_call_pars = (
-                (resource[db_field], object_storage_url),
-                kwargs,
-            )
-            assert expected_call_pars in effective_calls_pars
+    # store licences
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences = manager.load_licences_from_folder(licences_folder_path)
+    with session_obj() as session:
+        for licence in licences:
+            licence_uid = licence["licence_uid"]
+            manager.licence_sync(session, licence_uid, licences, storage_settings)
+        session.commit()
+    patch.reset_mock()
+
+    # create first dataset
+    with session_obj() as session:
+        manager.resource_sync(session, resource, storage_settings)
+        session.commit()
+
+    assert patch.call_count == 5
+    expected_args_object_storage_calls = [
+        (
+            os.path.join(resource_folder_path, "overview.png"),
+            storage_settings.object_storage_url,
+        ),
+        (mocker.ANY, storage_settings.object_storage_url),
+        (
+            os.path.join(resource_folder_path, "constraints.json"),
+            storage_settings.object_storage_url,
+        ),
+        (
+            os.path.join(resource_folder_path, "form.json"),
+            storage_settings.object_storage_url,
+        ),
+        (
+            os.path.join(resource_folder_path, "overview.png"),
+            storage_settings.object_storage_url,
+        ),
+    ]
+    effective_args_object_storage_calls = [pm.args for pm in patch.mock_calls]
+    for expected_args_object_storage_call in expected_args_object_storage_calls:
+        assert expected_args_object_storage_call in effective_args_object_storage_calls
+    assert effective_args_object_storage_calls[1][0].endswith("layout.json")
+    assert {
+        "bucket_name": "mycatalogue_bucket",
+        "subpath": "resources/reanalysis-era5-land",
+        "force": True,
+        "access_key": "admin1",
+        "secret_key": "secret1",
+        "secure": False,
+    } in [pm.kwargs for pm in patch.mock_calls]
     spy1.assert_called_once()
-    # assert (
-    #     (os.path.join(DATA_PATH, "layout.json"), object_storage_url),
-    #     kwargs,
-    # ) in effective_calls_pars
+    patch.reset_mock()
 
-    assert 1 == stored_record.pop("resource_id")
-    for column, value in stored_record.items():
-        if column not in [
-            "adaptor",
-            "record_update",
-            "form",
-            "constraints",
-            "previewimage",
-            "layout",
-        ]:
-            assert resource.get(column) == value
-    assert stored_record["form"] == "an url"
-    assert stored_record["constraints"] == "an url"
-    assert stored_record["previewimage"] == "an url"
-    assert stored_record["layout"] == "an url"
-
-    era5land = (
-        session.query(database.Resource)
-        .filter_by(resource_uid="reanalysis-era5-land")
-        .one()
+    # create second dataset
+    resource_folder_path2 = os.path.join(
+        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land-monthly-means"
     )
-    assert era5land.licences
-    assert era5land.licences[0].licence_uid == "licence-to-use-copernicus-products"
+    resource2 = manager.load_resource_from_folder(resource_folder_path2)
+    with session_obj() as session:
+        manager.resource_sync(session, resource2, storage_settings)
+        session.commit()
 
-    session.close()
+    all_db_resources = session.query(database.Resource).all()
+    utils.compare_resources_with_dumped_file(
+        all_db_resources,
+        os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
+    )
+    assert session.execute(
+        "select resource_id, licence_id "
+        "from resources_licences "
+        "order by resource_id, licence_id"
+    ).all() == [(1, 3), (2, 3)]
+    assert session.execute(
+        "select parent_resource_id, child_resource_id "
+        "from related_resources "
+        "order by parent_resource_id"
+    ).all() == [(1, 2), (2, 1)]
+
+    # modify second dataset
+    resource2["keywords"] = [
+        "Product type: New type",  # changed
+        "Spatial coverage: Global",
+        "Temporal coverage: Past",
+        "Variable domain: Land (hydrology)",
+        "Variable domain: Land (physics)",
+        "Variable domain: Land (biosphere)",
+        "Provider: Copernicus C3S",
+    ]
+    resource2["licence_uids"] = [
+        "licence-to-use-copernicus-products",
+        "eumetsat-cm-saf",  # added
+    ]
+    resource2["ds_contactemail"] = "a_new_test@email"
+    with session_obj() as session:
+        manager.resource_sync(session, resource2, storage_settings)
+        session.commit()
+    all_db_resources = session.query(database.Resource).all()
+    utils.compare_resources_with_dumped_file(
+        all_db_resources,
+        os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
+    )
+    assert session.execute(
+        "select resource_id, licence_id "
+        "from resources_licences "
+        "order by resource_id, licence_id"
+    ).all() == [(1, 3), (2, 1), (2, 3)]
+    assert session.execute(
+        "select parent_resource_id, child_resource_id "
+        "from related_resources "
+        "order by parent_resource_id"
+    ).all() == [(1, 2)]
+
     # reset globals for tests following
     config.dbsettings = None
+    config.storagesettings = None

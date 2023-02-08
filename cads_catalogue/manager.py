@@ -160,13 +160,15 @@ def licence_sync(
         session.add(db_licence)
         logger.debug("added db licence %r" % licence_uid)
     else:
-        db_licence.update(loaded_licence)
+        session.query(database.Licence).filter_by(
+            licence_id=db_licence.licence_id
+        ).update(loaded_licence)
         logger.debug("updated db licence %r" % licence_uid)
 
     file_path = db_licence.download_filename
     subpath = os.path.join("licences", licence_uid)
     storage_kws = storage_settings.storage_kws
-    db_licence["download_filename"] = object_storage.store_file(
+    db_licence.download_filename = object_storage.store_file(
         file_path,
         storage_settings.object_storage_url,
         bucket_name=storage_settings.catalogue_bucket,
@@ -398,8 +400,6 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
 
     metadata["lineage"] = data.get("lineage")
     metadata["publication_date"] = data.get("publication_date")
-
-    # NOTE: licence_uids is for relationship, not a db field
     metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
 
     metadata["representative_fraction"] = data.get("representative_fraction")
@@ -571,7 +571,6 @@ def resource_sync(
             raise ValueError("licence_uid = %r not found" % licence_uid)
         db_licences[licence_uid] = licence_obj
 
-    _ = dataset.pop("related_resources_keywords", [])
     subpath = os.path.join("resources", dataset["resource_uid"])
     object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
     if "layout" in object_storage_fields:
@@ -596,27 +595,35 @@ def resource_sync(
             force=True,
             **storage_settings.storage_kws,
         )[0]
-
-    dataset_obj = session.query(database.Resource).filter_by(resource_id=resource["resource_uid"]).first()
-    if not dataset_obj:
+    dataset_query_obj = session.query(database.Resource).filter_by(
+        resource_uid=resource["resource_uid"]
+    )
+    if not dataset_query_obj.all():
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
     else:
-        dataset_obj.update(dataset)
+        dataset_query_obj.update(dataset)
+        dataset_obj = dataset_query_obj.one()
+    session.flush()  # needed to use resource_id in related resources
 
-    dataset.licences = []  # FIXME: is it enought to remove records from many to many table?
+    dataset_obj.licences = []
     for licence_uid in licence_uids:
         dataset_obj.licences.append(db_licences[licence_uid])
 
-    # TODO: remove all records from table related_resources with this resource_uid
+    # clean related_resources
     all_db_resources = session.query(database.Resource).all()
-
-    related_resources = find_related_resources(all_db_resources, only_involving_uid=resource["resource_uid"])
+    for db_resource in all_db_resources:
+        db_resource.related_resources = [
+            r
+            for r in db_resource.related_resources
+            if r.resource_id != dataset_obj.resource_id
+        ]
+    # recompute related resources
+    related_resources = find_related_resources(
+        all_db_resources, only_involving_uid=dataset_obj.resource_uid
+    )
     for res1, res2 in related_resources:
-        res1_obj = session.query(database.Resource).filter_by(resource_uid=res1["resource_uid"]).one()
-        res2_obj = session.query(database.Resource).filter_by(resource_uid=res2["resource_uid"]).one()
-        res1_obj.related_resources.append(res2_obj)
-        res2_obj.related_resources.append(res1_obj)
+        res1.related_resources.append(res2)
     return dataset_obj
 
 
@@ -716,8 +723,9 @@ def manage_upload_images_and_layout(
 
 
 def find_related_resources(
-    resources: list[dict[str, Any]], only_involving_uid=None,
-) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    resources: list[database.Resource],
+    only_involving_uid=None,
+) -> list[tuple[database.Resource, database.Resource]]:
     """Return couples of resources related each other.
 
     Each input resources is a python dictionary as returned by the function
@@ -728,7 +736,7 @@ def find_related_resources(
 
     Parameters
     ----------
-    resources: list of resources (i.e. python dictionaries of metadata)
+    resources: list of resources
     only_involving_uid: if not None, filter results only involving the specified resource_uid
 
     Returns
@@ -738,16 +746,19 @@ def find_related_resources(
     relationships_found = []
     all_possible_relationships = itertools.permutations(resources, 2)
     for (res1, res2) in all_possible_relationships:
-        if only_involving_uid and res1["resource_uid"] != only_involving_uid \
-                and res2["resource_uid"] != only_involving_uid:
+        if (
+            only_involving_uid
+            and res1.resource_uid != only_involving_uid
+            and res2.resource_uid != only_involving_uid
+        ):
             continue
-        res1_keywords = set(res1.get("keywords", []))
-        res2_keywords = set(res2.get("keywords", []))
+        res1_keywords = set(res1.keywords)
+        res2_keywords = set(res2.keywords)
         if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
             continue
-        res1_rel_res_kws = set(res1.get("related_resources_keywords", []))
-        res2_rel_res_kws = set(res2.get("related_resources_keywords", []))
+        res1_rel_res_kws = set(res1.related_resources_keywords)
+        res2_rel_res_kws = set(res2.related_resources_keywords)
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found
