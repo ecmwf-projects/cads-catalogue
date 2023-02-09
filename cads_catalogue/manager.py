@@ -51,7 +51,7 @@ def is_db_to_update(
     session: Session,
     resources_folder_path: str | pathlib.Path,
     licences_folder_path: str | pathlib.Path,
-) -> Tuple[bool, str, str]:
+) -> Tuple[bool, str | None, str | None]:
     """
     Compare current and last run's status of repo folders and return if the database is to update.
 
@@ -76,13 +76,15 @@ def is_db_to_update(
         resource_hash = utils.get_last_commit_hash(resources_folder_path)
     except Exception:  # noqa
         logger.exception(
-            "no check on commit hash for folder %r, error follows" % resources_folder_path
+            "no check on commit hash for folder %r, error follows"
+            % resources_folder_path
         )
     try:
         licence_hash = utils.get_last_commit_hash(licences_folder_path)
     except Exception:  # noqa
         logger.exception(
-            "no check on commit hash for folder %r, error follows" % licences_folder_path
+            "no check on commit hash for folder %r, error follows"
+            % licences_folder_path
         )
 
     if not last_update_record:
@@ -93,7 +95,12 @@ def is_db_to_update(
     # last_update_record exists
     last_resource_hash = getattr(last_update_record, "catalogue_repo_commit")
     last_licence_hash = getattr(last_update_record, "licence_repo_commit")
-    if last_resource_hash and last_resource_hash == resource_hash and last_licence_hash and last_licence_hash == licence_hash:
+    if (
+        last_resource_hash
+        and last_resource_hash == resource_hash
+        and last_licence_hash
+        and last_licence_hash == licence_hash
+    ):
         is_to_update = False
     else:
         is_to_update = True

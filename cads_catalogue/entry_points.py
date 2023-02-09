@@ -102,7 +102,7 @@ def setup_database(
     storage_settings = config.ensure_storage_settings(config.storagesettings)
 
     input_resource_uids = []
-    with session_obj.begin() as session:
+    with session_obj.begin() as session:  # type: ignore
         # check if source folders have changed from last registered update
         is_db_to_update, resource_hash, licence_hash = manager.is_db_to_update(
             session, resources_folder_path, licences_folder_path
@@ -117,7 +117,9 @@ def setup_database(
             licence_uid = licence["licence_uid"]
             try:
                 with session.begin_nested():
-                    manager.licence_sync(session, licence_uid, licences, storage_settings)
+                    manager.licence_sync(
+                        session, licence_uid, licences, storage_settings
+                    )
             except Exception:  # noqa
                 logger.exception(
                     "sync for licence %s failed, error follows." % licence_uid
@@ -125,7 +127,7 @@ def setup_database(
 
         # load metadata of each resource from files and sync each resource in the db
         for resource_folder_path in glob.glob(
-                os.path.join(resources_folder_path, "*/")
+            os.path.join(resources_folder_path, "*/")
         ):
             resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
             input_resource_uids.append(resource_uid)
@@ -137,12 +139,22 @@ def setup_database(
                 logger.exception(
                     "sync from %s failed, error follows." % resource_folder_path
                 )
+
+        # remote not involved resources from the db
         if delete_orphans:
             session.query(database.Resource).filter(
                 database.Resource.resource_uid.notin_(input_resource_uids)
             ).delete()
-        new_update_info = database.CatalogueUpdate(catalogue_repo_commit=resource_hash, licence_repo_commit=licence_hash)
+
+        # update hashes from the catalogue_updates table
+        new_update_info = database.CatalogueUpdate(
+            catalogue_repo_commit=resource_hash, licence_repo_commit=licence_hash
+        )
         session.add(new_update_info)
+        logger.info(
+            "update catalogue with resources hash: %r and licence hash: %r"
+            % (resource_hash, licence_hash)
+        )
 
     # TODO? remove licences from the db if both
     #   * not present in the licences_folder_path

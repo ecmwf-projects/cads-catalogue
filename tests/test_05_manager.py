@@ -41,26 +41,25 @@ def test_is_db_to_update(
     l2 = "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
     with session_obj() as session:
         # begin with empty table
-        assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (True, last_c1, last_l1)
-        )
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (True, last_c1, last_l1)
         # insert a catalogue update
         new_record = database.CatalogueUpdate(
-            catalogue_repo_commit=last_c1,
-            licence_repo_commit=last_l1
+            catalogue_repo_commit=last_c1, licence_repo_commit=last_l1
         )
         session.add(new_record)
         session.commit()
-        assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (False, last_c1, last_l1)
-        )
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (False, last_c1, last_l1)
         # simulate a new repo update
         mocker.patch.object(
             utils, "get_last_commit_hash", new=dummy_get_last_commit_hash2
         )
-        assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (True, c2, l2)
-        )
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (True, c2, l2)
         # update the db with only one right repo commit
         new_record = database.CatalogueUpdate(
             catalogue_repo_commit=c2,
@@ -68,9 +67,9 @@ def test_is_db_to_update(
         )
         session.add(new_record)
         session.commit()
-        assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (True, c2, l2)
-        )
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (True, c2, l2)
         # update the db with both two right repo commit
         new_record = database.CatalogueUpdate(
             catalogue_repo_commit=c2,
@@ -78,9 +77,9 @@ def test_is_db_to_update(
         )
         session.add(new_record)
         session.commit()
-        assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (False, c2, l2)
-        )
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (False, c2, l2)
 
 
 def test_load_licences_from_folder() -> None:
