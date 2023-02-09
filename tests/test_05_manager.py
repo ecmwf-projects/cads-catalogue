@@ -35,53 +35,51 @@ def test_is_db_to_update(
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_get_last_commit_hash1)
     resource_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json")
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
-
+    last_c1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
+    last_l1 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
+    c2 = "5f662d202e4084dd569567bab0957c8a56f79aaa"
+    l2 = "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
     with session_obj() as session:
         # begin with empty table
         assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
-            is True
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (True, last_c1, last_l1)
         )
         # insert a catalogue update
         new_record = database.CatalogueUpdate(
-            catalogue_repo_commit="5f662d202e4084dd569567bab0957c8a56f79c0f",
-            licence_repo_commit="f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+            catalogue_repo_commit=last_c1,
+            licence_repo_commit=last_l1
         )
         session.add(new_record)
         session.commit()
         assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
-            is False
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (False, last_c1, last_l1)
         )
         # simulate a new repo update
         mocker.patch.object(
             utils, "get_last_commit_hash", new=dummy_get_last_commit_hash2
         )
         assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
-            is True
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (True, c2, l2)
         )
-        # update the db with only one repo commit
+        # update the db with only one right repo commit
         new_record = database.CatalogueUpdate(
-            catalogue_repo_commit="5f662d202e4084dd569567bab0957c8a56f79aaa",
-            licence_repo_commit="f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+            catalogue_repo_commit=c2,
+            licence_repo_commit=last_l1,
         )
         session.add(new_record)
         session.commit()
         assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
-            is True
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (True, c2, l2)
         )
-        # update the db with only both two right repo commit
+        # update the db with both two right repo commit
         new_record = database.CatalogueUpdate(
-            catalogue_repo_commit="5f662d202e4084dd569567bab0957c8a56f79aaa",
-            licence_repo_commit="f0591ec408b59d32a46a5d08b9786641dffe5bbb",
+            catalogue_repo_commit=c2,
+            licence_repo_commit=l2,
         )
         session.add(new_record)
         session.commit()
         assert (
-            manager.is_db_to_update(session, resource_folder_path, licences_folder_path)
-            is False
+            manager.is_db_to_update(session, resource_folder_path, licences_folder_path) == (False, c2, l2)
         )
 
 

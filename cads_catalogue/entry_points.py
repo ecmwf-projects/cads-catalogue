@@ -96,61 +96,53 @@ def setup_database(
     if not sqlalchemy_utils.database_exists(engine.url):
         sqlalchemy_utils.create_database(engine.url)
         database.metadata.create_all(bind=engine)
-
-    # check if source folders have changed from last registered update
     session_obj = sa.orm.sessionmaker(engine)
-    if not force:
-        with session_obj.begin() as session:  # type: ignore
-            is_db_to_update = manager.is_db_to_update(
-                session, resources_folder_path, licences_folder_path
-            )
-            if not is_db_to_update:
-                logger.info("no manager run: source files didn't change.")
-                return
 
     # get storage parameters from environment
     storage_settings = config.ensure_storage_settings(config.storagesettings)
-    # TODO: update commit hashes on db
-    # load metadata of licences from files and sync each licence in the db
-    licences = manager.load_licences_from_folder(licences_folder_path)
-    for licence in licences:
-        licence_uid = licence["licence_uid"]
-        with session_obj() as session:
-            session.begin()
+
+    input_resource_uids = []
+    with session_obj.begin() as session:
+        # check if source folders have changed from last registered update
+        is_db_to_update, resource_hash, licence_hash = manager.is_db_to_update(
+            session, resources_folder_path, licences_folder_path
+        )
+        if not force and not is_db_to_update:
+            logger.info("no manager run: source files didn't change.")
+            return
+
+        # load metadata of licences from files and sync each licence in the db
+        licences = manager.load_licences_from_folder(licences_folder_path)
+        for licence in licences:
+            licence_uid = licence["licence_uid"]
             try:
-                manager.licence_sync(session, licence_uid, licences, storage_settings)
+                with session.begin_nested():
+                    manager.licence_sync(session, licence_uid, licences, storage_settings)
             except Exception:  # noqa
-                session.rollback()
                 logger.exception(
                     "sync for licence %s failed, error follows." % licence_uid
                 )
-            else:
-                session.commit()
 
-    # load metadata of each resource from files and sync each resource in the db
-    input_resource_uids = []
-    with session_obj() as session:
+        # load metadata of each resource from files and sync each resource in the db
         for resource_folder_path in glob.glob(
-            os.path.join(resources_folder_path, "*/")
+                os.path.join(resources_folder_path, "*/")
         ):
             resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
             input_resource_uids.append(resource_uid)
-            session.begin()
             try:
-                resource = manager.load_resource_from_folder(resource_folder_path)
-                manager.resource_sync(session, resource, storage_settings)
+                with session.begin_nested():
+                    resource = manager.load_resource_from_folder(resource_folder_path)
+                    manager.resource_sync(session, resource, storage_settings)
             except Exception:  # noqa
-                session.rollback()
                 logger.exception(
                     "sync from %s failed, error follows." % resource_folder_path
                 )
-            else:
-                session.commit()
         if delete_orphans:
             session.query(database.Resource).filter(
                 database.Resource.resource_uid.notin_(input_resource_uids)
             ).delete()
-            session.commit()
+        new_update_info = database.CatalogueUpdate(catalogue_repo_commit=resource_hash, licence_repo_commit=licence_hash)
+        session.add(new_update_info)
 
     # TODO? remove licences from the db if both
     #   * not present in the licences_folder_path
