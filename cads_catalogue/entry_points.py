@@ -96,6 +96,13 @@ def setup_database(
     if not sqlalchemy_utils.database_exists(engine.url):
         sqlalchemy_utils.create_database(engine.url)
         database.metadata.create_all(bind=engine)
+    else:
+        # check structure, rebuild in case of missing tables
+        conn = engine.connect()
+        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
+        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
+            database.metadata.drop_all(engine)
+            database.metadata.create_all(engine)
     session_obj = sa.orm.sessionmaker(engine)
 
     # get storage parameters from environment
