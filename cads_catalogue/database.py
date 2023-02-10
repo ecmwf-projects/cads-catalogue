@@ -25,6 +25,20 @@ metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
 
+class CatalogueUpdate(BaseModel):
+    """Catalogue manager update information ORM model."""
+
+    __tablename__ = "catalogue_updates"
+
+    catalogue_update_id = sa.Column(sa.Integer, primary_key=True)
+    update_time = sa.Column(
+        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
+    )
+    catalogue_repo_commit = sa.Column(sa.String)
+    licence_repo_commit = sa.Column(sa.String)
+    message_repo_commit = sa.Column(sa.String)
+
+
 class ResourceLicence(BaseModel):
     """many-to-many ORM model for resources-licences."""
 
@@ -68,6 +82,9 @@ class Resource(BaseModel):
     constraints_data = sa.Column(sa.JSON)
     form_data = sa.Column(sa.JSON)
     mapping = sa.Column(sa.JSON)
+    related_resources_keywords = sa.Column(
+        sa.dialects.postgresql.ARRAY(sa.VARCHAR(300))
+    )
 
     # geo extent
     geo_extent = sa.Column(sa.JSON)

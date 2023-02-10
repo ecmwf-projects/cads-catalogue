@@ -26,10 +26,9 @@ import tempfile
 import urllib.parse
 from typing import Any, List, Tuple
 
-from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 
-from cads_catalogue import database, object_storage
+from cads_catalogue import config, database, object_storage, utils
 
 logger = logging.getLogger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -48,55 +47,64 @@ OBJECT_STORAGE_UPLOAD_FILES = [
 ]
 
 
-def recursive_key_search(
-    obj: Any,
-    key: str,
-    current_result: list[Any] | None = None,
-) -> list[Any]:
-    """Crowl inside input dictionary/list searching for all keys=key for each dictionary found.
-
-    Note that it does not search inside values of the key found.
+def is_db_to_update(
+    session: Session,
+    resources_folder_path: str | pathlib.Path,
+    licences_folder_path: str | pathlib.Path,
+) -> Tuple[bool, str | None, str | None]:
+    """
+    Compare current and last run's status of repo folders and return if the database is to update.
 
     Parameters
     ----------
-    obj: input dictionary or list
-    key: key to search
-    current_result: list of results where aggregate what found on
+    session: opened SQLAlchemy session
+    resources_folder_path: the folder path where to look for metadata files of all the resources
+    licences_folder_path: the folder path where to look for metadata files of all the licences
 
     Returns
     -------
-    list of found values
+    (True or False | hash for resources, hash for licences)
     """
-    if current_result is None:
-        current_result = []
-    if isinstance(obj, dict):
-        for current_key, current_value in obj.items():
-            if current_key == key:
-                current_result.append(current_value)
-            else:
-                current_result = recursive_key_search(
-                    current_value, key, current_result
-                )
-    elif isinstance(obj, list):
-        for item in obj:
-            current_result = recursive_key_search(item, key, current_result)
-    return current_result
+    resource_hash = None
+    licence_hash = None
+    last_update_record = (
+        session.query(database.CatalogueUpdate)
+        .order_by(database.CatalogueUpdate.update_time.desc())
+        .first()
+    )
+    try:
+        resource_hash = utils.get_last_commit_hash(resources_folder_path)
+    except Exception:  # noqa
+        logger.exception(
+            "no check on commit hash for folder %r, error follows"
+            % resources_folder_path
+        )
+    try:
+        licence_hash = utils.get_last_commit_hash(licences_folder_path)
+    except Exception:  # noqa
+        logger.exception(
+            "no check on commit hash for folder %r, error follows"
+            % licences_folder_path
+        )
 
+    if not last_update_record:
+        logger.warning("table catalogue_updates is currently empty")
+        is_to_update = True
+        return is_to_update, resource_hash, licence_hash
 
-def object_as_dict(obj: Any) -> dict[str, Any]:
-    """Convert a sqlalchemy object in a python dictionary."""
-    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
-
-
-def str2bool(value: str, raise_if_unknown=True, default=False):
-    """Return boolean parsing of the string."""
-    if value.lower() in ["t", "true", "1", "yes", "y"]:
-        return True
-    if value.lower() in ["f", "false", "0", "no", "n"]:
-        return False
-    if raise_if_unknown:
-        raise ValueError("unparsable value for boolean: %r" % value)
-    return default
+    # last_update_record exists
+    last_resource_hash = getattr(last_update_record, "catalogue_repo_commit")
+    last_licence_hash = getattr(last_update_record, "licence_repo_commit")
+    if (
+        last_resource_hash
+        and last_resource_hash == resource_hash
+        and last_licence_hash
+        and last_licence_hash == licence_hash
+    ):
+        is_to_update = False
+    else:
+        is_to_update = True
+    return is_to_update, resource_hash, licence_hash
 
 
 def is_valid_resource(
@@ -132,6 +140,63 @@ def is_valid_resource(
     return True
 
 
+def licence_sync(
+    session: Session,
+    licence_uid: str,
+    licences: list[dict[str, Any]],
+    storage_settings: config.ObjectStorageSettings,
+) -> database.Licence:
+    """
+    Compare db record and file of a licence and make them the same.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    licence_uid: slag of the licence to sync with the database
+    licences: list of metadata of all loaded licences
+    storage_settings: object with settings to access the object storage
+
+    Returns
+    -------
+    The created/updated db licence
+    """
+    loaded_licences = [r for r in licences if r["licence_uid"] == licence_uid]
+    if len(loaded_licences) == 0:
+        raise ValueError("not found licence %r in loaded licences" % licence_uid)
+    elif len(loaded_licences) > 1:
+        raise ValueError(
+            "more than 1 licence for slag %r in loaded licences" % licence_uid
+        )
+    loaded_licence = loaded_licences[0]
+    db_licence = (
+        session.query(database.Licence)
+        .filter_by(licence_uid=licence_uid, revision=loaded_licence["revision"])
+        .first()
+    )
+    if not db_licence:
+        db_licence = database.Licence(**loaded_licence)
+        session.add(db_licence)
+        logger.debug("added db licence %r" % licence_uid)
+    else:
+        session.query(database.Licence).filter_by(
+            licence_id=db_licence.licence_id
+        ).update(loaded_licence)
+        logger.debug("updated db licence %r" % licence_uid)
+
+    file_path = db_licence.download_filename
+    subpath = os.path.join("licences", licence_uid)
+    storage_kws = storage_settings.storage_kws
+    db_licence.download_filename = object_storage.store_file(
+        file_path,
+        storage_settings.object_storage_url,
+        bucket_name=storage_settings.catalogue_bucket,
+        subpath=subpath,
+        force=True,
+        **storage_kws,
+    )[0]
+    return db_licence
+
+
 def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
     """Load licences metadata from json files contained in a folder.
 
@@ -149,8 +214,8 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
         if "deprecated" in os.path.basename(json_filepath).lower():
             continue
         with open(json_filepath) as fp:
-            json_data = json.load(fp)
             try:
+                json_data = json.load(fp)
                 licence = {
                     "licence_uid": json_data["id"],
                     "revision": json_data["revision"],
@@ -159,7 +224,12 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                         os.path.join(folder_path, json_data["downloadableFilename"])
                     ),
                 }
-            except KeyError:
+                for key in licence:
+                    assert licence[key], "%r is required" % key
+            except Exception:  # noqa
+                logger.exception(
+                    "licence file %r is not compliant: ignored" % json_filepath
+                )
                 continue
             licences.append(licence)
     return licences
@@ -219,7 +289,7 @@ def load_variable_id_map(form_json_path: str, mapping_json_path: str) -> dict[st
     with open(form_json_path) as fp:
         form_data = json.load(fp)
     # inside form.json we can find more keys 'labels' with id-value mappings
-    search_results = recursive_key_search(form_data, key="labels")
+    search_results = utils.recursive_key_search(form_data, key="labels")
     label_id_map: dict[str, str] = functools.reduce(
         lambda d, src: d.update(src) or d, search_results, {}
     )
@@ -338,7 +408,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         if isinstance(data["hidden"], bool):
             metadata["hidden"] = data["hidden"]
         else:
-            metadata["hidden"] = str2bool(data["hidden"])
+            metadata["hidden"] = utils.str2bool(data["hidden"])
     else:
         metadata["hidden"] = False
     metadata["keywords"] = data.get("keywords")
@@ -348,8 +418,6 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
 
     metadata["lineage"] = data.get("lineage")
     metadata["publication_date"] = data.get("publication_date")
-
-    # NOTE: licence_uids is for relationship, not a db field
     metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
 
     metadata["representative_fraction"] = data.get("representative_fraction")
@@ -489,48 +557,92 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     return metadata
 
 
-def store_licences(
+def resource_sync(
     session: Session,
-    licences: list[Any],
-    object_storage_url: str,
-    bucket_name: str = "cads-catalogue",
-    **storage_kws: Any,
-) -> list[dict[str, Any]]:
-    """Store a list of licences in a database and in the object storage.
-
-    Store a list of licences (as returned by `load_licences_from_folder`)
-    in a database and in the object storage.
-    If `doc_storage_path` is None, it will take DOCUMENT_STORAGE from the environment.
+    resource: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings,
+) -> database.Resource:
+    """
+    Compare db record and file of a resource and make them the same.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    licences: list of licences (as returned by `load_licences_from_folder`)
-    object_storage_url: endpoint URL of the object storage (for upload)
-    bucket_name: bucket name of the object storage to use
-    storage_kws: dictionary of parameters used to pass to the storage client
+    resource: metadata of a loaded resource from files
+    storage_settings: object with settings to access the object storage
 
     Returns
     -------
-    list: list of dictionaries of records inserted.
+    The created/updated db resource
     """
-    all_stored = []
-    for licence in licences:
-        file_path = licence["download_filename"]
-        subpath = os.path.join("licences", licence["licence_uid"])
-        licence["download_filename"] = object_storage.store_file(
+    dataset = resource.copy()
+    licence_uids = dataset.pop("licence_uids", [])
+    db_licences = dict()
+    for licence_uid in licence_uids:
+        licence_obj = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=licence_uid)
+            .order_by(database.Licence.revision.desc())
+            .first()
+        )
+        if not licence_obj:
+            raise ValueError("licence_uid = %r not found" % licence_uid)
+        db_licences[licence_uid] = licence_obj
+
+    subpath = os.path.join("resources", dataset["resource_uid"])
+    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
+    if "layout" in object_storage_fields:
+        dataset["layout"] = manage_upload_images_and_layout(
+            dataset,
+            storage_settings.object_storage_url,
+            storage_settings.document_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
+            **storage_settings.storage_kws,
+        )
+        object_storage_fields.remove("layout")
+        del dataset["layout_images_info"]
+    for db_field in object_storage_fields:
+        file_path = dataset.get(db_field)
+        if not file_path:
+            continue
+        dataset[db_field] = object_storage.store_file(
             file_path,
-            object_storage_url,
-            bucket_name=bucket_name,
+            storage_settings.object_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
             subpath=subpath,
             force=True,
-            **storage_kws,
+            **storage_settings.storage_kws,
         )[0]
-        licence_obj = database.Licence(**licence)
-        session.add(licence_obj)
-        stored_as_dict = object_as_dict(licence_obj)
-        all_stored.append(stored_as_dict)
-    return all_stored
+    dataset_query_obj = session.query(database.Resource).filter_by(
+        resource_uid=resource["resource_uid"]
+    )
+    if not dataset_query_obj.all():
+        dataset_obj = database.Resource(**dataset)
+        session.add(dataset_obj)
+    else:
+        dataset_query_obj.update(dataset)
+        dataset_obj = dataset_query_obj.one()
+    session.flush()  # needed to use resource_id in related resources
+
+    dataset_obj.licences = []  # type: ignore
+    for licence_uid in licence_uids:
+        dataset_obj.licences.append(db_licences[licence_uid])  # type: ignore
+
+    # clean related_resources
+    all_db_resources = session.query(database.Resource).all()
+    for db_resource in all_db_resources:
+        db_resource.related_resources = [  # type: ignore
+            r
+            for r in db_resource.related_resources  # type: ignore
+            if r.resource_id != dataset_obj.resource_id
+        ]
+    # recompute related resources
+    related_resources = find_related_resources(
+        all_db_resources, only_involving_uid=dataset_obj.resource_uid
+    )
+    for res1, res2 in related_resources:
+        res1.related_resources.append(res2)  # type: ignore
+    return dataset_obj
 
 
 def manage_upload_images_and_layout(
@@ -628,77 +740,10 @@ def manage_upload_images_and_layout(
     return layout_url
 
 
-def store_dataset(
-    session: Session,
-    dataset_md: dict[str, Any],
-    object_storage_url: str,
-    doc_storage_url: str,
-    bucket_name: str = "cads-catalogue",
-    **storage_kws: Any,
-) -> dict[str, Any]:
-    """Store a resource in a database and in the object storage.
-
-    Store a resource (as returned by `load_resource_from_folder`) in a database and some of its
-    files in the object storage and return a dictionary of the record stored.
-
-    Parameters
-    ----------
-    session: opened SQLAlchemy session
-    dataset_md: resource dictionary (as returned by `load_resource_from_folder`)
-    object_storage_url: endpoint URL of the object storage (for upload)
-    doc_storage_url: public endpoint URL of the object storage
-    bucket_name: bucket name of the object storage to use
-    storage_kws: dictionary of parameters used to pass to the storage client
-
-    Returns
-    -------
-    dict: a dictionary of the record stored.
-    """
-    dataset = dataset_md.copy()
-    licence_uids = dataset.pop("licence_uids", [])
-    _ = dataset.pop("related_resources_keywords", [])
-    subpath = os.path.join("resources", dataset["resource_uid"])
-    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
-    if "layout" in object_storage_fields:
-        dataset["layout"] = manage_upload_images_and_layout(
-            dataset,
-            object_storage_url,
-            doc_storage_url,
-            bucket_name=bucket_name,
-            **storage_kws,
-        )
-        object_storage_fields.remove("layout")
-        del dataset["layout_images_info"]
-    for db_field in object_storage_fields:
-        file_path = dataset.get(db_field)
-        if not file_path:
-            continue
-        dataset[db_field] = object_storage.store_file(
-            file_path,
-            object_storage_url,
-            bucket_name=bucket_name,
-            subpath=subpath,
-            force=True,
-            **storage_kws,
-        )[0]
-    dataset_obj = database.Resource(**dataset)
-    session.add(dataset_obj)
-    for licence_uid in licence_uids:
-        licence_obj = (
-            session.query(database.Licence)
-            .filter_by(licence_uid=licence_uid)
-            .order_by(database.Licence.revision.desc())
-            .first()
-        )
-        if licence_obj:
-            dataset_obj.licences.append(licence_obj)  # type: ignore
-    stored_as_dict = object_as_dict(dataset_obj)
-    return stored_as_dict
-
-
 def find_related_resources(
-    resources: list[dict[str, Any]]
-) -> list[tuple[dict[str, Any], dict[str, Any]]]:
+    resources: list[database.Resource],
+    only_involving_uid=None,
+) -> list[tuple[database.Resource, database.Resource]]:
     """Return couples of resources related each other.
 
     Each input resources is a python dictionary as returned by the function
@@ -709,7 +754,8 @@ def find_related_resources(
 
     Parameters
     ----------
-    resources: list of resources (i.e. python dictionaries of metadata)
+    resources: list of resources
+    only_involving_uid: if not None, filter results only involving the specified resource_uid
 
     Returns
     -------
@@ -718,13 +764,19 @@ def find_related_resources(
     relationships_found = []
     all_possible_relationships = itertools.permutations(resources, 2)
     for (res1, res2) in all_possible_relationships:
-        res1_keywords = set(res1.get("keywords", []))
-        res2_keywords = set(res2.get("keywords", []))
+        if (
+            only_involving_uid
+            and res1.resource_uid != only_involving_uid
+            and res2.resource_uid != only_involving_uid
+        ):
+            continue
+        res1_keywords = set(res1.keywords)  # type: ignore
+        res2_keywords = set(res2.keywords)  # type: ignore
         if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
             continue
-        res1_rel_res_kws = set(res1.get("related_resources_keywords", []))
-        res2_rel_res_kws = set(res2.get("related_resources_keywords", []))
+        res1_rel_res_kws = set(res1.related_resources_keywords)  # type: ignore
+        res2_rel_res_kws = set(res2.related_resources_keywords)  # type: ignore
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found

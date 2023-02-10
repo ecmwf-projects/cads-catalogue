@@ -23,13 +23,8 @@ except ImportError:  # pragma: no cover
     __version__ = "999"
 
 from .database import Licence, Resource, ResourceLicence, init_database
-from .entry_points import info, main, setup_test_database
-from .manager import (
-    load_licences_from_folder,
-    load_resource_from_folder,
-    store_dataset,
-    store_licences,
-)
+from .entry_points import info, main, setup_database
+from .manager import load_licences_from_folder, load_resource_from_folder
 
 __all__ = [
     "__version__",
@@ -39,9 +34,7 @@ __all__ = [
     "init_database",
     "load_licences_from_folder",
     "load_resource_from_folder",
-    "store_licences",
-    "store_dataset",
     "info",
-    "setup_test_database",
+    "setup_database",
     "main",
 ]
