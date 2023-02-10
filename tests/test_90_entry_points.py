@@ -35,6 +35,17 @@ def test_init_db(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
+def get_last_commit_factory(folder_suffix, folder_commit, else_commit2):
+    def dummy_get_last_commit(folder):
+        """Use for testing is_db_to_update."""
+        if folder_suffix in folder:
+            return folder_commit
+        else:
+            return else_commit2
+
+    return dummy_get_last_commit
+
+
 def test_setup_database(
     postgresql: Connection[str], mocker: pytest_mock.MockerFixture
 ) -> None:
@@ -83,10 +94,21 @@ def test_setup_database(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
-    # run the script to load test data
+    last_commit1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
+    last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
+    dummy_last_commit_function = get_last_commit_factory(
+        "cads-forms-json", last_commit1, last_commit2
+    )
+    mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
+    spy1 = mocker.spy(sqlalchemy_utils, "create_database")
+    spy2 = mocker.spy(database, "init_database")
+    spy3 = mocker.spy(manager, "load_licences_from_folder")
+    spy4 = mocker.spy(manager, "resource_sync")
+
+    # run the script to create the db, and load initial data
     result = runner.invoke(
         entry_points.app,
-        ["setup-database", "--connection-string", connection_string, "--force"],
+        ["setup-database", "--connection-string", connection_string],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -97,6 +119,18 @@ def test_setup_database(
     )
     # check no errors
     assert result.exit_code == 0
+    # check db is created
+    spy1.assert_called_once()
+    spy1.reset_mock()
+    # check db structure not dropped
+    spy2.assert_not_called()
+    spy2.reset_mock()
+    # check load of licences and resources
+    spy3.assert_called_once()
+    spy3.reset_mock()
+    assert spy4.call_count == 8
+    spy4.reset_mock()
+
     assert (
         patch.call_count == 42
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
@@ -170,8 +204,39 @@ def test_setup_database(
     )
     assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
 
+    catalog_updates = session.query(database.CatalogueUpdate).all()
+    assert len(catalog_updates) == 1
+    assert catalog_updates[0].catalogue_repo_commit == last_commit1
+    assert catalog_updates[0].licence_repo_commit == last_commit2
+    update_time1 = catalog_updates[0].update_time
     session.close()
 
+    # run a second time: do not anything, commit hash are the same
+    result = runner.invoke(
+        entry_points.app,
+        ["setup-database", "--connection-string", connection_string],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure not dropped
+    spy2.assert_not_called()
+    spy2.reset_mock()
+    # check no attempt to load licences and resources
+    spy3.assert_not_called()
+    spy3.reset_mock()
+    spy4.assert_not_called()
+    spy4.reset_mock()
+
+    # run a third time: force to run
     result = runner.invoke(
         entry_points.app,
         ["setup-database", "--connection-string", connection_string, "--force"],
@@ -184,6 +249,48 @@ def test_setup_database(
         },
     )
     assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure not dropped
+    spy2.assert_not_called()
+    spy2.reset_mock()
+    # check forced load of licences and resources
+    spy3.assert_called_once()
+    spy3.reset_mock()
+    assert spy4.call_count == 8
+    spy4.reset_mock()
+
+    # check nothing changes in the db
+    session = session_obj()
+    licences = [
+        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+    ]
+    assert len(licences) == len(expected_licences)
+    for expected_licence in expected_licences:
+        effective_found = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=expected_licence["licence_uid"])
+            .all()
+        )
+        assert effective_found
+        for field in ["revision", "title", "download_filename"]:
+            assert getattr(effective_found[0], field) == expected_licence[field]
+
+    resl = (
+        session.query(database.Resource)
+        .filter_by(resource_uid="reanalysis-era5-single-levels")
+        .one()
+    )
+    assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+
+    catalog_updates = session.query(database.CatalogueUpdate).all()
+    assert len(catalog_updates) == 1
+    assert catalog_updates[0].catalogue_repo_commit == last_commit1
+    assert catalog_updates[0].licence_repo_commit == last_commit2
+    assert catalog_updates[0].update_time > update_time1
+
+    session.close()
 
     # reset globals for tests following
     config.dbsettings = None

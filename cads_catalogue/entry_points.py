@@ -147,13 +147,14 @@ def setup_database(
             ).delete()
 
         # update hashes from the catalogue_updates table
+        session.query(database.CatalogueUpdate).delete()
         new_update_info = database.CatalogueUpdate(
             catalogue_repo_commit=resource_hash, licence_repo_commit=licence_hash
         )
         session.add(new_update_info)
         logger.info(
-            "update catalogue with resources hash: %r and licence hash: %r"
-            % (resource_hash, licence_hash)
+            "%supdate catalogue with resources hash: %r and licence hash: %r"
+            % (force and "forced " or "", resource_hash, licence_hash)
         )
 
     # TODO? remove licences from the db if both
