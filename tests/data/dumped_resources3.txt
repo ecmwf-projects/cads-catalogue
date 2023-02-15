@@ -3462,15 +3462,6 @@
         "file_format": "{grib,netcdf}",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Product type: Reanalysis",
-            "Spatial coverage: Global",
-            "Temporal coverage: Past",
-            "Variable domain: Land (hydrology)",
-            "Variable domain: Land (physics)",
-            "Variable domain: Land (biosphere)",
-            "Provider: Copernicus C3S"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -5302,15 +5293,6 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Product type: New type",
-            "Spatial coverage: Global",
-            "Temporal coverage: Past",
-            "Variable domain: Land (hydrology)",
-            "Variable domain: Land (physics)",
-            "Variable domain: Land (biosphere)",
-            "Provider: Copernicus C3S"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",

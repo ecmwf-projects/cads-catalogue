@@ -117,6 +117,7 @@ def test_setup_database(
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
+
     # check no errors
     assert result.exit_code == 0
     # check db is created
@@ -174,42 +175,41 @@ def test_setup_database(
         assert expected_call in patch.mock_calls
 
     # check db content
-    session = session_obj()
-    resources = session.query(database.Resource).order_by(
-        database.Resource.resource_uid
-    )
-
-    utils.compare_resources_with_dumped_file(
-        resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
-    )
-
-    licences = [
-        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
-    ]
-    assert len(licences) == len(expected_licences)
-    for expected_licence in expected_licences:
-        effective_found = (
-            session.query(database.Licence)
-            .filter_by(licence_uid=expected_licence["licence_uid"])
-            .all()
+    with session_obj() as session:
+        resources = session.query(database.Resource).order_by(
+            database.Resource.resource_uid
         )
-        assert effective_found
-        for field in ["revision", "title", "download_filename"]:
-            assert getattr(effective_found[0], field) == expected_licence[field]
 
-    resl = (
-        session.query(database.Resource)
-        .filter_by(resource_uid="reanalysis-era5-single-levels")
-        .one()
-    )
-    assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+        utils.compare_resources_with_dumped_file(
+            resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
+        )
 
-    catalog_updates = session.query(database.CatalogueUpdate).all()
-    assert len(catalog_updates) == 1
-    assert catalog_updates[0].catalogue_repo_commit == last_commit1
-    assert catalog_updates[0].licence_repo_commit == last_commit2
-    update_time1 = catalog_updates[0].update_time
-    session.close()
+        licences = [
+            utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+        ]
+        assert len(licences) == len(expected_licences)
+        for expected_licence in expected_licences:
+            effective_found = (
+                session.query(database.Licence)
+                .filter_by(licence_uid=expected_licence["licence_uid"])
+                .all()
+            )
+            assert effective_found
+            for field in ["revision", "title", "download_filename"]:
+                assert getattr(effective_found[0], field) == expected_licence[field]
+
+        resl = (
+            session.query(database.Resource)
+            .filter_by(resource_uid="reanalysis-era5-single-levels")
+            .one()
+        )
+        assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+
+        catalog_updates = session.query(database.CatalogueUpdate).all()
+        assert len(catalog_updates) == 1
+        assert catalog_updates[0].catalogue_repo_commit == last_commit1
+        assert catalog_updates[0].licence_repo_commit == last_commit2
+        update_time1 = catalog_updates[0].update_time
 
     # run a second time: do not anything, commit hash are the same
     result = runner.invoke(
@@ -262,35 +262,34 @@ def test_setup_database(
     spy4.reset_mock()
 
     # check nothing changes in the db
-    session = session_obj()
-    licences = [
-        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
-    ]
-    assert len(licences) == len(expected_licences)
-    for expected_licence in expected_licences:
-        effective_found = (
-            session.query(database.Licence)
-            .filter_by(licence_uid=expected_licence["licence_uid"])
-            .all()
+    with session_obj() as session:
+        licences = [
+            utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+        ]
+        assert len(licences) == len(expected_licences)
+        for expected_licence in expected_licences:
+            effective_found = (
+                session.query(database.Licence)
+                .filter_by(licence_uid=expected_licence["licence_uid"])
+                .all()
+            )
+            assert effective_found
+            for field in ["revision", "title", "download_filename"]:
+                assert getattr(effective_found[0], field) == expected_licence[field]
+
+        resl = (
+            session.query(database.Resource)
+            .filter_by(resource_uid="reanalysis-era5-single-levels")
+            .one()
         )
-        assert effective_found
-        for field in ["revision", "title", "download_filename"]:
-            assert getattr(effective_found[0], field) == expected_licence[field]
+        assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
 
-    resl = (
-        session.query(database.Resource)
-        .filter_by(resource_uid="reanalysis-era5-single-levels")
-        .one()
-    )
-    assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+        catalog_updates = session.query(database.CatalogueUpdate).all()
+        assert len(catalog_updates) == 1
+        assert catalog_updates[0].catalogue_repo_commit == last_commit1
+        assert catalog_updates[0].licence_repo_commit == last_commit2
+        assert catalog_updates[0].update_time > update_time1
 
-    catalog_updates = session.query(database.CatalogueUpdate).all()
-    assert len(catalog_updates) == 1
-    assert catalog_updates[0].catalogue_repo_commit == last_commit1
-    assert catalog_updates[0].licence_repo_commit == last_commit2
-    assert catalog_updates[0].update_time > update_time1
-
-    session.close()
 
     # reset globals for tests following
     config.dbsettings = None
@@ -369,4 +368,4 @@ def test_transaction_setup_database(
             "select resource_uid, abstract, description, type from resources"
         ).all()
         assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
-    session.close()
+    mocker.resetall()

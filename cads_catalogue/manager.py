@@ -577,6 +577,8 @@ def resource_sync(
     """
     dataset = resource.copy()
     licence_uids = dataset.pop("licence_uids", [])
+    keywords = dataset.pop("keywords", [])
+
     db_licences = dict()
     for licence_uid in licence_uids:
         licence_obj = (
@@ -622,26 +624,43 @@ def resource_sync(
     else:
         dataset_query_obj.update(dataset)
         dataset_obj = dataset_query_obj.one()
-    session.flush()  # needed to use resource_id in related resources
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
         dataset_obj.licences.append(db_licences[licence_uid])  # type: ignore
 
+    # build again related keywords
+    dataset_obj.keywords = []  # type: ignore
+    for keyword in set(keywords):
+        category_name, category_value = [r.strip() for r in keyword.split(":")]
+        kw_md = {
+            "category_name": category_name,
+            "category_value": category_value,
+            "keyword_name": keyword,
+        }
+        keyword_obj = (
+            session.query(database.Keyword)
+            .filter_by(**kw_md)
+            .first()
+        )
+        if not keyword_obj:
+            keyword_obj = database.Keyword(**kw_md)
+        dataset_obj.keywords.append(keyword_obj)  # type: ignore
+
+    session.flush()  # needed to use resource_id in related resources
+
     # clean related_resources
+    dataset_obj.related_resources = []
+    dataset_obj.back_related_resources = []
     all_db_resources = session.query(database.Resource).all()
-    for db_resource in all_db_resources:
-        db_resource.related_resources = [  # type: ignore
-            r
-            for r in db_resource.related_resources  # type: ignore
-            if r.resource_id != dataset_obj.resource_id
-        ]
+
     # recompute related resources
     related_resources = find_related_resources(
         all_db_resources, only_involving_uid=dataset_obj.resource_uid
     )
     for res1, res2 in related_resources:
         res1.related_resources.append(res2)  # type: ignore
+
     return dataset_obj
 
 
@@ -770,8 +789,8 @@ def find_related_resources(
             and res2.resource_uid != only_involving_uid
         ):
             continue
-        res1_keywords = set(res1.keywords)  # type: ignore
-        res2_keywords = set(res2.keywords)  # type: ignore
+        res1_keywords = set([r.keyword_name for r in res1.keywords])  # type: ignore
+        res2_keywords = set([r.keyword_name for r in res2.keywords])  # type: ignore
         if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
             continue

@@ -71,7 +71,7 @@ def setup_database(
     """Update the database with the catalogue data.
 
     Before to fill the database:
-      - if the database doesn't exist, it creates the structure;
+      - if the database doesn't exist (or some tables are missing), it creates the structure from scratch;
       - check input folders has changes from the last run (if not, and force=False, no update is run)
 
     Parameters
@@ -146,7 +146,6 @@ def setup_database(
                 logger.exception(
                     "sync from %s failed, error follows." % resource_folder_path
                 )
-
         # remote not involved resources from the db
         if delete_orphans:
             session.query(database.Resource).filter(

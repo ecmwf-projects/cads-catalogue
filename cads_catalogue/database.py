@@ -61,6 +61,34 @@ related_resources = sa.Table(
 )
 
 
+class ResourceKeyword(BaseModel):
+    """many-to-may ORM model for resources-keywords."""
+
+    __tablename__ = "resources_keywords"
+
+    resource_id = sa.Column(
+        sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
+    )
+    keyword_id = sa.Column(
+        sa.Integer, sa.ForeignKey("keywords.keyword_id"), primary_key=True
+    )
+
+
+class Keyword(BaseModel):
+    """Keyword ORM model."""
+
+    __tablename__ = "keywords"
+
+    keyword_id = sa.Column(sa.Integer, primary_key=True)
+    category_name = sa.Column(sa.String)
+    category_value = sa.Column(sa.String)
+    keyword_name = sa.Column(sa.String)
+
+    resources = sa.orm.relationship(
+        "Resource", secondary="resources_keywords", back_populates="keywords"
+    )
+
+
 class Resource(BaseModel):
     """Resource ORM model."""
 
@@ -111,7 +139,6 @@ class Resource(BaseModel):
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
     hidden = sa.Column(sa.BOOLEAN, default=False)
-    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)
     responsible_organisation = sa.Column(sa.String)
@@ -134,6 +161,9 @@ class Resource(BaseModel):
         primaryjoin=resource_id == related_resources.c.child_resource_id,
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
         backref=sa.orm.backref("back_related_resources"),  # type: ignore
+    )
+    keywords = sa.orm.relationship(
+        "Keyword", secondary="resources_keywords", back_populates="resources"
     )
 
 
