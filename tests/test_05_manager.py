@@ -1503,7 +1503,9 @@ def test_resource_sync(
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
         all_db_resources = session.query(database.Resource).all()
-        assert len(all_db_resources[0].keywords) == len(all_db_resources[1].keywords) == 7
+        assert (
+            len(all_db_resources[0].keywords) == len(all_db_resources[1].keywords) == 7
+        )
 
         utils.compare_resources_with_dumped_file(
             all_db_resources,
@@ -1526,8 +1528,22 @@ def test_resource_sync(
             "select resource_id, keyword_id "
             "from resources_keywords "
             "order by resource_id, keyword_id"
-        ).all() == [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7),
-                    (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]
+        ).all() == [
+            (1, 1),
+            (1, 2),
+            (1, 3),
+            (1, 4),
+            (1, 5),
+            (1, 6),
+            (1, 7),
+            (2, 1),
+            (2, 2),
+            (2, 3),
+            (2, 4),
+            (2, 5),
+            (2, 6),
+            (2, 7),
+        ]
     # modify second dataset
     resource2["keywords"] = [
         #  "Product type: Reanalysis",  # removed

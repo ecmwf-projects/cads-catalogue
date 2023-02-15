@@ -203,7 +203,9 @@ def test_setup_database(
             .filter_by(resource_uid="reanalysis-era5-single-levels")
             .one()
         )
-        assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+        assert (
+            resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+        )
 
         catalog_updates = session.query(database.CatalogueUpdate).all()
         assert len(catalog_updates) == 1
@@ -282,7 +284,9 @@ def test_setup_database(
             .filter_by(resource_uid="reanalysis-era5-single-levels")
             .one()
         )
-        assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+        assert (
+            resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+        )
 
         catalog_updates = session.query(database.CatalogueUpdate).all()
         assert len(catalog_updates) == 1
@@ -290,9 +294,10 @@ def test_setup_database(
         assert catalog_updates[0].licence_repo_commit == last_commit2
         assert catalog_updates[0].update_time > update_time1
 
-
     # reset globals for tests following
     config.dbsettings = None
+    config.storagesettings = None
+    mocker.resetall()
 
 
 def test_transaction_setup_database(
@@ -368,4 +373,7 @@ def test_transaction_setup_database(
             "select resource_uid, abstract, description, type from resources"
         ).all()
         assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
+    # reset globals for tests following
+    config.dbsettings = None
+    config.storagesettings = None
     mocker.resetall()

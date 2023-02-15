@@ -638,20 +638,14 @@ def resource_sync(
             "category_value": category_value,
             "keyword_name": keyword,
         }
-        keyword_obj = (
-            session.query(database.Keyword)
-            .filter_by(**kw_md)
-            .first()
-        )
+        keyword_obj = session.query(database.Keyword).filter_by(**kw_md).first()
         if not keyword_obj:
             keyword_obj = database.Keyword(**kw_md)
         dataset_obj.keywords.append(keyword_obj)  # type: ignore
 
-    session.flush()  # needed to use resource_id in related resources
-
     # clean related_resources
-    dataset_obj.related_resources = []
-    dataset_obj.back_related_resources = []
+    dataset_obj.related_resources = []  # type: ignore
+    dataset_obj.back_related_resources = []  # type: ignore
     all_db_resources = session.query(database.Resource).all()
 
     # recompute related resources
