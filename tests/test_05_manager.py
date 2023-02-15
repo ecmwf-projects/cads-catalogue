@@ -1502,28 +1502,29 @@ def test_resource_sync(
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
 
-    all_db_resources = session.query(database.Resource).all()
-    utils.compare_resources_with_dumped_file(
-        all_db_resources,
-        os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
-    )
-    assert session.execute(
-        "select resource_id, licence_id "
-        "from resources_licences "
-        "order by resource_id, licence_id"
-    ).all() == [
-        (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
-        (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
-    ]
-    assert session.execute(
-        "select parent_resource_id, child_resource_id "
-        "from related_resources "
-        "order by parent_resource_id"
-    ).all() == [(1, 2), (2, 1)]
+    with session_obj() as session:
+        all_db_resources = session.query(database.Resource).all()
+        utils.compare_resources_with_dumped_file(
+            all_db_resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
+        )
+        assert session.execute(
+            "select resource_id, licence_id "
+            "from resources_licences "
+            "order by resource_id, licence_id"
+        ).all() == [
+            (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+            (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+        ]
+        assert session.execute(
+            "select parent_resource_id, child_resource_id "
+            "from related_resources "
+            "order by parent_resource_id"
+        ).all() == [(1, 2), (2, 1)]
 
     # modify second dataset
     resource2["keywords"] = [
-        "Product type: New type",  # changed
+        #  "Product type: Reanalysis",   # removed
         "Spatial coverage: Global",
         "Temporal coverage: Past",
         "Variable domain: Land (hydrology)",
@@ -1539,25 +1540,27 @@ def test_resource_sync(
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
-    all_db_resources = session.query(database.Resource).all()
-    utils.compare_resources_with_dumped_file(
-        all_db_resources,
-        os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
-    )
-    assert session.execute(
-        "select resource_id, licence_id "
-        "from resources_licences "
-        "order by resource_id, licence_id"
-    ).all() == [
-        (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
-        (2, uid_id_licence_map["eumetsat-cm-saf"]),
-        (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
-    ]
-    assert session.execute(
-        "select parent_resource_id, child_resource_id "
-        "from related_resources "
-        "order by parent_resource_id"
-    ).all() == [(1, 2)]
+
+    with session_obj() as session:
+        all_db_resources = session.query(database.Resource).all()
+        utils.compare_resources_with_dumped_file(
+            all_db_resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
+        )
+        assert session.execute(
+            "select resource_id, licence_id "
+            "from resources_licences "
+            "order by resource_id, licence_id"
+        ).all() == [
+            (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+            (2, uid_id_licence_map["eumetsat-cm-saf"]),
+            (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+        ]
+        assert session.execute(
+            "select parent_resource_id, child_resource_id "
+            "from related_resources "
+            "order by parent_resource_id"
+        ).all() == [(1, 2)]
 
     # reset globals for tests following
     config.dbsettings = None

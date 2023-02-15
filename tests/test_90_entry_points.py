@@ -293,7 +293,9 @@ def test_setup_database(
     session.close()
 
     # reset globals for tests following
+    mocker.resetall()
     config.dbsettings = None
+    config.storagesettings = None
 
 
 def test_transaction_setup_database(
@@ -325,7 +327,7 @@ def test_transaction_setup_database(
         "INSERT INTO resources (resource_uid, abstract, description, type) "
         "VALUES ('dummy-dataset', 'a dummy ds', '[]', 'dataset')"
     )
-    session_obj = sessionmaker(engine)
+
     # simulate the object storage working...
     mocker.patch(
         "cads_catalogue.object_storage.store_file",
@@ -353,6 +355,7 @@ def test_transaction_setup_database(
     error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
     for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
         assert len([e for e in error_messages if dataset_name in e]) >= 1
+    session_obj = sessionmaker(engine)
     # ...anyway the licence content is updated...
     with session_obj() as session:
         licences = session.execute(
@@ -369,4 +372,9 @@ def test_transaction_setup_database(
             "select resource_uid, abstract, description, type from resources"
         ).all()
         assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
-    session.close()
+
+    # reset globals for tests following
+    config.dbsettings = None
+    config.storagesettings = None
+    mocker.resetall()
+    return

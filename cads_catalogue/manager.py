@@ -622,20 +622,15 @@ def resource_sync(
     else:
         dataset_query_obj.update(dataset)
         dataset_obj = dataset_query_obj.one()
-    session.flush()  # needed to use resource_id in related resources
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
         dataset_obj.licences.append(db_licences[licence_uid])  # type: ignore
 
     # clean related_resources
+    dataset_obj.related_resources = []  # type: ignore
+    dataset_obj.back_related_resources = []  # type: ignore
     all_db_resources = session.query(database.Resource).all()
-    for db_resource in all_db_resources:
-        db_resource.related_resources = [  # type: ignore
-            r
-            for r in db_resource.related_resources  # type: ignore
-            if r.resource_id != dataset_obj.resource_id
-        ]
     # recompute related resources
     related_resources = find_related_resources(
         all_db_resources, only_involving_uid=dataset_obj.resource_uid

@@ -5303,7 +5303,6 @@
         "format_version": null,
         "hidden": false,
         "keywords": [
-            "Product type: New type",
             "Spatial coverage: Global",
             "Temporal coverage: Past",
             "Variable domain: Land (hydrology)",
