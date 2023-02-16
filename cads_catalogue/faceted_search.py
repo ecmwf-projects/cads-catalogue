@@ -24,7 +24,7 @@ from cads_catalogue import database
 usage example:
 
 from cads_catalogue import database
-from cads_catalogue.faceted_search import get_datasets_by_keywords, get_faceted_numbers
+from cads_catalogue.faceted_search import get_datasets_by_keywords, get_faceted_stats
 
 session_obj = database.ensure_session_obj()
 session = session_obj()
@@ -33,33 +33,27 @@ session = session_obj()
 # for example a result of a text search on the title)
 datasets = session.query(database.Resource).all()
 
-# click on checkbox "Product type" -> "Reanalysis"
-keywords_dict = {"Product type": ["Reanalysis"]}
-# obtain list of datasets:
-dataset_results = get_datasets_by_keywords(datasets, keywords_dict)
-# obtain the faceted numbers of these dataset results: something like: 
-#  [('Parameter family', 'Aerosol', 2), ('Parameter family', 'Reactive gas', 3), ...]
-dataset_ids = [d.resource_id for d in dataset_results]
-faceted_numbers = get_faceted_numbers(session, resource_ids)
-
-# click also on checkbox "Product type" -> "Reactive gas"
-keywords_dict = {"Product type": ["Reanalysis", "Reactive gas"]}
-# in the same way obtain dataset results and faceted numbers:
-dataset_results = get_datasets_by_keywords(datasets, keywords_dict)
-dataset_ids = [d.resource_id for d in dataset_results]
-faceted_numbers = get_faceted_numbers(session, resource_ids)
-
-# click also on a checkbox of another category: 
+# Build keywords_dict: a dictionary where keys are the selected categories
+# and the values are the lists of the values selected for the corresponding category.
+# For example, selecting 
+#  "Product type" -> "Reanalysis"
+#  "Product type" -> "Reactive gas"
+#  "Variable domain" -> "Atmosphere (composition)"
 keywords_dict = {"Product type": ["Reanalysis", "Reactive gas"],
                  "Variable domain": ["Atmosphere (composition)"]}
-# in the same way obtain dataset results and faceted numbers:
+                 
+# Obtain list of datasets that are the results of the query:
 dataset_results = get_datasets_by_keywords(datasets, keywords_dict)
-dataset_ids = [d.resource_id for d in dataset_results]
-faceted_numbers = get_faceted_numbers(session, resource_ids)
+
+# the corresponding faceted stats are something like:
+#  [('Parameter family', 'Aerosol', 2), ('Parameter family', 'Reactive gas', 3), ...]
+# and can be obtained passing the ids of the dataset_results to the get_faceted_stats:
+results_ids = [d.resource_id for d in dataset_results]
+faceted_stats = get_faceted_stats(session, results_ids)
 """
 
 
-def get_faceted_numbers(session: Session, resource_ids: List[int]) -> List[Tuple[str, str, int]]:
+def get_faceted_stats(session: Session, resource_ids: List[int]) -> List[Tuple[str, str, int]]:
     """
     Return list of (category_name, category_value, number of datasets)
 
@@ -72,6 +66,7 @@ def get_faceted_numbers(session: Session, resource_ids: List[int]) -> List[Tuple
     -------
     Something like: [('Parameter family', 'Aerosol', 2), ('Parameter family', 'Reactive gas', 3), ...]
     """
+    # FIXME: replace using sqlalchemy, not SQL
     sql = """
     SELECT category_name, category_value, count(resource_id) 
     FROM resources_keywords 
