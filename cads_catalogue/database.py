@@ -24,6 +24,16 @@ from cads_catalogue import config
 metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
+DB_VERSION = 1  # to increment at each structure change
+
+
+class DBRelease(BaseModel):
+    """Information about current structure version."""
+
+    __tablename__ = "db_release"
+
+    db_release_version = sa.Column(sa.Integer, primary_key=True)
+
 
 class CatalogueUpdate(BaseModel):
     """Catalogue manager update information ORM model."""
@@ -198,4 +208,8 @@ def init_database(connection_string: str) -> sa.engine.Engine:
     # cleanup and create the schema
     metadata.drop_all(engine)
     metadata.create_all(engine)
+    session_obj = sa.orm.sessionmaker(engine)
+    # add structure version
+    with session_obj.begin() as session:  # type: ignore
+        session.add(DBRelease(db_release_version=DB_VERSION))
     return engine

@@ -46,8 +46,10 @@ def get_last_commit_factory(folder_suffix, folder_commit, else_commit2):
     return dummy_get_last_commit
 
 
-def test_setup_database(
-    postgresql: Connection[str], mocker: pytest_mock.MockerFixture
+def test_update_catalogue(
+    caplog: pytest.LogCaptureFixture,
+    postgresql: Connection[str],
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     connection_string = (
         f"postgresql://{postgresql.info.user}:"
@@ -108,7 +110,7 @@ def test_setup_database(
     # run the script to create the db, and load initial data
     result = runner.invoke(
         entry_points.app,
-        ["setup-database", "--connection-string", connection_string],
+        ["update-catalogue", "--connection-string", connection_string],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -122,8 +124,8 @@ def test_setup_database(
     # check db is created
     spy1.assert_called_once()
     spy1.reset_mock()
-    # check db structure not dropped
-    spy2.assert_not_called()
+    # check db structure initialized
+    spy2.assert_called_once()
     spy2.reset_mock()
     # check load of licences and resources
     spy3.assert_called_once()
@@ -214,7 +216,7 @@ def test_setup_database(
     # run a second time: do not anything, commit hash are the same
     result = runner.invoke(
         entry_points.app,
-        ["setup-database", "--connection-string", connection_string],
+        ["update-catalogue", "--connection-string", connection_string],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -227,7 +229,7 @@ def test_setup_database(
     # check db is not created
     spy1.assert_not_called()
     spy1.reset_mock()
-    # check db structure not dropped
+    # check db structure not initialized
     spy2.assert_not_called()
     spy2.reset_mock()
     # check no attempt to load licences and resources
@@ -239,7 +241,7 @@ def test_setup_database(
     # run a third time: force to run
     result = runner.invoke(
         entry_points.app,
-        ["setup-database", "--connection-string", connection_string, "--force"],
+        ["update-catalogue", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -252,7 +254,7 @@ def test_setup_database(
     # check db is not created
     spy1.assert_not_called()
     spy1.reset_mock()
-    # check db structure not dropped
+    # check db structure not initialized
     spy2.assert_not_called()
     spy2.reset_mock()
     # check forced load of licences and resources
@@ -263,6 +265,10 @@ def test_setup_database(
 
     # check nothing changes in the db
     session = session_obj()
+    assert (
+        session.query(database.DBRelease).first().db_release_version
+        == database.DB_VERSION
+    )
     licences = [
         utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
     ]
@@ -289,7 +295,35 @@ def test_setup_database(
     assert catalog_updates[0].catalogue_repo_commit == last_commit1
     assert catalog_updates[0].licence_repo_commit == last_commit2
     assert catalog_updates[0].update_time > update_time1
+    caplog.clear()
 
+    # simulate an update of the structure
+    session.query(database.DBRelease).update(
+        {"db_release_version": database.DB_VERSION - 1}
+    )
+    session.commit()
+    result = runner.invoke(
+        entry_points.app,
+        ["update-catalogue", "--connection-string", connection_string, "--force"],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure is initialized
+    spy2.assert_called_once()
+    spy2.reset_mock()
+    # check warning log
+    msg = "Catalogue DB structure is not updated. Running the init-db"
+    assert msg in [r.msg for r in caplog.records]
+    caplog.clear()
     session.close()
 
     # reset globals for tests following
@@ -298,12 +332,12 @@ def test_setup_database(
     config.storagesettings = None
 
 
-def test_transaction_setup_database(
+def test_transaction_update_catalogue(
     caplog: pytest.LogCaptureFixture,
     postgresql: Connection[str],
     mocker: pytest_mock.MockerFixture,
 ) -> None:
-    """Here we want to test that transactions are managed outside the setup test database."""
+    """Here we want to test that transactions are managed outside the update catalogue script."""
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
@@ -340,7 +374,7 @@ def test_transaction_setup_database(
     # ....so the entry point execution should fail...
     result = runner.invoke(
         entry_points.app,
-        ["setup-database", "--connection-string", connection_string, "--force"],
+        ["update-catalogue", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
