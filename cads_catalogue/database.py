@@ -90,17 +90,17 @@ class Message(BaseModel):
     __tablename__ = "messages"
 
     message_id = sa.Column(sa.Integer, primary_key=True)
-    message_date = sa.Column(sa.DateTime, nullable=False)
-    message_summary = sa.Column(sa.Text)
-    message_severity = sa.Column(
+    date = sa.Column(sa.DateTime, nullable=False)
+    summary = sa.Column(sa.Text)
+    url = sa.Column(sa.Text)
+    severity = sa.Column(
         sa.Enum("info", "warning", "critical", "success", name="severity"),
         nullable=False,
         default="info",
     )
-    is_active = sa.Column(sa.BOOLEAN)
-    is_global = sa.Column(sa.BOOLEAN)
-    message_body = sa.Column(sa.Text)
-    message_status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
+    entries = sa.Column(sa.Text)
+    live = sa.Column(sa.BOOLEAN)
+    status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
 
     resources = sa.orm.relationship(
         "Resource", secondary="resources_messages", back_populates="messages"
