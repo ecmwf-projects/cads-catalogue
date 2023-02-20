@@ -207,7 +207,7 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
     -------
     list: list of dictionaries of metadata collected
     """
-    licences = []
+    licences: List[dict[str, Any]] = []
     json_filepaths = glob.glob(os.path.join(folder_path, "*.json"))
     for json_filepath in json_filepaths:
         if "deprecated" in os.path.basename(json_filepath).lower():
@@ -217,7 +217,7 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                 json_data = json.load(fp)
                 licence = {
                     "licence_uid": json_data["id"],
-                    "revision": json_data["revision"],
+                    "revision": int(json_data["revision"]),
                     "title": json_data["title"],
                     "download_filename": os.path.abspath(
                         os.path.join(folder_path, json_data["downloadableFilename"])
@@ -230,7 +230,20 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                     "licence file %r is not compliant: ignored" % json_filepath
                 )
                 continue
-            licences.append(licence)
+            already_loaded = [
+                (i, r)
+                for i, r in enumerate(licences)
+                if r["licence_uid"] == licence["licence_uid"]
+            ]
+            if already_loaded:
+                logger.warning(
+                    "found multiple licence slags %s in folder %s. Consider to remove the older revisions"
+                    % (licence["licence_uid"], folder_path)
+                )
+                if already_loaded[0][1]["revision"] < licence["revision"]:
+                    licences[already_loaded[0][0]] = licence
+            else:
+                licences.append(licence)
     return licences
 
 
