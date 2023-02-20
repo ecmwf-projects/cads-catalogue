@@ -61,7 +61,7 @@ def init_db(connection_string: str | None = None) -> None:
 
 
 @app.command()
-def setup_database(
+def update_catalogue(
     connection_string: str | None = None,
     force: bool = False,
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
@@ -88,22 +88,33 @@ def setup_database(
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
 
-    # create db if not existing
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
-    if not sqlalchemy_utils.database_exists(engine.url):
-        sqlalchemy_utils.create_database(engine.url)
-        database.metadata.create_all(bind=engine)
-    else:
-        # check structure, rebuild in case of missing tables
-        conn = engine.connect()
-        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
-            database.metadata.drop_all(engine)
-            database.metadata.create_all(engine)
     session_obj = sa.orm.sessionmaker(engine)
+
+    # create db/check structure
+    must_reset_structure = False
+    if not sqlalchemy_utils.database_exists(engine.url):
+        logging.info("creating catalogue database")
+        sqlalchemy_utils.create_database(engine.url)
+        must_reset_structure = True
+    else:
+        with session_obj.begin() as session:  # type: ignore
+            try:
+                assert (
+                    session.query(database.DBRelease).first().db_release_version
+                    == database.DB_VERSION
+                )
+            except Exception:
+                # TODO: exit with error log. User should call manually the init/update db script
+                logger.warning(
+                    "Catalogue DB structure is not updated. Running the init-db"
+                )
+                must_reset_structure = True
+    if must_reset_structure:
+        init_db(connection_string)
 
     # get storage parameters from environment
     storage_settings = config.ensure_storage_settings(config.storagesettings)
