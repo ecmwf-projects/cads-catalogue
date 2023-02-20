@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import functools
 import glob
 import itertools
 import json
@@ -265,40 +264,6 @@ def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[st
     return metadata
 
 
-def load_variable_id_map(form_json_path: str, mapping_json_path: str) -> dict[str, str]:
-    """
-    Return a dictionary {variable_label: variable_id} parsing form.json and mapping.json.
-
-    Parameters
-    ----------
-    form_json_path: path to the form.json file
-    mapping_json_path: path to the mapping.json file
-
-    Returns
-    -------
-    a dictionary {variable_label: variable_id}
-    """
-    ret_value: dict[str, str] = dict()
-    if not os.path.isfile(form_json_path) or not os.path.isfile(mapping_json_path):
-        return ret_value
-    # mapping.json is used to find the list of variable ids
-    with open(mapping_json_path) as fp:
-        mapping = json.load(fp)
-        variable_ids = list(mapping["remap"]["variable"].keys())
-
-    with open(form_json_path) as fp:
-        form_data = json.load(fp)
-    # inside form.json we can find more keys 'labels' with id-value mappings
-    search_results = utils.recursive_key_search(form_data, key="labels")
-    label_id_map: dict[str, str] = functools.reduce(
-        lambda d, src: d.update(src) or d, search_results, {}
-    )
-    ret_value = {
-        value: key for key, value in label_id_map.items() if key in variable_ids
-    }
-    return ret_value
-
-
 def load_resource_documentation(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load a resource's documentation metadata.
 
@@ -455,14 +420,9 @@ def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
         return metadata
     with open(variables_file_path) as fp:
         variables_data = json.load(fp)
-
-    form_json_path = os.path.join(folder_path, "form.json")
-    mapping_json_path = os.path.join(folder_path, "mapping.json")
-    variable_id_map = load_variable_id_map(form_json_path, mapping_json_path)
     variables: list[dict[str, str]] = []
     for variable_name, properties in variables_data.items():
         variable_item = {
-            "id": variable_id_map[variable_name],
             "label": variable_name,
             "description": properties.get("description"),
             "units": properties.get("units"),
