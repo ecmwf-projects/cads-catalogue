@@ -29,8 +29,8 @@ def compare_resources_with_dumped_file(
     """Use for testing records with dumped versions on files."""
     dict_resources = [object_as_dict(r) for r in records]
     #  uncomment following 2 lines to generate the expected file
-    #  with open(file_path, "w") as fp:
-    #      json.dump(dict_resources, fp, default=str, indent=4)
+    # with open(file_path, "w") as fp:
+    #     json.dump(dict_resources, fp, default=str, indent=4)
     with open(file_path) as fp:
         expected_resources = json.load(fp)
     for i, resource in enumerate(dict_resources):
