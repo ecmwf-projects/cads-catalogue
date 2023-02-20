@@ -131,70 +131,6 @@ def test_load_resource_for_object_storage() -> None:
     }
 
 
-def test_load_variable_id_map() -> None:
-    form_json_path = os.path.join(
-        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land", "form.json"
-    )
-    mapping_json_path = os.path.join(
-        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land", "mapping.json"
-    )
-    res = manager.load_variable_id_map(form_json_path, mapping_json_path)
-    assert res == {
-        "10m u-component of wind": "10m_u_component_of_wind",
-        "10m v-component of wind": "10m_v_component_of_wind",
-        "2m dewpoint temperature": "2m_dewpoint_temperature",
-        "2m temperature": "2m_temperature",
-        "Evaporation from bare soil": "evaporation_from_bare_soil",
-        "Evaporation from open water surfaces excluding oceans": "evaporation_from_"
-        "open_water_surfaces_"
-        "excluding_oceans",
-        "Evaporation from the top of canopy": "evaporation_from_the_top_of_canopy",
-        "Evaporation from vegetation transpiration": "evaporation_from_vegetation_transpiration",
-        "Forecast albedo": "forecast_albedo",
-        "Lake bottom temperature": "lake_bottom_temperature",
-        "Lake ice depth": "lake_ice_depth",
-        "Lake ice temperature": "lake_ice_temperature",
-        "Lake mix-layer depth": "lake_mix_layer_depth",
-        "Lake mix-layer temperature": "lake_mix_layer_temperature",
-        "Lake shape factor": "lake_shape_factor",
-        "Lake total layer temperature": "lake_total_layer_temperature",
-        "Leaf area index, high vegetation": "leaf_area_index_high_vegetation",
-        "Leaf area index, low vegetation": "leaf_area_index_low_vegetation",
-        "Potential evaporation": "potential_evaporation",
-        "Runoff": "runoff",
-        "Skin reservoir content": "skin_reservoir_content",
-        "Skin temperature": "skin_temperature",
-        "Snow albedo": "snow_albedo",
-        "Snow cover": "snow_cover",
-        "Snow density": "snow_density",
-        "Snow depth": "snow_depth",
-        "Snow depth water equivalent": "snow_depth_water_equivalent",
-        "Snow evaporation": "snow_evaporation",
-        "Snowfall": "snowfall",
-        "Snowmelt": "snowmelt",
-        "Soil temperature level 1": "soil_temperature_level_1",
-        "Soil temperature level 2": "soil_temperature_level_2",
-        "Soil temperature level 3": "soil_temperature_level_3",
-        "Soil temperature level 4": "soil_temperature_level_4",
-        "Sub-surface runoff": "sub_surface_runoff",
-        "Surface latent heat flux": "surface_latent_heat_flux",
-        "Surface net solar radiation": "surface_net_solar_radiation",
-        "Surface net thermal radiation": "surface_net_thermal_radiation",
-        "Surface pressure": "surface_pressure",
-        "Surface runoff": "surface_runoff",
-        "Surface sensible heat flux": "surface_sensible_heat_flux",
-        "Surface solar radiation downwards": "surface_solar_radiation_downwards",
-        "Surface thermal radiation downwards": "surface_thermal_radiation_downwards",
-        "Temperature of snow layer": "temperature_of_snow_layer",
-        "Total evaporation": "total_evaporation",
-        "Total precipitation": "total_precipitation",
-        "Volumetric soil water layer 1": "volumetric_soil_water_layer_1",
-        "Volumetric soil water layer 2": "volumetric_soil_water_layer_2",
-        "Volumetric soil water layer 3": "volumetric_soil_water_layer_3",
-        "Volumetric soil water layer 4": "volumetric_soil_water_layer_4",
-    }
-
-
 def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
@@ -365,7 +301,6 @@ def test_load_resource_from_folder() -> None:
                 "combined with the V component of 10m wind to "
                 "give the speed and direction of the horizontal "
                 "10m wind.",
-                "id": "10m_u_component_of_wind",
                 "label": "10m u-component of wind",
                 "units": "m s^-1",
             },
@@ -384,7 +319,6 @@ def test_load_resource_from_folder() -> None:
                 "combined with the U component of 10m wind to "
                 "give the speed and direction of the horizontal "
                 "10m wind.",
-                "id": "10m_v_component_of_wind",
                 "label": "10m v-component of wind",
                 "units": "m s^-1",
             },
@@ -401,7 +335,6 @@ def test_load_resource_from_folder() -> None:
                 "atmospheric conditions. Temperature measured "
                 "in kelvin can be converted to degrees Celsius "
                 "(°C) by subtracting 273.15.",
-                "id": "2m_dewpoint_temperature",
                 "label": "2m dewpoint temperature",
                 "units": "K",
             },
@@ -414,7 +347,6 @@ def test_load_resource_from_folder() -> None:
                 "Temperature measured in kelvin can be "
                 "converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "2m_temperature",
                 "label": "2m temperature",
                 "units": "K",
             },
@@ -423,7 +355,6 @@ def test_load_resource_from_folder() -> None:
                 "the top of the land surface. This variable is "
                 "accumulated from the beginning of the forecast "
                 "time to the end of the forecast step.",
-                "id": "evaporation_from_bare_soil",
                 "label": "Evaporation from bare soil",
                 "units": "m of water equivalent",
             },
@@ -433,7 +364,6 @@ def test_load_resource_from_folder() -> None:
                 "excluding oceans. This variable is accumulated "
                 "from the beginning of the forecast time to the "
                 "end of the forecast step.",
-                "id": "evaporation_from_open_water_surfaces_excluding_oceans",
                 "label": "Evaporation from open water surfaces excluding " "oceans",
                 "units": "m of water equivalent",
             },
@@ -443,7 +373,6 @@ def test_load_resource_from_folder() -> None:
                 "canopy. This variable is accumulated from the "
                 "beginning of the forecast time to the end of "
                 "the forecast step.",
-                "id": "evaporation_from_the_top_of_canopy",
                 "label": "Evaporation from the top of canopy",
                 "units": "m of water equivalent",
             },
@@ -455,7 +384,6 @@ def test_load_resource_from_folder() -> None:
                 "variable is accumulated from the beginning of "
                 "the forecast time to the end of the forecast "
                 "step.",
-                "id": "evaporation_from_vegetation_transpiration",
                 "label": "Evaporation from vegetation transpiration",
                 "units": "m of water equivalent",
             },
@@ -483,7 +411,6 @@ def test_load_resource_from_folder() -> None:
                 "years) is used, modified by the model over "
                 "water, ice and snow. Albedo is often shown as "
                 "a percentage (%).",
-                "id": "forecast_albedo",
                 "label": "Forecast albedo",
                 "units": "dimensionless",
             },
@@ -496,7 +423,6 @@ def test_load_resource_from_folder() -> None:
                 "water bodies in the Integrated Forecasting "
                 "System. The model keeps lake depth and surface "
                 "area (or fractional cover) constant in time.",
-                "id": "lake_bottom_temperature",
                 "label": "Lake bottom temperature",
                 "units": "K",
             },
@@ -509,7 +435,6 @@ def test_load_resource_from_folder() -> None:
                 "reservoirs and rivers) and coastal water. A "
                 "single ice layer is represented. This "
                 "parameter is the thickness of that ice layer.",
-                "id": "lake_ice_depth",
                 "label": "Lake ice depth",
                 "units": "m",
             },
@@ -523,7 +448,6 @@ def test_load_resource_from_folder() -> None:
                 "temperature measured in kelvin can be "
                 "converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "lake_ice_temperature",
                 "label": "Lake ice temperature",
                 "units": "K",
             },
@@ -544,7 +468,6 @@ def test_load_resource_from_folder() -> None:
                 "water is greater than that of the water below. "
                 "Mixing can also occur through the action of "
                 "wind on the surface of the lake.",
-                "id": "lake_mix_layer_depth",
                 "label": "Lake mix-layer depth",
                 "units": "m",
             },
@@ -565,7 +488,6 @@ def test_load_resource_from_folder() -> None:
                 "wind on the surface of the lake. Temperature "
                 "measured in kelvin can be converted to degrees "
                 "Celsius (°C) by subtracting 273.15.",
-                "id": "lake_mix_layer_temperature",
                 "label": "Lake mix-layer temperature",
                 "units": "K",
             },
@@ -581,7 +503,6 @@ def test_load_resource_from_folder() -> None:
                 "bodies with two layers in the vertical, the "
                 "mixed layer above and the thermocline below "
                 "where temperature changes with depth.",
-                "id": "lake_shape_factor",
                 "label": "Lake shape factor",
                 "units": "dimensionless",
             },
@@ -597,7 +518,6 @@ def test_load_resource_from_folder() -> None:
                 "the two layers. Temperature measured in kelvin "
                 "can be converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "lake_total_layer_temperature",
                 "label": "Lake total layer temperature",
                 "units": "K",
             },
@@ -605,7 +525,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "One-half of the total green leaf area per unit "
                 "horizontal ground surface area for high "
                 "vegetation type.",
-                "id": "leaf_area_index_high_vegetation",
                 "label": "Leaf area index, high vegetation",
                 "units": "m^2 m^-2",
             },
@@ -613,7 +532,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "One-half of the total green leaf area per unit "
                 "horizontal ground surface area for low "
                 "vegetation type.",
-                "id": "leaf_area_index_low_vegetation",
                 "label": "Leaf area index, low vegetation",
                 "units": "m^2 m^-2",
             },
@@ -640,7 +558,6 @@ def test_load_resource_from_folder() -> None:
                 "way pev is computed in ERA5. This variable is "
                 "accumulated from the beginning of the forecast "
                 "time to the end of the forecast step.",
-                "id": "potential_evaporation",
                 "label": "Potential evaporation",
                 "units": "m",
             },
@@ -670,7 +587,6 @@ def test_load_resource_from_folder() -> None:
                 "information about how runoff is calculated is "
                 "given in the IFS Physical Processes "
                 "documentation.",
-                "id": "runoff",
                 "label": "Runoff",
                 "units": "m",
             },
@@ -683,7 +599,6 @@ def test_load_resource_from_folder() -> None:
                 "can hold depends on the type of vegetation, "
                 "and may be zero.  Water leaves the 'skin "
                 "reservoir' by evaporation.",
-                "id": "skin_reservoir_content",
                 "label": "Skin reservoir content",
                 "units": "m of water equivalent",
             },
@@ -699,7 +614,6 @@ def test_load_resource_from_folder() -> None:
                 "over land and sea. Temperature measured in "
                 "kelvin can be converted to degrees Celsius "
                 "(°C) by subtracting 273.15.",
-                "id": "skin_temperature",
                 "label": "Skin temperature",
                 "units": "K",
             },
@@ -712,7 +626,6 @@ def test_load_resource_from_folder() -> None:
                 "Values vary between 0 and 1. Typically, snow "
                 "and ice have high reflectivity with albedo "
                 "values of 0.8 and above.",
-                "id": "snow_albedo",
                 "label": "Snow albedo",
                 "units": "dimensionless",
             },
@@ -720,7 +633,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "It represents the fraction (0-1) of the cell / "
                 "grid-box occupied by snow (similar to the "
                 "cloud cover fields of ERA5).",
-                "id": "snow_cover",
                 "label": "Snow cover",
                 "units": "%",
             },
@@ -731,7 +643,6 @@ def test_load_resource_from_folder() -> None:
                 "additional layer over the uppermost soil "
                 "level. The snow may cover all or part of the "
                 "grid box.",
-                "id": "snow_density",
                 "label": "Snow density",
                 "units": "kg m^-3",
             },
@@ -739,7 +650,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "Instantaneous grib-box average of the snow "
                 "thickness on the ground (excluding snow on "
                 "canopy).",
-                "id": "snow_depth",
                 "label": "Snow depth",
                 "units": "m",
             },
@@ -753,7 +663,6 @@ def test_load_resource_from_folder() -> None:
                 "additional layer over the uppermost soil "
                 "level. The snow may cover all or part of the "
                 "grid box.",
-                "id": "snow_depth_water_equivalent",
                 "label": "Snow depth water equivalent",
                 "units": "m of water equivalent",
             },
@@ -763,7 +672,6 @@ def test_load_resource_from_folder() -> None:
                 "fraction). This variable is accumulated from "
                 "the beginning of the forecast time to the end "
                 "of the forecast step.",
-                "id": "snow_evaporation",
                 "label": "Snow evaporation",
                 "units": "m of water equivalent",
             },
@@ -788,7 +696,6 @@ def test_load_resource_from_folder() -> None:
                 "local to a particular point in space and time, "
                 "rather than representing averages over a model "
                 "grid box and model time step.",
-                "id": "snowfall",
                 "label": "Snowfall",
                 "units": "m of water equivalent",
             },
@@ -798,7 +705,6 @@ def test_load_resource_from_folder() -> None:
                 "This variable is accumulated from the "
                 "beginning of the forecast time to the end of "
                 "the forecast step.",
-                "id": "snowmelt",
                 "label": "Snowmelt",
                 "units": "m of water equivalent",
             },
@@ -813,21 +719,18 @@ def test_load_resource_from_folder() -> None:
                 "layer. Temperature measured in kelvin can be "
                 "converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "soil_temperature_level_1",
                 "label": "Soil temperature level 1",
                 "units": "K",
             },
             {
                 "description": "Temperature of the soil in layer 2 (7 -28cm) "
                 "of the ECMWF Integrated Forecasting System.",
-                "id": "soil_temperature_level_2",
                 "label": "Soil temperature level 2",
                 "units": "K",
             },
             {
                 "description": "Temperature of the soil in layer 3 (28-100cm) "
                 "of the ECMWF Integrated Forecasting System.",
-                "id": "soil_temperature_level_3",
                 "label": "Soil temperature level 3",
                 "units": "K",
             },
@@ -835,7 +738,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "Temperature of the soil in layer 4 (100-289 "
                 "cm) of the ECMWF Integrated Forecasting "
                 "System.",
-                "id": "soil_temperature_level_4",
                 "label": "Soil temperature level 4",
                 "units": "K",
             },
@@ -864,7 +766,6 @@ def test_load_resource_from_folder() -> None:
                 "information about how runoff is calculated is "
                 "given in the IFS Physical Processes "
                 "documentation.",
-                "id": "sub_surface_runoff",
                 "label": "Sub-surface runoff",
                 "units": "m",
             },
@@ -874,7 +775,6 @@ def test_load_resource_from_folder() -> None:
                 "accumulated from the beginning of the forecast "
                 "time to the end of the forecast step. By model "
                 "convention, downward fluxes are positive.",
-                "id": "surface_latent_heat_flux",
                 "label": "Surface latent heat flux",
                 "units": "J m^-2",
             },
@@ -900,7 +800,6 @@ def test_load_resource_from_folder() -> None:
                 "period expressed in seconds. The ECMWF "
                 "convention for vertical fluxes is positive "
                 "downwards.",
-                "id": "surface_net_solar_radiation",
                 "label": "Surface net solar radiation",
                 "units": "J m^-2",
             },
@@ -910,7 +809,6 @@ def test_load_resource_from_folder() -> None:
                 "forecast time to the end of the forecast step. "
                 "By model convention downward fluxes are "
                 "positive.",
-                "id": "surface_net_thermal_radiation",
                 "label": "Surface net thermal radiation",
                 "units": "J m^-2",
             },
@@ -932,7 +830,6 @@ def test_load_resource_from_folder() -> None:
                 "measured in hPa and sometimes is presented in "
                 "the old units of millibars, mb (1 hPa = 1 mb = "
                 "100 Pa).",
-                "id": "surface_pressure",
                 "label": "Surface pressure",
                 "units": "Pa",
             },
@@ -961,7 +858,6 @@ def test_load_resource_from_folder() -> None:
                 "drought or flood. More information about how "
                 "runoff is calculated is given in the IFS "
                 "Physical Processes documentation.",
-                "id": "surface_runoff",
                 "label": "Surface runoff",
                 "units": "m",
             },
@@ -986,7 +882,6 @@ def test_load_resource_from_folder() -> None:
                 "should be divided by the accumulation period "
                 "expressed in seconds. The ECMWF convention for "
                 "vertical fluxes is positive downwards.",
-                "id": "surface_sensible_heat_flux",
                 "label": "Surface sensible heat flux",
                 "units": "J m^-2",
             },
@@ -1018,7 +913,6 @@ def test_load_resource_from_folder() -> None:
                 "divided by the accumulation period expressed "
                 "in seconds. The ECMWF convention for vertical "
                 "fluxes is positive downwards.",
-                "id": "surface_solar_radiation_downwards",
                 "label": "Surface solar radiation downwards",
                 "units": "J m-2",
             },
@@ -1040,7 +934,6 @@ def test_load_resource_from_folder() -> None:
                 "divided by the accumulation period expressed "
                 "in seconds. The ECMWF convention for vertical "
                 "fluxes is positive downwards.",
-                "id": "surface_thermal_radiation_downwards",
                 "label": "Surface thermal radiation downwards",
                 "units": "J m-2",
             },
@@ -1054,7 +947,6 @@ def test_load_resource_from_folder() -> None:
                 "grid box. Temperature measured in kelvin can "
                 "be converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "temperature_of_snow_layer",
                 "label": "Temperature of snow layer",
                 "units": "K",
             },
@@ -1070,7 +962,6 @@ def test_load_resource_from_folder() -> None:
                 "fluxes are positive. Therefore, negative "
                 "values indicate evaporation and positive "
                 "values indicate condensation.",
-                "id": "total_evaporation",
                 "label": "Total evaporation",
                 "units": "m of water equivalent",
             },
@@ -1099,7 +990,6 @@ def test_load_resource_from_folder() -> None:
                 "local to a particular point in space and time, "
                 "rather than representing averages over a model "
                 "grid box and  model time step.",
-                "id": "total_precipitation",
                 "label": "Total precipitation",
                 "units": "m",
             },
@@ -1110,28 +1000,24 @@ def test_load_resource_from_folder() -> None:
                 "is associated with the soil texture (or "
                 "classification), soil depth, and the "
                 "underlying groundwater level.",
-                "id": "volumetric_soil_water_layer_1",
                 "label": "Volumetric soil water layer 1",
                 "units": "m^3 m^-3",
             },
             {
                 "description": "Volume of water in soil layer 2 (7 -28 cm) of "
                 "the ECMWF Integrated Forecasting System.",
-                "id": "volumetric_soil_water_layer_2",
                 "label": "Volumetric soil water layer 2",
                 "units": "m^3 m^-3",
             },
             {
                 "description": "Volume of water in soil layer 3 (28-100 cm) of "
                 "the ECMWF Integrated Forecasting System.",
-                "id": "volumetric_soil_water_layer_3",
                 "label": "Volumetric soil water layer 3",
                 "units": "m^3 m^-3",
             },
             {
                 "description": "Volume of water in soil layer 4 (100-289 cm) "
                 "of the ECMWF Integrated Forecasting System.",
-                "id": "volumetric_soil_water_layer_4",
                 "label": "Volumetric soil water layer 4",
                 "units": "m^3 m^-3",
             },
