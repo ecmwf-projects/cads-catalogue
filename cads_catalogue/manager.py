@@ -535,10 +535,10 @@ def md2message_record(msg_path, is_global) -> dict[str, Any]:
         "date": datetime.datetime.strptime(header_obj["date"][0], "%Y-%m-%dT%H:%M:%SZ"),
         "summary": " ".join(header_obj.get("summary", [""])).strip(),
         "severity": header_obj.get("severity", ["info"])[0],
-        "is_active": str2bool(header_obj.get("live", ["false"])[0]),
+        "live": str2bool(header_obj.get("live", ["false"])[0]),
         "is_global": is_global,
         "message_body": message_body,
-        "message_status": header_obj.get("status", ["ongoing"])[0],
+        "status": header_obj.get("status", ["ongoing"])[0],
         # this is not a db field
         "entries": [e.strip() for e in header_obj.get("entries", [""])[0].split(",")],
     }
@@ -549,10 +549,8 @@ def md2message_record(msg_path, is_global) -> dict[str, Any]:
         raise ValueError(
             "%r is not a valid value for severity" % msg_record["severity"]
         )
-    if msg_record["message_status"] not in ("ongoing", "closed", "fixed"):
-        raise ValueError(
-            "%r is not a valid value for status" % msg_record["message_status"]
-        )
+    if msg_record["status"] not in ("ongoing", "closed", "fixed"):
+        raise ValueError("%r is not a valid value for status" % msg_record["status"])
     if not msg_record["is_global"] and not msg_record["entries"]:
         raise ValueError("expected a values for entries, found empty")
     return msg_record

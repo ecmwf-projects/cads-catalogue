@@ -98,7 +98,10 @@ class Message(BaseModel):
         nullable=False,
         default="info",
     )
+
+    message_body = sa.Column(sa.Text)
     entries = sa.Column(sa.Text)
+    is_global = sa.Column(sa.BOOLEAN)
     live = sa.Column(sa.BOOLEAN)
     status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
 
