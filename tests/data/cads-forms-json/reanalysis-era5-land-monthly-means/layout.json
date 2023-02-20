@@ -388,7 +388,8 @@
             {
               "id": "all_docs-0",
               "type": "link",
-              "url": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
+              "new-window": true,
+              "href": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
               "title": "ERA5-Land online documentation",
               "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above."
             }
@@ -407,7 +408,8 @@
             {
               "id": "portal",
               "type": "link",
-              "url": "https://support.ecmwf.int",
+              "new-window": true,
+              "href": "https://support.ecmwf.int",
               "title": "ECMWF Support Portal"
             }
           ]

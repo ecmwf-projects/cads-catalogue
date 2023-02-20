@@ -1,9 +1,8 @@
-import datetime
-import json
 import os.path
 import unittest.mock
 from typing import Any
 
+import pytest
 import pytest_mock
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -11,7 +10,7 @@ from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
 from typer.testing import CliRunner
 
-from cads_catalogue import config, database, entry_points, manager
+from cads_catalogue import config, database, entry_points, manager, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -36,8 +35,21 @@ def test_init_db(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
-def test_setup_test_database(
-    postgresql: Connection[str], mocker: pytest_mock.MockerFixture
+def get_last_commit_factory(folder_suffix, folder_commit, else_commit2):
+    def dummy_get_last_commit(folder):
+        """Use for testing is_db_to_update."""
+        if folder_suffix in folder:
+            return folder_commit
+        else:
+            return else_commit2
+
+    return dummy_get_last_commit
+
+
+def test_update_catalogue(
+    caplog: pytest.LogCaptureFixture,
+    postgresql: Connection[str],
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     connection_string = (
         f"postgresql://{postgresql.info.user}:"
@@ -50,6 +62,8 @@ def test_setup_test_database(
         TESTDATA_PATH, "cds-licences/licence-to-use-copernicus-products.pdf"
     )
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://mypublic-storage/"
+    bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -78,35 +92,60 @@ def test_setup_test_database(
             "download_filename": "an url",
         },
     ]
-
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
-    # run the script to load test data
+    last_commit1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
+    last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
+    dummy_last_commit_function = get_last_commit_factory(
+        "cads-forms-json", last_commit1, last_commit2
+    )
+    mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
+    spy1 = mocker.spy(sqlalchemy_utils, "create_database")
+    spy2 = mocker.spy(database, "init_database")
+    spy3 = mocker.spy(manager, "load_licences_from_folder")
+    spy4 = mocker.spy(manager, "resource_sync")
+
+    # run the script to create the db, and load initial data
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        ["update-catalogue", "--connection-string", connection_string],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
         },
     )
+    # check no errors
+    assert result.exit_code == 0
+    # check db is created
+    spy1.assert_called_once()
+    spy1.reset_mock()
+    # check db structure initialized
+    spy2.assert_called_once()
+    spy2.reset_mock()
+    # check load of licences and resources
+    spy3.assert_called_once()
+    spy3.reset_mock()
+    assert spy4.call_count == 8
+    spy4.reset_mock()
+
     assert (
         patch.call_count == 42
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
     assert {
+        "bucket_name": bucket_name,
         "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "access_key": "storage_user",
         "secret_key": "storage_password",
         "secure": False,
     } in [mp.kwargs for mp in patch.mock_calls]
-    # check no errors
-    assert result.exit_code == 0
     # check object storage calls
     expected_calls = [  # these are only some
         unittest.mock.call(
@@ -114,6 +153,7 @@ def test_setup_test_database(
                 TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
             ),
             object_storage_url,
+            bucket_name=bucket_name,
             force=True,
             subpath="licences/licence-to-use-copernicus-products",
             **object_storage_kws,
@@ -126,6 +166,7 @@ def test_setup_test_database(
                 "overview.png",
             ),
             object_storage_url,
+            bucket_name=bucket_name,
             force=True,
             subpath="resources/reanalysis-era5-land",
             **object_storage_kws,
@@ -136,18 +177,16 @@ def test_setup_test_database(
 
     # check db content
     session = session_obj()
-    resources = [
-        manager.object_as_dict(r)
-        for r in session.query(database.Resource).order_by(
-            database.Resource.resource_uid
-        )
-    ]
-    # with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt"), "w") as fp:
-    #     json.dump(resources, fp, default=str, indent=4)
-    with open(os.path.join(TESTDATA_PATH, "dumped_resources.txt")) as fp:
-        expected_resources: list[dict[str, Any]] = json.load(fp)
+    resources = session.query(database.Resource).order_by(
+        database.Resource.resource_uid
+    )
+
+    utils.compare_resources_with_dumped_file(
+        resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
+    )
+
     licences = [
-        manager.object_as_dict(ll) for ll in session.query(database.Licence).all()
+        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
     ]
     assert len(licences) == len(expected_licences)
     for expected_licence in expected_licences:
@@ -160,19 +199,89 @@ def test_setup_test_database(
         for field in ["revision", "title", "download_filename"]:
             assert getattr(effective_found[0], field) == expected_licence[field]
 
-    for i, resource in enumerate(resources):
-        for key in resource:
-            if key in ("record_update", "resource_id"):
-                continue
-            expected_resource = [
-                r
-                for r in expected_resources
-                if r["resource_uid"] == resource["resource_uid"]
-            ][0]
-            value = resource[key]
-            if isinstance(value, datetime.date):
-                value = value.isoformat()
-            assert value == expected_resource[key], key
+    resl = (
+        session.query(database.Resource)
+        .filter_by(resource_uid="reanalysis-era5-single-levels")
+        .one()
+    )
+    assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+
+    catalog_updates = session.query(database.CatalogueUpdate).all()
+    assert len(catalog_updates) == 1
+    assert catalog_updates[0].catalogue_repo_commit == last_commit1
+    assert catalog_updates[0].licence_repo_commit == last_commit2
+    update_time1 = catalog_updates[0].update_time
+    session.close()
+
+    # run a second time: do not anything, commit hash are the same
+    result = runner.invoke(
+        entry_points.app,
+        ["update-catalogue", "--connection-string", connection_string],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure not initialized
+    spy2.assert_not_called()
+    spy2.reset_mock()
+    # check no attempt to load licences and resources
+    spy3.assert_not_called()
+    spy3.reset_mock()
+    spy4.assert_not_called()
+    spy4.reset_mock()
+
+    # run a third time: force to run
+    result = runner.invoke(
+        entry_points.app,
+        ["update-catalogue", "--connection-string", connection_string, "--force"],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["access_key"],
+            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure not initialized
+    spy2.assert_not_called()
+    spy2.reset_mock()
+    # check forced load of licences and resources
+    spy3.assert_called_once()
+    spy3.reset_mock()
+    assert spy4.call_count == 8
+    spy4.reset_mock()
+
+    # check nothing changes in the db
+    session = session_obj()
+    assert (
+        session.query(database.DBRelease).first().db_release_version
+        == database.DB_VERSION
+    )
+    licences = [
+        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+    ]
+    assert len(licences) == len(expected_licences)
+    for expected_licence in expected_licences:
+        effective_found = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=expected_licence["licence_uid"])
+            .all()
+        )
+        assert effective_found
+        for field in ["revision", "title", "download_filename"]:
+            assert getattr(effective_found[0], field) == expected_licence[field]
 
     resl = (
         session.query(database.Resource)
@@ -181,32 +290,61 @@ def test_setup_test_database(
     )
     assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
 
-    session.close()
+    catalog_updates = session.query(database.CatalogueUpdate).all()
+    assert len(catalog_updates) == 1
+    assert catalog_updates[0].catalogue_repo_commit == last_commit1
+    assert catalog_updates[0].licence_repo_commit == last_commit2
+    assert catalog_updates[0].update_time > update_time1
+    caplog.clear()
 
+    # simulate an update of the structure
+    session.query(database.DBRelease).update(
+        {"db_release_version": database.DB_VERSION - 1}
+    )
+    session.commit()
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        ["update-catalogue", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
         },
     )
     assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure is initialized
+    spy2.assert_called_once()
+    spy2.reset_mock()
+    # check warning log
+    msg = "Catalogue DB structure is not updated. Running the init-db"
+    assert msg in [r.msg for r in caplog.records]
+    caplog.clear()
+    session.close()
 
     # reset globals for tests following
+    mocker.resetall()
     config.dbsettings = None
+    config.storagesettings = None
 
 
-def test_transaction_setup_test_database(
-    postgresql: Connection[str], mocker: pytest_mock.MockerFixture
+def test_transaction_update_catalogue(
+    caplog: pytest.LogCaptureFixture,
+    postgresql: Connection[str],
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
-    """Here we want to test that transactions are managed outside the setup test database."""
+    """Here we want to test that transactions are managed outside the update catalogue script."""
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://mypublic-storage/"
+    bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -214,12 +352,16 @@ def test_transaction_setup_test_database(
     }
     # create the db empty
     engine = database.init_database(connection_string)
-    # add some data
+    # add some dummy data
     engine.execute(
         "INSERT INTO licences (licence_uid, revision, title, download_filename) "
         "VALUES ('a-licence', 1, 'a licence', 'a file.pdf')"
     )
-    session_obj = sessionmaker(engine)
+    engine.execute(
+        "INSERT INTO resources (resource_uid, abstract, description, type) "
+        "VALUES ('dummy-dataset', 'a dummy ds', '[]', 'dataset')"
+    )
+
     # simulate the object storage working...
     mocker.patch(
         "cads_catalogue.object_storage.store_file",
@@ -227,23 +369,46 @@ def test_transaction_setup_test_database(
     )
     # ... but impose the store_dataset fails to work...
     mocker.patch.object(
-        manager, "store_dataset", side_effect=Exception("dataset error")
+        manager, "resource_sync", side_effect=Exception("dataset error")
     )
     # ....so the entry point execution should fail...
     result = runner.invoke(
         entry_points.app,
-        ["setup-test-database", "--connection-string", connection_string, "--force"],
+        ["update-catalogue", "--connection-string", connection_string, "--force"],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
             "STORAGE_ADMIN": object_storage_kws["access_key"],
             "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "CATALOGUE_BUCKET": bucket_name,
         },
     )
-    assert result.exit_code != 0
-    # ...but db content must stay unchanged
-    session = session_obj()
-    assert session.query(database.Resource).all() == []
-    licences = session.query(database.Licence).all()
-    assert len(licences) == 1
-    assert licences[0].title == "a licence"
-    session.close()
+    # ...without raising any
+    assert result.exit_code == 0
+    # ...but there is an error log for each dataset
+    error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
+    for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
+        assert len([e for e in error_messages if dataset_name in e]) >= 1
+    session_obj = sessionmaker(engine)
+    # ...anyway the licence content is updated...
+    with session_obj() as session:
+        licences = session.execute(
+            "select licence_uid from licences order by lower(licence_uid)"
+        ).all()
+        assert licences == [
+            ("a-licence",),
+            ("CCI-data-policy-for-satellite-surface-radiation-budget",),
+            ("eumetsat-cm-saf",),
+            ("licence-to-use-copernicus-products",),
+        ]
+        #  ....but the resources must stay unchanged
+        resources = session.execute(
+            "select resource_uid, abstract, description, type from resources"
+        ).all()
+        assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
+
+    # reset globals for tests following
+    config.dbsettings = None
+    config.storagesettings = None
+    mocker.resetall()
+    return

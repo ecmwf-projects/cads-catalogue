@@ -28,84 +28,96 @@
                 {
                   "id": "documents-0",
                   "type": "link",
-                  "url": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_atbd_gac_rad_2_3_pdf.pdf",
+                  "new-window": true,
+                  "href": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_atbd_gac_rad_2_3_pdf.pdf",
                   "title": "Algorithm Theoretical Basis Document, v2.3, CM SAF documentation",
                   "description": "This CM SAF  report provides  information  on  the validation of the surface  radiation  products  from  the  CM SAF  CLARA Edition 2.0 (CLARA-A2) data records  derived  from  AVHRR sensors onboard the series of NOAA satellites and the METOP satellites "
                 },
                 {
                   "id": "documents-1",
                   "type": "link",
-                  "url": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_pum_gac_rad_2_1_pdf.pdf",
+                  "new-window": true,
+                  "href": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_pum_gac_rad_2_1_pdf.pdf",
                   "title": "Product User Manual, v2.1 CM SAF documentation",
                   "description": "Provides information on the features, quality and usage of the dataset  "
                 },
                 {
                   "id": "documents-2",
                   "type": "link",
-                  "url": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_val_gac_rad_2_1_pdf.pdf",
+                  "new-window": true,
+                  "href": "https://www.cmsaf.eu/SharedDocs/Literatur/document/2016/saf_cm_dwd_val_gac_rad_2_1_pdf.pdf",
                   "title": "Validation Report, v2.1, CM SAF documentation",
                   "description": "Provides information on the validation and intercomparison of both the cloud and radiation products "
                 },
                 {
                   "id": "documents-3",
                   "type": "link",
-                  "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.3.5.2-v3.2_202101_PUGS_CCISurfaceRadiationBudget_v1.0.pdf",
+                  "new-window": true,
+                  "href": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.3.5.2-v3.2_202101_PUGS_CCISurfaceRadiationBudget_v1.0.pdf",
                   "title": "Product User Guide, v1.0, C3S documentation",
                   "description": "Provides information on the features, quality and usage of the dataset, including the latest ICDR updates"
                 },
                 {
                   "id": "documents-4",
                   "type": "link",
-                  "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_cci_D3.3_PUG_v5.1.pdf ",
+                  "new-window": true,
+                  "href": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_cci_D3.3_PUG_v5.1.pdf ",
                   "title": "Product User Guide, v5.1, ESA Cloud CCI documentation ",
                   "description": "Provides information on the features, quality and usage of the dataset of the original ESA Cloud CCI dataset v3.0"
                 },
                 {
                   "id": "documents-5",
                   "type": "link",
-                  "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.1.2.2-v3.1_202010_ATBD_CCISurfaceRadiationBudget_v1.0.pdf",
+                  "new-window": true,
+                  "href": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.1.2.2-v3.1_202010_ATBD_CCISurfaceRadiationBudget_v1.0.pdf",
                   "title": "Algorithm Theoretical Basis Document, v1.0, C3S documentation",
                   "description": "Provides information on the processing algorithm implemented for the retrieval of the surface radiation budget variables; it lists differences of the brokered to the C3S dataset compared to the original "
                 },
                 {
                   "id": "documents-6",
                   "type": "link",
-                  "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_CCI_D2.1.1_ATBD_CC4CL-TOAFLUX_v1.1.pdf",
+                  "new-window": true,
+                  "href": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_CCI_D2.1.1_ATBD_CC4CL-TOAFLUX_v1.1.pdf",
                   "title": "Algorithm Theoretical Basis Document, CC4CL TOA FLUX v1.1, ESA Cloud CCI documentation",
                   "description": "Provides information on the calculation of radiative flux products from cloud properties of the original ESA Cloud CCI dataset v3.0"
                 },
                 {
                   "id": "documents-7",
                   "type": "link",
-                  "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_CCI_D2.1a3_ATBD_v6.2_cc4cl.pdf",
+                  "new-window": true,
+                  "href": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_CCI_D2.1a3_ATBD_v6.2_cc4cl.pdf",
                   "title": "Algorithm Theoretical Baseline Document, CC4CL v6.2, ESA Cloud CCI documentation",
                   "description": "Provides information on the processing algorithm, module Community Cloud retrieval for Climate (CC4CL) "
                 },
                 {
                   "id": "documents-8",
                   "type": "link",
-                  "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.2.2.5-v3.2_202103_PQAD_CCISurfaceRadiationBudget_v1.0.pdf",
+                  "new-window": true,
+                  "href": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.2.2.5-v3.2_202103_PQAD_CCISurfaceRadiationBudget_v1.0.pdf",
                   "title": "Product Quality Assurance Document, v1.0, C3S documentation",
                   "description": "This document describes the data quality assurance process applied by the data producer before release of the dataset."
                 },
                 {
                   "id": "documents-9",
                   "type": "link",
-                  "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.2.2.6-v3.2_202103_PQAR_CCISurfaceRadiationBudget_v1.0.pdf",
+                  "new-window": true,
+                  "href": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.2.2.6-v3.2_202103_PQAR_CCISurfaceRadiationBudget_v1.0.pdf",
                   "title": "Product Quality Assessment Report, v1.0, C3S documentation",
                   "description": "Provides the latest report on data quality obtained according to methodologies described in the product quality assurance document."
                 },
                 {
                   "id": "documents-10",
                   "type": "link",
-                  "url": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_cci_D4.1_PVIR_v6.1.pdf",
+                  "new-window": true,
+                  "href": "http://www.esa-cloud-cci.org/sites/default/files/upload/Cloud_cci_D4.1_PVIR_v6.1.pdf",
                   "title": "Product Validation and Intercomparison Report, v6.1, ESA Cloud CCI documentation ",
                   "description": "Provides information on the validation and intercomparison of both the cloud and radiation products of the original ESA Cloud CCI dataset v3.0"
                 },
                 {
                   "id": "documents-11",
                   "type": "link",
-                  "url": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.4.2.2_201902_Tutorial_ECVSurfaceRadiationBudget_v1.4.mp4",
+                  "new-window": true,
+                  "href": "https://datastore.copernicus-climate.eu/documents/satellite-surface-radiation-budget/C3S_D312b_Lot1.4.2.2_201902_Tutorial_ECVSurfaceRadiationBudget_v1.4.mp4",
                   "title": "Tutorial on the Essential Climate Variable Surface Radiation Budget",
                   "description": "The following tutorial describes the Essential Climate Variable \u201cSurface Radiation Budget\u201d and presents different surface radiation fluxes as well as their estimation methods from satellite observations. The related datasets are the CM SAF Cloud, Albedo and Radiation from the AVHRR data record, Edition 2 & E2.1 (CLARA-A2 & CLARA-A2.1) and the ESA Cloud_cci ATSR2-AATSRv3 dataset."
                 }
@@ -131,7 +143,8 @@
             {
               "id": "portal",
               "type": "link",
-              "url": "https://support.ecmwf.int",
+              "new-window": true,
+              "href": "https://support.ecmwf.int",
               "title": "ECMWF Support Portal"
             }
           ]

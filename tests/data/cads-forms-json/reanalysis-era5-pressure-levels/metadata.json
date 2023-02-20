@@ -27,6 +27,7 @@
   "ds_responsible_organisation_role": "publisher",
   "end_date": "2022-12-09",
   "file_format": "grib",
+  "hidden": false,
   "inspire_theme": "Atmospheric conditions",
   "keywords": [
     "Variable domain: Atmosphere (surface)",

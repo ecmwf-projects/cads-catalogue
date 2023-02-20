@@ -24,6 +24,30 @@ from cads_catalogue import config
 metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
+DB_VERSION = 1  # to increment at each structure change
+
+
+class DBRelease(BaseModel):
+    """Information about current structure version."""
+
+    __tablename__ = "db_release"
+
+    db_release_version = sa.Column(sa.Integer, primary_key=True)
+
+
+class CatalogueUpdate(BaseModel):
+    """Catalogue manager update information ORM model."""
+
+    __tablename__ = "catalogue_updates"
+
+    catalogue_update_id = sa.Column(sa.Integer, primary_key=True)
+    update_time = sa.Column(
+        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
+    )
+    catalogue_repo_commit = sa.Column(sa.String)
+    licence_repo_commit = sa.Column(sa.String)
+    message_repo_commit = sa.Column(sa.String)
+
 
 class ResourceLicence(BaseModel):
     """many-to-many ORM model for resources-licences."""
@@ -104,6 +128,9 @@ class Resource(BaseModel):
     constraints_data = sa.Column(sa.JSON)
     form_data = sa.Column(sa.JSON)
     mapping = sa.Column(sa.JSON)
+    related_resources_keywords = sa.Column(
+        sa.dialects.postgresql.ARRAY(sa.VARCHAR(300))
+    )
 
     # geo extent
     geo_extent = sa.Column(sa.JSON)
@@ -129,6 +156,7 @@ class Resource(BaseModel):
     ds_responsible_organisation_role = sa.Column(sa.String)
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
+    hidden = sa.Column(sa.BOOLEAN, default=False)
     keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)
@@ -195,7 +223,9 @@ def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessio
     if session_obj:
         return session_obj
     settings = config.ensure_settings(config.dbsettings)
-    session_obj = sa.orm.sessionmaker(sa.create_engine(settings.connection_string))
+    session_obj = sa.orm.sessionmaker(
+        sa.create_engine(settings.connection_string, pool_recycle=settings.pool_recycle)
+    )
     return session_obj
 
 
@@ -217,4 +247,8 @@ def init_database(connection_string: str) -> sa.engine.Engine:
     # cleanup and create the schema
     metadata.drop_all(engine)
     metadata.create_all(engine)
+    session_obj = sa.orm.sessionmaker(engine)
+    # add structure version
+    with session_obj.begin() as session:  # type: ignore
+        session.add(DBRelease(db_release_version=DB_VERSION))
     return engine

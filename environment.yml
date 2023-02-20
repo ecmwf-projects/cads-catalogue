@@ -9,11 +9,8 @@ channels:
 dependencies:
 - markdown
 - minio
-- postgresql
-- psycopg
 - psycopg2
 - pydantic
-- pyyaml
 - sqlalchemy==1.4*
 - sqlalchemy-utils
 - typer

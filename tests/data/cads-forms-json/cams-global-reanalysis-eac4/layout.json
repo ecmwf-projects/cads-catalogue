@@ -754,30 +754,34 @@
             {
               "id": "all_docs-0",
               "type": "link",
-              "url": "https://confluence.ecmwf.int/x/OIX4B",
+              "href": "https://confluence.ecmwf.int/x/OIX4B",
               "title": "CAMS Reanalysis data documentation",
-              "description": "Overall description of CAMS Reanalysis dataset."
+              "description": "Overall description of CAMS Reanalysis dataset.",
+              "new-window": true
             },
             {
               "id": "all_docs-1",
               "type": "link",
-              "url": "https://confluence.ecmwf.int/x/OIX4B#CAMS:Reanalysisdatadocumentation-Knownissues",
+              "href": "https://confluence.ecmwf.int/x/OIX4B#CAMS:Reanalysisdatadocumentation-Knownissues",
               "title": "Known issues",
-              "description": "Information about known issues found within the CAMS global reanalysis dataset"
+              "description": "Information about known issues found within the CAMS global reanalysis dataset",
+              "new-window": true
             },
             {
               "id": "all_docs-2",
               "type": "link",
-              "url": "https://atmosphere.copernicus.eu/node/325#fe56bdb4-1bdf-4d47-b46b-261a1ea57243",
+              "href": "https://atmosphere.copernicus.eu/node/325#fe56bdb4-1bdf-4d47-b46b-261a1ea57243",
               "title": "Evaluation and quality assurance (EQA) reports",
-              "description": "Detailed validation reports"
+              "description": "Detailed validation reports",
+              "new-window": true
             },
             {
               "id": "all_docs-3",
               "type": "link",
-              "url": "http://www.atmos-chem-phys.net/19/3515/2019/",
+              "href": "http://www.atmos-chem-phys.net/19/3515/2019/",
               "title": "Data citation",
-              "description": "Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/"
+              "description": "Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/",
+              "new-window": true
             }
           ]
         }
@@ -794,8 +798,9 @@
             {
               "id": "portal",
               "type": "link",
-              "url": "https://support.ecmwf.int",
-              "title": "ECMWF Support Portal"
+              "href": "https://support.ecmwf.int",
+              "title": "ECMWF Support Portal",
+              "new-window": true
             }
           ]
         },

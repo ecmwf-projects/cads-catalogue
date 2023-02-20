@@ -8,163 +8,82 @@ import pytest
 import pytest_mock
 from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import config, database, manager, object_storage
+from cads_catalogue import config, database, manager, object_storage, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def test_recursive_search() -> None:
-    obj1 = {
-        "a": 1,
-        "b": [
-            {"a": 2, "b": {"a": 3, "b": 4}},
-            [1, 2, 3],
-            [{}, {"b": 4}, {"a": 4, "b": 4}],
-        ],
-        "c": {"a": 5, "b": {"a": 6, "b": 4}},
-    }
-    res1 = manager.recursive_key_search(obj1, key="a")
-    assert res1 == [1, 2, 3, 4, 5, 6]
-    form_json_path = os.path.join(
-        TESTDATA_PATH,
-        "cads-forms-json",
-        "satellite-surface-radiation-budget",
-        "form.json",
-    )
-    with open(form_json_path) as fp:
-        form_data = json.load(fp)
-    search_results = manager.recursive_key_search(form_data, key="labels")
-    assert search_results == [
-        {
-            "cci": "CCI (Climate Change Initiative)",
-            "clara": "CLARA (CLoud, Albedo and Radiation)",
-        },
-        {
-            "c3s": "C3S (Copernicus Climate Change Service)",
-            "esa": "ESA (European Space Agency)",
-            "eumetsat": "EUMETSAT (European Organisation for the Exploitation of "
-            "Meteorological Satellites)",
-        },
-        {
-            "all_variables": "All variables (CCI product family)",
-            "surface_downwelling_longwave_flux": "Surface downwelling longwave  flux",
-            "surface_downwelling_shortwave_flux": "Surface downwelling shortwave  flux",
-            "surface_net_downward_longwave_flux": "Surface net downward longwave  flux",
-            "surface_net_downward_radiative_flux": "Surface net downward radiative flux",
-            "surface_net_downward_shortwave_flux": "Surface net downward shortwave  flux",
-            "surface_upwelling_longwave_flux": "Surface upwelling longwave  flux",
-            "surface_upwelling_shortwave_flux": "Surface upwelling shortwave  flux",
-        },
-        {
-            "interim_climate_data_record": "Interim Climate Data Record (ICDR)",
-            "thematic_climate_data_record": "Thematic Climate Data Record (TCDR)",
-        },
-        {
-            "aatsr_on_envisat": "AATSR on ENVISAT",
-            "atsr2_on_ers2": "ATSR2 on ERS2",
-            "avhrr_on_multiple_satellites": "AVHRR on multiple satellites",
-            "slstr_on_sentinel_3a_is_under_investigation": "SLSTR on Sentinel-3A is "
-            "under investigation",
-            "slstr_on_sentinel_3b_is_under_investigation": "SLSTR on Sentinel-3B is "
-            "under investigation",
-        },
-        {"daily_mean": "Daily mean", "monthly_mean": "Monthly mean"},
-        {
-            "1982": "1982",
-            "1983": "1983",
-            "1984": "1984",
-            "1985": "1985",
-            "1986": "1986",
-            "1987": "1987",
-            "1988": "1988",
-            "1989": "1989",
-            "1990": "1990",
-            "1991": "1991",
-            "1992": "1992",
-            "1993": "1993",
-            "1994": "1994",
-            "1995": "1995",
-            "1996": "1996",
-            "1997": "1997",
-            "1998": "1998",
-            "1999": "1999",
-            "2000": "2000",
-            "2001": "2001",
-            "2002": "2002",
-            "2003": "2003",
-            "2004": "2004",
-            "2005": "2005",
-            "2006": "2006",
-            "2007": "2007",
-            "2008": "2008",
-            "2009": "2009",
-            "2010": "2010",
-            "2011": "2011",
-            "2012": "2012",
-            "2013": "2013",
-            "2014": "2014",
-            "2015": "2015",
-            "2016": "2016",
-            "2017": "2017",
-            "2018": "2018",
-            "2019": "2019",
-            "2020": "2020",
-            "2021": "2021",
-        },
-        {
-            "01": "January",
-            "02": "February",
-            "03": "March",
-            "04": "April",
-            "05": "May",
-            "06": "June",
-            "07": "July",
-            "08": "August",
-            "09": "September",
-            "10": "October",
-            "11": "November",
-            "12": "December",
-        },
-        {
-            "01": "01",
-            "02": "02",
-            "03": "03",
-            "04": "04",
-            "05": "05",
-            "06": "06",
-            "07": "07",
-            "08": "08",
-            "09": "09",
-            "10": "10",
-            "11": "11",
-            "12": "12",
-            "13": "13",
-            "14": "14",
-            "15": "15",
-            "16": "16",
-            "17": "17",
-            "18": "18",
-            "19": "19",
-            "20": "20",
-            "21": "21",
-            "22": "22",
-            "23": "23",
-            "24": "24",
-            "25": "25",
-            "26": "26",
-            "27": "27",
-            "28": "28",
-            "29": "29",
-            "30": "30",
-            "31": "31",
-        },
-        {"v1_0": "v1.0"},
-        {"tgz": "Compressed tar file (.tar.gz)", "zip": "Zip file (.zip)"},
-    ]
+def dummy_get_last_commit_hash1(folder):
+    """Use for testing is_db_to_update."""
+    if "cads-forms-json" in folder:
+        return "5f662d202e4084dd569567bab0957c8a56f79c0f"
+    else:
+        return "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
 
 
-def test_load_metadata_licences() -> None:
+def dummy_get_last_commit_hash2(folder):
+    """Use for testing is_db_to_update."""
+    if "cads-forms-json" in folder:
+        return "5f662d202e4084dd569567bab0957c8a56f79aaa"
+    else:
+        return "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
+
+
+def test_is_db_to_update(
+    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+) -> None:
+    mocker.patch.object(utils, "get_last_commit_hash", new=dummy_get_last_commit_hash1)
+    resource_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json")
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    last_c1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
+    last_l1 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
+    c2 = "5f662d202e4084dd569567bab0957c8a56f79aaa"
+    l2 = "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
+    with session_obj() as session:
+        # begin with empty table
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (True, last_c1, last_l1)
+        # insert a catalogue update
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit=last_c1, licence_repo_commit=last_l1
+        )
+        session.add(new_record)
+        session.commit()
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (False, last_c1, last_l1)
+        # simulate a new repo update
+        mocker.patch.object(
+            utils, "get_last_commit_hash", new=dummy_get_last_commit_hash2
+        )
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (True, c2, l2)
+        # update the db with only one right repo commit
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit=c2,
+            licence_repo_commit=last_l1,
+        )
+        session.add(new_record)
+        session.commit()
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (True, c2, l2)
+        # update the db with both two right repo commit
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit=c2,
+            licence_repo_commit=l2,
+        )
+        session.add(new_record)
+        session.commit()
+        assert manager.is_db_to_update(
+            session, resource_folder_path, licences_folder_path
+        ) == (False, c2, l2)
+
+
+def test_load_licences_from_folder() -> None:
     # test data taken from repository "https://git.ecmwf.int/projects/CDS/repos/cds-licences"
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     expected_licences = [
@@ -210,70 +129,6 @@ def test_load_resource_for_object_storage() -> None:
         "form": os.path.join(folder_path, "form.json"),
         "layout": os.path.join(folder_path, "layout.json"),
         "previewimage": os.path.join(folder_path, "overview.png"),
-    }
-
-
-def test_load_variable_id_map() -> None:
-    form_json_path = os.path.join(
-        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land", "form.json"
-    )
-    mapping_json_path = os.path.join(
-        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land", "mapping.json"
-    )
-    res = manager.load_variable_id_map(form_json_path, mapping_json_path)
-    assert res == {
-        "10m u-component of wind": "10m_u_component_of_wind",
-        "10m v-component of wind": "10m_v_component_of_wind",
-        "2m dewpoint temperature": "2m_dewpoint_temperature",
-        "2m temperature": "2m_temperature",
-        "Evaporation from bare soil": "evaporation_from_bare_soil",
-        "Evaporation from open water surfaces excluding oceans": "evaporation_from_"
-        "open_water_surfaces_"
-        "excluding_oceans",
-        "Evaporation from the top of canopy": "evaporation_from_the_top_of_canopy",
-        "Evaporation from vegetation transpiration": "evaporation_from_vegetation_transpiration",
-        "Forecast albedo": "forecast_albedo",
-        "Lake bottom temperature": "lake_bottom_temperature",
-        "Lake ice depth": "lake_ice_depth",
-        "Lake ice temperature": "lake_ice_temperature",
-        "Lake mix-layer depth": "lake_mix_layer_depth",
-        "Lake mix-layer temperature": "lake_mix_layer_temperature",
-        "Lake shape factor": "lake_shape_factor",
-        "Lake total layer temperature": "lake_total_layer_temperature",
-        "Leaf area index, high vegetation": "leaf_area_index_high_vegetation",
-        "Leaf area index, low vegetation": "leaf_area_index_low_vegetation",
-        "Potential evaporation": "potential_evaporation",
-        "Runoff": "runoff",
-        "Skin reservoir content": "skin_reservoir_content",
-        "Skin temperature": "skin_temperature",
-        "Snow albedo": "snow_albedo",
-        "Snow cover": "snow_cover",
-        "Snow density": "snow_density",
-        "Snow depth": "snow_depth",
-        "Snow depth water equivalent": "snow_depth_water_equivalent",
-        "Snow evaporation": "snow_evaporation",
-        "Snowfall": "snowfall",
-        "Snowmelt": "snowmelt",
-        "Soil temperature level 1": "soil_temperature_level_1",
-        "Soil temperature level 2": "soil_temperature_level_2",
-        "Soil temperature level 3": "soil_temperature_level_3",
-        "Soil temperature level 4": "soil_temperature_level_4",
-        "Sub-surface runoff": "sub_surface_runoff",
-        "Surface latent heat flux": "surface_latent_heat_flux",
-        "Surface net solar radiation": "surface_net_solar_radiation",
-        "Surface net thermal radiation": "surface_net_thermal_radiation",
-        "Surface pressure": "surface_pressure",
-        "Surface runoff": "surface_runoff",
-        "Surface sensible heat flux": "surface_sensible_heat_flux",
-        "Surface solar radiation downwards": "surface_solar_radiation_downwards",
-        "Surface thermal radiation downwards": "surface_thermal_radiation_downwards",
-        "Temperature of snow layer": "temperature_of_snow_layer",
-        "Total evaporation": "total_evaporation",
-        "Total precipitation": "total_precipitation",
-        "Volumetric soil water layer 1": "volumetric_soil_water_layer_1",
-        "Volumetric soil water layer 2": "volumetric_soil_water_layer_2",
-        "Volumetric soil water layer 3": "volumetric_soil_water_layer_3",
-        "Volumetric soil water layer 4": "volumetric_soil_water_layer_4",
     }
 
 
@@ -398,6 +253,7 @@ def test_load_resource_from_folder() -> None:
         "form_data": json.load(form_fp),
         "format_version": None,
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
+        "hidden": False,
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -446,7 +302,6 @@ def test_load_resource_from_folder() -> None:
                 "combined with the V component of 10m wind to "
                 "give the speed and direction of the horizontal "
                 "10m wind.",
-                "id": "10m_u_component_of_wind",
                 "label": "10m u-component of wind",
                 "units": "m s^-1",
             },
@@ -465,7 +320,6 @@ def test_load_resource_from_folder() -> None:
                 "combined with the U component of 10m wind to "
                 "give the speed and direction of the horizontal "
                 "10m wind.",
-                "id": "10m_v_component_of_wind",
                 "label": "10m v-component of wind",
                 "units": "m s^-1",
             },
@@ -482,7 +336,6 @@ def test_load_resource_from_folder() -> None:
                 "atmospheric conditions. Temperature measured "
                 "in kelvin can be converted to degrees Celsius "
                 "(°C) by subtracting 273.15.",
-                "id": "2m_dewpoint_temperature",
                 "label": "2m dewpoint temperature",
                 "units": "K",
             },
@@ -495,7 +348,6 @@ def test_load_resource_from_folder() -> None:
                 "Temperature measured in kelvin can be "
                 "converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "2m_temperature",
                 "label": "2m temperature",
                 "units": "K",
             },
@@ -504,7 +356,6 @@ def test_load_resource_from_folder() -> None:
                 "the top of the land surface. This variable is "
                 "accumulated from the beginning of the forecast "
                 "time to the end of the forecast step.",
-                "id": "evaporation_from_bare_soil",
                 "label": "Evaporation from bare soil",
                 "units": "m of water equivalent",
             },
@@ -514,7 +365,6 @@ def test_load_resource_from_folder() -> None:
                 "excluding oceans. This variable is accumulated "
                 "from the beginning of the forecast time to the "
                 "end of the forecast step.",
-                "id": "evaporation_from_open_water_surfaces_excluding_oceans",
                 "label": "Evaporation from open water surfaces excluding " "oceans",
                 "units": "m of water equivalent",
             },
@@ -524,7 +374,6 @@ def test_load_resource_from_folder() -> None:
                 "canopy. This variable is accumulated from the "
                 "beginning of the forecast time to the end of "
                 "the forecast step.",
-                "id": "evaporation_from_the_top_of_canopy",
                 "label": "Evaporation from the top of canopy",
                 "units": "m of water equivalent",
             },
@@ -536,7 +385,6 @@ def test_load_resource_from_folder() -> None:
                 "variable is accumulated from the beginning of "
                 "the forecast time to the end of the forecast "
                 "step.",
-                "id": "evaporation_from_vegetation_transpiration",
                 "label": "Evaporation from vegetation transpiration",
                 "units": "m of water equivalent",
             },
@@ -564,7 +412,6 @@ def test_load_resource_from_folder() -> None:
                 "years) is used, modified by the model over "
                 "water, ice and snow. Albedo is often shown as "
                 "a percentage (%).",
-                "id": "forecast_albedo",
                 "label": "Forecast albedo",
                 "units": "dimensionless",
             },
@@ -577,7 +424,6 @@ def test_load_resource_from_folder() -> None:
                 "water bodies in the Integrated Forecasting "
                 "System. The model keeps lake depth and surface "
                 "area (or fractional cover) constant in time.",
-                "id": "lake_bottom_temperature",
                 "label": "Lake bottom temperature",
                 "units": "K",
             },
@@ -590,7 +436,6 @@ def test_load_resource_from_folder() -> None:
                 "reservoirs and rivers) and coastal water. A "
                 "single ice layer is represented. This "
                 "parameter is the thickness of that ice layer.",
-                "id": "lake_ice_depth",
                 "label": "Lake ice depth",
                 "units": "m",
             },
@@ -604,7 +449,6 @@ def test_load_resource_from_folder() -> None:
                 "temperature measured in kelvin can be "
                 "converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "lake_ice_temperature",
                 "label": "Lake ice temperature",
                 "units": "K",
             },
@@ -625,7 +469,6 @@ def test_load_resource_from_folder() -> None:
                 "water is greater than that of the water below. "
                 "Mixing can also occur through the action of "
                 "wind on the surface of the lake.",
-                "id": "lake_mix_layer_depth",
                 "label": "Lake mix-layer depth",
                 "units": "m",
             },
@@ -646,7 +489,6 @@ def test_load_resource_from_folder() -> None:
                 "wind on the surface of the lake. Temperature "
                 "measured in kelvin can be converted to degrees "
                 "Celsius (°C) by subtracting 273.15.",
-                "id": "lake_mix_layer_temperature",
                 "label": "Lake mix-layer temperature",
                 "units": "K",
             },
@@ -662,7 +504,6 @@ def test_load_resource_from_folder() -> None:
                 "bodies with two layers in the vertical, the "
                 "mixed layer above and the thermocline below "
                 "where temperature changes with depth.",
-                "id": "lake_shape_factor",
                 "label": "Lake shape factor",
                 "units": "dimensionless",
             },
@@ -678,7 +519,6 @@ def test_load_resource_from_folder() -> None:
                 "the two layers. Temperature measured in kelvin "
                 "can be converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "lake_total_layer_temperature",
                 "label": "Lake total layer temperature",
                 "units": "K",
             },
@@ -686,7 +526,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "One-half of the total green leaf area per unit "
                 "horizontal ground surface area for high "
                 "vegetation type.",
-                "id": "leaf_area_index_high_vegetation",
                 "label": "Leaf area index, high vegetation",
                 "units": "m^2 m^-2",
             },
@@ -694,7 +533,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "One-half of the total green leaf area per unit "
                 "horizontal ground surface area for low "
                 "vegetation type.",
-                "id": "leaf_area_index_low_vegetation",
                 "label": "Leaf area index, low vegetation",
                 "units": "m^2 m^-2",
             },
@@ -721,7 +559,6 @@ def test_load_resource_from_folder() -> None:
                 "way pev is computed in ERA5. This variable is "
                 "accumulated from the beginning of the forecast "
                 "time to the end of the forecast step.",
-                "id": "potential_evaporation",
                 "label": "Potential evaporation",
                 "units": "m",
             },
@@ -751,7 +588,6 @@ def test_load_resource_from_folder() -> None:
                 "information about how runoff is calculated is "
                 "given in the IFS Physical Processes "
                 "documentation.",
-                "id": "runoff",
                 "label": "Runoff",
                 "units": "m",
             },
@@ -764,7 +600,6 @@ def test_load_resource_from_folder() -> None:
                 "can hold depends on the type of vegetation, "
                 "and may be zero.  Water leaves the 'skin "
                 "reservoir' by evaporation.",
-                "id": "skin_reservoir_content",
                 "label": "Skin reservoir content",
                 "units": "m of water equivalent",
             },
@@ -780,7 +615,6 @@ def test_load_resource_from_folder() -> None:
                 "over land and sea. Temperature measured in "
                 "kelvin can be converted to degrees Celsius "
                 "(°C) by subtracting 273.15.",
-                "id": "skin_temperature",
                 "label": "Skin temperature",
                 "units": "K",
             },
@@ -793,7 +627,6 @@ def test_load_resource_from_folder() -> None:
                 "Values vary between 0 and 1. Typically, snow "
                 "and ice have high reflectivity with albedo "
                 "values of 0.8 and above.",
-                "id": "snow_albedo",
                 "label": "Snow albedo",
                 "units": "dimensionless",
             },
@@ -801,7 +634,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "It represents the fraction (0-1) of the cell / "
                 "grid-box occupied by snow (similar to the "
                 "cloud cover fields of ERA5).",
-                "id": "snow_cover",
                 "label": "Snow cover",
                 "units": "%",
             },
@@ -812,7 +644,6 @@ def test_load_resource_from_folder() -> None:
                 "additional layer over the uppermost soil "
                 "level. The snow may cover all or part of the "
                 "grid box.",
-                "id": "snow_density",
                 "label": "Snow density",
                 "units": "kg m^-3",
             },
@@ -820,7 +651,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "Instantaneous grib-box average of the snow "
                 "thickness on the ground (excluding snow on "
                 "canopy).",
-                "id": "snow_depth",
                 "label": "Snow depth",
                 "units": "m",
             },
@@ -834,7 +664,6 @@ def test_load_resource_from_folder() -> None:
                 "additional layer over the uppermost soil "
                 "level. The snow may cover all or part of the "
                 "grid box.",
-                "id": "snow_depth_water_equivalent",
                 "label": "Snow depth water equivalent",
                 "units": "m of water equivalent",
             },
@@ -844,7 +673,6 @@ def test_load_resource_from_folder() -> None:
                 "fraction). This variable is accumulated from "
                 "the beginning of the forecast time to the end "
                 "of the forecast step.",
-                "id": "snow_evaporation",
                 "label": "Snow evaporation",
                 "units": "m of water equivalent",
             },
@@ -869,7 +697,6 @@ def test_load_resource_from_folder() -> None:
                 "local to a particular point in space and time, "
                 "rather than representing averages over a model "
                 "grid box and model time step.",
-                "id": "snowfall",
                 "label": "Snowfall",
                 "units": "m of water equivalent",
             },
@@ -879,7 +706,6 @@ def test_load_resource_from_folder() -> None:
                 "This variable is accumulated from the "
                 "beginning of the forecast time to the end of "
                 "the forecast step.",
-                "id": "snowmelt",
                 "label": "Snowmelt",
                 "units": "m of water equivalent",
             },
@@ -894,21 +720,18 @@ def test_load_resource_from_folder() -> None:
                 "layer. Temperature measured in kelvin can be "
                 "converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "soil_temperature_level_1",
                 "label": "Soil temperature level 1",
                 "units": "K",
             },
             {
                 "description": "Temperature of the soil in layer 2 (7 -28cm) "
                 "of the ECMWF Integrated Forecasting System.",
-                "id": "soil_temperature_level_2",
                 "label": "Soil temperature level 2",
                 "units": "K",
             },
             {
                 "description": "Temperature of the soil in layer 3 (28-100cm) "
                 "of the ECMWF Integrated Forecasting System.",
-                "id": "soil_temperature_level_3",
                 "label": "Soil temperature level 3",
                 "units": "K",
             },
@@ -916,7 +739,6 @@ def test_load_resource_from_folder() -> None:
                 "description": "Temperature of the soil in layer 4 (100-289 "
                 "cm) of the ECMWF Integrated Forecasting "
                 "System.",
-                "id": "soil_temperature_level_4",
                 "label": "Soil temperature level 4",
                 "units": "K",
             },
@@ -945,7 +767,6 @@ def test_load_resource_from_folder() -> None:
                 "information about how runoff is calculated is "
                 "given in the IFS Physical Processes "
                 "documentation.",
-                "id": "sub_surface_runoff",
                 "label": "Sub-surface runoff",
                 "units": "m",
             },
@@ -955,7 +776,6 @@ def test_load_resource_from_folder() -> None:
                 "accumulated from the beginning of the forecast "
                 "time to the end of the forecast step. By model "
                 "convention, downward fluxes are positive.",
-                "id": "surface_latent_heat_flux",
                 "label": "Surface latent heat flux",
                 "units": "J m^-2",
             },
@@ -981,7 +801,6 @@ def test_load_resource_from_folder() -> None:
                 "period expressed in seconds. The ECMWF "
                 "convention for vertical fluxes is positive "
                 "downwards.",
-                "id": "surface_net_solar_radiation",
                 "label": "Surface net solar radiation",
                 "units": "J m^-2",
             },
@@ -991,7 +810,6 @@ def test_load_resource_from_folder() -> None:
                 "forecast time to the end of the forecast step. "
                 "By model convention downward fluxes are "
                 "positive.",
-                "id": "surface_net_thermal_radiation",
                 "label": "Surface net thermal radiation",
                 "units": "J m^-2",
             },
@@ -1013,7 +831,6 @@ def test_load_resource_from_folder() -> None:
                 "measured in hPa and sometimes is presented in "
                 "the old units of millibars, mb (1 hPa = 1 mb = "
                 "100 Pa).",
-                "id": "surface_pressure",
                 "label": "Surface pressure",
                 "units": "Pa",
             },
@@ -1042,7 +859,6 @@ def test_load_resource_from_folder() -> None:
                 "drought or flood. More information about how "
                 "runoff is calculated is given in the IFS "
                 "Physical Processes documentation.",
-                "id": "surface_runoff",
                 "label": "Surface runoff",
                 "units": "m",
             },
@@ -1067,7 +883,6 @@ def test_load_resource_from_folder() -> None:
                 "should be divided by the accumulation period "
                 "expressed in seconds. The ECMWF convention for "
                 "vertical fluxes is positive downwards.",
-                "id": "surface_sensible_heat_flux",
                 "label": "Surface sensible heat flux",
                 "units": "J m^-2",
             },
@@ -1099,7 +914,6 @@ def test_load_resource_from_folder() -> None:
                 "divided by the accumulation period expressed "
                 "in seconds. The ECMWF convention for vertical "
                 "fluxes is positive downwards.",
-                "id": "surface_solar_radiation_downwards",
                 "label": "Surface solar radiation downwards",
                 "units": "J m-2",
             },
@@ -1121,7 +935,6 @@ def test_load_resource_from_folder() -> None:
                 "divided by the accumulation period expressed "
                 "in seconds. The ECMWF convention for vertical "
                 "fluxes is positive downwards.",
-                "id": "surface_thermal_radiation_downwards",
                 "label": "Surface thermal radiation downwards",
                 "units": "J m-2",
             },
@@ -1135,7 +948,6 @@ def test_load_resource_from_folder() -> None:
                 "grid box. Temperature measured in kelvin can "
                 "be converted to degrees Celsius (°C) by "
                 "subtracting 273.15.",
-                "id": "temperature_of_snow_layer",
                 "label": "Temperature of snow layer",
                 "units": "K",
             },
@@ -1151,7 +963,6 @@ def test_load_resource_from_folder() -> None:
                 "fluxes are positive. Therefore, negative "
                 "values indicate evaporation and positive "
                 "values indicate condensation.",
-                "id": "total_evaporation",
                 "label": "Total evaporation",
                 "units": "m of water equivalent",
             },
@@ -1180,7 +991,6 @@ def test_load_resource_from_folder() -> None:
                 "local to a particular point in space and time, "
                 "rather than representing averages over a model "
                 "grid box and  model time step.",
-                "id": "total_precipitation",
                 "label": "Total precipitation",
                 "units": "m",
             },
@@ -1191,28 +1001,24 @@ def test_load_resource_from_folder() -> None:
                 "is associated with the soil texture (or "
                 "classification), soil depth, and the "
                 "underlying groundwater level.",
-                "id": "volumetric_soil_water_layer_1",
                 "label": "Volumetric soil water layer 1",
                 "units": "m^3 m^-3",
             },
             {
                 "description": "Volume of water in soil layer 2 (7 -28 cm) of "
                 "the ECMWF Integrated Forecasting System.",
-                "id": "volumetric_soil_water_layer_2",
                 "label": "Volumetric soil water layer 2",
                 "units": "m^3 m^-3",
             },
             {
                 "description": "Volume of water in soil layer 3 (28-100 cm) of "
                 "the ECMWF Integrated Forecasting System.",
-                "id": "volumetric_soil_water_layer_3",
                 "label": "Volumetric soil water layer 3",
                 "units": "m^3 m^-3",
             },
             {
                 "description": "Volume of water in soil layer 4 (100-289 cm) "
                 "of the ECMWF Integrated Forecasting System.",
-                "id": "volumetric_soil_water_layer_4",
                 "label": "Volumetric soil water layer 4",
                 "units": "m^3 m^-3",
             },
@@ -1362,6 +1168,7 @@ def test_manage_upload_images_and_layout(
     }
     create_layout_for_test(layout_path, sections=sections, aside=aside)
     object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://public-storage/"
     storage_kws: dict[str, Any] = {
         "access_key": "storage_user",
         "secret_key": "storage_password",
@@ -1379,7 +1186,7 @@ def test_manage_upload_images_and_layout(
         "content": "a content",
         "image": {
             "alt": "alternative text",
-            "url": "http://myobject-storage:myport/an url",
+            "url": "http://public-storage/an url",
         },
     }
     sections = [
@@ -1408,143 +1215,243 @@ def test_manage_upload_images_and_layout(
         },
     }
     layout_data = manager.manage_upload_images_and_layout(
-        dataset_md, object_storage_url, ret_layout_data=True, **storage_kws
+        dataset_md,
+        object_storage_url,
+        doc_storage_url=doc_storage_url,
+        ret_layout_data=True,
+        **storage_kws
     )
 
     assert layout_data == expected_layout
 
 
-def test_store_licences(
+def test_licence_sync(
     session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
-    object_storage_url = "http://myobject-storage:myport/"
-    storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+    my_settings_dict = {
+        "object_storage_url": "object/storage/url",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "my/url",
     }
     licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
     licences = manager.load_licences_from_folder(licences_folder_path)
-    session = session_obj()
-    res = session.query(database.Licence).all()
-    assert res == []
+    licence_uid = "CCI-data-policy-for-satellite-surface-radiation-budget"
+    licence_md = {
+        "licence_id": 1,
+        "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+        "revision": 4,
+        "title": "CCI product licence",
+        "download_filename": "an url",
+    }
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
         return_value=("an url", "a version"),
     )
+    # start without any licence in the db
+    with session_obj() as session:
+        manager.licence_sync(session, licence_uid, licences, storage_settings)
+        session.commit()
+        db_licences = session.query(database.Licence).all()
+        assert len(db_licences) == 1
+        assert utils.object_as_dict(db_licences[0]) == licence_md
 
-    manager.store_licences(session, licences, object_storage_url, **storage_kws)
-    session.commit()
-    assert patch.call_count == len(licences)
+    assert patch.call_count == 1
     assert (
         os.path.join(
             licences_folder_path,
             "CCI-data-policy-for-satellite-surface-radiation-budget.pdf",
         ),
-        object_storage_url,
+        storage_settings.object_storage_url,
     ) in [pm.args for pm in patch.mock_calls]
 
     assert {
-        "force": True,
+        "bucket_name": "mycatalogue_bucket",
         "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
+        "force": True,
+        "access_key": "admin1",
+        "secret_key": "secret1",
         "secure": False,
     } in [pm.kwargs for pm in patch.mock_calls]
-    res = session.query(database.Licence).all()
-    assert len(res) == len(licences)
-    db_obj_as_dict = manager.object_as_dict(res[0])
-    assert 1 == db_obj_as_dict.pop("licence_id")
-    assert db_obj_as_dict == licences[0]
-    assert db_obj_as_dict["download_filename"] == "an url"
-    session.close()
+    patch.reset_mock()
+
+    # update an existing licence
+    updated_licence = [r for r in licences if r["licence_uid"] == licence_uid][0]
+    updated_licence["title"] = "CCI product licence UPDATED"
+    licence_md2 = {
+        "licence_id": 1,
+        "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
+        "revision": 4,
+        "title": "CCI product licence UPDATED",
+        "download_filename": "an url",
+    }
+    licences = [updated_licence]
+    with session_obj() as session:
+        manager.licence_sync(session, licence_uid, licences, storage_settings)
+        session.commit()
+        db_licences = session.query(database.Licence).all()
+        assert len(db_licences) == 1
+        assert utils.object_as_dict(db_licences[0]) == licence_md2
+
     # reset globals for tests following
     config.dbsettings = None
+    config.storagesettings = None
 
 
-def test_store_dataset(
+def test_resource_sync(
     session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
-    object_storage_url = "http://myobject-storage:myport/"
-    storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+    my_settings_dict = {
+        "object_storage_url": "object/storage/url",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "my/url",
     }
-
-    mocker.patch.object(
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
+    patch = mocker.patch.object(
         object_storage, "store_file", return_value=("an url", "a version")
     )
     spy1 = mocker.spy(manager, "manage_upload_images_and_layout")
-    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
-    licences = manager.load_licences_from_folder(licences_folder_path)
-    session = session_obj()
-    manager.store_licences(session, licences, object_storage_url, **storage_kws)
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
-    assert resource["licence_uids"][0] in [r["licence_uid"] for r in licences]
-    assert resource["licence_uids"] == ["licence-to-use-copernicus-products"]
-    assert resource["related_resources_keywords"] == []
-    res = session.query(database.Resource).all()
-    assert res == []
+    # start without any licence in the db
+    with session_obj() as session:
+        with pytest.raises(ValueError):
+            manager.resource_sync(session, resource, storage_settings)
+    assert patch.call_count == 0
+    patch.reset_mock()
 
-    patch = mocker.patch(
-        "cads_catalogue.object_storage.store_file",
-        return_value=("an url", "a version"),
-    )
-    stored_record = manager.store_dataset(
-        session, resource, object_storage_url, **storage_kws
-    )
-    session.commit()
-    assert (
-        patch.call_count == 5
-    )  # len(OBJECT_STORAGE_UPLOAD_FILES) + 1 overview.png, cited inside layout.json
-    kwargs = storage_kws.copy()
-    kwargs["subpath"] = "resources/reanalysis-era5-land"
-    kwargs["force"] = True
-    effective_calls_pars = [(c.args, c.kwargs) for c in patch.mock_calls]
-    for file_name, db_field in manager.OBJECT_STORAGE_UPLOAD_FILES:
-        if file_name != "layout.json":
-            expected_call_pars = (
-                (resource[db_field], object_storage_url),
-                kwargs,
-            )
-            assert expected_call_pars in effective_calls_pars
+    # store licences
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences = manager.load_licences_from_folder(licences_folder_path)
+    with session_obj() as session:
+        for licence in licences:
+            licence_uid = licence["licence_uid"]
+            manager.licence_sync(session, licence_uid, licences, storage_settings)
+        session.commit()
+        db_licences = session.execute(
+            "select licence_uid, licence_id from licences order by licence_uid"
+        ).all()
+        uid_id_licence_map = dict(db_licences)
+    patch.reset_mock()
+
+    # create first dataset
+    with session_obj() as session:
+        manager.resource_sync(session, resource, storage_settings)
+        session.commit()
+
+    assert patch.call_count == 5
+    expected_args_object_storage_calls = [
+        (
+            os.path.join(resource_folder_path, "overview.png"),
+            storage_settings.object_storage_url,
+        ),
+        (mocker.ANY, storage_settings.object_storage_url),
+        (
+            os.path.join(resource_folder_path, "constraints.json"),
+            storage_settings.object_storage_url,
+        ),
+        (
+            os.path.join(resource_folder_path, "form.json"),
+            storage_settings.object_storage_url,
+        ),
+        (
+            os.path.join(resource_folder_path, "overview.png"),
+            storage_settings.object_storage_url,
+        ),
+    ]
+    effective_args_object_storage_calls = [pm.args for pm in patch.mock_calls]
+    for expected_args_object_storage_call in expected_args_object_storage_calls:
+        assert expected_args_object_storage_call in effective_args_object_storage_calls
+    assert effective_args_object_storage_calls[1][0].endswith("layout.json")
+    assert {
+        "bucket_name": "mycatalogue_bucket",
+        "subpath": "resources/reanalysis-era5-land",
+        "force": True,
+        "access_key": "admin1",
+        "secret_key": "secret1",
+        "secure": False,
+    } in [pm.kwargs for pm in patch.mock_calls]
     spy1.assert_called_once()
-    # assert (
-    #     (os.path.join(DATA_PATH, "layout.json"), object_storage_url),
-    #     kwargs,
-    # ) in effective_calls_pars
+    patch.reset_mock()
 
-    assert 1 == stored_record.pop("resource_id")
-    for column, value in stored_record.items():
-        if column not in [
-            "adaptor",
-            "record_update",
-            "form",
-            "constraints",
-            "previewimage",
-            "layout",
-        ]:
-            assert resource.get(column) == value
-    assert stored_record["form"] == "an url"
-    assert stored_record["constraints"] == "an url"
-    assert stored_record["previewimage"] == "an url"
-    assert stored_record["layout"] == "an url"
-
-    era5land = (
-        session.query(database.Resource)
-        .filter_by(resource_uid="reanalysis-era5-land")
-        .one()
+    # create second dataset
+    resource_folder_path2 = os.path.join(
+        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land-monthly-means"
     )
-    assert era5land.licences
-    assert era5land.licences[0].licence_uid == "licence-to-use-copernicus-products"
+    resource2 = manager.load_resource_from_folder(resource_folder_path2)
+    with session_obj() as session:
+        manager.resource_sync(session, resource2, storage_settings)
+        session.commit()
 
-    session.close()
+    with session_obj() as session:
+        all_db_resources = session.query(database.Resource).all()
+        utils.compare_resources_with_dumped_file(
+            all_db_resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
+        )
+        assert session.execute(
+            "select resource_id, licence_id "
+            "from resources_licences "
+            "order by resource_id, licence_id"
+        ).all() == [
+            (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+            (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+        ]
+        assert session.execute(
+            "select parent_resource_id, child_resource_id "
+            "from related_resources "
+            "order by parent_resource_id"
+        ).all() == [(1, 2), (2, 1)]
+
+    # modify second dataset
+    resource2["keywords"] = [
+        #  "Product type: Reanalysis",   # removed
+        "Spatial coverage: Global",
+        "Temporal coverage: Past",
+        "Variable domain: Land (hydrology)",
+        "Variable domain: Land (physics)",
+        "Variable domain: Land (biosphere)",
+        "Provider: Copernicus C3S",
+    ]
+    resource2["licence_uids"] = [
+        "licence-to-use-copernicus-products",
+        "eumetsat-cm-saf",  # added
+    ]
+    resource2["ds_contactemail"] = "a_new_test@email"
+    with session_obj() as session:
+        manager.resource_sync(session, resource2, storage_settings)
+        session.commit()
+
+    with session_obj() as session:
+        all_db_resources = session.query(database.Resource).all()
+        utils.compare_resources_with_dumped_file(
+            all_db_resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
+        )
+        assert session.execute(
+            "select resource_id, licence_id "
+            "from resources_licences "
+            "order by resource_id, licence_id"
+        ).all() == [
+            (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+            (2, uid_id_licence_map["eumetsat-cm-saf"]),
+            (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+        ]
+        assert session.execute(
+            "select parent_resource_id, child_resource_id "
+            "from related_resources "
+            "order by parent_resource_id"
+        ).all() == [(1, 2)]
+
     # reset globals for tests following
     config.dbsettings = None
+    config.storagesettings = None
 
 
 def test_load_messages() -> None:

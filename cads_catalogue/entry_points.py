@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import logging
 import os.path
-from typing import Any
 
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -61,98 +61,124 @@ def init_db(connection_string: str | None = None) -> None:
 
 
 @app.command()
-def setup_test_database(
+def update_catalogue(
     connection_string: str | None = None,
     force: bool = False,
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
     licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
+    delete_orphans: bool = False,
 ) -> None:
-    """Fill the database with some test data.
+    """Update the database with the catalogue data.
 
-    Before to fill with test data:
-      - if the database doesn't exist, it creates a new one;
-      - if the structure is not updated (or force=True), it builds up the structure from scratch
+    Before to fill the database:
+      - if the database doesn't exist, it creates the structure;
+      - check input folders has changes from the last run (if not, and force=False, no update is run)
 
     Parameters
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
-    force: if True, create db from scratch also if already existing (default False)
+    force: if True, run update regardless input folders has no changes from last update (default False)
     resources_folder_path: path to the root folder containing metadata files for resources
     licences_folder_path: path to the root folder containing metadata files for licences
+    delete_orphans: if True, delete resources not involved in the update process (default False)
     """
-    # validation
+    # input validation
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
-    # get storage parameters from environment
-    for key in ("OBJECT_STORAGE_URL", "STORAGE_ADMIN", "STORAGE_PASSWORD"):
-        if key not in os.environ:
-            raise KeyError(
-                "key %r must be defined in the environment in order to use the object storage"
-                % key
-            )
-    object_storage_url = os.environ["OBJECT_STORAGE_URL"]
-    storage_kws: dict[str, Any] = {
-        "access_key": os.environ["STORAGE_ADMIN"],
-        "secret_key": os.environ["STORAGE_PASSWORD"],
-        "secure": False,
-    }
-    # load metadata of licences and resources
-    licences = manager.load_licences_from_folder(licences_folder_path)
-    resources = []
-    for resource_slug in os.listdir(resources_folder_path):
-        resource_folder_path = os.path.join(resources_folder_path, resource_slug)
-        if not manager.is_valid_resource(resource_folder_path, licences=licences):
-            logger.warning(
-                "folder %r ignored: not a valid resource folder" % resource_folder_path
-            )
-            continue
-        resource = manager.load_resource_from_folder(resource_folder_path)
-        resources.append(resource)
-    related_resources = manager.find_related_resources(resources)
-    # create empty db if not existing, else inspect the structure
+
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
-    structure_exists = True
-    if not sqlalchemy_utils.database_exists(engine.url):
-        sqlalchemy_utils.create_database(connection_string)
-        structure_exists = False
-        conn = engine.connect()
-    else:
-        conn = engine.connect()
-        query = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-        if set(conn.execute(query).scalars()) != set(database.metadata.tables):  # type: ignore
-            structure_exists = False
+    session_obj = sa.orm.sessionmaker(engine)
 
-    with conn.begin():
-        # create the structure if required
-        if not structure_exists or force:
-            database.metadata.drop_all(conn)
-            database.metadata.create_all(conn)
-        # store metadata collected into the structure
-        session_obj = sa.orm.sessionmaker(bind=conn)
+    # create db/check structure
+    must_reset_structure = False
+    if not sqlalchemy_utils.database_exists(engine.url):
+        logging.info("creating catalogue database")
+        sqlalchemy_utils.create_database(engine.url)
+        must_reset_structure = True
+    else:
         with session_obj.begin() as session:  # type: ignore
-            manager.store_licences(session, licences, object_storage_url, **storage_kws)
-            for resource in resources:
-                manager.store_dataset(
-                    session, resource, object_storage_url, **storage_kws
+            try:
+                assert (
+                    session.query(database.DBRelease).first().db_release_version
+                    == database.DB_VERSION
                 )
-            for res1, res2 in related_resources:
-                res1_obj = (
-                    session.query(database.Resource)
-                    .filter_by(resource_uid=res1["resource_uid"])
-                    .one()
+            except Exception:
+                # TODO: exit with error log. User should call manually the init/update db script
+                logger.warning(
+                    "Catalogue DB structure is not updated. Running the init-db"
                 )
-                res2_obj = (
-                    session.query(database.Resource)
-                    .filter_by(resource_uid=res2["resource_uid"])
-                    .one()
+                must_reset_structure = True
+    if must_reset_structure:
+        init_db(connection_string)
+
+    # get storage parameters from environment
+    storage_settings = config.ensure_storage_settings(config.storagesettings)
+
+    input_resource_uids = []
+    with session_obj.begin() as session:  # type: ignore
+        # check if source folders have changed from last registered update
+        is_db_to_update, resource_hash, licence_hash = manager.is_db_to_update(
+            session, resources_folder_path, licences_folder_path
+        )
+        if not force and not is_db_to_update:
+            logger.info("no manager run: source files didn't change.")
+            return
+
+        # load metadata of licences from files and sync each licence in the db
+        licences = manager.load_licences_from_folder(licences_folder_path)
+        for licence in licences:
+            licence_uid = licence["licence_uid"]
+            try:
+                with session.begin_nested():
+                    manager.licence_sync(
+                        session, licence_uid, licences, storage_settings
+                    )
+            except Exception:  # noqa
+                logger.exception(
+                    "sync for licence %s failed, error follows." % licence_uid
                 )
-                res1_obj.related_resources.append(res2_obj)
-                res2_obj.related_resources.append(res1_obj)
+
+        # load metadata of each resource from files and sync each resource in the db
+        for resource_folder_path in glob.glob(
+            os.path.join(resources_folder_path, "*/")
+        ):
+            resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+            input_resource_uids.append(resource_uid)
+            try:
+                with session.begin_nested():
+                    resource = manager.load_resource_from_folder(resource_folder_path)
+                    manager.resource_sync(session, resource, storage_settings)
+            except Exception:  # noqa
+                logger.exception(
+                    "sync from %s failed, error follows." % resource_folder_path
+                )
+
+        # remote not involved resources from the db
+        if delete_orphans:
+            session.query(database.Resource).filter(
+                database.Resource.resource_uid.notin_(input_resource_uids)
+            ).delete()
+
+        # update hashes from the catalogue_updates table
+        session.query(database.CatalogueUpdate).delete()
+        new_update_info = database.CatalogueUpdate(
+            catalogue_repo_commit=resource_hash, licence_repo_commit=licence_hash
+        )
+        session.add(new_update_info)
+        logger.info(
+            "%supdate catalogue with resources hash: %r and licence hash: %r"
+            % (force and "forced " or "", resource_hash, licence_hash)
+        )
+
+    # TODO? remove licences from the db if both
+    #   * not present in the licences_folder_path
+    #   and
+    #   * not cited from any dataset
 
 
 def main() -> None:
