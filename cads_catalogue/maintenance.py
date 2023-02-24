@@ -18,11 +18,12 @@ import logging
 
 import sqlalchemy.engine
 
-
 logger = logging.getLogger(__name__)
 
 
-def force_vacuum(conn: sqlalchemy.engine.Connection, only_older_than_days: int | None = None) -> None:
+def force_vacuum(
+    conn: sqlalchemy.engine.Connection, only_older_than_days: int | None = None
+) -> None:
     """
     Force run 'vacuum analyze' on all tables.
 
@@ -39,21 +40,24 @@ def force_vacuum(conn: sqlalchemy.engine.Connection, only_older_than_days: int |
     else:
         days = int(only_older_than_days)
         sql = """
-        SELECT relname FROM pg_stat_all_tables 
-        WHERE schemaname = 'public' 
+        SELECT relname FROM pg_stat_all_tables
+        WHERE schemaname = 'public'
         AND (
-         (last_analyze is NULL AND last_autoanalyze is NULL) 
+         (last_analyze is NULL AND last_autoanalyze is NULL)
           OR (
-             (last_analyze < last_autoanalyze OR last_analyze is null) 
+             (last_analyze < last_autoanalyze OR last_analyze is null)
              AND last_autoanalyze < now() - interval '%s day'
-             ) 
-          OR (
-             (last_autoanalyze < last_analyze OR last_autoanalyze is null) 
-             AND last_analyze < now() - interval '%s day' 
              )
-        )""" % (days, days)
+          OR (
+             (last_autoanalyze < last_analyze OR last_autoanalyze is null)
+             AND last_analyze < now() - interval '%s day'
+             )
+        )""" % (
+            days,
+            days,
+        )
     tables = conn.execute(sql).scalars()
     for table in tables:
         logging.debug("running VACUUM ANALYZE for table %s" % table)
-        vacuum_sql = 'VACUUM ANALYZE %s' % table
+        vacuum_sql = "VACUUM ANALYZE %s" % table
         conn.execute(vacuum_sql)
