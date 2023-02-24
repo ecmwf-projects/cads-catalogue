@@ -22,10 +22,40 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 import typer
 
-from cads_catalogue import config, database, manager
+from cads_catalogue import config, database, maintenance, manager
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)
+
+
+@app.command()
+def force_vacuum(
+    connection_string: str | None = None, only_older_than_days: int | None = None
+) -> None:
+    """
+    Force run 'vacuum analyze' on all tables.
+
+    If `only_older_than_days` is not None, running only over tables whose vacuum has not run
+    for more than `only_older_than_days` days.
+
+    Parameters
+    ----------
+    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    only_older_than_days: number of days from the last run of autovacuum that triggers the vacuum of the table
+    """
+    if not connection_string:
+        dbsettings = config.ensure_settings(config.dbsettings)
+        connection_string = dbsettings.connection_string
+    # set isolation_level because vacuum cannot be performed inside a transaction block
+    engine = sa.create_engine(connection_string, isolation_level="AUTOCOMMIT")
+    conn = engine.connect()
+    try:
+        maintenance.force_vacuum(conn, only_older_than_days)
+        logger.info("successfully performed vacuum.")
+    except Exception:
+        logger.exception("problem on forcing vacuum, error follows.")
+    finally:
+        conn.close()
 
 
 @app.command()
