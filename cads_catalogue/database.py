@@ -99,7 +99,7 @@ class Message(BaseModel):
         default="info",
     )
 
-    message_body = sa.Column(sa.Text)
+    body = sa.Column(sa.Text)
     entries = sa.Column(sa.Text)
     is_global = sa.Column(sa.BOOLEAN)
     live = sa.Column(sa.BOOLEAN)

@@ -43,7 +43,7 @@ def md2message_record(msg_path, is_global) -> dict[str, Any]:
     with open(msg_path) as fp:
         text = fp.read()
     md_obj = markdown.Markdown(extensions=["meta"])
-    message_body = md_obj.convert(text).strip()
+    body = md_obj.convert(text).strip()
     header_obj = md_obj.Meta  # type: ignore
     msg_record = {
         "date": datetime.datetime.strptime(header_obj["date"][0], "%Y-%m-%dT%H:%M:%SZ"),
@@ -51,13 +51,13 @@ def md2message_record(msg_path, is_global) -> dict[str, Any]:
         "severity": header_obj.get("severity", ["info"])[0],
         "live": utils.str2bool(header_obj.get("live", ["false"])[0]),
         "is_global": is_global,
-        "message_body": message_body,
+        "body": body,
         "status": header_obj.get("status", ["ongoing"])[0],
         # this is not a db field
         "entries": [e.strip() for e in header_obj.get("entries", [""])[0].split(",")],
     }
     # some validations
-    if not msg_record["summary"] and not msg_record["message_body"]:
+    if not msg_record["summary"] and not msg_record["body"]:
         raise ValueError("both summary and message body empty on %r" % msg_path)
     if msg_record["severity"] not in ("info", "warning", "critical", "success"):
         raise ValueError(

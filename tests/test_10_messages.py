@@ -17,7 +17,7 @@ def test_load_messages() -> None:
             "entries": [""],
             "live": True,
             "is_global": True,
-            "message_body": "<h1>main message content</h1>\n"
+            "body": "<h1>main message content</h1>\n"
             "<p>Wider <strong>markdown syntax</strong> allowed here. "
             "This is the full text message.</p>",
             "status": "fixed",
@@ -29,7 +29,7 @@ def test_load_messages() -> None:
             "entries": ["reanalisys-era5-xxx", "satellite-surface-radiation-budget"],
             "live": False,
             "is_global": False,
-            "message_body": "<h1>message main body for archived warning message for some "
+            "body": "<h1>message main body for archived warning message for some "
             "entries</h1>\n"
             "<p>Wider <strong>markdown syntax</strong> allowed here. In "
             "this example:\n"
@@ -46,7 +46,7 @@ def test_load_messages() -> None:
             "entries": ["reanalisys-era5-land", "satellite-surface-radiation-budget"],
             "live": True,
             "is_global": False,
-            "message_body": "<h1>message main body for active critical message for some "
+            "body": "<h1>message main body for active critical message for some "
             "datasets</h1>\n"
             "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
             "status": "ongoing",
@@ -58,7 +58,7 @@ def test_load_messages() -> None:
             "entries": ["reanalisys-era5-land", "satellite-surface-xxx"],
             "live": False,
             "is_global": False,
-            "message_body": "<h1>message main body for archived critical message for "
+            "body": "<h1>message main body for archived critical message for "
             "some datasets</h1>\n"
             "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
             "status": "ongoing",
@@ -70,7 +70,7 @@ def test_load_messages() -> None:
             "entries": [""],
             "live": False,
             "is_global": True,
-            "message_body": "<h1>main message content</h1>\n"
+            "body": "<h1>main message content</h1>\n"
             "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
             "status": "fixed",
             "severity": "critical",
@@ -82,7 +82,7 @@ def test_load_messages() -> None:
             "severity": "warning",
             "live": True,
             "is_global": True,
-            "message_body": "<h1>main message content</h1>\n<p>Wider <strong>"
+            "body": "<h1>main message content</h1>\n<p>Wider <strong>"
             "markdown syntax</strong> allowed here.</p>",
             "status": "fixed",
             "entries": [""],
