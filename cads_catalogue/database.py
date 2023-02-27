@@ -116,16 +116,16 @@ class Resource(BaseModel):
 
     # internal functionality related
     adaptor = sa.Column(sa.Text)
-    adaptor_configuration = sa.Column(sa.JSON)
-    constraints_data = sa.Column(sa.JSON)
-    form_data = sa.Column(sa.JSON)
-    mapping = sa.Column(sa.JSON)
+    adaptor_configuration = sa.Column(sa.dialects.postgresql.JSONB)
+    constraints_data = sa.Column(sa.dialects.postgresql.JSONB)
+    form_data = sa.Column(sa.dialects.postgresql.JSONB)
+    mapping = sa.Column(sa.dialects.postgresql.JSONB)
     related_resources_keywords = sa.Column(
         sa.dialects.postgresql.ARRAY(sa.VARCHAR(300))
     )
 
     # geo extent
-    geo_extent = sa.Column(sa.JSON)
+    geo_extent = sa.Column(sa.dialects.postgresql.JSONB)
 
     # date/time
     begin_date = sa.Column(sa.Date)
@@ -140,8 +140,8 @@ class Resource(BaseModel):
     abstract = sa.Column(sa.TEXT, nullable=False)
     citation = sa.Column(sa.String)
     contactemail = sa.Column(sa.String)
-    description = sa.Column(sa.JSON, nullable=False)
-    documentation = sa.Column(sa.JSON)
+    description = sa.Column(sa.dialects.postgresql.JSONB, nullable=False)
+    documentation = sa.Column(sa.dialects.postgresql.JSONB)
     doi = sa.Column(sa.String)
     ds_contactemail = sa.Column(sa.String)
     ds_responsible_organisation = sa.Column(sa.String)
@@ -159,7 +159,7 @@ class Resource(BaseModel):
     type = sa.Column(sa.VARCHAR(300), nullable=False)
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
-    variables = sa.Column(sa.JSON)
+    variables = sa.Column(sa.dialects.postgresql.JSONB)
 
     # relationship attributes
     licences = sa.orm.relationship(

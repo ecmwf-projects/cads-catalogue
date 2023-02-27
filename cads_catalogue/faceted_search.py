@@ -35,13 +35,13 @@ datasets = session.query(database.Resource).all()
 
 # Build keywords_dict: a dictionary where keys are the selected categories
 # and the values are the lists of the values selected for the corresponding category.
-# For example, selecting 
+# For example, selecting
 #  "Product type" -> "Reanalysis"
 #  "Product type" -> "Reactive gas"
 #  "Variable domain" -> "Atmosphere (composition)"
 keywords_dict = {"Product type": ["Reanalysis", "Reactive gas"],
                  "Variable domain": ["Atmosphere (composition)"]}
-                 
+
 # Obtain list of datasets that are the results of the query:
 dataset_results = get_datasets_by_keywords(datasets, keywords_dict)
 
@@ -53,9 +53,11 @@ faceted_stats = get_faceted_stats(session, results_ids)
 """
 
 
-def get_faceted_stats(session: Session, resource_ids: List[int]) -> List[Tuple[str, str, int]]:
+def get_faceted_stats(
+    session: Session, resource_ids: List[int]
+) -> List[Tuple[str, str, int]]:
     """
-    Return list of (category_name, category_value, number of datasets)
+    Return list of (category_name, category_value, number of datasets).
 
     Parameters
     ----------
@@ -68,18 +70,22 @@ def get_faceted_stats(session: Session, resource_ids: List[int]) -> List[Tuple[s
     """
     # FIXME: replace using sqlalchemy, not SQL
     sql = """
-    SELECT category_name, category_value, count(resource_id) 
-    FROM resources_keywords 
+    SELECT category_name, category_value, count(resource_id)
+    FROM resources_keywords
     LEFT JOIN keywords USING (keyword_id)
     WHERE resource_id in (%s)
-    GROUP BY (category_name, category_value) 
+    GROUP BY (category_name, category_value)
     ORDER BY category_name, category_value
-    """ % ','.join(["%s" % r for r in resource_ids])
+    """ % ",".join(
+        ["%s" % r for r in resource_ids]
+    )
     result = session.execute(sql).all()
     return result  # type: ignore
 
 
-def get_datasets_by_keywords(resources: List[database.Resource], keywords_dict: dict[str, List[str]]) -> List[int]:
+def get_datasets_by_keywords(
+    resources: List[database.Resource], keywords_dict: dict[str, List[str]]
+) -> List[int]:
     """
     Return the list of resources matching to a set of input keywords.
 
