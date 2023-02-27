@@ -91,7 +91,7 @@ class Message(BaseModel):
 
     message_id = sa.Column(sa.Integer, primary_key=True)
     date = sa.Column(sa.DateTime, nullable=False)
-    summary = sa.Column(sa.Text)
+    summary = sa.Column(sa.Text, nullable=True)
     url = sa.Column(sa.Text)
     severity = sa.Column(
         sa.Enum("info", "warning", "critical", "success", name="severity"),
@@ -99,14 +99,17 @@ class Message(BaseModel):
         default="info",
     )
 
-    body = sa.Column(sa.Text)
+    content = sa.Column(sa.Text)
     entries = sa.Column(sa.Text)
     is_global = sa.Column(sa.BOOLEAN)
     live = sa.Column(sa.BOOLEAN)
     status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
 
     resources = sa.orm.relationship(
-        "Resource", secondary="resources_messages", back_populates="messages"
+        "Resource",
+        secondary="resources_messages",
+        back_populates="messages",
+        lazy="joined",
     )
 
 
