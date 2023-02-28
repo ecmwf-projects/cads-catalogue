@@ -331,7 +331,7 @@ def test_update_catalogue(
     assert msg in [r.msg for r in caplog.records]
     caplog.clear()
     session.close()
-    
+
     # reset globals for tests following
     mocker.resetall()
     config.dbsettings = None
