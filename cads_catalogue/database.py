@@ -83,8 +83,8 @@ class ResourceKeyword(BaseModel):
     keyword_id = sa.Column(
         sa.Integer, sa.ForeignKey("keywords.keyword_id"), primary_key=True
     )
-    
-    
+
+
 class ResourceMessage(BaseModel):
     """many-to-many ORM model for resources-messages."""
 
@@ -110,6 +110,7 @@ class Keyword(BaseModel):
 
     resources = sa.orm.relationship(
         "Resource", secondary="resources_keywords", back_populates="keywords"
+    )
 
 
 class Message(BaseModel):
