@@ -24,7 +24,8 @@ from cads_catalogue import config
 metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
-DB_VERSION = 3  # to increment at each structure change
+
+DB_VERSION = 4  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -71,6 +72,19 @@ related_resources = sa.Table(
 )
 
 
+class ResourceKeyword(BaseModel):
+    """many-to-may ORM model for resources-keywords."""
+
+    __tablename__ = "resources_keywords"
+
+    resource_id = sa.Column(
+        sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
+    )
+    keyword_id = sa.Column(
+        sa.Integer, sa.ForeignKey("keywords.keyword_id"), primary_key=True
+    )
+
+
 class ResourceMessage(BaseModel):
     """many-to-many ORM model for resources-messages."""
 
@@ -81,6 +95,21 @@ class ResourceMessage(BaseModel):
     )
     message_id = sa.Column(
         sa.Integer, sa.ForeignKey("messages.message_id"), primary_key=True
+    )
+
+
+class Keyword(BaseModel):
+    """Keyword ORM model."""
+
+    __tablename__ = "keywords"
+
+    keyword_id = sa.Column(sa.Integer, primary_key=True)
+    category_name = sa.Column(sa.String)
+    category_value = sa.Column(sa.String)
+    keyword_name = sa.Column(sa.String)
+
+    resources = sa.orm.relationship(
+        "Resource", secondary="resources_keywords", back_populates="keywords"
     )
 
 
@@ -99,7 +128,6 @@ class Message(BaseModel):
         nullable=False,
         default="info",
     )
-
     content = sa.Column(sa.Text)
     entries = sa.Column(sa.Text)
     is_global = sa.Column(sa.BOOLEAN)
@@ -131,16 +159,16 @@ class Resource(BaseModel):
 
     # internal functionality related
     adaptor = sa.Column(sa.Text)
-    adaptor_configuration = sa.Column(sa.JSON)
-    constraints_data = sa.Column(sa.JSON)
-    form_data = sa.Column(sa.JSON)
-    mapping = sa.Column(sa.JSON)
+    adaptor_configuration = sa.Column(sa.dialects.postgresql.JSONB)
+    constraints_data = sa.Column(sa.dialects.postgresql.JSONB)
+    form_data = sa.Column(sa.dialects.postgresql.JSONB)
+    mapping = sa.Column(sa.dialects.postgresql.JSONB)
     related_resources_keywords = sa.Column(
         sa.dialects.postgresql.ARRAY(sa.VARCHAR(300))
     )
 
     # geo extent
-    geo_extent = sa.Column(sa.JSON)
+    geo_extent = sa.Column(sa.dialects.postgresql.JSONB)
 
     # date/time
     begin_date = sa.Column(sa.Date)
@@ -155,8 +183,8 @@ class Resource(BaseModel):
     abstract = sa.Column(sa.TEXT, nullable=False)
     citation = sa.Column(sa.String)
     contactemail = sa.Column(sa.String)
-    description = sa.Column(sa.JSON, nullable=False)
-    documentation = sa.Column(sa.JSON)
+    description = sa.Column(sa.dialects.postgresql.JSONB, nullable=False)
+    documentation = sa.Column(sa.dialects.postgresql.JSONB)
     doi = sa.Column(sa.String)
     ds_contactemail = sa.Column(sa.String)
     ds_responsible_organisation = sa.Column(sa.String)
@@ -164,7 +192,6 @@ class Resource(BaseModel):
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
     hidden = sa.Column(sa.BOOLEAN, default=False)
-    keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.VARCHAR(300)))
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)
     responsible_organisation = sa.Column(sa.String)
@@ -175,7 +202,7 @@ class Resource(BaseModel):
     type = sa.Column(sa.VARCHAR(300), nullable=False)
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
-    variables = sa.Column(sa.JSON)
+    variables = sa.Column(sa.dialects.postgresql.JSONB)
 
     # relationship attributes
     licences = sa.orm.relationship(
@@ -190,6 +217,9 @@ class Resource(BaseModel):
         primaryjoin=resource_id == related_resources.c.child_resource_id,
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
         backref=sa.orm.backref("back_related_resources"),  # type: ignore
+    )
+    keywords = sa.orm.relationship(
+        "Keyword", secondary="resources_keywords", back_populates="resources"
     )
 
 

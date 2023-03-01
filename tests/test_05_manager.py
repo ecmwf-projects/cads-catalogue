@@ -1343,6 +1343,7 @@ def test_resource_sync(
     with session_obj() as session:
         manager.resource_sync(session, resource, storage_settings)
         session.commit()
+        assert len(session.query(database.Resource).first().keywords) == 7
 
     assert patch.call_count == 5
     expected_args_object_storage_calls = [
@@ -1387,9 +1388,14 @@ def test_resource_sync(
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
+        all_db_resources = session.query(database.Resource).all()
+        assert (
+            len(all_db_resources[0].keywords) == len(all_db_resources[1].keywords) == 7
+        )
 
     with session_obj() as session:
         all_db_resources = session.query(database.Resource).all()
+
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
@@ -1407,10 +1413,29 @@ def test_resource_sync(
             "from related_resources "
             "order by parent_resource_id"
         ).all() == [(1, 2), (2, 1)]
-
+        assert session.execute(
+            "select resource_id, keyword_id "
+            "from resources_keywords "
+            "order by resource_id, keyword_id"
+        ).all() == [
+            (1, 1),
+            (1, 2),
+            (1, 3),
+            (1, 4),
+            (1, 5),
+            (1, 6),
+            (1, 7),
+            (2, 1),
+            (2, 2),
+            (2, 3),
+            (2, 4),
+            (2, 5),
+            (2, 6),
+            (2, 7),
+        ]
     # modify second dataset
     resource2["keywords"] = [
-        #  "Product type: Reanalysis",   # removed
+        #  "Product type: Reanalysis",  # removed
         "Spatial coverage: Global",
         "Temporal coverage: Past",
         "Variable domain: Land (hydrology)",

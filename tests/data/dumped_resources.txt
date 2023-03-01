@@ -1621,15 +1621,6 @@
         "file_format": null,
         "format_version": "1",
         "hidden": false,
-        "keywords": [
-            "Variable domain: Atmosphere (composition)",
-            "Variable domain: Atmosphere (meteorology)",
-            "Parameter family: Aerosol",
-            "Parameter family: Reactive gas",
-            "Spatial coverage: Global",
-            "Product type: Reanalysis",
-            "Temporal coverage: Past"
-        ],
         "lineage": "Copernicus Atmospheric Monitoring Service",
         "representative_fraction": null,
         "responsible_organisation": "ECMWF",
@@ -4255,15 +4246,6 @@
         "file_format": null,
         "format_version": "1",
         "hidden": false,
-        "keywords": [
-            "Variable domain: Atmosphere (composition)",
-            "Variable domain: Atmosphere (meteorology)",
-            "Parameter family: Aerosol",
-            "Parameter family: Reactive gas",
-            "Spatial coverage: Global",
-            "Product type: Reanalysis",
-            "Temporal coverage: Past"
-        ],
         "lineage": "Copernicus Atmospheric Monitoring Service",
         "representative_fraction": null,
         "responsible_organisation": "ECMWF",
@@ -5411,12 +5393,6 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Product type: Derived reanalysis",
-            "Spatial coverage: Global",
-            "Variable domain: Atmosphere (surface)",
-            "Temporal coverage: Past"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -8938,15 +8914,6 @@
         "file_format": "{grib,netcdf}",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Product type: Reanalysis",
-            "Spatial coverage: Global",
-            "Temporal coverage: Past",
-            "Variable domain: Land (hydrology)",
-            "Variable domain: Land (physics)",
-            "Variable domain: Land (biosphere)",
-            "Provider: Copernicus C3S"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -10728,15 +10695,6 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Product type: Reanalysis",
-            "Spatial coverage: Global",
-            "Temporal coverage: Past",
-            "Variable domain: Land (hydrology)",
-            "Variable domain: Land (physics)",
-            "Variable domain: Land (biosphere)",
-            "Provider: Copernicus C3S"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -14442,14 +14400,6 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Variable domain: Atmosphere (surface)",
-            "Variable domain: Atmosphere (upper air)",
-            "Temporal coverage: Past",
-            "Spatial coverage: Global",
-            "Product type: Reanalysis",
-            "Provider: Copernicus C3S"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -35535,14 +35485,6 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Variable domain: Atmosphere (surface)",
-            "Variable domain: Atmosphere (upper air)",
-            "Temporal coverage: Past",
-            "Spatial coverage: Global",
-            "Product type: Reanalysis",
-            "Provider: Copernicus C3S"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -38733,15 +38675,6 @@
         "file_format": "NetCDF",
         "format_version": null,
         "hidden": false,
-        "keywords": [
-            "Product type: Satellite observations",
-            "Temporal coverage: Past",
-            "Variable domain: Atmosphere (surface)",
-            "Spatial coverage: Global",
-            "Provider: EUMETSAT SAF",
-            "Provider: Copernicus C3S",
-            "Provider: ESA CCI"
-        ],
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",

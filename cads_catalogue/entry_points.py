@@ -102,7 +102,7 @@ def update_catalogue(
     """Update the database with the catalogue data.
 
     Before to fill the database:
-      - if the database doesn't exist, it creates the structure;
+      - if the database doesn't exist (or some tables are missing), it creates the structure from scratch;
       - check input folders has changes from the last run (if not, and force=False, no update is run)
 
     Parameters
