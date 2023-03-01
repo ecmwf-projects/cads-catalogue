@@ -13,6 +13,7 @@ def test_load_messages() -> None:
     msg_root = TEST_MESSAGE_ROOT_PATH
     expected_msgs = [
         {
+            "message_uid": "global/2023/Jan/2021-01-example-of-info-active.md",
             "date": datetime.datetime(2021, 1, 14, 11, 27, 13),
             "entries": [""],
             "live": True,
@@ -25,8 +26,9 @@ def test_load_messages() -> None:
             "summary": "a summary of the message",
         },
         {
+            "message_uid": "contents/2023/2023-01-archived-warning.md",
             "date": datetime.datetime(2023, 1, 11, 11, 27, 13),
-            "entries": ["reanalisys-era5-xxx", "satellite-surface-radiation-budget"],
+            "entries": ["reanalysis-era5-xxx", "satellite-surface-radiation-budget"],
             "live": False,
             "is_global": False,
             "content": "<h1>message main body for archived warning message for some "
@@ -42,8 +44,9 @@ def test_load_messages() -> None:
             "summary": "",
         },
         {
+            "message_uid": "contents/2023/2023-01-era5-issue-456.md",
             "date": datetime.datetime(2023, 1, 12, 11, 27, 13),
-            "entries": ["reanalisys-era5-land", "satellite-surface-radiation-budget"],
+            "entries": ["reanalysis-era5-land", "satellite-surface-radiation-budget"],
             "live": True,
             "is_global": False,
             "content": "<h1>message main body for active critical message for some "
@@ -54,8 +57,9 @@ def test_load_messages() -> None:
             "summary": "example of active critical content message",
         },
         {
+            "message_uid": "contents/foo-bar/this-will-be-also-taken.md",
             "date": datetime.datetime(2023, 1, 13, 11, 27, 13),
-            "entries": ["reanalisys-era5-land", "satellite-surface-xxx"],
+            "entries": ["reanalysis-era5-land", "satellite-surface-xxx"],
             "live": False,
             "is_global": False,
             "content": "<h1>message main body for archived critical message for "
@@ -66,6 +70,7 @@ def test_load_messages() -> None:
             "summary": "example of expired critical content message",
         },
         {
+            "message_uid": "global/2023/Jan/2023-01-example-of-archived-critical.md",
             "date": datetime.datetime(2023, 1, 15, 11, 27, 13),
             "entries": [""],
             "live": False,
@@ -77,6 +82,7 @@ def test_load_messages() -> None:
             "summary": "A **brief description** of the message",
         },
         {
+            "message_uid": "global/2023/Jan/2023-01-example-warning-active.md",
             "date": datetime.datetime(2023, 1, 16, 11, 27, 13),
             "summary": "A **brief description** of the message",
             "severity": "warning",

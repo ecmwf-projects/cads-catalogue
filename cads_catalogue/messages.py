@@ -18,22 +18,79 @@ import datetime
 import logging
 import os
 import pathlib
-from typing import Any, List
+from typing import Any, Dict, List
 
 import markdown
+from sqlalchemy.orm.session import Session
 
-from cads_catalogue import utils
+from cads_catalogue import database, utils
 
+THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def md2message_record(msg_path, is_global) -> dict[str, Any]:
+def message_sync(
+    session: Session,
+    msg: dict[str, Any],
+) -> database.Message:
+    """
+    Compare db record and file of a message and make them the same.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    msg: metadata of loaded message
+
+    Returns
+    -------
+    The created/updated db message
+    """
+    message = msg.copy()
+    message_uid = message["message_uid"]
+    if not message["is_global"]:
+        resource_uids = message.pop("entries")
+        db_resources: Dict[str, Any] = dict()
+        for resource_uid in resource_uids:
+            if "xxx" in resource_uid:
+                pattern = resource_uid.replace("xxx", "%")
+                clause = database.Resource.resource_uid.like(pattern)
+            else:
+                clause = database.Resource.resource_uid == resource_uid
+            for resource_obj in session.query(database.Resource).filter(clause):
+                if not resource_obj:
+                    raise ValueError("resource_uid = %r not found" % resource_uid)
+                db_resources[resource_uid] = db_resources.get(resource_uid, [])
+                db_resources[resource_uid].append(resource_obj)
+
+    db_message = (
+        session.query(database.Message).filter_by(message_uid=message_uid).first()
+    )
+    if not db_message:
+        db_message = database.Message(**message)
+        session.add(db_message)
+        logger.debug("added db message %r" % message_uid)
+    else:
+        session.query(database.Message).filter_by(
+            message_id=db_message.message_id
+        ).update(msg)
+        logger.debug("updated db message %r" % message_uid)
+
+    db_message.resources = []  # type: ignore
+    if not message["is_global"]:
+        for resource_uid in resource_uids:
+            for resource_obj in db_resources[resource_uid]:
+                db_message.resources.append(resource_obj)  # type: ignore
+    return db_message
+
+
+def md2message_record(msg_path, msg_uid, is_global) -> dict[str, Any]:
     """
     Load message record from a markdown file.
 
     Parameters
     ----------
     msg_path: path to the message markdown file
+    msg_uid: uid of the message record
     is_global: True if message must be considered global, False otherwise
 
     Returns
@@ -46,6 +103,7 @@ def md2message_record(msg_path, is_global) -> dict[str, Any]:
     content = md_obj.convert(text).strip()
     header_obj = md_obj.Meta  # type: ignore
     msg_record = {
+        "message_uid": msg_uid,
         "date": datetime.datetime.strptime(header_obj["date"][0], "%Y-%m-%dT%H:%M:%SZ"),
         "summary": " ".join(header_obj.get("summary", [""])).strip(),
         "severity": header_obj.get("severity", ["info"])[0],
@@ -92,8 +150,11 @@ def load_messages(root_msg_folder: str | pathlib.Path) -> List[dict[str, Any]]:
             for current_file in files:
                 file_path = os.path.join(current_root, current_file)
                 if os.path.splitext(current_file)[1].lower() == ".md":
+                    msg_uid = os.path.relpath(file_path, root_msg_folder)
                     try:
-                        msg_record = md2message_record(file_path, is_global=is_global)
+                        msg_record = md2message_record(
+                            file_path, msg_uid, is_global=is_global
+                        )
                     except:  # noqa
                         logger.exception("error loading message %r" % file_path)
                         continue

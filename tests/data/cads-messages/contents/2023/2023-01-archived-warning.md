@@ -2,7 +2,7 @@
 date: 2023-01-11T11:27:13Z
 live: false
 severity: warning
-entries: reanalisys-era5-xxx,satellite-surface-radiation-budget
+entries: reanalysis-era5-xxx,satellite-surface-radiation-budget
 ---
  
 # message main body for archived warning message for some entries 

@@ -90,6 +90,7 @@ class Message(BaseModel):
     __tablename__ = "messages"
 
     message_id = sa.Column(sa.Integer, primary_key=True)
+    message_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     date = sa.Column(sa.DateTime, nullable=False)
     summary = sa.Column(sa.Text, nullable=True)
     url = sa.Column(sa.Text)
