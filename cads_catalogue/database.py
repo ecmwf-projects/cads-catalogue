@@ -24,7 +24,7 @@ from cads_catalogue import config
 metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
-DB_VERSION = 1  # to increment at each structure change
+DB_VERSION = 2  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -69,6 +69,49 @@ related_resources = sa.Table(
     sa.Column("parent_resource_id", sa.Integer, sa.ForeignKey("resources.resource_id")),
     sa.Column("child_resource_id", sa.Integer, sa.ForeignKey("resources.resource_id")),
 )
+
+
+class ResourceMessage(BaseModel):
+    """many-to-many ORM model for resources-messages."""
+
+    __tablename__ = "resources_messages"
+
+    resource_id = sa.Column(
+        sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
+    )
+    message_id = sa.Column(
+        sa.Integer, sa.ForeignKey("messages.message_id"), primary_key=True
+    )
+
+
+class Message(BaseModel):
+    """Message ORM Model."""
+
+    __tablename__ = "messages"
+
+    message_id = sa.Column(sa.Integer, primary_key=True)
+    message_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
+    date = sa.Column(sa.DateTime, nullable=False)
+    summary = sa.Column(sa.Text, nullable=True)
+    url = sa.Column(sa.Text)
+    severity = sa.Column(
+        sa.Enum("info", "warning", "critical", "success", name="severity"),
+        nullable=False,
+        default="info",
+    )
+
+    content = sa.Column(sa.Text)
+    entries = sa.Column(sa.Text)
+    is_global = sa.Column(sa.BOOLEAN)
+    live = sa.Column(sa.BOOLEAN)
+    status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
+
+    resources = sa.orm.relationship(
+        "Resource",
+        secondary="resources_messages",
+        back_populates="messages",
+        lazy="joined",
+    )
 
 
 class Resource(BaseModel):
@@ -137,6 +180,9 @@ class Resource(BaseModel):
     # relationship attributes
     licences = sa.orm.relationship(
         "Licence", secondary="resources_licences", back_populates="resources"
+    )
+    messages = sa.orm.relationship(
+        "Message", secondary="resources_messages", back_populates="resources"
     )
     related_resources = sa.orm.relationship(
         "Resource",
