@@ -22,7 +22,7 @@ import sqlalchemy as sa
 import sqlalchemy_utils
 import typer
 
-from cads_catalogue import config, database, manager
+from cads_catalogue import config, database, manager, messages
 
 app = typer.Typer()
 logger = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ def update_catalogue(
     force: bool = False,
     resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
     licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
+    messages_folder_path: str | None = None,
     delete_orphans: bool = False,
 ) -> None:
     """Update the database with the catalogue data.
@@ -80,6 +81,7 @@ def update_catalogue(
     force: if True, run update regardless input folders has no changes from last update (default False)
     resources_folder_path: path to the root folder containing metadata files for resources
     licences_folder_path: path to the root folder containing metadata files for licences
+    messages_folder_path: path to the root folder containing metadata files for system messages
     delete_orphans: if True, delete resources not involved in the update process (default False)
     """
     # input validation
@@ -87,6 +89,8 @@ def update_catalogue(
         raise ValueError("%r is not a folder" % resources_folder_path)
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
+    if messages_folder_path and not os.path.isdir(messages_folder_path):
+        raise ValueError("%r is not a folder" % messages_folder_path)
 
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
@@ -158,11 +162,38 @@ def update_catalogue(
                     "sync from %s failed, error follows." % resource_folder_path
                 )
 
+        # load metadata of messages from files and sync each messages in the db
+        msgs = []
+        if messages_folder_path:
+            msgs = messages.load_messages(messages_folder_path)
+        involved_msg_ids = []
+        for msg in msgs:
+            msg_uid = msg["message_uid"]
+            involved_msg_ids.append(msg_uid)
+            try:
+                with session.begin_nested():
+                    messages.message_sync(session, msg)
+            except Exception:  # noqa
+                logger.exception("sync for message %s failed, error follows." % msg_uid)
+
+        # remove not loaded messages from the db
+        msgs_to_delete = session.query(database.Message).filter(
+            database.Message.message_uid.notin_(involved_msg_ids)
+        )
+        for msg_to_delete in msgs_to_delete:
+            msg_to_delete.resources = []
+            session.delete(msg_to_delete)
+
         # remote not involved resources from the db
         if delete_orphans:
-            session.query(database.Resource).filter(
+            datasets_to_delete = session.query(database.Resource).filter(
                 database.Resource.resource_uid.notin_(input_resource_uids)
-            ).delete()
+            )
+            for dataset_to_delete in datasets_to_delete:
+                dataset_to_delete.licences = []
+                dataset_to_delete.messages = []
+                dataset_to_delete.related_resources = []
+                session.delete(dataset_to_delete)
 
         # update hashes from the catalogue_updates table
         session.query(database.CatalogueUpdate).delete()
