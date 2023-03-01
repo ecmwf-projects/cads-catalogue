@@ -1,3 +1,4 @@
+import datetime
 import os.path
 import unittest.mock
 from typing import Any
@@ -14,6 +15,8 @@ from cads_catalogue import config, database, entry_points, manager, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
+TEST_MESSAGES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-messages")
+
 runner = CliRunner()
 
 
@@ -110,7 +113,13 @@ def test_update_catalogue(
     # run the script to create the db, and load initial data
     result = runner.invoke(
         entry_points.app,
-        ["update-catalogue", "--connection-string", connection_string],
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+        ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -181,39 +190,144 @@ def test_update_catalogue(
         resources = session.query(database.Resource).order_by(
             database.Resource.resource_uid
         )
-
         utils.compare_resources_with_dumped_file(
             resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
         )
 
-        licences = [
-            utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
-        ]
-        assert len(licences) == len(expected_licences)
-        for expected_licence in expected_licences:
-            effective_found = (
-                session.query(database.Licence)
-                .filter_by(licence_uid=expected_licence["licence_uid"])
-                .all()
-            )
-            assert effective_found
-            for field in ["revision", "title", "download_filename"]:
-                assert getattr(effective_found[0], field) == expected_licence[field]
-
-        resl = (
-            session.query(database.Resource)
-            .filter_by(resource_uid="reanalysis-era5-single-levels")
+    assert session.execute("select count(*) from messages").scalars().one() == 6
+    expected_msgs = [
+        {
+            "message_uid": "contents/2023/2023-01-archived-warning.md",
+            "date": datetime.datetime(2023, 1, 11, 11, 27, 13),
+            "summary": "",
+            "url": None,
+            "severity": "warning",
+            "content": "<h1>message main body for archived warning message for some entries</h1>\n"
+            "<p>Wider <strong>markdown syntax</strong> allowed here. In this example:\n* "
+            "<em>summary</em> is missing, so only this main body message is used\n*"
+            " <em>status</em> is missing (indeed actually is not used yet)</p>",
+            "entries": None,
+            "is_global": False,
+            "live": False,
+            "status": "ongoing",
+        },
+        {
+            "message_uid": "contents/2023/2023-01-era5-issue-456.md",
+            "date": datetime.datetime(2023, 1, 12, 11, 27, 13),
+            "summary": "example of active critical content message",
+            "url": None,
+            "severity": "critical",
+            "content": "<h1>message main body for active critical message for some datasets</h1>\n"
+            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
+            "entries": None,
+            "is_global": False,
+            "live": True,
+            "status": "ongoing",
+        },
+        {
+            "message_uid": "contents/foo-bar/this-will-be-also-taken.md",
+            "date": datetime.datetime(2023, 1, 13, 11, 27, 13),
+            "summary": "example of expired critical content message",
+            "url": None,
+            "severity": "critical",
+            "content": "<h1>message main body for archived critical message for some datasets</h1>\n"
+            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
+            "entries": None,
+            "is_global": False,
+            "live": False,
+            "status": "ongoing",
+        },
+        {
+            "message_uid": "portal/2023/Jan/2021-01-example-of-info-active.md",
+            "date": datetime.datetime(2021, 1, 14, 11, 27, 13),
+            "summary": "a summary of the message",
+            "url": None,
+            "severity": "info",
+            "content": "<h1>main message content</h1>\n<p>Wider <strong>markdown syntax</strong>"
+            " allowed here. This is the full text message.</p>",
+            "entries": '{""}',
+            "is_global": True,
+            "live": True,
+            "status": "fixed",
+        },
+        {
+            "message_uid": "portal/2023/Jan/2023-01-example-of-archived-critical.md",
+            "date": datetime.datetime(2023, 1, 15, 11, 27, 13),
+            "summary": "A **brief description** of the message",
+            "url": None,
+            "severity": "critical",
+            "content": "<h1>main message content</h1>\n<p>Wider <strong>markdown syntax</strong>"
+            " allowed here.</p>",
+            "entries": '{""}',
+            "is_global": True,
+            "live": False,
+            "status": "fixed",
+        },
+        {
+            "message_uid": "portal/2023/Jan/2023-01-example-warning-active.md",
+            "date": datetime.datetime(2023, 1, 16, 11, 27, 13),
+            "summary": "A **brief description** of the message",
+            "url": None,
+            "severity": "warning",
+            "content": "<h1>main message content</h1>\n<p>Wider <strong>markdown syntax</strong>"
+            " allowed here.</p>",
+            "entries": '{""}',
+            "is_global": True,
+            "live": True,
+            "status": "fixed",
+        },
+    ]
+    db_msgs = session.query(database.Message).order_by(database.Message.message_uid)
+    for db_msg in db_msgs:
+        msg_dict = utils.object_as_dict(db_msg)
+        expected_msg = [
+            m for m in expected_msgs if m["message_uid"] == db_msg.message_uid
+        ][0]
+        for k, v in expected_msg.items():
+            assert msg_dict[k] == expected_msg[k]
+    assert sorted(
+        [
+            r.resource_uid
+            for r in session.query(database.Message)
+            .filter_by(message_uid="contents/2023/2023-01-archived-warning.md")
             .one()
-        )
-        assert (
-            resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
-        )
+            .resources
+        ]
+    ) == [
+        "reanalysis-era5-land",
+        "reanalysis-era5-land-monthly-means",
+        "reanalysis-era5-pressure-levels",
+        "reanalysis-era5-single-levels",
+        "satellite-surface-radiation-budget",
+    ]
 
-        catalog_updates = session.query(database.CatalogueUpdate).all()
-        assert len(catalog_updates) == 1
-        assert catalog_updates[0].catalogue_repo_commit == last_commit1
-        assert catalog_updates[0].licence_repo_commit == last_commit2
-        update_time1 = catalog_updates[0].update_time
+    licences = [
+        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+    ]
+    assert len(licences) == len(expected_licences)
+    for expected_licence in expected_licences:
+        effective_found = (
+            session.query(database.Licence)
+            .filter_by(licence_uid=expected_licence["licence_uid"])
+            .all()
+        )
+        assert effective_found
+        for field in ["revision", "title", "download_filename"]:
+            assert getattr(effective_found[0], field) == expected_licence[field]
+
+    resl = (
+        session.query(database.Resource)
+        .filter_by(resource_uid="reanalysis-era5-single-levels")
+        .one()
+    )
+    assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
+
+    catalog_updates = session.query(database.CatalogueUpdate).all()
+    assert len(catalog_updates) == 1
+    assert catalog_updates[0].catalogue_repo_commit == last_commit1
+    assert catalog_updates[0].licence_repo_commit == last_commit2
+    update_time1 = catalog_updates[0].update_time
+    session.close()
 
     # run a second time: do not anything, commit hash are the same
     result = runner.invoke(

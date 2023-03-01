@@ -20,5 +20,6 @@ dependencies:
 - sqlalchemy-stubs
 - pip:
   - pytest-postgresql
+  - types-Markdown
   - types-PyYAML
   - types-sqlalchemy-utils
