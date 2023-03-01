@@ -237,7 +237,7 @@ def test_update_catalogue(
             "status": "ongoing",
         },
         {
-            "message_uid": "global/2023/Jan/2021-01-example-of-info-active.md",
+            "message_uid": "portal/2023/Jan/2021-01-example-of-info-active.md",
             "date": datetime.datetime(2021, 1, 14, 11, 27, 13),
             "summary": "a summary of the message",
             "url": None,
@@ -250,7 +250,7 @@ def test_update_catalogue(
             "status": "fixed",
         },
         {
-            "message_uid": "global/2023/Jan/2023-01-example-of-archived-critical.md",
+            "message_uid": "portal/2023/Jan/2023-01-example-of-archived-critical.md",
             "date": datetime.datetime(2023, 1, 15, 11, 27, 13),
             "summary": "A **brief description** of the message",
             "url": None,
@@ -263,7 +263,7 @@ def test_update_catalogue(
             "status": "fixed",
         },
         {
-            "message_uid": "global/2023/Jan/2023-01-example-warning-active.md",
+            "message_uid": "portal/2023/Jan/2023-01-example-warning-active.md",
             "date": datetime.datetime(2023, 1, 16, 11, 27, 13),
             "summary": "A **brief description** of the message",
             "url": None,

@@ -144,8 +144,11 @@ def load_messages(root_msg_folder: str | pathlib.Path) -> List[dict[str, Any]]:
     """
     loaded_messages: List[dict[str, Any]] = []
     contents_folder = os.path.join(root_msg_folder, "contents")
-    global_folder = os.path.join(root_msg_folder, "global")
+    global_folder = os.path.join(root_msg_folder, "portal")
     for is_global, root_folder in [(False, contents_folder), (True, global_folder)]:
+        if not os.path.isdir(root_folder):
+            logger.warning("not found folder %r" % root_folder)
+            continue
         for current_root, dirs, files in os.walk(root_folder):
             for current_file in files:
                 file_path = os.path.join(current_root, current_file)
