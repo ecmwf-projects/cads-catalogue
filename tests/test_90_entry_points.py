@@ -1,4 +1,5 @@
 import datetime
+import json
 import os.path
 import unittest.mock
 from typing import Any
@@ -442,7 +443,7 @@ def test_update_catalogue(
     spy2.reset_mock()
     # check warning log
     msg = "Catalogue DB structure is not updated. Running the init-db"
-    assert msg in [r.msg for r in caplog.records]
+    assert msg in [json.loads(r.msg)["event"] for r in caplog.records]
     caplog.clear()
     session.close()
 

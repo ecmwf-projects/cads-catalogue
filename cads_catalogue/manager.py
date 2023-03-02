@@ -17,7 +17,6 @@
 import glob
 import itertools
 import json
-import logging
 import os
 import pathlib
 import shutil
@@ -25,11 +24,12 @@ import tempfile
 import urllib.parse
 from typing import Any, List, Tuple
 
+import structlog
 from sqlalchemy.orm.session import Session
 
 from cads_catalogue import config, database, object_storage, utils
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
