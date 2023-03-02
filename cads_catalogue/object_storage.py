@@ -16,16 +16,16 @@
 
 import hashlib
 import json
-import logging
 import os
 import pathlib
 import urllib.parse
 from typing import Any
 
 import minio  # type: ignore
+import structlog
 from minio import commonconfig, versioningconfig
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
     "Version": "2012-10-17",

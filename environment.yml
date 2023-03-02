@@ -13,4 +13,5 @@ dependencies:
 - pydantic
 - sqlalchemy==1.4*
 - sqlalchemy-utils
+- structlog
 - typer

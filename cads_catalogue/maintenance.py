@@ -14,11 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-
 import sqlalchemy.engine
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def force_vacuum(
@@ -58,6 +57,6 @@ def force_vacuum(
         )
     tables = conn.execute(sql).scalars()
     for table in tables:
-        logging.debug("running VACUUM ANALYZE for table %s" % table)
+        logger.debug("running VACUUM ANALYZE for table %s" % table)
         vacuum_sql = "VACUUM ANALYZE %s" % table
         conn.execute(vacuum_sql)

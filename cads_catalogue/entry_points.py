@@ -15,17 +15,17 @@
 # limitations under the License.
 
 import glob
-import logging
 import os.path
 
 import sqlalchemy as sa
 import sqlalchemy_utils
+import structlog
 import typer
 
 from cads_catalogue import config, database, maintenance, manager, messages
 
 app = typer.Typer()
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @app.command()
@@ -131,7 +131,7 @@ def update_catalogue(
     # create db/check structure
     must_reset_structure = False
     if not sqlalchemy_utils.database_exists(engine.url):
-        logging.info("creating catalogue database")
+        logger.info("creating catalogue database")
         sqlalchemy_utils.create_database(engine.url)
         must_reset_structure = True
     else:

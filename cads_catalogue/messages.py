@@ -15,18 +15,18 @@
 # limitations under the License.
 
 import datetime
-import logging
 import os
 import pathlib
 from typing import Any, Dict, List
 
 import markdown
+import structlog
 from sqlalchemy.orm.session import Session
 
 from cads_catalogue import database, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def message_sync(
