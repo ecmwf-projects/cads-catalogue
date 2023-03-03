@@ -138,7 +138,6 @@ def test_update_catalogue(
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
-
     # check no errors
     assert result.exit_code == 0
     # check db is created
@@ -209,14 +208,15 @@ def test_update_catalogue(
         {
             "message_uid": "contents/2023/2023-01-archived-warning.md",
             "date": datetime.datetime(2023, 1, 11, 11, 27, 13),
-            "summary": "",
+            "summary": None,
             "url": None,
             "severity": "warning",
-            "content": "<h1>message main body for archived warning message for some entries</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here. In this example:\n* "
-            "<em>summary</em> is missing, so only this main body message is used\n*"
-            " <em>status</em> is missing (indeed actually is not used yet)</p>",
-            "entries": None,
+            "content": "# message main body for archived warning message for some "
+            "entries \n"
+            " \n"
+            "Wider **markdown syntax** allowed here. In this example:\n"
+            "* *summary* is missing, so only this main body message is used\n"
+            "* *status* is missing (indeed actually is not used yet)",
             "is_global": False,
             "live": False,
             "status": "ongoing",
@@ -227,9 +227,10 @@ def test_update_catalogue(
             "summary": "example of active critical content message",
             "url": None,
             "severity": "critical",
-            "content": "<h1>message main body for active critical message for some datasets</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
-            "entries": None,
+            "content": "# message main body for active critical message for some "
+            "datasets \n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "is_global": False,
             "live": True,
             "status": "ongoing",
@@ -240,9 +241,10 @@ def test_update_catalogue(
             "summary": "example of expired critical content message",
             "url": None,
             "severity": "critical",
-            "content": "<h1>message main body for archived critical message for some datasets</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
-            "entries": None,
+            "content": "# message main body for archived critical message for some "
+            "datasets \n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "is_global": False,
             "live": False,
             "status": "ongoing",
@@ -253,9 +255,10 @@ def test_update_catalogue(
             "summary": "a summary of the message",
             "url": None,
             "severity": "info",
-            "content": "<h1>main message content</h1>\n<p>Wider <strong>markdown syntax</strong>"
-            " allowed here. This is the full text message.</p>",
-            "entries": '{""}',
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here. This is the full text "
+            "message.",
             "is_global": True,
             "live": True,
             "status": "fixed",
@@ -266,9 +269,9 @@ def test_update_catalogue(
             "summary": "A **brief description** of the message",
             "url": None,
             "severity": "critical",
-            "content": "<h1>main message content</h1>\n<p>Wider <strong>markdown syntax</strong>"
-            " allowed here.</p>",
-            "entries": '{""}',
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "is_global": True,
             "live": False,
             "status": "fixed",
@@ -279,9 +282,9 @@ def test_update_catalogue(
             "summary": "A **brief description** of the message",
             "url": None,
             "severity": "warning",
-            "content": "<h1>main message content</h1>\n<p>Wider <strong>markdown syntax</strong>"
-            " allowed here.</p>",
-            "entries": '{""}',
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "is_global": True,
             "live": True,
             "status": "fixed",
