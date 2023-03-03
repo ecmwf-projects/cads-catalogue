@@ -16,7 +16,9 @@ from cads_catalogue import config, database, entry_points, manager, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
+TEST_RESOURCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-forms-json")
 TEST_MESSAGES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-messages")
+TEST_LICENCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cds-licences")
 
 runner = CliRunner()
 
@@ -39,13 +41,15 @@ def test_init_db(postgresql: Connection[str]) -> None:
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
 
 
-def get_last_commit_factory(folder_suffix, folder_commit, else_commit2):
+def get_last_commit_factory(folder1, commit1, folder2, commit2, else_commit3):
     def dummy_get_last_commit(folder):
         """Use for testing is_db_to_update."""
-        if folder_suffix in folder:
-            return folder_commit
+        if folder1 in folder:
+            return commit1
+        elif folder2 in folder:
+            return commit2
         else:
-            return else_commit2
+            return else_commit3
 
     return dummy_get_last_commit
 
@@ -102,8 +106,9 @@ def test_update_catalogue(
     )
     last_commit1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
     last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
+    last_commit3 = "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69"
     dummy_last_commit_function = get_last_commit_factory(
-        "cads-forms-json", last_commit1, last_commit2
+        "cads-forms-json", last_commit1, "cds-licences", last_commit2, last_commit3
     )
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
     spy1 = mocker.spy(sqlalchemy_utils, "create_database")
@@ -118,8 +123,12 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -327,13 +336,24 @@ def test_update_catalogue(
     assert len(catalog_updates) == 1
     assert catalog_updates[0].catalogue_repo_commit == last_commit1
     assert catalog_updates[0].licence_repo_commit == last_commit2
+    assert catalog_updates[0].message_repo_commit == last_commit3
     update_time1 = catalog_updates[0].update_time
     session.close()
 
     # run a second time: do not anything, commit hash are the same
     result = runner.invoke(
         entry_points.app,
-        ["update-catalogue", "--connection-string", connection_string],
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+        ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -358,7 +378,18 @@ def test_update_catalogue(
     # run a third time: force to run
     result = runner.invoke(
         entry_points.app,
-        ["update-catalogue", "--connection-string", connection_string, "--force"],
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--force",
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+        ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -425,7 +456,18 @@ def test_update_catalogue(
     session.commit()
     result = runner.invoke(
         entry_points.app,
-        ["update-catalogue", "--connection-string", connection_string, "--force"],
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--force",
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+        ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
@@ -442,7 +484,7 @@ def test_update_catalogue(
     spy2.assert_called_once()
     spy2.reset_mock()
     # check warning log
-    msg = "Catalogue DB structure is not updated. Running the init-db"
+    msg = "detected an old catalogue db structure"
     assert msg in [json.loads(r.msg)["event"] for r in caplog.records]
     caplog.clear()
     session.close()
@@ -495,7 +537,18 @@ def test_transaction_update_catalogue(
     # ....so the entry point execution should fail...
     result = runner.invoke(
         entry_points.app,
-        ["update-catalogue", "--connection-string", connection_string, "--force"],
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--force",
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+        ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
