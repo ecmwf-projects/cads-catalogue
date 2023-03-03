@@ -22,6 +22,8 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
+import logging
+import sys
 
 import structlog
 
@@ -41,6 +43,12 @@ __all__ = [
     "update_catalogue",
     "main",
 ]
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    stream=sys.stdout,
+)
 
 structlog.configure(
     processors=[
