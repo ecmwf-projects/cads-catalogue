@@ -4671,7 +4671,7 @@
         "form": "an url",
         "layout": "an url",
         "previewimage": "an url",
-        "adaptor": "import cacholote\nfrom cads_retrieve_tools import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    data_format = request.pop(\"format\", \"zip\")\n\n    if data_format not in {\"zip\", \"tgz\"}:\n        raise ValueError(f\"{data_format=} is not supported\")\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls(\n        [ru[\"url\"] for ru in requests_urls],\n        data_format=data_format\n    )\n    return open(path, \"rb\")\n",
+        "adaptor": "import cacholote\nfrom cads_adaptors import mapping, url_tools\n\n\n@cacholote.cacheable\ndef url_adaptor(request, config, metadata):\n\n    data_format = request.pop(\"format\", \"zip\")\n\n    if data_format not in {\"zip\", \"tgz\"}:\n        raise ValueError(f\"{data_format=} is not supported\")\n\n    mapping_config = config.pop(\"mapping\", {})\n    mapped_request = mapping.apply_mapping(request, mapping_config)\n\n    requests_urls = url_tools.requests_to_urls(mapped_request, patterns=config[\"patterns\"])\n\n    path = url_tools.download_from_urls(\n        [ru[\"url\"] for ru in requests_urls],\n        data_format=data_format\n    )\n    return open(path, \"rb\")\n",
         "adaptor_configuration": {
             "entry_point": "url_adaptor",
             "patterns": [
