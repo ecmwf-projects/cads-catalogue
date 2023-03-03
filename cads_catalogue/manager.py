@@ -34,9 +34,7 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
 )
-TEST_RESOURCES_DATA_PATH = os.path.abspath(
-    os.path.join(THIS_PATH, "..", "tests", "data", "cads-forms-json")
-)
+
 OBJECT_STORAGE_UPLOAD_FILES = [
     # (file_name, "db_field_name),
     ("constraints.json", "constraints"),
@@ -50,7 +48,8 @@ def is_db_to_update(
     session: Session,
     resources_folder_path: str | pathlib.Path,
     licences_folder_path: str | pathlib.Path,
-) -> Tuple[bool, str | None, str | None]:
+    messages_folder_path: str | pathlib.Path,
+) -> Tuple[bool, str | None, str | None, str | None]:
     """
     Compare current and last run's status of repo folders and return if the database is to update.
 
@@ -59,6 +58,7 @@ def is_db_to_update(
     session: opened SQLAlchemy session
     resources_folder_path: the folder path where to look for metadata files of all the resources
     licences_folder_path: the folder path where to look for metadata files of all the licences
+    messages_folder_path: the folder path where to look for metadata files of all the messages
 
     Returns
     -------
@@ -66,6 +66,7 @@ def is_db_to_update(
     """
     resource_hash = None
     licence_hash = None
+    message_hash = None
     last_update_record = (
         session.query(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
@@ -86,24 +87,46 @@ def is_db_to_update(
             % licences_folder_path
         )
 
+    try:
+        message_hash = utils.get_last_commit_hash(messages_folder_path)
+    except Exception:  # noqa
+        logger.exception(
+            "no check on commit hash for folder %r, error follows"
+            % messages_folder_path
+        )
+
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
         is_to_update = True
-        return is_to_update, resource_hash, licence_hash
+        return is_to_update, resource_hash, licence_hash, message_hash
 
     # last_update_record exists
     last_resource_hash = getattr(last_update_record, "catalogue_repo_commit")
     last_licence_hash = getattr(last_update_record, "licence_repo_commit")
-    if (
-        last_resource_hash
-        and last_resource_hash == resource_hash
-        and last_licence_hash
-        and last_licence_hash == licence_hash
-    ):
+    last_message_hash = getattr(last_update_record, "message_repo_commit")
+
+    if not last_resource_hash:
+        logger.warning("no information of last resource repository commit")
+    elif last_resource_hash != resource_hash:
+        logger.info("detected update of resource repository")
+    if not last_licence_hash:
+        logger.warning("no information of last licence repository commit")
+    elif last_licence_hash != licence_hash:
+        logger.info("detected update of licence repository")
+    if not last_message_hash:
+        logger.warning("no information of last message repository commit")
+    elif last_message_hash != message_hash:
+        logger.info("detected update of message repository")
+
+    if last_resource_hash and (
+        last_resource_hash,
+        last_licence_hash,
+        last_message_hash,
+    ) == (resource_hash, licence_hash, message_hash):
         is_to_update = False
     else:
         is_to_update = True
-    return is_to_update, resource_hash, licence_hash
+    return is_to_update, resource_hash, licence_hash, message_hash
 
 
 def is_valid_resource(
@@ -502,9 +525,6 @@ def load_layout_images_info(folder_path: str | pathlib.Path) -> dict[str, Any]:
 
 def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load metadata of a resource from an input folder.
-
-    Actually imported is based on examples provided for reanalysis-era5-land and
-    satellite-surface-radiation-budget.
 
     Parameters
     ----------

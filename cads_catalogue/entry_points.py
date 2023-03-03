@@ -43,6 +43,7 @@ def force_vacuum(
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     only_older_than_days: number of days from the last run of autovacuum that triggers the vacuum of the table
     """
+    logger.info("starting catalogue db vacuum")
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
@@ -51,9 +52,9 @@ def force_vacuum(
     conn = engine.connect()
     try:
         maintenance.force_vacuum(conn, only_older_than_days)
-        logger.info("successfully performed vacuum.")
-    except Exception:
-        logger.exception("problem on forcing vacuum, error follows.")
+        logger.info("successfully performed catalogue db vacuum")
+    except Exception:  # noqa
+        logger.exception("problem during db vacuum, error follows")
     finally:
         conn.close()
 
@@ -72,7 +73,7 @@ def info(connection_string: str | None = None) -> None:
     engine = sa.create_engine(connection_string)
     connection = engine.connect()
     connection.close()
-    logger.info("successfully connected to the catalogue database.")
+    logger.info("successfully connected to the catalogue database")
 
 
 @app.command()
@@ -83,20 +84,24 @@ def init_db(connection_string: str | None = None) -> None:
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
+    logger.info(
+        "starting initialization of catalogue db structure (version %s)"
+        % database.DB_VERSION
+    )
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     database.init_database(connection_string)
-    logger.info("successfully created the catalogue database structure.")
+    logger.info("successfully created the catalogue db structure")
 
 
 @app.command()
 def update_catalogue(
+    resources_folder_path: str = "",  # TODO: remove default
+    messages_folder_path: str = "",  # TODO: remove default
+    licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
     connection_string: str | None = None,
     force: bool = False,
-    resources_folder_path: str = manager.TEST_RESOURCES_DATA_PATH,
-    licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
-    messages_folder_path: str | None = None,
     delete_orphans: bool = False,
 ) -> None:
     """Update the database with the catalogue data.
@@ -107,11 +112,11 @@ def update_catalogue(
 
     Parameters
     ----------
+    resources_folder_path: path to the root folder containing metadata files for resources
+    messages_folder_path: path to the root folder containing metadata files for system messages
+    licences_folder_path: path to the root folder containing metadata files for licences
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     force: if True, run update regardless input folders has no changes from last update (default False)
-    resources_folder_path: path to the root folder containing metadata files for resources
-    licences_folder_path: path to the root folder containing metadata files for licences
-    messages_folder_path: path to the root folder containing metadata files for system messages
     delete_orphans: if True, delete resources not involved in the update process (default False)
     """
     # input validation
@@ -119,7 +124,7 @@ def update_catalogue(
         raise ValueError("%r is not a folder" % resources_folder_path)
     if not os.path.isdir(licences_folder_path):
         raise ValueError("%r is not a folder" % licences_folder_path)
-    if messages_folder_path and not os.path.isdir(messages_folder_path):
+    if not os.path.isdir(messages_folder_path):
         raise ValueError("%r is not a folder" % messages_folder_path)
 
     if not connection_string:
@@ -131,7 +136,7 @@ def update_catalogue(
     # create db/check structure
     must_reset_structure = False
     if not sqlalchemy_utils.database_exists(engine.url):
-        logger.info("creating catalogue database")
+        logger.info("creating catalogue db")
         sqlalchemy_utils.create_database(engine.url)
         must_reset_structure = True
     else:
@@ -141,30 +146,36 @@ def update_catalogue(
                     session.query(database.DBRelease).first().db_release_version
                     == database.DB_VERSION
                 )
-            except Exception:
+            except Exception:  # noqa
                 # TODO: exit with error log. User should call manually the init/update db script
-                logger.warning(
-                    "Catalogue DB structure is not updated. Running the init-db"
-                )
+                logger.warning("detected an old catalogue db structure")
                 must_reset_structure = True
     if must_reset_structure:
         init_db(connection_string)
 
     # get storage parameters from environment
     storage_settings = config.ensure_storage_settings(config.storagesettings)
-
     input_resource_uids = []
     with session_obj.begin() as session:  # type: ignore
         # check if source folders have changed from last registered update
-        is_db_to_update, resource_hash, licence_hash = manager.is_db_to_update(
-            session, resources_folder_path, licences_folder_path
+        (
+            is_db_to_update,
+            resource_hash,
+            licence_hash,
+            message_hash,
+        ) = manager.is_db_to_update(
+            session, resources_folder_path, licences_folder_path, messages_folder_path
         )
         if not force and not is_db_to_update:
-            logger.info("no manager run: source files didn't change.")
+            logger.info("catalogue update skipped: source files have not changed")
             return
 
+        logger.info("running catalogue db update for licences")
         # load metadata of licences from files and sync each licence in the db
         licences = manager.load_licences_from_folder(licences_folder_path)
+        logger.info(
+            "loaded %s licences from %s" % (len(licences), licences_folder_path)
+        )
         for licence in licences:
             licence_uid = licence["licence_uid"]
             try:
@@ -172,30 +183,37 @@ def update_catalogue(
                     manager.licence_sync(
                         session, licence_uid, licences, storage_settings
                     )
+                logger.info("licence %s db sync successful" % licence_uid)
             except Exception:  # noqa
                 logger.exception(
-                    "sync for licence %s failed, error follows." % licence_uid
+                    "db sync for licence %s failed, error follows" % licence_uid
                 )
 
+        logger.info("running catalogue db update for resources")
         # load metadata of each resource from files and sync each resource in the db
         for resource_folder_path in glob.glob(
             os.path.join(resources_folder_path, "*/")
         ):
             resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+            logger.debug("parsing folder %s" % resource_folder_path)
             input_resource_uids.append(resource_uid)
             try:
                 with session.begin_nested():
                     resource = manager.load_resource_from_folder(resource_folder_path)
+                    logger.info("resource %s loaded successful" % resource_uid)
                     manager.resource_sync(session, resource, storage_settings)
+                logger.info("resource %s db sync successful" % resource_uid)
             except Exception:  # noqa
                 logger.exception(
-                    "sync from %s failed, error follows." % resource_folder_path
+                    "db sync for resource %s failed, error follows" % resource_uid
                 )
 
+        logger.info("running catalogue db update for messages")
         # load metadata of messages from files and sync each messages in the db
-        msgs = []
-        if messages_folder_path:
-            msgs = messages.load_messages(messages_folder_path)
+        msgs = messages.load_messages(messages_folder_path)
+        logger.info(
+            "loaded %s messages from folder %s" % (len(msgs), messages_folder_path)
+        )
         involved_msg_ids = []
         for msg in msgs:
             msg_uid = msg["message_uid"]
@@ -203,8 +221,11 @@ def update_catalogue(
             try:
                 with session.begin_nested():
                     messages.message_sync(session, msg)
+                logger.info("message %s db sync successful" % msg_uid)
             except Exception:  # noqa
-                logger.exception("sync for message %s failed, error follows." % msg_uid)
+                logger.exception(
+                    "db sync for message %s failed, error follows" % msg_uid
+                )
 
         # remove not loaded messages from the db
         msgs_to_delete = session.query(database.Message).filter(
@@ -213,6 +234,7 @@ def update_catalogue(
         for msg_to_delete in msgs_to_delete:
             msg_to_delete.resources = []
             session.delete(msg_to_delete)
+            logger.debug("removed old message %s" % msg_to_delete.message_uid)
 
         # remote not involved resources from the db
         if delete_orphans:
@@ -224,16 +246,19 @@ def update_catalogue(
                 dataset_to_delete.messages = []
                 dataset_to_delete.related_resources = []
                 session.delete(dataset_to_delete)
+                logger.info("removed old resource %s" % dataset_to_delete.resource_uid)
 
         # update hashes from the catalogue_updates table
         session.query(database.CatalogueUpdate).delete()
         new_update_info = database.CatalogueUpdate(
-            catalogue_repo_commit=resource_hash, licence_repo_commit=licence_hash
+            catalogue_repo_commit=resource_hash,
+            licence_repo_commit=licence_hash,
+            message_repo_commit=message_hash,
         )
         session.add(new_update_info)
         logger.info(
-            "%supdate catalogue with resources hash: %r and licence hash: %r"
-            % (force and "forced " or "", resource_hash, licence_hash)
+            "%sdb update with input git hashes: %r, %r, %r"
+            % (force and "forced " or "", resource_hash, licence_hash, message_hash)
         )
 
     # TODO? remove licences from the db if both
