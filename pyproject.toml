@@ -13,9 +13,9 @@ classifiers = [
   "Topic :: Scientific/Engineering"
 ]
 dependencies = [
-  "markdown",
   "minio",
   "pydantic",
+  "python-frontmatter",
   "sqlalchemy",
   "sqlalchemy_utils",
   "structlog",

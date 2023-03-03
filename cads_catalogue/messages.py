@@ -14,16 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import os
 import pathlib
 from typing import Any, Dict, List
 
-import markdown
+import frontmatter  # type: ignore
 import structlog
 from sqlalchemy.orm.session import Session
 
-from cads_catalogue import database, utils
+from cads_catalogue import database
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
@@ -47,9 +46,9 @@ def message_sync(
     """
     message = msg.copy()
     message_uid = message["message_uid"]
+    resource_uids = message.pop("entries")
+    db_resources: Dict[str, Any] = dict()
     if not message["is_global"]:
-        resource_uids = message.pop("entries")
-        db_resources: Dict[str, Any] = dict()
         for resource_uid in resource_uids:
             if "xxx" in resource_uid:
                 pattern = resource_uid.replace("xxx", "%")
@@ -97,22 +96,18 @@ def md2message_record(msg_path, msg_uid, is_global) -> dict[str, Any]:
     -------
     dictionary of information parsed.
     """
-    with open(msg_path) as fp:
-        text = fp.read()
-    md_obj = markdown.Markdown(extensions=["meta"])
-    content = md_obj.convert(text).strip()
-    header_obj = md_obj.Meta  # type: ignore
+    md_obj = frontmatter.load(msg_path)
     msg_record = {
         "message_uid": msg_uid,
-        "date": datetime.datetime.strptime(header_obj["date"][0], "%Y-%m-%dT%H:%M:%SZ"),
-        "summary": " ".join(header_obj.get("summary", [""])).strip(),
-        "severity": header_obj.get("severity", ["info"])[0],
-        "live": utils.str2bool(header_obj.get("live", ["false"])[0]),
+        "date": md_obj["date"].replace(tzinfo=None),
+        "summary": md_obj.get("summary"),
+        "severity": md_obj.get("severity", "info"),
+        "live": md_obj.get("live", "false"),
         "is_global": is_global,
-        "content": content,
-        "status": header_obj.get("status", ["ongoing"])[0],
+        "content": md_obj.content.strip(),
+        "status": md_obj.get("status", "ongoing"),
         # this is not a db field
-        "entries": [e.strip() for e in header_obj.get("entries", [""])[0].split(",")],
+        "entries": [e.strip() for e in md_obj.get("entries", "").split(",")],
     }
     # some validations
     if not msg_record["summary"] and not msg_record["content"]:

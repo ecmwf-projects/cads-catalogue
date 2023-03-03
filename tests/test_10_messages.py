@@ -18,9 +18,10 @@ def test_load_messages() -> None:
             "entries": [""],
             "live": True,
             "is_global": True,
-            "content": "<h1>main message content</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here. "
-            "This is the full text message.</p>",
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here. This is the full text "
+            "message.",
             "status": "fixed",
             "severity": "info",
             "summary": "a summary of the message",
@@ -31,17 +32,15 @@ def test_load_messages() -> None:
             "entries": ["reanalysis-era5-xxx", "satellite-surface-radiation-budget"],
             "live": False,
             "is_global": False,
-            "content": "<h1>message main body for archived warning message for some "
-            "entries</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here. In "
-            "this example:\n"
-            "* <em>summary</em> is missing, so only this main body "
-            "message is used\n"
-            "* <em>status</em> is missing (indeed actually is not used "
-            "yet)</p>",
+            "content": "# message main body for archived warning message for some "
+            "entries \n"
+            " \n"
+            "Wider **markdown syntax** allowed here. In this example:\n"
+            "* *summary* is missing, so only this main body message is used\n"
+            "* *status* is missing (indeed actually is not used yet)",
             "status": "ongoing",
             "severity": "warning",
-            "summary": "",
+            "summary": None,
         },
         {
             "message_uid": "contents/2023/2023-01-era5-issue-456.md",
@@ -49,9 +48,10 @@ def test_load_messages() -> None:
             "entries": ["reanalysis-era5-land", "satellite-surface-radiation-budget"],
             "live": True,
             "is_global": False,
-            "content": "<h1>message main body for active critical message for some "
-            "datasets</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
+            "content": "# message main body for active critical message for some "
+            "datasets \n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "status": "ongoing",
             "severity": "critical",
             "summary": "example of active critical content message",
@@ -62,9 +62,10 @@ def test_load_messages() -> None:
             "entries": ["reanalysis-era5-land", "satellite-surface-xxx"],
             "live": False,
             "is_global": False,
-            "content": "<h1>message main body for archived critical message for "
-            "some datasets</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
+            "content": "# message main body for archived critical message for some "
+            "datasets \n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "status": "ongoing",
             "severity": "critical",
             "summary": "example of expired critical content message",
@@ -75,8 +76,9 @@ def test_load_messages() -> None:
             "entries": [""],
             "live": False,
             "is_global": True,
-            "content": "<h1>main message content</h1>\n"
-            "<p>Wider <strong>markdown syntax</strong> allowed here.</p>",
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "status": "fixed",
             "severity": "critical",
             "summary": "A **brief description** of the message",
@@ -84,14 +86,15 @@ def test_load_messages() -> None:
         {
             "message_uid": "portal/2023/Jan/2023-01-example-warning-active.md",
             "date": datetime.datetime(2023, 1, 16, 11, 27, 13),
-            "summary": "A **brief description** of the message",
-            "severity": "warning",
+            "entries": [""],
             "live": True,
             "is_global": True,
-            "content": "<h1>main message content</h1>\n<p>Wider <strong>"
-            "markdown syntax</strong> allowed here.</p>",
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
             "status": "fixed",
-            "entries": [""],
+            "severity": "warning",
+            "summary": "A **brief description** of the message",
         },
     ]
     loaded_msgs = messages.load_messages(msg_root)
