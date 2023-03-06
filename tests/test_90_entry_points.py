@@ -12,7 +12,14 @@ from psycopg import Connection
 from sqlalchemy.orm import sessionmaker
 from typer.testing import CliRunner
 
-from cads_catalogue import config, database, entry_points, manager, utils
+from cads_catalogue import (
+    config,
+    database,
+    entry_points,
+    licence_manager,
+    manager,
+    utils,
+)
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -113,7 +120,7 @@ def test_update_catalogue(
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
     spy1 = mocker.spy(sqlalchemy_utils, "create_database")
     spy2 = mocker.spy(database, "init_database")
-    spy3 = mocker.spy(manager, "load_licences_from_folder")
+    spy3 = mocker.spy(licence_manager, "load_licences_from_folder")
     spy4 = mocker.spy(manager, "resource_sync")
 
     # run the script to create the db, and load initial data

@@ -160,3 +160,51 @@ def load_messages(root_msg_folder: str | pathlib.Path) -> List[dict[str, Any]]:
                 else:
                     logger.warning("file at path %r will not be parsed" % file_path)
     return loaded_messages
+
+
+def update_catalogue_messages(
+    session: Session,
+    messages_folder_path: str | pathlib.Path,
+    remove_orphans: bool = True,
+):
+    """
+    Load metadata of messages from files and sync each message in the db.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    messages_folder_path: path to the root folder containing metadata files for system messages
+    remove_orphans: if True, remove from the database other messages not involved (default True)
+
+    Returns
+    -------
+    list: list of message uids involved
+    """
+    logger.info("running catalogue db update for messages")
+    # load metadata of messages from files and sync each messages in the db
+    msgs = load_messages(messages_folder_path)
+    logger.info("loaded %s messages from folder %s" % (len(msgs), messages_folder_path))
+    involved_msg_ids = []
+    for msg in msgs:
+        msg_uid = msg["message_uid"]
+        involved_msg_ids.append(msg_uid)
+        try:
+            with session.begin_nested():
+                message_sync(session, msg)
+            logger.info("message %s db sync successful" % msg_uid)
+        except Exception:  # noqa
+            logger.exception("db sync for message %s failed, error follows" % msg_uid)
+
+    if not remove_orphans:
+        return involved_msg_ids
+
+    # remove not loaded messages from the db
+    msgs_to_delete = session.query(database.Message).filter(
+        database.Message.message_uid.notin_(involved_msg_ids)
+    )
+    for msg_to_delete in msgs_to_delete:
+        msg_to_delete.resources = []  # type: ignore
+        session.delete(msg_to_delete)
+        logger.debug("removed old message %s" % msg_to_delete.message_uid)
+
+    return involved_msg_ids

@@ -29,7 +29,8 @@ import structlog
 
 from .database import Licence, Resource, ResourceLicence, init_database
 from .entry_points import info, main, update_catalogue
-from .manager import load_licences_from_folder, load_resource_from_folder
+from .licence_manager import load_licences_from_folder
+from .manager import load_resource_from_folder
 
 __all__ = [
     "__version__",
