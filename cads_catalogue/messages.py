@@ -18,7 +18,7 @@ import os
 import pathlib
 from typing import Any, Dict, List
 
-import frontmatter  # type: ignore
+import frontmatter
 import structlog
 from sqlalchemy.orm.session import Session
 
