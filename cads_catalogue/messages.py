@@ -18,7 +18,10 @@ import os
 import pathlib
 from typing import Any, Dict, List
 
-import frontmatter  # type: ignore
+try:
+    import frontmatter  # type: ignore
+except ModuleNotFoundError:
+    pass
 import structlog
 from sqlalchemy.orm.session import Session
 
