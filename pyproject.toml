@@ -38,6 +38,12 @@ exclude = "tests/data"
 plugins = "sqlmypy"
 strict = false
 
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+  "frontmatter.*"
+]
+
 [tool.ruff]
 ignore = [
   # pydocstyle: Missing Docstrings

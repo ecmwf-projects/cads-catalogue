@@ -18,7 +18,7 @@ import os
 import pathlib
 from typing import Any, Dict, List
 
-import frontmatter  # type: ignore
+import frontmatter
 import structlog
 from sqlalchemy.orm.session import Session
 
@@ -71,7 +71,7 @@ def message_sync(
     else:
         session.query(database.Message).filter_by(
             message_id=db_message.message_id
-        ).update(msg)
+        ).update(message)
         logger.debug("updated db message %r" % message_uid)
 
     db_message.resources = []  # type: ignore

@@ -661,7 +661,7 @@ def find_related_resources(
     """
     relationships_found = []
     all_possible_relationships = itertools.permutations(resources, 2)
-    for (res1, res2) in all_possible_relationships:
+    for res1, res2 in all_possible_relationships:
         if (
             only_involving_uid
             and res1.resource_uid != only_involving_uid
