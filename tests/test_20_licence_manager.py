@@ -29,6 +29,7 @@ def test_licence_sync(
         "revision": 4,
         "title": "CCI product licence",
         "download_filename": "an url",
+        "scope": "dataset",
     }
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
@@ -71,6 +72,7 @@ def test_licence_sync(
         "revision": 4,
         "title": "CCI product licence UPDATED",
         "download_filename": "an url",
+        "scope": "dataset",
     }
     licences = [updated_licence]
     with session_obj() as session:
@@ -97,6 +99,7 @@ def test_load_licences_from_folder() -> None:
             "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
             "revision": 4,
             "title": "CCI product licence",
+            "scope": "dataset",
         },
         {
             "download_filename": os.path.join(
@@ -105,6 +108,7 @@ def test_load_licences_from_folder() -> None:
             "licence_uid": "eumetsat-cm-saf",
             "revision": 1,
             "title": "EUMETSAT CM SAF products licence",
+            "scope": "dataset",
         },
         {
             "download_filename": os.path.join(
@@ -113,6 +117,7 @@ def test_load_licences_from_folder() -> None:
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
+            "scope": "dataset",
         },
     ]
     licences = sorted(

@@ -114,6 +114,8 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                 }
                 for key in licence:
                     assert licence[key], "%r is required" % key
+                licence["scope"] = json_data.get("scope", "dataset")
+                assert licence["scope"] in ("dataset", "portal")
             except Exception:  # noqa
                 logger.exception(
                     "licence file %r is not compliant: ignored" % json_filepath
