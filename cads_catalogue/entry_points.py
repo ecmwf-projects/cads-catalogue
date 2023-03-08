@@ -176,7 +176,7 @@ def update_catalogue(
             logger.info("catalogue update skipped: source files have not changed")
             return
 
-        licence_manager.update_catalogue_licences(
+        involved_licences = licence_manager.update_catalogue_licences(
             session, licences_folder_path, storage_settings
         )
         involved_resource_uids = manager.update_catalogue_resources(
@@ -184,9 +184,11 @@ def update_catalogue(
         )
         messages.update_catalogue_messages(session, messages_folder_path)
 
-        # remote not involved resources from the db
         if delete_orphans:
             manager.remove_datasets(session, keep_resource_uids=involved_resource_uids)
+        licence_manager.remove_orphan_licences(
+            session, keep_licences=involved_licences, resources=involved_resource_uids
+        )
 
         # update hashes from the catalogue_updates table
         session.query(database.CatalogueUpdate).delete()
@@ -200,11 +202,6 @@ def update_catalogue(
             "%sdb update with input git hashes: %r, %r, %r"
             % (force and "forced " or "", resource_hash, licence_hash, message_hash)
         )
-
-    # TODO? remove licences from the db if both
-    #   * not present in the licences_folder_path
-    #   and
-    #   * not cited from any dataset
 
 
 def main() -> None:

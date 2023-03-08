@@ -171,3 +171,27 @@ def update_catalogue_licences(
                 "db sync for licence %s failed, error follows" % licence_uid
             )
     return involved_licence_uids
+
+
+def remove_orphan_licences(
+    session: Session, keep_licences: List[str], resources: List[str]
+):
+    """
+    Remove all licences that not are in the list of `keep_licences` and unrelated to any resource.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    keep_licences: list of licence_uid to keep
+    resources: list of resource_uid
+    """
+    licences_to_delete = session.query(database.Resource).filter(
+        database.Resource.resource_uid.notin_(keep_licences)
+    )
+    for licence_to_delete in licences_to_delete:
+        related_dataset_uids = [r.resource_uid for r in licence_to_delete.resources]
+        if set(related_dataset_uids).intersection(set(resources)):
+            continue
+        licence_to_delete.resources = []  # type: ignore
+        session.delete(licence_to_delete)
+        logger.info("removed licence %s" % licence_to_delete.licence_uid)
