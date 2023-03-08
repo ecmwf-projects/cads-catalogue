@@ -76,8 +76,8 @@ def licence_sync(
     storage_kws = storage_settings.storage_kws
     db_licence.download_filename = object_storage.store_file(
         file_path,
-        storage_settings.object_storage_url,
-        bucket_name=storage_settings.catalogue_bucket,
+        storage_settings.object_storage_url,  # type: ignore
+        bucket_name=storage_settings.catalogue_bucket,  # type: ignore
         subpath=subpath,
         force=True,
         **storage_kws,

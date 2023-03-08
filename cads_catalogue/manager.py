@@ -481,9 +481,9 @@ def resource_sync(
     if "layout" in object_storage_fields:
         dataset["layout"] = manage_upload_images_and_layout(
             dataset,
-            storage_settings.object_storage_url,
-            storage_settings.document_storage_url,
-            bucket_name=storage_settings.catalogue_bucket,
+            storage_settings.object_storage_url,  # type: ignore
+            storage_settings.document_storage_url,  # type: ignore
+            bucket_name=storage_settings.catalogue_bucket,  # type: ignore
             **storage_settings.storage_kws,
         )
         object_storage_fields.remove("layout")
@@ -494,8 +494,8 @@ def resource_sync(
             continue
         dataset[db_field] = object_storage.store_file(
             file_path,
-            storage_settings.object_storage_url,
-            bucket_name=storage_settings.catalogue_bucket,
+            storage_settings.object_storage_url,  # type: ignore
+            bucket_name=storage_settings.catalogue_bucket,  # type: ignore
             subpath=subpath,
             force=True,
             **storage_settings.storage_kws,
