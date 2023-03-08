@@ -115,6 +115,9 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                 for key in licence:
                     assert licence[key], "%r is required" % key
                 licence["scope"] = json_data.get("scope", "dataset")
+                # TODO: hardcoded uid for licence with scope 'portal' is to remove
+                if licence["licence_uid"] == "terms-of-use-cds":
+                    licence["scope"] = "portal"
                 assert licence["scope"] in ("dataset", "portal")
             except Exception:  # noqa
                 logger.exception(
