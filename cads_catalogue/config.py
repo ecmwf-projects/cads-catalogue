@@ -61,14 +61,27 @@ class ObjectStorageSettings(pydantic.BaseSettings):
     - ``document_storage_url``: object storage URL (public)
     """
 
-    object_storage_url: str
-    storage_admin: str
-    storage_password: str
-    catalogue_bucket: str
-    document_storage_url: str
+    object_storage_url: str | None = None
+    storage_admin: str | None = None
+    storage_password: str | None = None
+    catalogue_bucket: str | None = None
+    document_storage_url: str | None = None
+
+    @pydantic.validator(
+        "object_storage_url",
+        "storage_admin",
+        "storage_password",
+        "catalogue_bucket",
+        "document_storage_url",
+    )
+    def fields_must_be_set(cls: pydantic.BaseSettings, v: str | None) -> str | None:
+        """Validate parameters for connection to object storage."""
+        if v is None:
+            raise ValueError("some settings for the object storage are not set")
+        return v
 
     @property
-    def storage_kws(self) -> dict[str, str | bool]:
+    def storage_kws(self) -> dict[str, str | bool | None]:
         """Return a dictionary to be used with the storage client."""
         return {
             "access_key": self.storage_admin,

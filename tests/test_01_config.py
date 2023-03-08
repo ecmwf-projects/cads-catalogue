@@ -52,7 +52,7 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
         "postgresql://%(catalogue_db_user)s:%(catalogue_db_password)s"
         "@%(catalogue_db_host)s/%(catalogue_db_name)s" % my_settings_dict
     )
-    mysettings = config.SqlalchemySettings(**my_settings_dict)
+    mysettings = config.SqlalchemySettings(**my_settings_dict)  # type: ignore
     effective_settings = config.ensure_settings(mysettings)
 
     assert config.dbsettings == effective_settings
