@@ -25,7 +25,7 @@ metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
 
-DB_VERSION = 6  # to increment at each structure change
+DB_VERSION = 7  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -232,6 +232,9 @@ class Licence(BaseModel):
     revision = sa.Column(sa.Integer, index=True, nullable=False)
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
+    scope = sa.Column(
+        sa.Enum("portal", "dataset", name="licence_scope"), default="dataset"
+    )
 
     resources = sa.orm.relationship(
         "Resource", secondary="resources_licences", back_populates="licences"
