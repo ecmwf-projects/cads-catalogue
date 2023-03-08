@@ -65,7 +65,7 @@ def test_storagesettings(temp_environ: Any) -> None:
     # check settings must have a password set (no default)
     temp_environ.pop("storage_password", default=None)
     with pytest.raises(ValueError) as excinfo:
-        config.ObjectStorageSettings()
+        config.ObjectStorageSettings()  # type: ignore
     assert "storage_password" in str(excinfo.value)
     config.storagesettings = None
 
@@ -79,7 +79,7 @@ def test_storagesettings(temp_environ: Any) -> None:
     for k, v in my_settings_dict.items():
         temp_environ[k] = v
 
-    settings = config.ObjectStorageSettings()
+    settings = config.ObjectStorageSettings()  # type: ignore
     for k, v in my_settings_dict.items():
         assert v == getattr(settings, k)
     config.storagesettings = None
