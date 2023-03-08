@@ -182,11 +182,11 @@ def remove_orphan_licences(
     Parameters
     ----------
     session: opened SQLAlchemy session
-    keep_licences: list of licence_uid to keep
+    keep_licences: list of licence uids to keep
     resources: list of resource_uid
     """
-    licences_to_delete = session.query(database.Resource).filter(
-        database.Resource.resource_uid.notin_(keep_licences)
+    licences_to_delete = session.query(database.Licence).filter(
+        database.Licence.licence_uid.notin_(keep_licences)
     )
     for licence_to_delete in licences_to_delete:
         related_dataset_uids = [r.resource_uid for r in licence_to_delete.resources]

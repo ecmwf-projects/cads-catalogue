@@ -574,13 +574,12 @@ def test_transaction_update_catalogue(
     for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
         assert len([e for e in error_messages if dataset_name in e]) >= 1
     session_obj = sessionmaker(engine)
-    # ...anyway the licence content is updated...
+    # ...anyway the licence content is updated...(uninvolved licence is removed)
     with session_obj() as session:
         licences = session.execute(
             "select licence_uid from licences order by lower(licence_uid)"
         ).all()
         assert licences == [
-            ("a-licence",),
             ("CCI-data-policy-for-satellite-surface-radiation-budget",),
             ("eumetsat-cm-saf",),
             ("licence-to-use-copernicus-products",),
