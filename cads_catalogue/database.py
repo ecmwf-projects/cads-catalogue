@@ -25,7 +25,7 @@ metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
 
-DB_VERSION = 5  # to increment at each structure change
+DB_VERSION = 6  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
