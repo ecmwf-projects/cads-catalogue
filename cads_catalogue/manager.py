@@ -162,114 +162,6 @@ def is_valid_resource(
     return True
 
 
-def licence_sync(
-    session: Session,
-    licence_uid: str,
-    licences: list[dict[str, Any]],
-    storage_settings: config.ObjectStorageSettings,
-) -> database.Licence:
-    """
-    Compare db record and file of a licence and make them the same.
-
-    Parameters
-    ----------
-    session: opened SQLAlchemy session
-    licence_uid: slag of the licence to sync with the database
-    licences: list of metadata of all loaded licences
-    storage_settings: object with settings to access the object storage
-
-    Returns
-    -------
-    The created/updated db licence
-    """
-    loaded_licences = [r for r in licences if r["licence_uid"] == licence_uid]
-    if len(loaded_licences) == 0:
-        raise ValueError("not found licence %r in loaded licences" % licence_uid)
-    elif len(loaded_licences) > 1:
-        raise ValueError(
-            "more than 1 licence for slag %r in loaded licences" % licence_uid
-        )
-    loaded_licence = loaded_licences[0]
-    db_licence = (
-        session.query(database.Licence)
-        .filter_by(licence_uid=licence_uid, revision=loaded_licence["revision"])
-        .first()
-    )
-    if not db_licence:
-        db_licence = database.Licence(**loaded_licence)
-        session.add(db_licence)
-        logger.debug("added db licence %r" % licence_uid)
-    else:
-        session.query(database.Licence).filter_by(
-            licence_id=db_licence.licence_id
-        ).update(loaded_licence)
-        logger.debug("updated db licence %r" % licence_uid)
-
-    file_path = db_licence.download_filename
-    subpath = os.path.join("licences", licence_uid)
-    storage_kws = storage_settings.storage_kws
-    db_licence.download_filename = object_storage.store_file(
-        file_path,
-        storage_settings.object_storage_url,  # type: ignore
-        bucket_name=storage_settings.catalogue_bucket,  # type: ignore
-        subpath=subpath,
-        force=True,
-        **storage_kws,
-    )[0]
-    return db_licence
-
-
-def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
-    """Load licences metadata from json files contained in a folder.
-
-    Parameters
-    ----------
-    folder_path: the folder path where to look for json files
-
-    Returns
-    -------
-    list: list of dictionaries of metadata collected
-    """
-    licences: List[dict[str, Any]] = []
-    json_filepaths = glob.glob(os.path.join(folder_path, "*.json"))
-    for json_filepath in json_filepaths:
-        if "deprecated" in os.path.basename(json_filepath).lower():
-            continue
-        with open(json_filepath) as fp:
-            try:
-                json_data = json.load(fp)
-                licence = {
-                    "licence_uid": json_data["id"],
-                    "revision": int(json_data["revision"]),
-                    "title": json_data["title"],
-                    "download_filename": os.path.abspath(
-                        os.path.join(folder_path, json_data["downloadableFilename"])
-                    ),
-                }
-                for key in licence:
-                    assert licence[key], "%r is required" % key
-            except Exception:  # noqa
-                logger.exception(
-                    "licence file %r is not compliant: ignored" % json_filepath
-                )
-                continue
-            already_loaded = [
-                (i, r)
-                for i, r in enumerate(licences)
-                if r["licence_uid"] == licence["licence_uid"]
-            ]
-            if already_loaded:
-                logger.warning(
-                    "found multiple licence slags %s in folder %s. Consider to remove the older revisions"
-                    % (licence["licence_uid"], folder_path)
-                )
-                if already_loaded[0][1]["revision"] < licence["revision"]:
-                    licences[already_loaded[0][0]] = licence
-            else:
-                licences.append(licence)
-    return licences
-
-
 def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load a resource's metadata regarding files that should be uploaded to the object storage.
 
@@ -786,3 +678,63 @@ def find_related_resources(
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found
+
+
+def update_catalogue_resources(
+    session: Session,
+    resources_folder_path: str | pathlib.Path,
+    storage_settings: config.ObjectStorageSettings,
+) -> List[str]:
+    """
+    Load metadata of resources from files and sync each resource in the db.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    resources_folder_path: path to the root folder containing metadata files for resources
+    storage_settings: object with settings to access the object storage
+
+    Returns
+    -------
+    list: list of resource uids involved
+    """
+    input_resource_uids = []
+
+    logger.info("running catalogue db update for resources")
+    # load metadata of each resource from files and sync each resource in the db
+    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+        resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+        logger.debug("parsing folder %s" % resource_folder_path)
+        input_resource_uids.append(resource_uid)
+        try:
+            with session.begin_nested():
+                resource = load_resource_from_folder(resource_folder_path)
+                logger.info("resource %s loaded successful" % resource_uid)
+                resource_sync(session, resource, storage_settings)
+            logger.info("resource %s db sync successful" % resource_uid)
+        except Exception:  # noqa
+            logger.exception(
+                "db sync for resource %s failed, error follows" % resource_uid
+            )
+    return input_resource_uids
+
+
+def remove_datasets(session: Session, keep_resource_uids: List[str]):
+    """
+    Remove all datasets that not are in the list of `keep_resource_uids`.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    keep_resource_uids: list of uids of resources to save
+    """
+    # remote not involved resources from the db
+    datasets_to_delete = session.query(database.Resource).filter(
+        database.Resource.resource_uid.notin_(keep_resource_uids)
+    )
+    for dataset_to_delete in datasets_to_delete:
+        dataset_to_delete.licences = []  # type: ignore
+        dataset_to_delete.messages = []  # type: ignore
+        dataset_to_delete.related_resources = []  # type: ignore
+        session.delete(dataset_to_delete)
+        logger.info("removed resource %s" % dataset_to_delete.resource_uid)
