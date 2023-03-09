@@ -25,7 +25,7 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 TEST_RESOURCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-forms-json")
 TEST_MESSAGES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-messages")
-TEST_LICENCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cds-licences")
+TEST_LICENCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-licences")
 
 runner = CliRunner()
 
@@ -74,7 +74,7 @@ def test_update_catalogue(
     engine = sa.create_engine(connection_string)
     session_obj = sessionmaker(engine)
     licence_path = os.path.join(
-        TESTDATA_PATH, "cds-licences/licence-to-use-copernicus-products.pdf"
+        TESTDATA_PATH, "cads-licences/licence-to-use-copernicus-products.pdf"
     )
     object_storage_url = "http://myobject-storage:myport/"
     doc_storage_url = "http://mypublic-storage/"
@@ -115,7 +115,7 @@ def test_update_catalogue(
     last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
     last_commit3 = "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69"
     dummy_last_commit_function = get_last_commit_factory(
-        "cads-forms-json", last_commit1, "cds-licences", last_commit2, last_commit3
+        "cads-forms-json", last_commit1, "cads-licences", last_commit2, last_commit3
     )
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
     spy1 = mocker.spy(sqlalchemy_utils, "create_database")
@@ -176,7 +176,7 @@ def test_update_catalogue(
     expected_calls = [  # these are only some
         unittest.mock.call(
             os.path.join(
-                TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
+                TESTDATA_PATH, "cads-licences", "licence-to-use-copernicus-products.pdf"
             ),
             object_storage_url,
             bucket_name=bucket_name,
