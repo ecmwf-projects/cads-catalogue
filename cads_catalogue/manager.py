@@ -238,6 +238,7 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
             with open(file_path) as fp:
                 metadata[db_field] = json.load(fp)
 
+    metadata["adaptor"] = None
     adaptor_code_path = os.path.join(folder_path, "adaptor.py")
     if os.path.isfile(adaptor_code_path):
         with open(adaptor_code_path) as fp:
