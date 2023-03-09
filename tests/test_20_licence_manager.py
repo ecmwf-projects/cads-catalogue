@@ -20,7 +20,7 @@ def test_licence_sync(
         "catalogue_bucket": "mycatalogue_bucket",
         "document_storage_url": "my/url",
     }
-    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
     licences = licence_manager.load_licences_from_folder(licences_folder_path)
     licence_uid = "CCI-data-policy-for-satellite-surface-radiation-budget"
     licence_md = {
@@ -88,8 +88,7 @@ def test_licence_sync(
 
 
 def test_load_licences_from_folder() -> None:
-    # test data taken from repository "https://git.ecmwf.int/projects/CDS/repos/cds-licences"
-    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
     expected_licences = [
         {
             "download_filename": os.path.join(

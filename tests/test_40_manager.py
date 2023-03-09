@@ -23,7 +23,7 @@ def dummy_get_last_commit_hash1(folder):
     """Use for testing is_db_to_update."""
     if "cads-forms-json" in folder:
         return "5f662d202e4084dd569567bab0957c8a56f79c0f"
-    elif "cds-licences" in folder:
+    elif "cads-licences" in folder:
         return "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
     else:
         return "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69"
@@ -33,7 +33,7 @@ def dummy_get_last_commit_hash2(folder):
     """Use for testing is_db_to_update."""
     if "cads-forms-json" in folder:
         return "5f662d202e4084dd569567bab0957c8a56f79aaa"
-    elif "cds-licences" in folder:
+    elif "cads-licences" in folder:
         return "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
     else:
         return "ebdb3b017a14a42fb75ea7b44992f3f178aa0ccc"
@@ -44,7 +44,7 @@ def test_is_db_to_update(
 ) -> None:
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_get_last_commit_hash1)
     resource_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json")
-    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
     messages_folder_path = os.path.join(TESTDATA_PATH, "cds-messages")
     last_c1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
     last_l1 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
@@ -1228,7 +1228,7 @@ def test_resource_sync(
     patch.reset_mock()
 
     # store licences
-    licences_folder_path = os.path.join(TESTDATA_PATH, "cds-licences")
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
     licences = licence_manager.load_licences_from_folder(licences_folder_path)
     with session_obj() as session:
         for licence in licences:

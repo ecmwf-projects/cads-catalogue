@@ -18,6 +18,7 @@ import glob
 import json
 import os
 import pathlib
+import shutil
 from typing import Any, List
 
 import structlog
@@ -105,19 +106,16 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
             try:
                 json_data = json.load(fp)
                 licence = {
-                    "licence_uid": json_data["id"],
+                    "licence_uid": json_data["licence_uid"],
                     "revision": int(json_data["revision"]),
                     "title": json_data["title"],
                     "download_filename": os.path.abspath(
-                        os.path.join(folder_path, json_data["downloadableFilename"])
+                        os.path.join(folder_path, json_data["download_filename"])
                     ),
                 }
                 for key in licence:
                     assert licence[key], "%r is required" % key
                 licence["scope"] = json_data.get("scope", "dataset")
-                # TODO: hardcoded uid for licence with scope 'portal' is to remove
-                if licence["licence_uid"] == "terms-of-use-cds":
-                    licence["scope"] = "portal"
                 assert licence["scope"] in ("dataset", "portal")
             except Exception:  # noqa
                 logger.exception(
@@ -200,3 +198,87 @@ def remove_orphan_licences(
         licence_to_delete.resources = []  # type: ignore
         session.delete(licence_to_delete)
         logger.info("removed licence %s" % licence_to_delete.licence_uid)
+
+
+def migrate_from_cds_licences(
+    cds_licences_folder: str | pathlib.Path, cads_licences_folder: str | pathlib.Path
+) -> None:
+    """
+    Migrate contents from cds-licences to new repo cads-licences.
+
+    Parameters
+    ----------
+    cds_licences_folder: cds-licences root folder path
+    cads_licences_folder: cads-licences root folder path
+    """
+    licences: List[dict[str, Any]] = []
+    all_input_files = os.listdir(cds_licences_folder)
+    json_filepaths = glob.glob(os.path.join(cds_licences_folder, "*.json"))
+    for json_filepath in json_filepaths:
+        if "deprecated" in os.path.basename(json_filepath).lower():
+            logger.warning("licence ignored because deprecated: %r" % json_filepath)
+            continue
+        with open(json_filepath) as fp:
+            try:
+                json_data = json.load(fp)
+                licence = {
+                    "licence_uid": json_data["id"],
+                    "revision": int(json_data["revision"]),
+                    "title": json_data["title"],
+                    "download_filename": json_data["downloadableFilename"],
+                }
+                assert os.path.isfile(
+                    os.path.join(cds_licences_folder, json_data["downloadableFilename"])
+                )
+                for key in licence:
+                    assert licence[key], "%r is required" % key
+                licence["scope"] = json_data.get("scope", "dataset")
+                if licence["licence_uid"] == "terms-of-use-cds":
+                    licence["scope"] = "portal"
+                assert licence["scope"] in ("dataset", "portal")
+                md_files = [
+                    r
+                    for r in all_input_files
+                    if r.lower().startswith(licence["licence_uid"])
+                    and r.lower().endswith(".md")
+                ]
+                if len(md_files) > 1:
+                    logger.warning(
+                        "more .md files for licence %s" % licence["licence_uid"]
+                    )
+                    continue
+                if len(md_files) == 1:
+                    licence["md_filename"] = md_files[0]
+            except Exception:  # noqa
+                logger.exception(
+                    "licence file %r is not compliant: ignored" % json_filepath
+                )
+                continue
+            already_loaded = [
+                (i, r)
+                for i, r in enumerate(licences)
+                if r["licence_uid"] == licence["licence_uid"]
+            ]
+            if already_loaded:
+                logger.warning(
+                    "found multiple licence slags %s in folder %s. Consider to remove the older revisions"
+                    % (licence["licence_uid"], cds_licences_folder)
+                )
+                if already_loaded[0][1]["revision"] < licence["revision"]:
+                    licences[already_loaded[0][0]] = licence
+            else:
+                licences.append(licence)
+    for licence in licences:
+        licence_uid = licence["licence_uid"]
+        json_file_path = os.path.join(cads_licences_folder, licence_uid + ".json")
+        with open(json_file_path, "w") as fp:
+            json.dump(licence, fp, indent=2)
+        shutil.copyfile(
+            os.path.join(cds_licences_folder, licence["download_filename"]),
+            os.path.join(cads_licences_folder, licence["download_filename"]),
+        )
+        if licence.get("md_filename"):
+            shutil.copyfile(
+                os.path.join(cds_licences_folder, licence["md_filename"]),
+                os.path.join(cads_licences_folder, licence["md_filename"]),
+            )

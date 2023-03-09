@@ -1,11 +1,7 @@
 {
-
-	"id": "eumetsat-cm-saf",
-
+	"licence_uid": "eumetsat-cm-saf",
 	"revision": 1,
-
 	"title": "EUMETSAT CM SAF products licence",
-
-	"downloadableFilename": "eumetsat-cm-saf.pdf"
-
+	"download_filename": "eumetsat-cm-saf.pdf",
+    "scope": "dataset"
 }

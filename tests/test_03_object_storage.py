@@ -31,7 +31,7 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
         "secure": False,
     }
     file_path = os.path.join(
-        TESTDATA_PATH, "cds-licences", "licence-to-use-copernicus-products.pdf"
+        TESTDATA_PATH, "cads-licences", "licence-to-use-copernicus-products.pdf"
     )
     # patching the used Minio client APIs
     patch1 = mocker.patch.object(minio.Minio, "__init__", return_value=None)
