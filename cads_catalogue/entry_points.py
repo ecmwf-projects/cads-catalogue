@@ -28,10 +28,39 @@ from cads_catalogue import (
     maintenance,
     manager,
     messages,
+    validations,
 )
 
 app = typer.Typer()
 logger = structlog.get_logger(__name__)
+
+
+@app.command()
+def validate_dataset(resource_folder_path: str) -> None:
+    """
+    Validate a dataset folder for the catalogue manager.
+
+    Parameters
+    ----------
+    resource_folder_path: dataset folder path
+    """
+    if not os.path.isdir(resource_folder_path):
+        raise ValueError("%r is not a folder" % resource_folder_path)
+    validations.validate_dataset(resource_folder_path)
+
+
+@app.command()
+def validate_datasets(resources_folder_path: str) -> None:
+    """
+    Explore and report subfolders to validate contents as valid datasets for the catalogue manager.
+
+    Parameters
+    ----------
+    resources_folder_path: the root folder where to search dataset subfolders in
+    """
+    if not os.path.isdir(resources_folder_path):
+        raise ValueError("%r is not a folder" % resources_folder_path)
+    validations.validate_datasets(resources_folder_path)
 
 
 @app.command()

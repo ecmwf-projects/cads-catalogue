@@ -47,7 +47,7 @@ __all__ = [
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(message)s",
+    format="%(levelname).4s: %(message)s",
     stream=sys.stdout,
 )
 
