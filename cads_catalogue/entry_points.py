@@ -173,7 +173,10 @@ def update_catalogue(
             session, resources_folder_path, licences_folder_path, messages_folder_path
         )
         if not force and not is_db_to_update:
-            logger.info("catalogue update skipped: source files have not changed")
+            logger.info(
+                "catalogue update skipped: source files have not changed. "
+                "Use --force to update anyway."
+            )
             return
 
         involved_licences = licence_manager.update_catalogue_licences(
