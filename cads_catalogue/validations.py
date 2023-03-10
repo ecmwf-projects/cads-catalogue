@@ -219,6 +219,12 @@ def validate_metadata_json(dataset_folder):
     return metadata
 
 
+def validate_variables(dataset_folder):
+    """Validate variables.json of a dataset."""
+    file_name = "variables.json"
+    validate_base_json(dataset_folder, file_name, required=False)
+
+
 def validate_dataset(dataset_folder: str) -> None:
     """
     Validate a dataset folder for the catalogue manager.
@@ -235,6 +241,7 @@ def validate_dataset(dataset_folder: str) -> None:
     validate_form(dataset_folder)
     validate_layout(dataset_folder)
     validate_mapping(dataset_folder)
+    validate_variables(dataset_folder)
     logger.info(f"---end validation of folder {dataset_folder}---")
 
 
