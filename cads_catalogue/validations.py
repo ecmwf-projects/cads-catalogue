@@ -25,11 +25,32 @@ from cads_catalogue import utils
 logger = logging.getLogger(__name__)
 
 
+def validate_base_json(folder, file_name, required=True):
+    """Do a base validation of a json file inside a folder."""
+    logger.info(f"-starting validation of {file_name}-")
+    file_path = os.path.join(folder, file_name)
+    if not os.path.isfile(file_path):
+        if required:
+            logger.error("{file_name} not found")
+        return
+
+    with open(file_path) as fp:
+        try:
+            data = json.load(fp)
+        except Exception:  # noqa
+            logger.exception("{file_name} is not a valid json")
+            return
+    return data
+
+
 def validate_adaptors(dataset_folder):
     """Validate adaptor information of a dataset."""
     logger.info("-starting validation of adaptors-")
     adaptor_conf_file_path = os.path.join(dataset_folder, "adaptor.json")
+    adaptor_code_file_path = os.path.join(dataset_folder, "adaptor.py")
     if not os.path.isfile(adaptor_conf_file_path):
+        if os.path.isfile(adaptor_code_file_path):
+            logger.error("found adaptor.py without adaptor.json")
         return
 
     with open(adaptor_conf_file_path) as fp:
@@ -59,6 +80,30 @@ def validate_adaptors(dataset_folder):
                 code = fp.read()
             if entry_point not in code:
                 logger.error("class name '{entry_point}' not found in adaptor.py")
+
+
+def validate_constraints(dataset_folder):
+    """Validate constraints.json of a dataset."""
+    file_name = "constraints.json"
+    validate_base_json(dataset_folder, file_name)
+
+
+def validate_form(dataset_folder):
+    """Validate form.json of a dataset."""
+    file_name = "form.json"
+    validate_base_json(dataset_folder, file_name)
+
+
+def validate_layout(dataset_folder):
+    """Validate layout.json of a dataset."""
+    file_name = "layout.json"
+    validate_base_json(dataset_folder, file_name)
+
+
+def validate_mapping(dataset_folder):
+    """Validate mapping.json of a dataset."""
+    file_name = "mapping.json"
+    validate_base_json(dataset_folder, file_name)
 
 
 def validate_metadata_json(dataset_folder):
@@ -186,6 +231,10 @@ def validate_dataset(dataset_folder: str) -> None:
     logger.info(f"---starting validation of resource {resource_uid}---")
     validate_metadata_json(dataset_folder)
     validate_adaptors(dataset_folder)
+    validate_constraints(dataset_folder)
+    validate_form(dataset_folder)
+    validate_layout(dataset_folder)
+    validate_mapping(dataset_folder)
     logger.info(f"---end validation of folder {dataset_folder}---")
 
 
