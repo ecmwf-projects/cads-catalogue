@@ -31,14 +31,14 @@ def validate_base_json(folder, file_name, required=True):
     file_path = os.path.join(folder, file_name)
     if not os.path.isfile(file_path):
         if required:
-            logger.error("{file_name} not found")
+            logger.error(f"{file_name} not found")
         return
 
     with open(file_path) as fp:
         try:
             data = json.load(fp)
         except Exception:  # noqa
-            logger.exception("{file_name} is not a valid json")
+            logger.exception(f"{file_name} is not a valid json")
             return
     return data
 
@@ -68,18 +68,18 @@ def validate_adaptors(dataset_folder):
     if ":" in entry_point:
         if os.path.isfile(adaptor_code_file_path):
             logger.error(
-                "found adaptor.py: remove it or change inconsistent entry_point '{entry_point}'"
+                f"found adaptor.py: remove it or change inconsistent entry_point '{entry_point}'"
             )
     else:
         if not os.path.isfile(adaptor_code_file_path):
             logger.error(
-                "adaptor.py not found: add it or change inconsistent entry_point '{entry_point}'"
+                f"adaptor.py not found: add it or change inconsistent entry_point '{entry_point}'"
             )
         else:
             with open(adaptor_code_file_path) as fp:
                 code = fp.read()
             if entry_point not in code:
-                logger.error("class name '{entry_point}' not found in adaptor.py")
+                logger.error(f"class name '{entry_point}' not found in adaptor.py")
 
 
 def validate_constraints(dataset_folder):
@@ -97,7 +97,37 @@ def validate_form(dataset_folder):
 def validate_layout(dataset_folder):
     """Validate layout.json of a dataset."""
     file_name = "layout.json"
-    validate_base_json(dataset_folder, file_name)
+    layout_data = validate_base_json(dataset_folder, file_name)
+
+    found_image = False
+    # search all the images inside body/main/sections:
+    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
+    for i, section in enumerate(sections):
+        blocks = section.get("blocks", [])
+        for j, block in enumerate(blocks):
+            image_rel_path = block.get("image", {}).get("url")
+            if block.get("type") == "thumb-markdown" and image_rel_path:
+                image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
+                if not os.path.isfile(image_abs_path):
+                    logger.error(
+                        f"image {image_rel_path} referenced on {file_name} not found"
+                    )
+                else:
+                    found_image = True
+    # search all the images inside body/aside:
+    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
+    for i, block in enumerate(aside_blocks):
+        image_rel_path = block.get("image", {}).get("url")
+        if block.get("type") == "thumb-markdown" and image_rel_path:
+            image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
+            if not os.path.isfile(image_abs_path):
+                logger.error(
+                    f"image {image_rel_path} referenced on {file_name} not found"
+                )
+            else:
+                found_image = True
+    if not found_image:
+        logger.warning(f"image of the dataset not found in {file_name}")
 
 
 def validate_mapping(dataset_folder):
@@ -108,18 +138,8 @@ def validate_mapping(dataset_folder):
 
 def validate_metadata_json(dataset_folder):
     """Validate metadata.json of a dataset."""
-    logger.info("-starting validation of metadata.json-")
-    metadata_file_path = os.path.join(dataset_folder, "metadata.json")
-    if not os.path.isfile(metadata_file_path):
-        logger.error(f"metadata.json not found in {dataset_folder}")
-        return
-
-    with open(metadata_file_path) as fp:
-        try:
-            data = json.load(fp)
-        except Exception:  # noqa
-            logger.exception("metadata.json is not a valid json")
-            return
+    file_name = "metadata.json"
+    data = validate_base_json(dataset_folder, file_name)
 
     metadata = dict()
     required_fields = ["abstract", "licences", "resource_type", "title"]
@@ -180,7 +200,7 @@ def validate_metadata_json(dataset_folder):
                 datetime.datetime.strptime(value, "%Y-%m-%d")
             except:  # noqa
                 logger.error(
-                    f"value '{value} not parsable as a valid date: use format YY:MM:DD"
+                    f"value '{value} not parsable as a valid date: use format YY-MM-DD"
                 )
 
     try:
@@ -214,7 +234,7 @@ def validate_metadata_json(dataset_folder):
     if keywords:
         for keyword in keywords:
             if len(keyword.split(":")) != 2:
-                logger.error("keyword {keyword} not compliant")
+                logger.error(f"keyword {keyword} not compliant")
 
     return metadata
 
