@@ -129,39 +129,6 @@ def is_db_to_update(
     return is_to_update, resource_hash, licence_hash, message_hash
 
 
-def is_valid_resource(
-    resource_folder_path: str | pathlib.Path, licences: list[dict[str, Any]]
-) -> bool:
-    """Return True if input folders seems a valid resource folder, False otherwise.
-
-    Parameters
-    ----------
-    resource_folder_path: the folder path where to look for json files of the resource
-    licences: list of loaded licences, as returned from `load_licences_from_folder`
-    """
-    metadata_path = os.path.join(resource_folder_path, "metadata.json")
-    if not os.path.isfile(metadata_path):
-        return False
-    try:
-        md = load_resource_from_folder(resource_folder_path)
-    except:  # noqa
-        logger.exception(
-            "resource at path %r doesn't seem a valid dataset, error follows"
-        )
-        return False
-    allowed_licence_uids = set([r["licence_uid"] for r in licences])
-    resource_licences = set(md["licence_uids"])
-    not_found_licences = list(resource_licences - allowed_licence_uids)
-    if not_found_licences:
-        logger.error(
-            "resource at path %r doesn't seem a valid dataset, "
-            "not found required licences: %r"
-            % (resource_folder_path, not_found_licences)
-        )
-        return False
-    return True
-
-
 def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load a resource's metadata regarding files that should be uploaded to the object storage.
 
@@ -480,11 +447,18 @@ def resource_sync(
     subpath = os.path.join("resources", dataset["resource_uid"])
     object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
     if "layout" in object_storage_fields:
-        dataset["layout"] = manage_upload_images_and_layout(
+        layout_data = manage_upload_images_and_layout(
             dataset,
-            storage_settings.object_storage_url,  # type: ignore
-            storage_settings.document_storage_url,  # type: ignore
-            bucket_name=storage_settings.catalogue_bucket,  # type: ignore
+            storage_settings.object_storage_url,
+            storage_settings.document_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
+            **storage_settings.storage_kws,
+        )
+        dataset["layout"] = store_layout_by_data(
+            dataset,
+            layout_data,
+            storage_settings.object_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
             **storage_settings.storage_kws,
         )
         object_storage_fields.remove("layout")
@@ -495,8 +469,8 @@ def resource_sync(
             continue
         dataset[db_field] = object_storage.store_file(
             file_path,
-            storage_settings.object_storage_url,  # type: ignore
-            bucket_name=storage_settings.catalogue_bucket,  # type: ignore
+            storage_settings.object_storage_url,
+            bucket_name=storage_settings.catalogue_bucket,
             subpath=subpath,
             force=True,
             **storage_settings.storage_kws,
@@ -549,10 +523,9 @@ def manage_upload_images_and_layout(
     object_storage_url: str,
     doc_storage_url: str,
     bucket_name: str = "cads-catalogue",
-    ret_layout_data=False,
     **storage_kws: Any,
-) -> str:
-    """Upload images referenced in the layout.json and upload a modified json with images' URLs.
+) -> dict[str, Any]:
+    """Upload images referenced in the layout.json and return a modified json data with images' URLs.
 
     Parameters
     ----------
@@ -560,12 +533,11 @@ def manage_upload_images_and_layout(
     object_storage_url: endpoint URL of the object storage (for upload)
     doc_storage_url: public endpoint URL of the object storage (for download)
     bucket_name: bucket name of the object storage to use
-    ret_layout_data: True only for testing, to return modified json of layout
     storage_kws: dictionary of parameters used to pass to the storage client
 
     Returns
     -------
-    str: URL of the layout.json modified with the uploaded URLs of the images.
+    data of the layout.json modified
     """
     layout_file_path = dataset["layout"]
     with open(layout_file_path) as fp:
@@ -617,6 +589,31 @@ def manage_upload_images_and_layout(
             layout_data["body"]["aside"]["blocks"][i]["image"]["url"] = images_stored[
                 image_abs_path
             ]
+    return layout_data
+
+
+def store_layout_by_data(
+    dataset: dict[str, Any],
+    layout_data: dict[str, Any],
+    object_storage_url: str,
+    bucket_name: str = "cads-catalogue",
+    **storage_kws: Any,
+) -> str:
+    """
+    Store a layout.json in the object storage providing its json data.
+
+    Parameters
+    ----------
+    dataset: resource dictionary (as returned by `load_resource_from_folder`)
+    layout_data: data of the layout.json to store
+    object_storage_url: endpoint URL of the object storage (for upload)
+    bucket_name: bucket name of the object storage to use
+    storage_kws: dictionary of parameters used to pass to the storage client
+
+    Returns
+    -------
+    str: URL of the layout.json uploaded to the object storage
+    """
     # upload of modified layout.json
     tempdir_path = tempfile.mkdtemp()
     subpath = os.path.join("resources", dataset["resource_uid"])
@@ -634,8 +631,6 @@ def manage_upload_images_and_layout(
         )[0]
     finally:
         shutil.rmtree(tempdir_path)
-    if ret_layout_data:
-        return layout_data
     return layout_url
 
 
