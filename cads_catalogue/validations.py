@@ -97,14 +97,27 @@ def validate_form(dataset_folder):
 def validate_layout(dataset_folder):
     """Validate layout.json of a dataset."""
     file_name = "layout.json"
-    layout_data = validate_base_json(dataset_folder, file_name)
+    try:
+        layout_data = validate_base_json(dataset_folder, file_name)
 
-    found_image = False
-    # search all the images inside body/main/sections:
-    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
-    for i, section in enumerate(sections):
-        blocks = section.get("blocks", [])
-        for j, block in enumerate(blocks):
+        found_image = False
+        # search all the images inside body/main/sections:
+        sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
+        for i, section in enumerate(sections):
+            blocks = section.get("blocks", [])
+            for j, block in enumerate(blocks):
+                image_rel_path = block.get("image", {}).get("url")
+                if block.get("type") == "thumb-markdown" and image_rel_path:
+                    image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
+                    if not os.path.isfile(image_abs_path):
+                        logger.error(
+                            f"image {image_rel_path} referenced on {file_name} not found"
+                        )
+                    else:
+                        found_image = True
+        # search all the images inside body/aside:
+        aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
+        for i, block in enumerate(aside_blocks):
             image_rel_path = block.get("image", {}).get("url")
             if block.get("type") == "thumb-markdown" and image_rel_path:
                 image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
@@ -114,18 +127,8 @@ def validate_layout(dataset_folder):
                     )
                 else:
                     found_image = True
-    # search all the images inside body/aside:
-    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
-    for i, block in enumerate(aside_blocks):
-        image_rel_path = block.get("image", {}).get("url")
-        if block.get("type") == "thumb-markdown" and image_rel_path:
-            image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
-            if not os.path.isfile(image_abs_path):
-                logger.error(
-                    f"image {image_rel_path} referenced on {file_name} not found"
-                )
-            else:
-                found_image = True
+    except:
+        logger.exception("some unexpected error on reading layout.json. Error follows.")
     if not found_image:
         logger.warning(f"image of the dataset not found in {file_name}")
 
