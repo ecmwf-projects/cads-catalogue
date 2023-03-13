@@ -127,7 +127,7 @@ def validate_layout(dataset_folder):
                     )
                 else:
                     found_image = True
-    except:
+    except Exception:
         logger.exception("some unexpected error on reading layout.json. Error follows.")
     if not found_image:
         logger.warning(f"image of the dataset not found in {file_name}")
@@ -136,7 +136,7 @@ def validate_layout(dataset_folder):
 def validate_mapping(dataset_folder):
     """Validate mapping.json of a dataset."""
     file_name = "mapping.json"
-    validate_base_json(dataset_folder, file_name)
+    validate_base_json(dataset_folder, file_name, required=False)
 
 
 def validate_metadata_json(dataset_folder):
@@ -203,7 +203,7 @@ def validate_metadata_json(dataset_folder):
                 datetime.datetime.strptime(value, "%Y-%m-%d")
             except:  # noqa
                 logger.error(
-                    f"value '{value} not parsable as a valid date: use format YY-MM-DD"
+                    f"value '{value} not parsable as a valid date: use format YYYY-MM-DD"
                 )
 
     try:
