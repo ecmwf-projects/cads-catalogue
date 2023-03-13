@@ -145,7 +145,7 @@ def validate_metadata_json(dataset_folder):
     data = validate_base_json(dataset_folder, file_name)
 
     metadata = dict()
-    required_fields = ["abstract", "licences", "resource_type", "title"]
+    required_fields = ["abstract", "resource_type", "title"]
     for required_field in required_fields:
         if required_field not in data or not data.get(required_field):
             logger.error(f"required field not found or empty: '{required_field}'")
@@ -169,6 +169,7 @@ def validate_metadata_json(dataset_folder):
         "hidden",
         "inspire_theme",
         "keywords",
+        "licences",
         "lineage",
         "publication_date",
         "related_resources_keywords",
@@ -203,7 +204,7 @@ def validate_metadata_json(dataset_folder):
                 datetime.datetime.strptime(value, "%Y-%m-%d")
             except:  # noqa
                 logger.error(
-                    f"value '{value} not parsable as a valid date: use format YYYY-MM-DD"
+                    f"value '{value}' not parsable as a valid date: use format YYYY-MM-DD"
                 )
 
     try:
