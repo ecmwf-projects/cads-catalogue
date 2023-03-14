@@ -126,6 +126,7 @@ def validate_layout(dataset_folder):
                 )
             else:
                 found_image = True
+
     if not found_image:
         logger.warning(f"image of the dataset not found in {file_name}")
 
@@ -133,7 +134,7 @@ def validate_layout(dataset_folder):
 def validate_mapping(dataset_folder):
     """Validate mapping.json of a dataset."""
     file_name = "mapping.json"
-    validate_base_json(dataset_folder, file_name)
+    validate_base_json(dataset_folder, file_name, required=False)
 
 
 def validate_metadata_json(dataset_folder):
@@ -142,7 +143,7 @@ def validate_metadata_json(dataset_folder):
     data = validate_base_json(dataset_folder, file_name)
 
     metadata = dict()
-    required_fields = ["abstract", "licences", "resource_type", "title"]
+    required_fields = ["abstract", "resource_type", "title"]
     for required_field in required_fields:
         if required_field not in data or not data.get(required_field):
             logger.error(f"required field not found or empty: '{required_field}'")
@@ -166,6 +167,7 @@ def validate_metadata_json(dataset_folder):
         "hidden",
         "inspire_theme",
         "keywords",
+        "licences",
         "lineage",
         "publication_date",
         "related_resources_keywords",
@@ -200,7 +202,7 @@ def validate_metadata_json(dataset_folder):
                 datetime.datetime.strptime(value, "%Y-%m-%d")
             except:  # noqa
                 logger.error(
-                    f"value '{value} not parsable as a valid date: use format YY-MM-DD"
+                    f"value '{value}' not parsable as a valid date: use format YYYY-MM-DD"
                 )
 
     try:
@@ -255,13 +257,22 @@ def validate_dataset(dataset_folder: str) -> None:
     """
     resource_uid = os.path.basename(dataset_folder.rstrip(os.sep))
     logger.info(f"---starting validation of resource {resource_uid}---")
-    validate_metadata_json(dataset_folder)
-    validate_adaptors(dataset_folder)
-    validate_constraints(dataset_folder)
-    validate_form(dataset_folder)
-    validate_layout(dataset_folder)
-    validate_mapping(dataset_folder)
-    validate_variables(dataset_folder)
+    validators = [
+        validate_metadata_json,
+        validate_adaptors,
+        validate_constraints,
+        validate_form,
+        validate_layout,
+        validate_mapping,
+        validate_variables,
+    ]
+    for validator in validators:
+        try:
+            validator(dataset_folder)
+        except Exception:
+            logger.exception(
+                f"unexpected error running {validator.__name__}. Error follows."
+            )
     logger.info(f"---end validation of folder {dataset_folder}---")
 
 
