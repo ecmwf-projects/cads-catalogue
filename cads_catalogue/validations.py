@@ -97,27 +97,14 @@ def validate_form(dataset_folder):
 def validate_layout(dataset_folder):
     """Validate layout.json of a dataset."""
     file_name = "layout.json"
-    try:
-        layout_data = validate_base_json(dataset_folder, file_name)
+    layout_data = validate_base_json(dataset_folder, file_name)
 
-        found_image = False
-        # search all the images inside body/main/sections:
-        sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
-        for i, section in enumerate(sections):
-            blocks = section.get("blocks", [])
-            for j, block in enumerate(blocks):
-                image_rel_path = block.get("image", {}).get("url")
-                if block.get("type") == "thumb-markdown" and image_rel_path:
-                    image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
-                    if not os.path.isfile(image_abs_path):
-                        logger.error(
-                            f"image {image_rel_path} referenced on {file_name} not found"
-                        )
-                    else:
-                        found_image = True
-        # search all the images inside body/aside:
-        aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
-        for i, block in enumerate(aside_blocks):
+    found_image = False
+    # search all the images inside body/main/sections:
+    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
+    for i, section in enumerate(sections):
+        blocks = section.get("blocks", [])
+        for j, block in enumerate(blocks):
             image_rel_path = block.get("image", {}).get("url")
             if block.get("type") == "thumb-markdown" and image_rel_path:
                 image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
@@ -127,8 +114,19 @@ def validate_layout(dataset_folder):
                     )
                 else:
                     found_image = True
-    except Exception:
-        logger.exception("some unexpected error on reading layout.json. Error follows.")
+    # search all the images inside body/aside:
+    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
+    for i, block in enumerate(aside_blocks):
+        image_rel_path = block.get("image", {}).get("url")
+        if block.get("type") == "thumb-markdown" and image_rel_path:
+            image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
+            if not os.path.isfile(image_abs_path):
+                logger.error(
+                    f"image {image_rel_path} referenced on {file_name} not found"
+                )
+            else:
+                found_image = True
+
     if not found_image:
         logger.warning(f"image of the dataset not found in {file_name}")
 
@@ -259,13 +257,22 @@ def validate_dataset(dataset_folder: str) -> None:
     """
     resource_uid = os.path.basename(dataset_folder.rstrip(os.sep))
     logger.info(f"---starting validation of resource {resource_uid}---")
-    validate_metadata_json(dataset_folder)
-    validate_adaptors(dataset_folder)
-    validate_constraints(dataset_folder)
-    validate_form(dataset_folder)
-    validate_layout(dataset_folder)
-    validate_mapping(dataset_folder)
-    validate_variables(dataset_folder)
+    validators = [
+        validate_metadata_json,
+        validate_adaptors,
+        validate_constraints,
+        validate_form,
+        validate_layout,
+        validate_mapping,
+        validate_variables,
+    ]
+    for validator in validators:
+        try:
+            validator(dataset_folder)
+        except Exception:
+            logger.exception(
+                f"unexpected error running {validator.__name__}. Error follows."
+            )
     logger.info(f"---end validation of folder {dataset_folder}---")
 
 
