@@ -8,7 +8,6 @@ from sqlalchemy.orm import sessionmaker
 from cads_catalogue import (
     config,
     database,
-    layout_manager,
     licence_manager,
     manager,
     object_storage,
@@ -103,7 +102,6 @@ def test_load_resource_for_object_storage() -> None:
     assert res == {
         "constraints": os.path.join(folder_path, "constraints.json"),
         "form": os.path.join(folder_path, "form.json"),
-        "layout": os.path.join(folder_path, "layout.json"),
         "previewimage": os.path.join(folder_path, "overview.png"),
     }
 
@@ -239,10 +237,6 @@ def test_load_resource_from_folder() -> None:
             "Variable domain: Land (physics)",
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S",
-        ],
-        "layout": os.path.join(resource_folder_path, "layout.json"),
-        "layout_images_info": [
-            (os.path.join(resource_folder_path, "overview.png"), "sections", 0, 0)
         ],
         "licence_uids": ["licence-to-use-copernicus-products"],
         "lineage": "EC Copernicus program",
@@ -1022,7 +1016,6 @@ def test_resource_sync(
     patch = mocker.patch.object(
         object_storage, "store_file", return_value=("an url", "a version")
     )
-    spy1 = mocker.spy(layout_manager, "manage_upload_layout_images")
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
@@ -1056,7 +1049,7 @@ def test_resource_sync(
         session.commit()
         assert len(session.query(database.Resource).first().keywords) == 7
 
-    assert patch.call_count == 5
+    assert patch.call_count == 3
     expected_args_object_storage_calls = [
         (
             os.path.join(resource_folder_path, "overview.png"),
@@ -1071,15 +1064,11 @@ def test_resource_sync(
             os.path.join(resource_folder_path, "form.json"),
             storage_settings.object_storage_url,
         ),
-        (
-            os.path.join(resource_folder_path, "overview.png"),
-            storage_settings.object_storage_url,
-        ),
     ]
     effective_args_object_storage_calls = [pm.args for pm in patch.mock_calls]
     for expected_args_object_storage_call in expected_args_object_storage_calls:
         assert expected_args_object_storage_call in effective_args_object_storage_calls
-    assert effective_args_object_storage_calls[1][0].endswith("layout.json")
+    assert effective_args_object_storage_calls[1][0].endswith("form.json")
     assert {
         "bucket_name": "mycatalogue_bucket",
         "subpath": "resources/reanalysis-era5-land",
@@ -1088,7 +1077,6 @@ def test_resource_sync(
         "secret_key": "secret1",
         "secure": False,
     } in [pm.kwargs for pm in patch.mock_calls]
-    spy1.assert_called_once()
     patch.reset_mock()
 
     # create second dataset
