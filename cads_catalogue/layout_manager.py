@@ -23,8 +23,9 @@ import urllib.parse
 from typing import Any, List, Tuple
 
 import structlog
+from sqlalchemy.orm.session import Session
 
-from cads_catalogue import object_storage
+from cads_catalogue import config, object_storage
 
 logger = structlog.get_logger(__name__)
 
@@ -198,3 +199,31 @@ def store_layout_by_data(
     finally:
         shutil.rmtree(tempdir_path)
     return layout_url
+
+
+def transform_layout(
+    session: Session,
+    resource_folder_path: str | pathlib.Path,
+    resource: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings,
+):
+    """
+    Modify layout.json information inside resource metadata, with related uploads to the object storage.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    resource_folder_path: folder path where to find layout.json
+    resource: metadata of a loaded resource from files
+    storage_settings: object with settings to access the object storage
+
+    Returns
+    -------
+    modified version of input resource metadata
+    """
+    # TODO:
+    # load json data of layout.json
+    # transform json data processing uploads of images' blocks
+    # transform json data processing uploads of licences' blocks
+    # create a temporary file with new layout.json, upload to the object storage and modify resource['layout']
+    return resource

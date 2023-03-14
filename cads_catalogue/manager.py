@@ -32,13 +32,11 @@ TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
 )
 
-OBJECT_STORAGE_UPLOAD_FILES = [
-    # (file_name, "db_field_name),
-    ("constraints.json", "constraints"),
-    ("form.json", "form"),
-    ("layout.json", "layout"),
-    ("overview.png", "previewimage"),
-]
+OBJECT_STORAGE_UPLOAD_FILES = {
+    "constraints.json": "constraints",
+    "form.json": "form",
+    "overview.png": "previewimage",
+}
 
 
 def is_db_to_update(
@@ -127,10 +125,7 @@ def is_db_to_update(
 
 
 def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[str, Any]:
-    """Load a resource's metadata regarding files that should be uploaded to the object storage.
-
-    Look inside the folder_path tree for files listed in OBJECT_STORAGE_UPLOAD_FILES.
-    Actually metadata collected is the absolute path of the files to be uploaded.
+    """Load absolute paths of files that should be uploaded to the object storage.
 
     Parameters
     ----------
@@ -140,12 +135,11 @@ def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[st
     -------
     dict: dictionary of metadata collected
     """
-    file_names_to_upload = [f[0] for f in OBJECT_STORAGE_UPLOAD_FILES]
     metadata = dict()
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
-        if filename in file_names_to_upload and os.path.isfile(file_path):
-            db_field_name = dict(OBJECT_STORAGE_UPLOAD_FILES)[filename]
+        if filename in OBJECT_STORAGE_UPLOAD_FILES and os.path.isfile(file_path):
+            db_field_name = OBJECT_STORAGE_UPLOAD_FILES[filename]
             metadata[db_field_name] = os.path.abspath(file_path)
     return metadata
 
@@ -339,7 +333,6 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
         load_resource_documentation,
         load_resource_metadata_file,
         load_resource_variables,
-        layout_manager.load_layout_images_info,
     ]
     for loader_function in loader_functions:
         metadata.update(loader_function(folder_path))
@@ -381,25 +374,7 @@ def resource_sync(
         db_licences[licence_uid] = licence_obj
 
     subpath = os.path.join("resources", dataset["resource_uid"])
-    object_storage_fields = set(dict(OBJECT_STORAGE_UPLOAD_FILES).values())
-    if "layout" in object_storage_fields:
-        layout_data = layout_manager.manage_upload_layout_images(
-            dataset,
-            storage_settings.object_storage_url,
-            storage_settings.document_storage_url,
-            bucket_name=storage_settings.catalogue_bucket,
-            **storage_settings.storage_kws,
-        )
-        dataset["layout"] = layout_manager.store_layout_by_data(
-            dataset,
-            layout_data,
-            storage_settings.object_storage_url,
-            bucket_name=storage_settings.catalogue_bucket,
-            **storage_settings.storage_kws,
-        )
-        object_storage_fields.remove("layout")
-        del dataset["layout_images_info"]
-    for db_field in object_storage_fields:
+    for _, db_field in OBJECT_STORAGE_UPLOAD_FILES.items():
         file_path = dataset.get(db_field)
         if not file_path:
             continue
@@ -526,6 +501,9 @@ def update_catalogue_resources(
             with session.begin_nested():
                 resource = load_resource_from_folder(resource_folder_path)
                 logger.info("resource %s loaded successful" % resource_uid)
+                resource = layout_manager.transform_layout(
+                    session, resource_folder_path, resource, storage_settings
+                )
                 resource_sync(session, resource, storage_settings)
             logger.info("resource %s db sync successful" % resource_uid)
         except Exception:  # noqa
