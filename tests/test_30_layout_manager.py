@@ -3,8 +3,15 @@ import os.path
 
 import pytest
 import pytest_mock
+from sqlalchemy.orm import sessionmaker
 
-from cads_catalogue import config, layout_manager, object_storage
+from cads_catalogue import (
+    config,
+    database,
+    layout_manager,
+    licence_manager,
+    object_storage,
+)
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -24,6 +31,111 @@ def create_layout_for_test(path, sections=[], aside={}):
     with open(path, "w") as fp:
         json.dump(base_data, fp)
     return base_data
+
+
+def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
+    dataset_uid = "my-dummy-dataset"
+    resource = {"resource_uid": dataset_uid}
+    # add some licences to work on
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
+    licences = licence_manager.load_licences_from_folder(licences_folder_path)
+    with session_obj() as session:
+        for licence in licences:
+            session.add(database.Licence(**licence))
+        session.commit()
+        session.query(database.Licence).all()
+    # create a test layout.json
+    layout_path = os.path.join(str(tmpdir), "layout.json")
+    block1 = {"licence-id": "licence-to-use-copernicus-products", "type": "licence"}
+    block2 = {
+        "type": "link",
+        "id": "test-link-id",
+        "title": "a link",
+        "href": "http://a-link.html",
+    }
+    block3 = {"licence-id": "eumetsat-cm-saf", "type": "licence"}
+    sections = [
+        {"id": "overview", "blocks": [block1, block2, block3]},
+        {"id": "overview2", "blocks": [block2, block3]},
+    ]
+    aside = {"blocks": [block1, block2]}
+    # expected blocks
+    block11 = {
+        "type": "button",
+        "id": f"{dataset_uid}-licences",
+        "title": "Licence",
+        "action": "modal",
+        "content": "dummy md content",
+    }
+    block12 = {
+        "type": "button",
+        "id": f"{dataset_uid}-licences-download",
+        "parent": f"{dataset_uid}-licences",
+        "title": "Download PDF",
+        "action": "download",
+        "contents-url": os.path.join(
+            licences_folder_path, "licence-to-use-copernicus-products.pdf"
+        ),
+    }
+    block13 = {
+        "type": "button",
+        "id": f"{dataset_uid}-licences-clipboard",
+        "parent": f"{dataset_uid}-licences",
+        "title": "Copy to clipboard",
+        "action": "copy-clipboard",
+    }
+    block31 = {
+        "type": "button",
+        "id": f"{dataset_uid}-licences",
+        "title": "Licence",
+        "action": "modal",
+        "content": "dummy md content",
+    }
+    block32 = {
+        "type": "button",
+        "id": f"{dataset_uid}-licences-download",
+        "parent": f"{dataset_uid}-licences",
+        "title": "Download PDF",
+        "action": "download",
+        "contents-url": os.path.join(licences_folder_path, "eumetsat-cm-saf.pdf"),
+    }
+    block33 = {
+        "type": "button",
+        "id": f"{dataset_uid}-licences-clipboard",
+        "parent": f"{dataset_uid}-licences",
+        "title": "Copy to clipboard",
+        "action": "copy-clipboard",
+    }
+    layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
+
+    new_layout_data = layout_manager.transform_licences_blocks(
+        session, layout_data, resource
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": [
+                    {
+                        "id": "overview",
+                        "blocks": [
+                            block11,
+                            block12,
+                            block13,
+                            block2,
+                            block31,
+                            block32,
+                            block33,
+                        ],
+                    },
+                    {"id": "overview2", "blocks": [block2, block31, block32, block33]},
+                ]
+            },
+            "aside": {
+                "blocks": [block11, block12, block13, block2],
+            },
+        },
+    }
 
 
 def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> None:

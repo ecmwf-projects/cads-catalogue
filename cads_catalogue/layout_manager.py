@@ -122,23 +122,19 @@ def transform_image_blocks(
     return new_data
 
 
-def build_licence_blocks(
-    all_licences, dataset_uid, licence_uid
-) -> List[dict[str, str]]:
+def build_licence_blocks(licence, dataset_uid) -> List[dict[str, str]]:
     """
     Build a list of new licence blocks to be inserted inside the layout data.
 
     Parameters
     ----------
-    all_licences: all db licence objects
+    licence: related licence object
     dataset_uid: dataset uid
-    licence_uid: licence uid
 
     Returns
     -------
     list of 3 new licence blocks for the layout data
     """
-    licence = [r for r in all_licences if r.licence_uid == licence_uid][0]
     new_blocks = [
         {
             "type": "button",
@@ -150,7 +146,7 @@ def build_licence_blocks(
         },
         {
             "type": "button",
-            "id": "{dataset_uid}-licences-download",
+            "id": f"{dataset_uid}-licences-download",
             "parent": f"{dataset_uid}-licences",
             "title": "Download PDF",
             "action": "download",
@@ -176,9 +172,7 @@ def transform_licences_blocks(
     ----------
     session: opened SQLAlchemy session
     layout_data: data of the layout.json to store
-    resource_folder_path
     resource: resource dictionary (as returned by `load_resource_from_folder`)
-    storage_settings: object with settings to access the object storage
 
     Returns
     -------
@@ -193,13 +187,19 @@ def transform_licences_blocks(
         replacements = 0
         for j, block in enumerate(blocks):
             new_blocks_index = j + replacements * 2
-            if block.get("type") == "license":  # FIXME: licence?
+            if block.get("type") == "licence":
+                licence_uid = block["licence-id"]
+                try:
+                    licence = [
+                        r for r in all_licences if r.licence_uid == block["licence-id"]
+                    ][0]
+                except IndexError:
+                    raise ValueError(f"not found licence {licence_uid}")
+
                 blocks_before = new_data["body"]["main"]["sections"][i]["blocks"][
                     :new_blocks_index
                 ]
-                new_blocks = build_licence_blocks(
-                    all_licences, resource["resource_uid"], block["licence_id"]
-                )
+                new_blocks = build_licence_blocks(licence, resource["resource_uid"])
                 blocks_after = new_data["body"]["main"]["sections"][i]["blocks"][
                     new_blocks_index + 1 :
                 ]
@@ -213,18 +213,23 @@ def transform_licences_blocks(
     replacements = 0
     for i, block in enumerate(aside_blocks):
         new_blocks_index = i + replacements * 2
-        if block.get("type") == "license":  # FIXME: licence?
+        if block.get("type") == "licence":
+            licence_uid = block["licence-id"]
+            try:
+                licence = [
+                    r for r in all_licences if r.licence_uid == block["licence-id"]
+                ][0]
+            except IndexError:
+                raise ValueError(f"not found licence {licence_uid}")
             blocks_before = new_data["body"]["aside"]["blocks"][:new_blocks_index]
-            new_blocks = build_licence_blocks(
-                all_licences, resource["resource_uid"], block["licence_id"]
-            )
+            new_blocks = build_licence_blocks(licence, resource["resource_uid"])
             blocks_after = new_data["body"]["aside"]["blocks"][new_blocks_index + 1 :]
             new_data["body"]["aside"]["blocks"] = (
                 blocks_before + new_blocks + blocks_after
             )
             replacements += 1
 
-    return layout_data
+    return new_data
 
 
 def store_layout_by_data(
