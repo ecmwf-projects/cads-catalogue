@@ -21,19 +21,19 @@ import pathlib
 import shutil
 import tempfile
 import urllib.parse
-from typing import Any
+from typing import Any, List
 
 import structlog
 from sqlalchemy.orm.session import Session
 
-from cads_catalogue import config, object_storage
+from cads_catalogue import config, database, object_storage
 
 logger = structlog.get_logger(__name__)
 
 
 def transform_image_blocks(
     layout_data: dict[str, Any],
-    folder_path:  str | pathlib.Path,
+    folder_path: str | pathlib.Path,
     resource: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ) -> dict[str, Any]:
@@ -122,12 +122,53 @@ def transform_image_blocks(
     return new_data
 
 
+def build_licence_blocks(
+    all_licences, dataset_uid, licence_uid
+) -> List[dict[str, str]]:
+    """
+    Build a list of new licence blocks to be inserted inside the layout data.
+
+    Parameters
+    ----------
+    all_licences: all db licence objects
+    dataset_uid: dataset uid
+    licence_uid: licence uid
+
+    Returns
+    -------
+    list of 3 new licence blocks for the layout data
+    """
+    licence = [r for r in all_licences if r.licence_uid == licence_uid][0]
+    new_blocks = [
+        {
+            "type": "button",
+            "id": f"{dataset_uid}-licences",
+            "title": "Licence",
+            "action": "modal",
+            "content": "dummy md content",  # TODO: replace with contents-url
+            # "contents-url": licence.md_content_file,
+        },
+        {
+            "type": "button",
+            "id": "{dataset_uid}-licences-download",
+            "parent": f"{dataset_uid}-licences",
+            "title": "Download PDF",
+            "action": "download",
+            "contents-url": licence.download_filename,
+        },
+        {
+            "type": "button",
+            "id": f"{dataset_uid}-licences-clipboard",
+            "parent": f"{dataset_uid}-licences",
+            "title": "Copy to clipboard",
+            "action": "copy-clipboard",
+        },
+    ]
+    return new_blocks
+
+
 def transform_licences_blocks(
-    session: Session,
-    layout_data: dict[str, Any],
-    resource_folder_path: str | pathlib.Path,
-    resource: dict[str, Any],
-    storage_settings: config.ObjectStorageSettings,
+    session: Session, layout_data: dict[str, Any], resource: dict[str, Any]
 ):
     """Transform layout.json data processing uploads of referenced licences.
 
@@ -143,7 +184,46 @@ def transform_licences_blocks(
     -------
     dict: dictionary of layout_data modified
     """
-    # TODO
+    new_data = copy.deepcopy(layout_data)
+    all_licences = session.query(database.Licence).all()
+    # search all licence blocks inside body/main/sections:
+    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
+    for i, section in enumerate(sections):
+        blocks = section.get("blocks", [])
+        replacements = 0
+        for j, block in enumerate(blocks):
+            new_blocks_index = j + replacements * 2
+            if block.get("type") == "license":  # FIXME: licence?
+                blocks_before = new_data["body"]["main"]["sections"][i]["blocks"][
+                    :new_blocks_index
+                ]
+                new_blocks = build_licence_blocks(
+                    all_licences, resource["resource_uid"], block["licence_id"]
+                )
+                blocks_after = new_data["body"]["main"]["sections"][i]["blocks"][
+                    new_blocks_index + 1 :
+                ]
+                new_data["body"]["main"]["sections"][i]["blocks"] = (
+                    blocks_before + new_blocks + blocks_after
+                )
+                replacements += 1
+
+    # search all licence blocks inside body/aside:
+    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
+    replacements = 0
+    for i, block in enumerate(aside_blocks):
+        new_blocks_index = i + replacements * 2
+        if block.get("type") == "license":  # FIXME: licence?
+            blocks_before = new_data["body"]["aside"]["blocks"][:new_blocks_index]
+            new_blocks = build_licence_blocks(
+                all_licences, resource["resource_uid"], block["licence_id"]
+            )
+            blocks_after = new_data["body"]["aside"]["blocks"][new_blocks_index + 1 :]
+            new_data["body"]["aside"]["blocks"] = (
+                blocks_before + new_blocks + blocks_after
+            )
+            replacements += 1
+
     return layout_data
 
 
@@ -214,9 +294,6 @@ def transform_layout(
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
-    layout_data = transform_licences_blocks(
-        session, layout_data, resource_folder_path, resource, storage_settings
-    )
+    layout_data = transform_licences_blocks(session, layout_data, resource)
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
-    # create a temporary file with new layout.json, upload to the object storage and modify resource['layout']
     return resource
