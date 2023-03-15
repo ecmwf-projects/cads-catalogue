@@ -255,7 +255,7 @@ def store_layout_by_data(
     subpath = os.path.join("resources", resource["resource_uid"])
     layout_temp_path = os.path.join(tempdir_path, "layout.json")
     with open(layout_temp_path, "w") as fp:
-        json.dump(layout_data, fp)
+        json.dump(layout_data, fp, indent=2)
     try:
         layout_url = object_storage.store_file(
             layout_temp_path,
