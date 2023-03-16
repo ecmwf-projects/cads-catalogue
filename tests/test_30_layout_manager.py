@@ -116,12 +116,20 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
                             "licence-to-use-copernicus-productsv12.md",
                         )
                         + [block2]
-                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf", "eumetsat-cm-safv1.md"),
+                        + get_blocks(
+                            "eumetsat-cm-saf",
+                            "eumetsat-cm-saf.pdf",
+                            "eumetsat-cm-safv1.md",
+                        ),
                     },
                     {
                         "id": "overview2",
                         "blocks": [block2]
-                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf", "eumetsat-cm-safv1.md"),
+                        + get_blocks(
+                            "eumetsat-cm-saf",
+                            "eumetsat-cm-saf.pdf",
+                            "eumetsat-cm-safv1.md",
+                        ),
                     },
                 ]
             },
