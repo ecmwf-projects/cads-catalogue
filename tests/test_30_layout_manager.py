@@ -34,8 +34,14 @@ def create_layout_for_test(path, sections=[], aside={}):
 
 
 def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
-    dataset_uid = "my-dummy-dataset"
-    resource = {"resource_uid": dataset_uid}
+    my_settings_dict = {
+        "object_storage_url": "object/storage/url",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "my/url",
+    }
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     # add some licences to work on
     licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
     licences = licence_manager.load_licences_from_folder(licences_folder_path)
@@ -60,56 +66,39 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
     ]
     aside = {"blocks": [block1, block2]}
     # expected blocks
-    block11 = {
-        "type": "button",
-        "id": f"{dataset_uid}-licences",
-        "title": "Licence",
-        "action": "modal",
-        "content": "dummy md content",
-    }
-    block12 = {
-        "type": "button",
-        "id": f"{dataset_uid}-licences-download",
-        "parent": f"{dataset_uid}-licences",
-        "title": "Download PDF",
-        "action": "download",
-        "contents-url": os.path.join(
-            licences_folder_path, "licence-to-use-copernicus-products.pdf"
-        ),
-    }
-    block13 = {
-        "type": "button",
-        "id": f"{dataset_uid}-licences-clipboard",
-        "parent": f"{dataset_uid}-licences",
-        "title": "Copy to clipboard",
-        "action": "copy-clipboard",
-    }
-    block31 = {
-        "type": "button",
-        "id": f"{dataset_uid}-licences",
-        "title": "Licence",
-        "action": "modal",
-        "content": "dummy md content",
-    }
-    block32 = {
-        "type": "button",
-        "id": f"{dataset_uid}-licences-download",
-        "parent": f"{dataset_uid}-licences",
-        "title": "Download PDF",
-        "action": "download",
-        "contents-url": os.path.join(licences_folder_path, "eumetsat-cm-saf.pdf"),
-    }
-    block33 = {
-        "type": "button",
-        "id": f"{dataset_uid}-licences-clipboard",
-        "parent": f"{dataset_uid}-licences",
-        "title": "Copy to clipboard",
-        "action": "copy-clipboard",
-    }
+
+    def get_blocks(licence_uid, licence_pdf_name):
+        block11 = {
+            "type": "button",
+            "id": f"{licence_uid}-licences",
+            "title": "Licence",
+            "action": "modal",
+            "content": "dummy md content",
+        }
+        block12 = {
+            "type": "button",
+            "id": f"{licence_uid}-licences-download",
+            "parent": f"{licence_uid}-licences",
+            "title": "Download PDF",
+            "action": "download",
+            "contents-url": os.path.join(
+                licences_folder_path,
+                licence_pdf_name,  # "licence-to-use-copernicus-products.pdf"
+            ),
+        }
+        block13 = {
+            "type": "button",
+            "id": f"{licence_uid}-licences-clipboard",
+            "parent": f"{licence_uid}-licences",
+            "title": "Copy to clipboard",
+            "action": "copy-clipboard",
+        }
+        return [block11, block12, block13]
+
     layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
 
     new_layout_data = layout_manager.transform_licences_blocks(
-        session, layout_data, resource
+        session, layout_data, storage_settings
     )
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
@@ -118,21 +107,26 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
                 "sections": [
                     {
                         "id": "overview",
-                        "blocks": [
-                            block11,
-                            block12,
-                            block13,
-                            block2,
-                            block31,
-                            block32,
-                            block33,
-                        ],
+                        "blocks": get_blocks(
+                            "licence-to-use-copernicus-products",
+                            "licence-to-use-copernicus-products.pdf",
+                        )
+                        + [block2]
+                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf"),
                     },
-                    {"id": "overview2", "blocks": [block2, block31, block32, block33]},
+                    {
+                        "id": "overview2",
+                        "blocks": [block2]
+                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf"),
+                    },
                 ]
             },
             "aside": {
-                "blocks": [block11, block12, block13, block2],
+                "blocks": get_blocks(
+                    "licence-to-use-copernicus-products",
+                    "licence-to-use-copernicus-products.pdf",
+                )
+                + [block2]
             },
         },
     }

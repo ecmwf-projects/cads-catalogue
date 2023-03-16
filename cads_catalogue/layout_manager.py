@@ -122,14 +122,14 @@ def transform_image_blocks(
     return new_data
 
 
-def build_licence_blocks(licence, dataset_uid) -> List[dict[str, str]]:
+def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
     """
     Build a list of new licence blocks to be inserted inside the layout data.
 
     Parameters
     ----------
     licence: related licence object
-    dataset_uid: dataset uid
+    doc_storage_url: public base url of the document storage
 
     Returns
     -------
@@ -138,7 +138,7 @@ def build_licence_blocks(licence, dataset_uid) -> List[dict[str, str]]:
     new_blocks = [
         {
             "type": "button",
-            "id": f"{dataset_uid}-licences",
+            "id": f"{licence.licence_uid}-licences",
             "title": "Licence",
             "action": "modal",
             "content": "dummy md content",  # TODO: replace with contents-url
@@ -146,16 +146,18 @@ def build_licence_blocks(licence, dataset_uid) -> List[dict[str, str]]:
         },
         {
             "type": "button",
-            "id": f"{dataset_uid}-licences-download",
-            "parent": f"{dataset_uid}-licences",
+            "id": f"{licence.licence_uid}-licences-download",
+            "parent": f"{licence.licence_uid}-licences",
             "title": "Download PDF",
             "action": "download",
-            "contents-url": licence.download_filename,
+            "contents-url": urllib.parse.urljoin(
+                doc_storage_url, licence.download_filename
+            ),
         },
         {
             "type": "button",
-            "id": f"{dataset_uid}-licences-clipboard",
-            "parent": f"{dataset_uid}-licences",
+            "id": f"{licence.licence_uid}-licences-clipboard",
+            "parent": f"{licence.licence_uid}-licences",
             "title": "Copy to clipboard",
             "action": "copy-clipboard",
         },
@@ -164,7 +166,9 @@ def build_licence_blocks(licence, dataset_uid) -> List[dict[str, str]]:
 
 
 def transform_licences_blocks(
-    session: Session, layout_data: dict[str, Any], resource: dict[str, Any]
+    session: Session,
+    layout_data: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings,
 ):
     """Transform layout.json data processing uploads of referenced licences.
 
@@ -172,13 +176,14 @@ def transform_licences_blocks(
     ----------
     session: opened SQLAlchemy session
     layout_data: data of the layout.json to store
-    resource: resource dictionary (as returned by `load_resource_from_folder`)
+    storage_settings: object with settings to access the object storage
 
     Returns
     -------
     dict: dictionary of layout_data modified
     """
     new_data = copy.deepcopy(layout_data)
+    doc_storage_url = storage_settings.document_storage_url
     all_licences = session.query(database.Licence).all()
     # search all licence blocks inside body/main/sections:
     sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
@@ -199,7 +204,7 @@ def transform_licences_blocks(
                 blocks_before = new_data["body"]["main"]["sections"][i]["blocks"][
                     :new_blocks_index
                 ]
-                new_blocks = build_licence_blocks(licence, resource["resource_uid"])
+                new_blocks = build_licence_blocks(licence, doc_storage_url)
                 blocks_after = new_data["body"]["main"]["sections"][i]["blocks"][
                     new_blocks_index + 1 :
                 ]
@@ -222,7 +227,7 @@ def transform_licences_blocks(
             except IndexError:
                 raise ValueError(f"not found licence {licence_uid}")
             blocks_before = new_data["body"]["aside"]["blocks"][:new_blocks_index]
-            new_blocks = build_licence_blocks(licence, resource["resource_uid"])
+            new_blocks = build_licence_blocks(licence, doc_storage_url)
             blocks_after = new_data["body"]["aside"]["blocks"][new_blocks_index + 1 :]
             new_data["body"]["aside"]["blocks"] = (
                 blocks_before + new_blocks + blocks_after
@@ -299,6 +304,6 @@ def transform_layout(
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
-    layout_data = transform_licences_blocks(session, layout_data, resource)
+    layout_data = transform_licences_blocks(session, layout_data, storage_settings)
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
     return resource
