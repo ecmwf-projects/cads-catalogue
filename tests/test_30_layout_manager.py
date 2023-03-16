@@ -67,13 +67,16 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
     aside = {"blocks": [block1, block2]}
     # expected blocks
 
-    def get_blocks(licence_uid, licence_pdf_name):
+    def get_blocks(licence_uid, licence_pdf_name, licence_md_name):
         block11 = {
             "type": "button",
             "id": f"{licence_uid}-licences",
             "title": "Licence",
             "action": "modal",
-            "content": "dummy md content",
+            "contents-url": os.path.join(
+                licences_folder_path,
+                licence_md_name,
+            ),
         }
         block12 = {
             "type": "button",
@@ -83,7 +86,7 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
             "action": "download",
             "contents-url": os.path.join(
                 licences_folder_path,
-                licence_pdf_name,  # "licence-to-use-copernicus-products.pdf"
+                licence_pdf_name,
             ),
         }
         block13 = {
@@ -110,14 +113,15 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
                         "blocks": get_blocks(
                             "licence-to-use-copernicus-products",
                             "licence-to-use-copernicus-products.pdf",
+                            "licence-to-use-copernicus-productsv12.md",
                         )
                         + [block2]
-                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf"),
+                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf", "eumetsat-cm-safv1.md"),
                     },
                     {
                         "id": "overview2",
                         "blocks": [block2]
-                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf"),
+                        + get_blocks("eumetsat-cm-saf", "eumetsat-cm-saf.pdf", "eumetsat-cm-safv1.md"),
                     },
                 ]
             },
@@ -125,6 +129,7 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
                 "blocks": get_blocks(
                     "licence-to-use-copernicus-products",
                     "licence-to-use-copernicus-products.pdf",
+                    "licence-to-use-copernicus-productsv12.md",
                 )
                 + [block2]
             },

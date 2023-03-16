@@ -160,7 +160,7 @@ def test_update_catalogue(
     spy4.reset_mock()
 
     assert (
-        patch.call_count == 42
+        patch.call_count == 45
     )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
@@ -527,8 +527,8 @@ def test_transaction_update_catalogue(
     engine = database.init_database(connection_string)
     # add some dummy data
     engine.execute(
-        "INSERT INTO licences (licence_uid, revision, title, download_filename) "
-        "VALUES ('a-licence', 1, 'a licence', 'a file.pdf')"
+        "INSERT INTO licences (licence_uid, revision, title, download_filename, md_filename) "
+        "VALUES ('a-licence', 1, 'a licence', 'a file.pdf', 'a file.md')"
     )
     engine.execute(
         "INSERT INTO resources (resource_uid, abstract, description, type) "
