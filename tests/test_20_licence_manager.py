@@ -30,6 +30,7 @@ def test_licence_sync(
         "title": "CCI product licence",
         "download_filename": "an url",
         "scope": "dataset",
+        "md_filename": "an url",
     }
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
@@ -44,7 +45,7 @@ def test_licence_sync(
         assert len(db_licences) == 1
         assert utils.object_as_dict(db_licences[0]) == licence_md
 
-    assert patch.call_count == 1
+    assert patch.call_count == 2
     assert (
         os.path.join(
             licences_folder_path,
@@ -73,6 +74,7 @@ def test_licence_sync(
         "title": "CCI product licence UPDATED",
         "download_filename": "an url",
         "scope": "dataset",
+        "md_filename": "an url",
     }
     licences = [updated_licence]
     with session_obj() as session:
@@ -95,6 +97,10 @@ def test_load_licences_from_folder() -> None:
                 licences_folder_path,
                 "CCI-data-policy-for-satellite-surface-radiation-budget.pdf",
             ),
+            "md_filename": os.path.join(
+                licences_folder_path,
+                "CCI-data-policy-for-satellite-surface-radiation-budgetv4.md",
+            ),
             "licence_uid": "CCI-data-policy-for-satellite-surface-radiation-budget",
             "revision": 4,
             "title": "CCI product licence",
@@ -108,6 +114,10 @@ def test_load_licences_from_folder() -> None:
             "revision": 1,
             "title": "EUMETSAT CM SAF products licence",
             "scope": "dataset",
+            "md_filename": os.path.join(
+                licences_folder_path,
+                "eumetsat-cm-safv1.md",
+            ),
         },
         {
             "download_filename": os.path.join(
@@ -117,6 +127,10 @@ def test_load_licences_from_folder() -> None:
             "revision": 12,
             "title": "Licence to use Copernicus Products",
             "scope": "dataset",
+            "md_filename": os.path.join(
+                licences_folder_path,
+                "licence-to-use-copernicus-productsv12.md",
+            ),
         },
     ]
     licences = sorted(

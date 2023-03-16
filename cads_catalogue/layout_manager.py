@@ -141,8 +141,9 @@ def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
             "id": f"{licence.licence_uid}-licences",
             "title": "Licence",
             "action": "modal",
-            "content": "dummy md content",  # TODO: replace with contents-url
-            # "contents-url": licence.md_content_file,
+            "contents-url": urllib.parse.urljoin(
+                doc_storage_url, licence.md_filename
+            ),
         },
         {
             "type": "button",

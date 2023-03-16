@@ -72,17 +72,19 @@ def licence_sync(
         ).update(loaded_licence)
         logger.debug("updated db licence %r" % licence_uid)
 
-    file_path = db_licence.download_filename
-    subpath = os.path.join("licences", licence_uid)
-    storage_kws = storage_settings.storage_kws
-    db_licence.download_filename = object_storage.store_file(
-        file_path,
-        storage_settings.object_storage_url,  # type: ignore
-        bucket_name=storage_settings.catalogue_bucket,  # type: ignore
-        subpath=subpath,
-        force=True,
-        **storage_kws,
-    )[0]
+    for column_name in ["download_filename", "md_filename"]:
+        file_path = getattr(db_licence, column_name)
+        subpath = os.path.join("licences", licence_uid)
+        storage_kws = storage_settings.storage_kws
+        file_url = object_storage.store_file(
+            file_path,
+            storage_settings.object_storage_url,  # type: ignore
+            bucket_name=storage_settings.catalogue_bucket,  # type: ignore
+            subpath=subpath,
+            force=True,
+            **storage_kws,
+        )[0]
+        setattr(db_licence, column_name, file_url)
     return db_licence
 
 
@@ -112,11 +114,16 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                     "download_filename": os.path.abspath(
                         os.path.join(folder_path, json_data["download_filename"])
                     ),
+                    "md_filename": os.path.abspath(
+                        os.path.join(folder_path, json_data["md_filename"])
+                    ),
+                    "scope": json_data["scope"],
                 }
                 for key in licence:
                     assert licence[key], "%r is required" % key
-                licence["scope"] = json_data.get("scope", "dataset")
                 assert licence["scope"] in ("dataset", "portal")
+                assert os.path.isfile(licence["download_filename"])
+                assert os.path.isfile(licence["md_filename"])
             except Exception:  # noqa
                 logger.exception(
                     "licence file %r is not compliant: ignored" % json_filepath
