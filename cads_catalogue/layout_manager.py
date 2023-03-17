@@ -36,7 +36,8 @@ def manage_image_section(
     section: dict[str, Any],
     images_stored: dict[str, str],
     resource: dict[str, Any],
-    storage_settings: config.ObjectStorageSettings,
+    storage_settings: config.ObjectStorageSettings | Any,
+    disable_upload: bool = False,
 ):
     """
     Look for thumb-markdown blocks and modify accordingly with upload to object storage.
@@ -48,15 +49,18 @@ def manage_image_section(
     images_stored: dictionary of image urls already stored
     resource: metadata of loaded resource
     storage_settings: object with settings to access the object storage
+    disable_upload: disable upload (for testing, default False)
     """
     new_section = copy.deepcopy(section)
     blocks = new_section.get("blocks", [])
     for i, block in enumerate(copy.deepcopy(blocks)):
-        image_rel_path = block.get("image", {}).get("url")
+        image_dict = block.get("image", {})
+        image_rel_path = image_dict.get("url")
         if block.get("type") == "thumb-markdown" and image_rel_path:
             image_abs_path = os.path.join(folder_path, block["image"]["url"])
             if os.path.isfile(image_abs_path):
-                if image_abs_path not in images_stored:
+                if image_abs_path not in images_stored and not disable_upload:
+                    # process upload to object storage
                     subpath = os.path.dirname(
                         os.path.join(
                             "resources", resource["resource_uid"], image_rel_path
@@ -70,15 +74,21 @@ def manage_image_section(
                         force=True,
                         **storage_settings.storage_kws,
                     )[0]
+                    # update cache of the upload urls
                     images_stored[image_abs_path] = urllib.parse.urljoin(
                         storage_settings.document_storage_url, image_rel_url
                     )
-                blocks[i]["image"]["url"] = images_stored[image_abs_path]
+                blocks[i]["image"]["url"] = images_stored.get(image_abs_path, "")
             else:
                 raise ValueError(f"image {image_rel_path} not found")
         elif block.get("type") in ("section", "accordion"):
             blocks[i] = manage_image_section(
-                folder_path, block, images_stored, resource, storage_settings
+                folder_path,
+                block,
+                images_stored,
+                resource,
+                storage_settings,
+                disable_upload=disable_upload,
             )
     return new_section
 
@@ -87,7 +97,8 @@ def transform_image_blocks(
     layout_data: dict[str, Any],
     folder_path: str | pathlib.Path,
     resource: dict[str, Any],
-    storage_settings: config.ObjectStorageSettings,
+    storage_settings: config.ObjectStorageSettings | Any,
+    disable_upload: bool = False,
 ) -> dict[str, Any]:
     """Transform layout.json data processing uploads of referenced images.
 
@@ -97,6 +108,7 @@ def transform_image_blocks(
     folder_path: folder path where to find layout.json
     resource: metadata of loaded resource
     storage_settings: object with settings to access the object storage
+    disable_upload: disable upload (for testing/validations, default False)
 
     Returns
     -------
@@ -105,16 +117,28 @@ def transform_image_blocks(
     images_stored: dict[str, str] = dict()
     new_data = copy.deepcopy(layout_data)
     # search all the images inside body/main/sections:
-    sections = new_data.get("body", {}).get("main", {}).get("sections", [])
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
     for i, section in enumerate(copy.deepcopy(sections)):
         sections[i] = manage_image_section(
-            folder_path, section, images_stored, resource, storage_settings
+            folder_path,
+            section,
+            images_stored,
+            resource,
+            storage_settings,
+            disable_upload=disable_upload,
         )
     # search all the images inside body/aside:
     aside_section = new_data.get("body", {}).get("aside", {})
     if aside_section:
         new_data["body"]["aside"] = manage_image_section(
-            folder_path, aside_section, images_stored, resource, storage_settings
+            folder_path,
+            aside_section,
+            images_stored,
+            resource,
+            storage_settings,
+            disable_upload=disable_upload,
         )
     return new_data
 
@@ -224,14 +248,18 @@ def transform_licences_blocks(
     all_licences = session.query(database.Licence).all()
 
     # search all licence blocks inside body/main/sections:
-    sections = new_data.get("body", {}).get("main", {}).get("sections", [])
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
     for i, section in enumerate(copy.deepcopy(sections)):
         sections[i] = manage_licence_section(all_licences, section, doc_storage_url)
     # search all the images inside body/aside:
-    aside_section = new_data.get("body", {}).get("aside", {})
+    aside_section = body.get("aside", {})
     if aside_section:
         new_data["body"]["aside"] = manage_licence_section(
-            all_licences, aside_section, doc_storage_url
+            all_licences,
+            aside_section,
+            doc_storage_url,
         )
     return new_data
 
