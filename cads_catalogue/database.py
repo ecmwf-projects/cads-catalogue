@@ -25,7 +25,7 @@ metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
 
-DB_VERSION = 8  # to increment at each structure change
+DB_VERSION = 9  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -121,16 +121,16 @@ class Message(BaseModel):
     message_id = sa.Column(sa.Integer, primary_key=True)
     message_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     date = sa.Column(sa.DateTime, nullable=False)
-    summary = sa.Column(sa.Text, nullable=True)
-    url = sa.Column(sa.Text)
+    summary = sa.Column(sa.String, nullable=True)
+    url = sa.Column(sa.String)
     severity = sa.Column(
         sa.Enum("info", "warning", "critical", "success", name="severity"),
         nullable=False,
         default="info",
     )
-    content = sa.Column(sa.Text)
-    is_global = sa.Column(sa.BOOLEAN)
-    live = sa.Column(sa.BOOLEAN)
+    content = sa.Column(sa.String)
+    is_global = sa.Column(sa.Boolean)
+    live = sa.Column(sa.Boolean)
     status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
 
     resources = sa.orm.relationship(
@@ -157,14 +157,12 @@ class Resource(BaseModel):
     previewimage = sa.Column(sa.String)
 
     # internal functionality related
-    adaptor = sa.Column(sa.Text)
+    adaptor = sa.Column(sa.String)
     adaptor_configuration = sa.Column(sa.dialects.postgresql.JSONB)
     constraints_data = sa.Column(sa.dialects.postgresql.JSONB)
     form_data = sa.Column(sa.dialects.postgresql.JSONB)
     mapping = sa.Column(sa.dialects.postgresql.JSONB)
-    related_resources_keywords = sa.Column(
-        sa.dialects.postgresql.ARRAY(sa.VARCHAR(300))
-    )
+    related_resources_keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.String))
 
     # geo extent
     geo_extent = sa.Column(sa.dialects.postgresql.JSONB)
@@ -172,14 +170,14 @@ class Resource(BaseModel):
     # date/time
     begin_date = sa.Column(sa.Date)
     end_date = sa.Column(sa.Date)
-    publication_date = sa.Column(sa.DATE)
+    publication_date = sa.Column(sa.Date)
     record_update = sa.Column(
         sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
-    resource_update = sa.Column(sa.DATE)  # update_date of the source file
+    resource_update = sa.Column(sa.Date)  # update_date of the source file
 
     # other metadata
-    abstract = sa.Column(sa.TEXT, nullable=False)
+    abstract = sa.Column(sa.String, nullable=False)
     citation = sa.Column(sa.String)
     contactemail = sa.Column(sa.String)
     description = sa.Column(sa.dialects.postgresql.JSONB, nullable=False)
@@ -190,7 +188,7 @@ class Resource(BaseModel):
     ds_responsible_organisation_role = sa.Column(sa.String)
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
-    hidden = sa.Column(sa.BOOLEAN, default=False)
+    hidden = sa.Column(sa.Boolean, default=False)
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)
     responsible_organisation = sa.Column(sa.String)
@@ -198,7 +196,7 @@ class Resource(BaseModel):
     responsible_organisation_website = sa.Column(sa.String)
     title = sa.Column(sa.String)
     topic = sa.Column(sa.String)
-    type = sa.Column(sa.VARCHAR(300), nullable=False)
+    type = sa.Column(sa.String, nullable=False)
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
     variables = sa.Column(sa.dialects.postgresql.JSONB)
