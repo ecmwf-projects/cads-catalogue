@@ -102,7 +102,7 @@ def transform_image_blocks(
     -------
     dict: dictionary of layout_data modified
     """
-    images_stored = dict()
+    images_stored: dict[str, str] = dict()
     new_data = copy.deepcopy(layout_data)
     # search all the images inside body/main/sections:
     sections = new_data.get("body", {}).get("main", {}).get("sections", [])
@@ -119,7 +119,9 @@ def transform_image_blocks(
     return new_data
 
 
-def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
+def build_licence_blocks(
+    licence: database.Licence, doc_storage_url: str
+) -> List[dict[str, str]]:
     """
     Build a list of new licence blocks to be inserted inside the layout data.
 
@@ -161,6 +163,45 @@ def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
     return new_blocks
 
 
+def manage_licence_section(
+    all_licences: List[database.Licence],
+    section: dict[str, Any],
+    doc_storage_url: str,
+):
+    """
+    Look for licence blocks and modify accordingly with urls of object storage files.
+
+    Parameters
+    ----------
+    all_licences: list of licence objects in the database
+    section: section of layout.json data
+    doc_storage_url: public url of the object storage
+    """
+    new_section = copy.deepcopy(section)
+    blocks = new_section.get("blocks", [])
+    replacements = 0
+    for i, block in enumerate(copy.deepcopy(blocks)):
+        if block.get("type") == "licence":
+            licence_uid = block["licence-id"]
+            try:
+                licence = [
+                    r for r in all_licences if r.licence_uid == block["licence-id"]
+                ][0]
+            except IndexError:
+                raise ValueError(f"not found licence {licence_uid}")
+            new_blocks = build_licence_blocks(licence, doc_storage_url)
+            del blocks[i + 2 * replacements]
+            blocks.insert(i + 2 * replacements, new_blocks[0])
+            blocks.insert(i + 1 + 2 * replacements, new_blocks[1])
+            blocks.insert(i + 2 + 2 * replacements, new_blocks[2])
+            replacements += 1
+        elif block.get("type") in ("section", "accordion"):
+            blocks[i + 2 * replacements] = manage_licence_section(
+                all_licences, block, doc_storage_url
+            )
+    return new_section
+
+
 def transform_licences_blocks(
     session: Session,
     layout_data: dict[str, Any],
@@ -181,55 +222,17 @@ def transform_licences_blocks(
     new_data = copy.deepcopy(layout_data)
     doc_storage_url = storage_settings.document_storage_url
     all_licences = session.query(database.Licence).all()
+
     # search all licence blocks inside body/main/sections:
-    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
-    for i, section in enumerate(sections):
-        blocks = section.get("blocks", [])
-        replacements = 0
-        for j, block in enumerate(blocks):
-            new_blocks_index = j + replacements * 2
-            if block.get("type") == "licence":
-                licence_uid = block["licence-id"]
-                try:
-                    licence = [
-                        r for r in all_licences if r.licence_uid == block["licence-id"]
-                    ][0]
-                except IndexError:
-                    raise ValueError(f"not found licence {licence_uid}")
-
-                blocks_before = new_data["body"]["main"]["sections"][i]["blocks"][
-                    :new_blocks_index
-                ]
-                new_blocks = build_licence_blocks(licence, doc_storage_url)
-                blocks_after = new_data["body"]["main"]["sections"][i]["blocks"][
-                    new_blocks_index + 1 :
-                ]
-                new_data["body"]["main"]["sections"][i]["blocks"] = (
-                    blocks_before + new_blocks + blocks_after
-                )
-                replacements += 1
-
-    # search all licence blocks inside body/aside:
-    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
-    replacements = 0
-    for i, block in enumerate(aside_blocks):
-        new_blocks_index = i + replacements * 2
-        if block.get("type") == "licence":
-            licence_uid = block["licence-id"]
-            try:
-                licence = [
-                    r for r in all_licences if r.licence_uid == block["licence-id"]
-                ][0]
-            except IndexError:
-                raise ValueError(f"not found licence {licence_uid}")
-            blocks_before = new_data["body"]["aside"]["blocks"][:new_blocks_index]
-            new_blocks = build_licence_blocks(licence, doc_storage_url)
-            blocks_after = new_data["body"]["aside"]["blocks"][new_blocks_index + 1 :]
-            new_data["body"]["aside"]["blocks"] = (
-                blocks_before + new_blocks + blocks_after
-            )
-            replacements += 1
-
+    sections = new_data.get("body", {}).get("main", {}).get("sections", [])
+    for i, section in enumerate(copy.deepcopy(sections)):
+        sections[i] = manage_licence_section(all_licences, section, doc_storage_url)
+    # search all the images inside body/aside:
+    aside_section = new_data.get("body", {}).get("aside", {})
+    if aside_section:
+        new_data["body"]["aside"] = manage_licence_section(
+            all_licences, aside_section, doc_storage_url
+        )
     return new_data
 
 

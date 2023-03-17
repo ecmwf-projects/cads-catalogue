@@ -49,54 +49,22 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
         for licence in licences:
             session.add(database.Licence(**licence))
         session.commit()
-        session.query(database.Licence).all()
+        all_licences = session.query(database.Licence).all()
     # create a test layout.json
     layout_path = os.path.join(str(tmpdir), "layout.json")
-    block1 = {"licence-id": "licence-to-use-copernicus-products", "type": "licence"}
+    block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence"}
     block2 = {
         "type": "link",
         "id": "test-link-id",
         "title": "a link",
         "href": "http://a-link.html",
     }
-    block3 = {"licence-id": "eumetsat-cm-saf", "type": "licence"}
+    block3 = {"licence-id": all_licences[1].licence_uid, "type": "licence"}
     sections = [
         {"id": "overview", "blocks": [block1, block2, block3]},
         {"id": "overview2", "blocks": [block2, block3]},
     ]
     aside = {"blocks": [block1, block2]}
-    # expected blocks
-
-    def get_blocks(licence_uid, licence_pdf_name, licence_md_name):
-        block11 = {
-            "type": "button",
-            "id": f"{licence_uid}-licences",
-            "title": "Licence",
-            "action": "modal",
-            "contents-url": os.path.join(
-                licences_folder_path,
-                licence_md_name,
-            ),
-        }
-        block12 = {
-            "type": "button",
-            "id": f"{licence_uid}-licences-download",
-            "parent": f"{licence_uid}-licences",
-            "title": "Download PDF",
-            "action": "download",
-            "contents-url": os.path.join(
-                licences_folder_path,
-                licence_pdf_name,
-            ),
-        }
-        block13 = {
-            "type": "button",
-            "id": f"{licence_uid}-licences-clipboard",
-            "parent": f"{licence_uid}-licences",
-            "title": "Copy to clipboard",
-            "action": "copy-clipboard",
-        }
-        return [block11, block12, block13]
 
     layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
 
@@ -110,39 +78,107 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
                 "sections": [
                     {
                         "id": "overview",
-                        "blocks": get_blocks(
-                            "licence-to-use-copernicus-products",
-                            "licence-to-use-copernicus-products.pdf",
-                            "licence-to-use-copernicus-productsv12.md",
+                        "blocks": layout_manager.build_licence_blocks(
+                            all_licences[0], storage_settings.document_storage_url
                         )
                         + [block2]
-                        + get_blocks(
-                            "eumetsat-cm-saf",
-                            "eumetsat-cm-saf.pdf",
-                            "eumetsat-cm-safv1.md",
+                        + layout_manager.build_licence_blocks(
+                            all_licences[1], storage_settings.document_storage_url
                         ),
                     },
                     {
                         "id": "overview2",
                         "blocks": [block2]
-                        + get_blocks(
-                            "eumetsat-cm-saf",
-                            "eumetsat-cm-saf.pdf",
-                            "eumetsat-cm-safv1.md",
+                        + layout_manager.build_licence_blocks(
+                            all_licences[1], storage_settings.document_storage_url
                         ),
                     },
                 ]
             },
             "aside": {
-                "blocks": get_blocks(
-                    "licence-to-use-copernicus-products",
-                    "licence-to-use-copernicus-products.pdf",
-                    "licence-to-use-copernicus-productsv12.md",
+                "blocks": layout_manager.build_licence_blocks(
+                    all_licences[0], storage_settings.document_storage_url
                 )
                 + [block2]
             },
         },
     }
+
+    # build a nested version
+    block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence"}
+    block2 = {
+        "type": "link",
+        "id": "test-link-id",
+        "title": "a link",
+        "href": "http://a-link.html",
+    }
+    block3 = {"licence-id": all_licences[1].licence_uid, "type": "licence"}
+    section1 = {"id": "overview", "blocks": [block1, block2, block3]}
+    section2 = {"id": "overview2", "blocks": [block2, block3]}
+    section3 = {"id": "section1", "type": "section", "blocks": [block1, block3]}
+    section4 = {
+        "id": "accordion1",
+        "type": "accordion",
+        "blocks": [section3, block1, block2],
+    }
+    sections = [section1, section4, section2]
+    aside = {"blocks": [block1, block2, section4, block3]}
+    new_block1 = layout_manager.build_licence_blocks(
+        all_licences[0], storage_settings.document_storage_url
+    )
+    new_block3 = layout_manager.build_licence_blocks(
+        all_licences[1], storage_settings.document_storage_url
+    )
+    layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
+
+    new_layout_data = layout_manager.transform_licences_blocks(
+        session, layout_data, storage_settings
+    )
+    expected = {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": [
+                    {"id": "overview", "blocks": new_block1 + [block2] + new_block3},
+                    {
+                        "id": "accordion1",
+                        "type": "accordion",
+                        "blocks": [
+                            {
+                                "id": "section1",
+                                "type": "section",
+                                "blocks": new_block1 + new_block3,
+                            }
+                        ]
+                        + new_block1
+                        + [block2],
+                    },
+                    {"id": "overview2", "blocks": [block2] + new_block3},
+                ]
+            },
+            "aside": {
+                "blocks": new_block1
+                + [block2]
+                + [
+                    {
+                        "id": "accordion1",
+                        "type": "accordion",
+                        "blocks": [
+                            {
+                                "id": "section1",
+                                "type": "section",
+                                "blocks": new_block1 + new_block3,
+                            }
+                        ]
+                        + new_block1
+                        + [block2],
+                    },
+                ]
+                + new_block3
+            },
+        },
+    }
+    assert new_layout_data == expected
 
 
 def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None:
@@ -177,7 +213,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
         },
     }
     section = {"id": "overview", "blocks": [no_image_block, image_block]}
-    images_stored = dict()
+    images_stored: dict[str, str] = dict()
 
     # not found overview/overview.png
     with pytest.raises(ValueError):
