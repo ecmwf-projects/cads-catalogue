@@ -31,70 +31,36 @@ from cads_catalogue import config, database, object_storage
 logger = structlog.get_logger(__name__)
 
 
-def transform_image_blocks(
-    layout_data: dict[str, Any],
+def manage_image_section(
     folder_path: str | pathlib.Path,
+    section: dict[str, Any],
+    images_stored: dict[str, str],
     resource: dict[str, Any],
-    storage_settings: config.ObjectStorageSettings,
-) -> dict[str, Any]:
-    """Transform layout.json data processing uploads of referenced images.
+    storage_settings: config.ObjectStorageSettings | Any,
+    disable_upload: bool = False,
+):
+    """
+    Look for thumb-markdown blocks and modify accordingly with upload to object storage.
 
     Parameters
     ----------
-    layout_data: layout.json input content
     folder_path: folder path where to find layout.json
+    section: section of layout.json data
+    images_stored: dictionary of image urls already stored
     resource: metadata of loaded resource
     storage_settings: object with settings to access the object storage
-
-    Returns
-    -------
-    dict: dictionary of layout_data modified
+    disable_upload: disable upload (for testing, default False)
     """
-    images_stored = dict()
-    new_data = copy.deepcopy(layout_data)
-    layout_file_path = os.path.join(folder_path, "layout.json")
-    # search all the images inside body/main/sections:
-    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
-    for i, section in enumerate(sections):
-        blocks = section.get("blocks", [])
-        for j, block in enumerate(blocks):
-            image_rel_path = block.get("image", {}).get("url")
-            if block.get("type") == "thumb-markdown" and image_rel_path:
-                image_abs_path = os.path.join(folder_path, block["image"]["url"])
-                if os.path.isfile(image_abs_path):
-                    if image_abs_path not in images_stored:
-                        subpath = os.path.dirname(
-                            os.path.join(
-                                "resources", resource["resource_uid"], image_rel_path
-                            )
-                        )
-                        image_rel_url = object_storage.store_file(
-                            image_abs_path,
-                            storage_settings.object_storage_url,
-                            bucket_name=storage_settings.catalogue_bucket,
-                            subpath=subpath,
-                            force=True,
-                            **storage_settings.storage_kws,
-                        )[0]
-                        images_stored[image_abs_path] = urllib.parse.urljoin(
-                            storage_settings.document_storage_url, image_rel_url
-                        )
-                    new_data["body"]["main"]["sections"][i]["blocks"][j]["image"][
-                        "url"
-                    ] = images_stored[image_abs_path]
-                else:
-                    raise ValueError(
-                        "image %r referenced on %r not found"
-                        % (image_rel_path, layout_file_path)
-                    )
-    # search all the images inside body/aside:
-    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
-    for i, block in enumerate(aside_blocks):
-        image_rel_path = block.get("image", {}).get("url")
+    new_section = copy.deepcopy(section)
+    blocks = new_section.get("blocks", [])
+    for i, block in enumerate(copy.deepcopy(blocks)):
+        image_dict = block.get("image", {})
+        image_rel_path = image_dict.get("url")
         if block.get("type") == "thumb-markdown" and image_rel_path:
             image_abs_path = os.path.join(folder_path, block["image"]["url"])
             if os.path.isfile(image_abs_path):
-                if image_abs_path not in images_stored:
+                if image_abs_path not in images_stored and not disable_upload:
+                    # process upload to object storage
                     subpath = os.path.dirname(
                         os.path.join(
                             "resources", resource["resource_uid"], image_rel_path
@@ -108,21 +74,78 @@ def transform_image_blocks(
                         force=True,
                         **storage_settings.storage_kws,
                     )[0]
+                    # update cache of the upload urls
                     images_stored[image_abs_path] = urllib.parse.urljoin(
                         storage_settings.document_storage_url, image_rel_url
                     )
-                new_data["body"]["aside"]["blocks"][i]["image"]["url"] = images_stored[
-                    image_abs_path
-                ]
+                blocks[i]["image"]["url"] = images_stored.get(image_abs_path, "")
             else:
-                raise ValueError(
-                    "image %r referenced on %r not found"
-                    % (image_rel_path, layout_file_path)
-                )
+                raise ValueError(f"image {image_rel_path} not found")
+        elif block.get("type") in ("section", "accordion"):
+            blocks[i] = manage_image_section(
+                folder_path,
+                block,
+                images_stored,
+                resource,
+                storage_settings,
+                disable_upload=disable_upload,
+            )
+    return new_section
+
+
+def transform_image_blocks(
+    layout_data: dict[str, Any],
+    folder_path: str | pathlib.Path,
+    resource: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings | Any,
+    disable_upload: bool = False,
+) -> dict[str, Any]:
+    """Transform layout.json data processing uploads of referenced images.
+
+    Parameters
+    ----------
+    layout_data: layout.json input content
+    folder_path: folder path where to find layout.json
+    resource: metadata of loaded resource
+    storage_settings: object with settings to access the object storage
+    disable_upload: disable upload (for testing/validations, default False)
+
+    Returns
+    -------
+    dict: dictionary of layout_data modified
+    """
+    images_stored: dict[str, str] = dict()
+    new_data = copy.deepcopy(layout_data)
+    # search all the images inside body/main/sections:
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
+    for i, section in enumerate(copy.deepcopy(sections)):
+        sections[i] = manage_image_section(
+            folder_path,
+            section,
+            images_stored,
+            resource,
+            storage_settings,
+            disable_upload=disable_upload,
+        )
+    # search all the images inside body/aside:
+    aside_section = new_data.get("body", {}).get("aside", {})
+    if aside_section:
+        new_data["body"]["aside"] = manage_image_section(
+            folder_path,
+            aside_section,
+            images_stored,
+            resource,
+            storage_settings,
+            disable_upload=disable_upload,
+        )
     return new_data
 
 
-def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
+def build_licence_blocks(
+    licence: database.Licence, doc_storage_url: str
+) -> List[dict[str, str]]:
     """
     Build a list of new licence blocks to be inserted inside the layout data.
 
@@ -139,7 +162,7 @@ def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
         {
             "type": "button",
             "id": f"{licence.licence_uid}-licences",
-            "title": "Licence",
+            "title": f"{licence.title}",
             "action": "modal",
             "contents-url": urllib.parse.urljoin(doc_storage_url, licence.md_filename),
         },
@@ -164,6 +187,45 @@ def build_licence_blocks(licence, doc_storage_url) -> List[dict[str, str]]:
     return new_blocks
 
 
+def manage_licence_section(
+    all_licences: List[database.Licence],
+    section: dict[str, Any],
+    doc_storage_url: str,
+):
+    """
+    Look for licence blocks and modify accordingly with urls of object storage files.
+
+    Parameters
+    ----------
+    all_licences: list of licence objects in the database
+    section: section of layout.json data
+    doc_storage_url: public url of the object storage
+    """
+    new_section = copy.deepcopy(section)
+    blocks = new_section.get("blocks", [])
+    replacements = 0
+    for i, block in enumerate(copy.deepcopy(blocks)):
+        if block.get("type") == "licence":
+            licence_uid = block["licence-id"]
+            try:
+                licence = [
+                    r for r in all_licences if r.licence_uid == block["licence-id"]
+                ][0]
+            except IndexError:
+                raise ValueError(f"not found licence {licence_uid}")
+            new_blocks = build_licence_blocks(licence, doc_storage_url)
+            del blocks[i + 2 * replacements]
+            blocks.insert(i + 2 * replacements, new_blocks[0])
+            blocks.insert(i + 1 + 2 * replacements, new_blocks[1])
+            blocks.insert(i + 2 + 2 * replacements, new_blocks[2])
+            replacements += 1
+        elif block.get("type") in ("section", "accordion"):
+            blocks[i + 2 * replacements] = manage_licence_section(
+                all_licences, block, doc_storage_url
+            )
+    return new_section
+
+
 def transform_licences_blocks(
     session: Session,
     layout_data: dict[str, Any],
@@ -184,55 +246,21 @@ def transform_licences_blocks(
     new_data = copy.deepcopy(layout_data)
     doc_storage_url = storage_settings.document_storage_url
     all_licences = session.query(database.Licence).all()
+
     # search all licence blocks inside body/main/sections:
-    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
-    for i, section in enumerate(sections):
-        blocks = section.get("blocks", [])
-        replacements = 0
-        for j, block in enumerate(blocks):
-            new_blocks_index = j + replacements * 2
-            if block.get("type") == "licence":
-                licence_uid = block["licence-id"]
-                try:
-                    licence = [
-                        r for r in all_licences if r.licence_uid == block["licence-id"]
-                    ][0]
-                except IndexError:
-                    raise ValueError(f"not found licence {licence_uid}")
-
-                blocks_before = new_data["body"]["main"]["sections"][i]["blocks"][
-                    :new_blocks_index
-                ]
-                new_blocks = build_licence_blocks(licence, doc_storage_url)
-                blocks_after = new_data["body"]["main"]["sections"][i]["blocks"][
-                    new_blocks_index + 1 :
-                ]
-                new_data["body"]["main"]["sections"][i]["blocks"] = (
-                    blocks_before + new_blocks + blocks_after
-                )
-                replacements += 1
-
-    # search all licence blocks inside body/aside:
-    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
-    replacements = 0
-    for i, block in enumerate(aside_blocks):
-        new_blocks_index = i + replacements * 2
-        if block.get("type") == "licence":
-            licence_uid = block["licence-id"]
-            try:
-                licence = [
-                    r for r in all_licences if r.licence_uid == block["licence-id"]
-                ][0]
-            except IndexError:
-                raise ValueError(f"not found licence {licence_uid}")
-            blocks_before = new_data["body"]["aside"]["blocks"][:new_blocks_index]
-            new_blocks = build_licence_blocks(licence, doc_storage_url)
-            blocks_after = new_data["body"]["aside"]["blocks"][new_blocks_index + 1 :]
-            new_data["body"]["aside"]["blocks"] = (
-                blocks_before + new_blocks + blocks_after
-            )
-            replacements += 1
-
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
+    for i, section in enumerate(copy.deepcopy(sections)):
+        sections[i] = manage_licence_section(all_licences, section, doc_storage_url)
+    # search all the images inside body/aside:
+    aside_section = body.get("aside", {})
+    if aside_section:
+        new_data["body"]["aside"] = manage_licence_section(
+            all_licences,
+            aside_section,
+            doc_storage_url,
+        )
     return new_data
 
 

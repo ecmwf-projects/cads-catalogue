@@ -20,7 +20,7 @@ import json
 import logging
 import os
 
-from cads_catalogue import utils
+from cads_catalogue import layout_manager, utils
 
 logger = logging.getLogger(__name__)
 
@@ -98,37 +98,19 @@ def validate_layout(dataset_folder):
     """Validate layout.json of a dataset."""
     file_name = "layout.json"
     layout_data = validate_base_json(dataset_folder, file_name)
-
-    found_image = False
-    # search all the images inside body/main/sections:
-    sections = layout_data.get("body", {}).get("main", {}).get("sections", [])
-    for i, section in enumerate(sections):
-        blocks = section.get("blocks", [])
-        for j, block in enumerate(blocks):
-            image_rel_path = block.get("image", {}).get("url")
-            if block.get("type") == "thumb-markdown" and image_rel_path:
-                image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
-                if not os.path.isfile(image_abs_path):
-                    logger.error(
-                        f"image {image_rel_path} referenced on {file_name} not found"
-                    )
-                else:
-                    found_image = True
-    # search all the images inside body/aside:
-    aside_blocks = layout_data.get("body", {}).get("aside", {}).get("blocks", [])
-    for i, block in enumerate(aside_blocks):
-        image_rel_path = block.get("image", {}).get("url")
-        if block.get("type") == "thumb-markdown" and image_rel_path:
-            image_abs_path = os.path.join(dataset_folder, block["image"]["url"])
-            if not os.path.isfile(image_abs_path):
-                logger.error(
-                    f"image {image_rel_path} referenced on {file_name} not found"
-                )
-            else:
-                found_image = True
-
-    if not found_image:
-        logger.warning(f"image of the dataset not found in {file_name}")
+    if not os.path.isfile(os.path.join(dataset_folder, file_name)):
+        return
+    # validate for images
+    try:
+        layout_manager.transform_image_blocks(
+            layout_data,
+            dataset_folder,
+            {"resource_uid": "validation"},
+            None,
+            disable_upload=True,
+        )
+    except Exception:  # noqa
+        logger.exception(f"Image parsing of {file_name} not compliant. Error follows.")
 
 
 def validate_mapping(dataset_folder):
@@ -141,7 +123,8 @@ def validate_metadata_json(dataset_folder):
     """Validate metadata.json of a dataset."""
     file_name = "metadata.json"
     data = validate_base_json(dataset_folder, file_name)
-
+    if not os.path.isfile(os.path.join(dataset_folder, file_name)):
+        return
     metadata = dict()
     required_fields = ["abstract", "resource_type", "title"]
     for required_field in required_fields:
