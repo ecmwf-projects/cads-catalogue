@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import csv
 import glob
 import json
 import os
@@ -289,3 +290,32 @@ def migrate_from_cds_licences(
                 os.path.join(cds_licences_folder, licence["md_filename"]),
                 os.path.join(cads_licences_folder, licence["md_filename"]),
             )
+
+
+def export_to_csv(cads_licences_folder: str, csv_path: str) -> None:
+    """
+    Export (uid, revision) of cads-licences on a csv.
+
+    Parameters
+    ----------
+    cads_licences_folder: path to the cads-licences folder
+    csv_path: csv output file path
+    """
+    licences = []
+    json_filepaths = glob.glob(os.path.join(cads_licences_folder, "*.json"))
+    for json_filepath in json_filepaths:
+        with open(json_filepath) as fp:
+            json_data = json.load(fp)
+            licence = {
+                "licence_uid": json_data["licence_uid"],
+                "revision": json_data["revision"],
+            }
+            licences.append(licence)
+
+    with open("licences.csv", "w") as fp:
+        writer = csv.DictWriter(
+            fp, fieldnames=["licence_uid", "revision"], delimiter=";"
+        )
+        writer.writeheader()
+        for licence in licences:
+            writer.writerow(licence)
