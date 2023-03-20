@@ -1293,7 +1293,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -3999,7 +4002,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -5235,7 +5241,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -8715,7 +8724,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -10492,7 +10504,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -14226,7 +14241,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -35065,7 +35083,10 @@
                     "licences": [
                         {
                             "id": "licence-to-use-copernicus-products",
-                            "revision": "latest"
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"
                         }
                     ]
                 }
@@ -38594,6 +38615,34 @@
                 "name": "format",
                 "required": true,
                 "type": "StringChoiceWidget"
+            },
+            {
+                "help": null,
+                "name": "licences",
+                "type": "LicenceWidget",
+                "label": "Terms of use",
+                "details": {
+                    "licences": [
+                        {
+                            "id": "CCI-data-policy-for-satellite-surface-radiation-budget",
+                            "label": "CCI product licence",
+                            "revision": 4,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"},
+                        {
+                            "id": "eumetsat-cm-saf",
+                            "label": "EUMETSAT CM SAF products licence",
+                            "revision": 1,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"},
+                        {
+                            "id": "licence-to-use-copernicus-products",
+                            "label": "Licence to use Copernicus Products",
+                            "revision": 12,
+                            "contents_url": "http://mypublic-storage/an url",
+                            "attachment_url": "http://mypublic-storage/an url"}
+                    ]
+                }
             }
         ],
         "mapping": {

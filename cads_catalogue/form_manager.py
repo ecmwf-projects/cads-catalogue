@@ -16,6 +16,7 @@
 
 import copy
 import json
+import operator
 import os
 import pathlib
 import shutil
@@ -31,24 +32,24 @@ from cads_catalogue import config, database, object_storage
 logger = structlog.get_logger(__name__)
 
 
-def manage_licence_block(
-    req_licences: List[database.Licence],
-    block: dict[str, Any],
-    doc_storage_url: str,
-):
+def build_licence_block(req_licences: List[database.Licence], doc_storage_url: str):
     """
     Modify accordingly the licence block with ids and urls required.
 
     Parameters
     ----------
     req_licences: list of licence objects required by the dataset
-    block: item of form.json data
     doc_storage_url: public url of the object storage
     """
-    new_block = copy.deepcopy(block)
-    if "details" not in new_block or not new_block["details"]:
-        new_block["details"] = {"licences": []}
-
+    new_block: dict[str, Any] = {
+        "type": "LicenceWidget",
+        "name": "licences",
+        "label": "Terms of use",
+        "help": None,
+        "details": {
+            "licences": [],
+        },
+    }
     licences_block = []
     for req_licence in req_licences:
         licence_block = {
@@ -64,7 +65,7 @@ def manage_licence_block(
         }
         licences_block.append(licence_block)
 
-    new_block["details"]["licences"] = licences_block
+    new_block["details"]["licences"] = licences_block  # type: ignore
     return new_block
 
 
@@ -102,12 +103,11 @@ def transform_licences_blocks(
         if not licence_obj:
             raise ValueError("licence_uid = %r not found" % licence_uid)
         req_licences.append(licence_obj)
+    req_licences = sorted(req_licences, key=operator.attrgetter("licence_uid"))
 
-    # search all licence blocks inside form items:
-    for i, block in enumerate(copy.deepcopy(form_data)):
-        if type == "LicenceWidget":
-            new_data[i] = manage_licence_block(req_licences, block, doc_storage_url)
-
+    # append 1 licence block inside form items:
+    new_block = build_licence_block(req_licences, doc_storage_url)
+    new_data.append(new_block)
     return new_data
 
 

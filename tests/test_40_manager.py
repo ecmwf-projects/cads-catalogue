@@ -1041,9 +1041,9 @@ def test_resource_sync(
     patch.reset_mock()
 
     # following fields properly tested apart
-    resource['form'] = 'an url for form.json'
-    resource['layout'] = 'an url for layout.json'
-    resource['form_data'] = 'content of form.json'
+    resource["form"] = "an url for form.json"
+    resource["layout"] = "an url for layout.json"
+    resource["form_data"] = "content of form.json"
     # create first dataset
     with session_obj() as session:
         manager.resource_sync(session, resource, storage_settings)
@@ -1082,9 +1082,9 @@ def test_resource_sync(
     )
     resource2 = manager.load_resource_from_folder(resource_folder_path2)
     # following fields properly tested apart
-    resource2['form'] = 'an url for form.json'
-    resource2['layout'] = 'an url for layout.json'
-    resource2['form_data'] = 'content of form.json'
+    resource2["form"] = "an url for form.json"
+    resource2["layout"] = "an url for layout.json"
+    resource2["form_data"] = "content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
@@ -1099,7 +1099,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
-            exclude_fields=("record_update", "resource_id")
+            exclude_fields=("record_update", "resource_id"),
         )
         assert session.execute(
             "select resource_id, licence_id "
@@ -1150,9 +1150,9 @@ def test_resource_sync(
     ]
     resource2["ds_contactemail"] = "a_new_test@email"
     # following fields properly tested apart
-    resource2['form'] = 'a new url for form.json'
-    resource2['layout'] = 'a new url for layout.json'
-    resource2['form_data'] = 'a new content of form.json'
+    resource2["form"] = "a new url for form.json"
+    resource2["layout"] = "a new url for layout.json"
+    resource2["form_data"] = "a new content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
