@@ -24,7 +24,14 @@ from typing import Any, List, Tuple
 import structlog
 from sqlalchemy.orm.session import Session
 
-from cads_catalogue import config, database, layout_manager, object_storage, utils
+from cads_catalogue import (
+    config,
+    database,
+    form_manager,
+    layout_manager,
+    object_storage,
+    utils,
+)
 
 logger = structlog.get_logger(__name__)
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -32,9 +39,9 @@ TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
 )
 
+# form.json and layout.json are managed separately
 OBJECT_STORAGE_UPLOAD_FILES = {
     "constraints.json": "constraints",
-    "form.json": "form",
     "overview.png": "previewimage",
 }
 
@@ -181,7 +188,6 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     json_files_db_map = [
         ("adaptor.json", "adaptor_configuration"),
         ("constraints.json", "constraints_data"),
-        ("form.json", "form_data"),
         ("mapping.json", "mapping"),
     ]
     for file_name, db_field in json_files_db_map:
@@ -502,6 +508,9 @@ def update_catalogue_resources(
                 resource = load_resource_from_folder(resource_folder_path)
                 logger.info("resource %s loaded successful" % resource_uid)
                 resource = layout_manager.transform_layout(
+                    session, resource_folder_path, resource, storage_settings
+                )
+                resource = form_manager.transform_form(
                     session, resource_folder_path, resource, storage_settings
                 )
                 resource_sync(session, resource, storage_settings)
