@@ -24,7 +24,7 @@ from sqlalchemy import inspect
 
 
 def compare_resources_with_dumped_file(
-    records, file_path, exclude_fields=("record_update", "resource_id", "layout")
+    records, file_path, exclude_fields=("record_update", "resource_id")
 ):
     """Use for testing records with dumped versions on files."""
     dict_resources = [object_as_dict(r) for r in records]

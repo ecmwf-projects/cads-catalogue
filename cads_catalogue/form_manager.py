@@ -103,12 +103,6 @@ def transform_licences_blocks(
             raise ValueError("licence_uid = %r not found" % licence_uid)
         req_licences.append(licence_obj)
 
-    req_licences = (
-        session.query(database.Resource)
-        .filter_by(resource_uid=resource["resource_uid"])
-        .licences
-    )
-
     # search all licence blocks inside form items:
     for i, block in enumerate(copy.deepcopy(form_data)):
         if type == "LicenceWidget":
