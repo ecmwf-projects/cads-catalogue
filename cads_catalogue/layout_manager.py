@@ -323,6 +323,7 @@ def transform_layout(
     modified version of input resource metadata
     """
     layout_file_path = os.path.join(resource_folder_path, "layout.json")
+    resource["layout"] = None
     if not os.path.isfile(layout_file_path):
         return resource
     with open(layout_file_path) as fp:

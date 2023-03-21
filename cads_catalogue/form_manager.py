@@ -170,6 +170,8 @@ def transform_form(
     modified version of input resource metadata
     """
     form_file_path = os.path.join(resource_folder_path, "form.json")
+    resource["form_data"] = None
+    resource["form"] = None
     if not os.path.isfile(form_file_path):
         return resource
     with open(form_file_path) as fp:
