@@ -322,10 +322,9 @@ def transform_layout(
     -------
     modified version of input resource metadata
     """
-    metadata: dict[str, Any] = dict()
     layout_file_path = os.path.join(resource_folder_path, "layout.json")
     if not os.path.isfile(layout_file_path):
-        return metadata
+        return resource
     with open(layout_file_path) as fp:
         layout_data = json.load(fp)
     layout_data = transform_image_blocks(

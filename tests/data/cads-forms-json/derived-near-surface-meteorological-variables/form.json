@@ -240,19 +240,5 @@
     "name": "format",
     "required": true,
     "type": "StringChoiceWidget"
-  },
-  {
-    "type": "LicenceWidget",
-    "name": "licences",
-    "label": "Terms of use",
-    "help": null,
-    "details": {
-      "licences": [
-        {
-          "id": "licence-to-use-copernicus-products",
-          "revision": "latest"
-        }
-      ]
-    }
   }
 ]

@@ -101,7 +101,6 @@ def test_load_resource_for_object_storage() -> None:
     res = manager.load_resource_for_object_storage(folder_path)
     assert res == {
         "constraints": os.path.join(folder_path, "constraints.json"),
-        "form": os.path.join(folder_path, "form.json"),
         "previewimage": os.path.join(folder_path, "overview.png"),
     }
 
@@ -224,8 +223,6 @@ def test_load_resource_from_folder() -> None:
         "ds_responsible_organisation_role": "publisher",
         "end_date": "2022-10-01",
         "file_format": ["grib", "netcdf"],
-        "form": os.path.join(resource_folder_path, "form.json"),
-        "form_data": json.load(form_fp),
         "format_version": None,
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
         "hidden": False,
@@ -1043,13 +1040,17 @@ def test_resource_sync(
         uid_id_licence_map = dict(db_licences)
     patch.reset_mock()
 
+    # following fields properly tested apart
+    resource["form"] = "an url for form.json"
+    resource["layout"] = "an url for layout.json"
+    resource["form_data"] = "content of form.json"
     # create first dataset
     with session_obj() as session:
         manager.resource_sync(session, resource, storage_settings)
         session.commit()
         assert len(session.query(database.Resource).first().keywords) == 7
 
-    assert patch.call_count == 3
+    assert patch.call_count == 2
     expected_args_object_storage_calls = [
         (
             os.path.join(resource_folder_path, "overview.png"),
@@ -1060,15 +1061,11 @@ def test_resource_sync(
             os.path.join(resource_folder_path, "constraints.json"),
             storage_settings.object_storage_url,
         ),
-        (
-            os.path.join(resource_folder_path, "form.json"),
-            storage_settings.object_storage_url,
-        ),
     ]
     effective_args_object_storage_calls = [pm.args for pm in patch.mock_calls]
     for expected_args_object_storage_call in expected_args_object_storage_calls:
         assert expected_args_object_storage_call in effective_args_object_storage_calls
-    assert effective_args_object_storage_calls[1][0].endswith("form.json")
+    assert effective_args_object_storage_calls[1][0].endswith("overview.png")
     assert {
         "bucket_name": "mycatalogue_bucket",
         "subpath": "resources/reanalysis-era5-land",
@@ -1084,6 +1081,10 @@ def test_resource_sync(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land-monthly-means"
     )
     resource2 = manager.load_resource_from_folder(resource_folder_path2)
+    # following fields properly tested apart
+    resource2["form"] = "an url for form.json"
+    resource2["layout"] = "an url for layout.json"
+    resource2["form_data"] = "content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
@@ -1098,6 +1099,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
+            exclude_fields=("record_update", "resource_id"),
         )
         assert session.execute(
             "select resource_id, licence_id "
@@ -1147,6 +1149,10 @@ def test_resource_sync(
         "eumetsat-cm-saf",  # added
     ]
     resource2["ds_contactemail"] = "a_new_test@email"
+    # following fields properly tested apart
+    resource2["form"] = "a new url for form.json"
+    resource2["layout"] = "a new url for layout.json"
+    resource2["form_data"] = "a new content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
