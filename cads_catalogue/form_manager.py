@@ -169,10 +169,9 @@ def transform_form(
     -------
     modified version of input resource metadata
     """
-    metadata: dict[str, Any] = dict()
     form_file_path = os.path.join(resource_folder_path, "form.json")
     if not os.path.isfile(form_file_path):
-        return metadata
+        return resource
     with open(form_file_path) as fp:
         form_data = json.load(fp)
     form_data = transform_licences_blocks(
