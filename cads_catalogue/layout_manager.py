@@ -335,4 +335,5 @@ def transform_layout(
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
     logger.debug(f"output layout_data: {layout_data}")
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
+    logger.debug(f"layout url: {resource['layout']}")
     return resource
