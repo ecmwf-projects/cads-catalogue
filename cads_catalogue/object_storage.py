@@ -181,6 +181,7 @@ def store_file(
     )
     for existing_object in existing_objects:
         version_id = existing_object.version_id
+        logger.debug(f"found stored with version id: {version_id}")
         obj_with_metadata = client.stat_object(
             bucket_name, object_name, version_id=version_id
         )
@@ -189,7 +190,9 @@ def store_file(
         logger.debug(f"destination_sha256: {destination_sha256}")
         if destination_sha256 and destination_sha256 == source_sha256:
             # already on the object storage: do not upload
-            logger.debug(f"NOT SAVING file: already found on object storage, version_id:{version_id}")
+            logger.debug(
+                f"NOT SAVING file: already found on object storage, version_id:{version_id}"
+            )
             break
     else:  # never gone on break: effective upload
         logger.debug("confirm SAVING file: not found on object storage")
