@@ -328,9 +328,12 @@ def transform_layout(
         return resource
     with open(layout_file_path) as fp:
         layout_data = json.load(fp)
+        logger.debug(f"input layout_data: {layout_data}")
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
+    logger.debug(f"output layout_data: {layout_data}")
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
+    logger.debug(f"layout url: {resource['layout']}")
     return resource

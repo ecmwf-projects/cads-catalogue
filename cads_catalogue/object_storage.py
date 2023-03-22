@@ -173,7 +173,7 @@ def store_file(
     with open(file_path, "rb") as fp:
         text = fp.read()
         source_sha256 = hashlib.sha256(text).hexdigest()
-
+        logger.debug(f"source_sha256: {source_sha256}")
     # check if destination already exists under some version
     # NOTE: 'include_user_meta' does not work, so use stat_object for the results
     existing_objects = client.list_objects(
@@ -186,9 +186,10 @@ def store_file(
         )
         # NOTE: when writing, metadata keys are prefixed by "x-amz-meta-"
         destination_sha256 = obj_with_metadata.metadata.get("x-amz-meta-sha256")
+        logger.debug(f"destination_sha256: {destination_sha256}")
         if destination_sha256 and destination_sha256 == source_sha256:
             # already on the object storage: do not upload
-            logger.debug("NOT SAVING file: already found on object storage")
+            logger.debug(f"NOT SAVING file: already found on object storage, version_id:{version_id}")
             break
     else:  # never gone on break: effective upload
         logger.debug("confirm SAVING file: not found on object storage")
@@ -196,6 +197,7 @@ def store_file(
             bucket_name, object_name, file_path, metadata={"sha256": source_sha256}
         )
         version_id = res.version_id
+        logger.debug(f"new version_id: {version_id}")
     download_url = "%s/%s?versionId=%s" % (bucket_name, object_name, version_id)
     ret_value = (download_url, version_id)
     return ret_value
