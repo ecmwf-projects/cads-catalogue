@@ -32,7 +32,7 @@ from cads_catalogue import (
 )
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
-PACKAGE_DIR = os.path.abspath(os.path.join(THIS_PATH, '..', '..'))
+PACKAGE_DIR = os.path.abspath(os.path.join(THIS_PATH, "..", ".."))
 app = typer.Typer()
 logger = structlog.get_logger(__name__)
 
