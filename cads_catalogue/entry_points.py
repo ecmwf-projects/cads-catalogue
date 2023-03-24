@@ -31,6 +31,8 @@ from cads_catalogue import (
     validations,
 )
 
+THIS_PATH = os.path.abspath(os.path.dirname(__file__))
+PACKAGE_DIR = os.path.abspath(os.path.join(THIS_PATH, '..', '..'))
 app = typer.Typer()
 logger = structlog.get_logger(__name__)
 
@@ -132,9 +134,9 @@ def init_db(connection_string: str | None = None) -> None:
 
 @app.command()
 def update_catalogue(
-    resources_folder_path: str = "",  # TODO: remove default
-    messages_folder_path: str = "",  # TODO: remove default
-    licences_folder_path: str = manager.TEST_LICENCES_DATA_PATH,
+    resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
+    messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
+    licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
     connection_string: str | None = None,
     force: bool = False,
     delete_orphans: bool = False,
