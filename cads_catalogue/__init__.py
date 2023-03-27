@@ -45,9 +45,10 @@ __all__ = [
     "main",
 ]
 
+# FIXME: this overwrites basicConfig in every package that imports it
 logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(levelname).4s: %(message)s",
+    level=logging.INFO,
+    format="%(message)s",
     stream=sys.stdout,
 )
 
