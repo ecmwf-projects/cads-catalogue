@@ -204,6 +204,36 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     return metadata
 
 
+def load_fulltext(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Find a file `fulltext.txt` in order to populate the field `fulltext`.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    # TODO: just a draft
+    metadata: dict[str, Any] = dict()
+    fulltext_path = os.path.join(folder_path, "fulltext.txt")
+    metadata["fulltext"] = None
+    if not os.path.isfile(fulltext_path):
+        return metadata
+    with open(fulltext_path) as fp:
+        lines = [r.strip() for r in fp.readlines()]
+
+    # some normalizations
+    chars_to_remove = [",", ".", ";", "(", ")"]
+    text = " ".join(lines)
+    text = text.lower()
+    for char_to_remove in chars_to_remove:
+        text = text.replace(char_to_remove, " ")
+
+    metadata["fulltext"] = text
+    return metadata
+
+
 def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load a resource's metadata from the metadata.json file.
 
@@ -335,6 +365,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     metadata["resource_uid"] = os.path.basename(folder_path)
     loader_functions = [
         load_resource_for_object_storage,
+        load_fulltext,
         load_adaptor_information,
         load_resource_documentation,
         load_resource_metadata_file,

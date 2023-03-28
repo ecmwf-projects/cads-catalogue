@@ -25,7 +25,7 @@ metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
 
-DB_VERSION = 9  # to increment at each structure change
+DB_VERSION = 10  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -188,6 +188,7 @@ class Resource(BaseModel):
     ds_responsible_organisation_role = sa.Column(sa.String)
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
+    fulltext = sa.Column(sa.String)
     hidden = sa.Column(sa.Boolean, default=False)
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)

@@ -224,6 +224,7 @@ def test_load_resource_from_folder() -> None:
         "end_date": "2022-10-01",
         "file_format": ["grib", "netcdf"],
         "format_version": None,
+        "fulltext": None,
         "geo_extent": {"bboxE": 360, "bboxN": 89, "bboxS": -89, "bboxW": 0},
         "hidden": False,
         "keywords": [
