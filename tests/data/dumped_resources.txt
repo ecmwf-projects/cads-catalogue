@@ -9196,7 +9196,7 @@
     {
         "resource_id": 6,
         "resource_uid": "reanalysis-era5-land-monthly-means",
-        "fulltext": null,
+        "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",

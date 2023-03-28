@@ -3101,7 +3101,7 @@
         "constraints": "an url",
         "previewimage": "an url",
         "adaptor": null,
-        "fulltext": null,
+        "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
         "adaptor_configuration": null,
         "constraints_data": [
             {

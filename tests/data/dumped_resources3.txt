@@ -3101,7 +3101,7 @@
         "constraints": "an url",
         "form": "a new url for form.json",
         "form_data": "a new content of form.json",
-        "fulltext": null,
+        "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
         "layout": "a new url for layout.json",
         "previewimage": "an url",
         "adaptor": null,
