@@ -25,6 +25,9 @@ import minio  # type: ignore
 import structlog
 from minio import commonconfig, versioningconfig
 
+from cads_catalogue import config
+
+THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
 
 DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
@@ -204,3 +207,172 @@ def store_file(
     download_url = "%s/%s?versionId=%s" % (bucket_name, object_name, version_id)
     ret_value = (download_url, version_id)
     return ret_value
+
+
+def test_bucket(
+    storage_settings: config.ObjectStorageSettings,
+    bucket_name: str = "cads-catalogue",
+) -> None:
+    logger.info("testing object storage capabilities")
+    client = minio.Minio(
+        urllib.parse.urlparse(storage_settings.object_storage_url).netloc,
+        **storage_settings.storage_kws,
+    )
+
+    logger.info("test 1: prepare a versioning download bucket")
+    if client.bucket_exists(bucket_name):
+        logger.warning(f"the bucket {bucket_name} already exists")
+    if not client.bucket_exists(bucket_name):
+        client.make_bucket(bucket_name)
+        client.set_bucket_versioning(
+            bucket_name, versioningconfig.VersioningConfig(commonconfig.ENABLED)
+        )
+        set_bucket_policy(client, bucket_name, "download")
+        logger.info(f"bucket {bucket_name} created")
+    if not client.bucket_exists(bucket_name):
+        logger.error(f"test 1 failed: bucket {bucket_name} not found")
+        return
+    logger.info("test 1 passed")
+
+    logger.info("test 2: upload a file")
+    file_path = os.path.abspath(
+        os.path.join(
+            THIS_PATH,
+            "..",
+            "tests",
+            "data",
+            "cads-forms-json",
+            "cams-global-reanalysis-eac4",
+            "overview.png",
+        )
+    )
+    subpath = "testfiles"
+    file_name = os.path.basename(file_path)
+    object_name = os.path.join(subpath, file_name)
+    existing_objects = client.list_objects(
+        bucket_name, object_name, include_user_meta=True, include_version=True
+    )
+    if existing_objects:
+        for existing_object in existing_objects:
+            version_id = existing_object.version_id
+            logger.warning(
+                f"found {object_name} stored with version id: {version_id}. Try removing."
+            )
+            client.remove_object(bucket_name, object_name, version_id)
+    existing_objects = client.list_objects(
+        bucket_name, object_name, include_user_meta=True, include_version=True
+    )
+    if existing_objects:
+        logger.error(f"test 2 failed: object {bucket_name} was not removed")
+        return
+    with open(file_path, "rb") as fp:
+        text = fp.read()
+        source_sha256 = hashlib.sha256(text).hexdigest()
+    res = client.fput_object(
+        bucket_name, object_name, file_path, metadata={"sha256": source_sha256}
+    )
+    version_id = res.version_id
+    existing_objects = client.list_objects(
+        bucket_name, object_name, include_user_meta=True, include_version=True
+    )
+    if not existing_objects:
+        logger.error(
+            f"test 2 failed: object {object_name} with version {version_id} not uploaded/found"
+        )
+        return
+    how_many_found = 0
+    found_right = 0
+    for existing_object in existing_objects:
+        how_many_found += 1
+        obj_with_metadata = client.stat_object(
+            bucket_name, object_name, version_id=existing_object.version_id
+        )
+        destination_sha256 = obj_with_metadata.metadata.get("x-amz-meta-sha256")
+        if existing_object.version_id != version_id:
+            logger.error(f"found object {object_name} with wrong version {version_id}")
+        if destination_sha256 != source_sha256:
+            logger.error(
+                f"object {object_name} with version {version_id} "
+                f"not uploaded with right sha256 {source_sha256}. Found sha256 {destination_sha256}"
+            )
+        if (
+            existing_object.version_id == version_id
+            and destination_sha256 == source_sha256
+        ):
+            found_right += 1
+            logger.info(
+                f"object {object_name} with version {version_id} found with right sha256 {source_sha256}"
+            )
+    if found_right == 1 and how_many_found == 1:
+        logger.info("test 2 passed")
+    else:
+        logger.info(
+            f"test 2 failed: found {found_right} right results, on total of {how_many_found} (expected: 1, 1)"
+        )
+        return
+
+    logger.info("test 3: retrieving a version of a file")
+    file_path2 = os.path.abspath(
+        os.path.join(
+            THIS_PATH,
+            "..",
+            "tests",
+            "data",
+            "cads-forms-json",
+            "reanalysis-era5-land-monthly-means",
+            "overview.png",
+        )
+    )
+    with open(file_path2, "rb") as fp:
+        text2 = fp.read()
+        source_sha256_2 = hashlib.sha256(text2).hexdigest()
+    assert source_sha256_2 != source_sha256
+    res2 = client.fput_object(
+        bucket_name, object_name, file_path2, metadata={"sha256": source_sha256_2}
+    )
+    version_id2 = res2.version_id
+    if version_id2 == version_id:
+        logger.error(
+            f"test 3 failed: different object {object_name} generated with the same version {version_id2}"
+        )
+        return
+    existing_objects = client.list_objects(
+        bucket_name, object_name, include_user_meta=True, include_version=True
+    )
+    if not existing_objects:
+        logger.error(
+            f"test 3 failed: no more found {object_name} with version {version_id2}"
+        )
+        return
+    how_many_found = 0
+    found_right = 0
+    for existing_object in existing_objects:
+        how_many_found += 1
+        obj_with_metadata = client.stat_object(
+            bucket_name, object_name, version_id=existing_object.version_id
+        )
+        destination_sha256 = obj_with_metadata.metadata.get("x-amz-meta-sha256")
+        if (existing_object.version_id, destination_sha256) not in [
+            (version_id, source_sha256),
+            (version_id2, source_sha256_2),
+        ]:
+            logger.error(
+                f"found object {object_name} with mismatch version/sha256 "
+                f"{existing_object.version_id} / {destination_sha256}"
+            )
+        else:
+            found_right += 1
+    if found_right == 2 and how_many_found == 2:
+        logger.info("test 3 passed")
+    else:
+        logger.error(
+            f"test 3 failed: found {found_right} right results, on total of {how_many_found}"
+        )
+
+    # cleanup
+    existing_objects = client.list_objects(
+        bucket_name, object_name, include_user_meta=True, include_version=True
+    )
+    for existing_object in existing_objects:
+        client.remove_object(bucket_name, object_name, existing_object.version_id)
+    return
