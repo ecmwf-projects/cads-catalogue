@@ -8,6 +8,7 @@
         "adaptor_configuration": null,
         "form": "an url for form.json",
         "form_data": "content of form.json",
+        "fulltext": null,
         "layout": "an url for layout.json",
         "constraints_data": [
             {
@@ -3100,6 +3101,7 @@
         "constraints": "an url",
         "previewimage": "an url",
         "adaptor": null,
+        "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
         "adaptor_configuration": null,
         "constraints_data": [
             {

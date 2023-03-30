@@ -4,6 +4,7 @@
         "resource_uid": "cams-global-reanalysis-eac4",
         "constraints": "an url",
         "form": "an url",
+        "fulltext": null,
         "layout": "an url",
         "previewimage": "an url",
         "adaptor": "import cacholote\nimport cdsapi\n\n\n@cacholote.cacheable\ndef adaptor(request, config, metadata):\n\n    # parse input options\n    collection_id = config.pop(\"collection_id\", None)\n    if not collection_id:\n        raise ValueError(f\"collection_id is required in request\")\n\n    # retrieve data\n    client = cdsapi.Client(config[\"url\"], config[\"key\"])\n    result_path = client.retrieve(collection_id, request).download()\n    return open(result_path, \"rb\")\n",
@@ -2415,6 +2416,7 @@
     {
         "resource_id": 2,
         "resource_uid": "cams-global-reanalysis-eac4-monthly",
+        "fulltext": null,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -4673,6 +4675,7 @@
     {
         "resource_id": 1,
         "resource_uid": "derived-near-surface-meteorological-variables",
+        "fulltext": null,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -5463,6 +5466,7 @@
     {
         "resource_id": 7,
         "resource_uid": "reanalysis-era5-land",
+        "fulltext": null,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -9192,6 +9196,7 @@
     {
         "resource_id": 6,
         "resource_uid": "reanalysis-era5-land-monthly-means",
+        "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -10976,6 +10981,7 @@
     {
         "resource_id": 8,
         "resource_uid": "reanalysis-era5-pressure-levels",
+        "fulltext": null,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -14514,6 +14520,7 @@
     {
         "resource_id": 3,
         "resource_uid": "reanalysis-era5-single-levels",
+        "fulltext": null,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -36832,6 +36839,7 @@
     {
         "resource_id": 4,
         "resource_uid": "satellite-surface-radiation-budget",
+        "fulltext": null,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
