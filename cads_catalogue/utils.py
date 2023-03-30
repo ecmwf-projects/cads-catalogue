@@ -16,10 +16,13 @@
 
 import datetime
 import json
+import logging
 import pathlib
 import subprocess
+import sys
 from typing import Any
 
+import structlog
 from sqlalchemy import inspect
 
 
@@ -65,39 +68,31 @@ def object_as_dict(obj: Any) -> dict[str, Any]:
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
-def recursive_key_search(
-    obj: Any,
-    key: str,
-    current_result: list[Any] | None = None,
-) -> list[Any]:
-    """Crowl inside input dictionary/list searching for all keys=key for each dictionary found.
+def configure_log(
+    loglevel=logging.INFO, logfmt="%(message)s", timefmt="%Y-%m-%d %H:%M.%S"
+):
+    """Configure the log for the package."""
+    logging.basicConfig(
+        level=loglevel,
+        format=logfmt,
+        stream=sys.stdout,
+    )
 
-    Note that it does not search inside values of the key found.
-
-    Parameters
-    ----------
-    obj: input dictionary or list
-    key: key to search
-    current_result: list of results where aggregate what found on
-
-    Returns
-    -------
-    list of found values
-    """
-    if current_result is None:
-        current_result = []
-    if isinstance(obj, dict):
-        for current_key, current_value in obj.items():
-            if current_key == key:
-                current_result.append(current_value)
-            else:
-                current_result = recursive_key_search(
-                    current_value, key, current_result
-                )
-    elif isinstance(obj, list):
-        for item in obj:
-            current_result = recursive_key_search(item, key, current_result)
-    return current_result
+    structlog.configure(
+        processors=[
+            structlog.stdlib.filter_by_level,
+            structlog.contextvars.merge_contextvars,
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.processors.TimeStamper(fmt=timefmt),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.JSONRenderer(),
+        ],
+        wrapper_class=structlog.stdlib.BoundLogger,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        cache_logger_on_first_use=True,
+    )
 
 
 def str2bool(value: str, raise_if_unknown=True, default=False):

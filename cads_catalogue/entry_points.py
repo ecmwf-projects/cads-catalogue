@@ -28,6 +28,7 @@ from cads_catalogue import (
     maintenance,
     manager,
     messages,
+    utils,
     validations,
 )
 
@@ -46,6 +47,7 @@ def validate_dataset(resource_folder_path: str) -> None:
     ----------
     resource_folder_path: dataset folder path
     """
+    utils.configure_log()
     if not os.path.isdir(resource_folder_path):
         raise ValueError("%r is not a folder" % resource_folder_path)
     validations.validate_dataset(resource_folder_path)
@@ -60,6 +62,7 @@ def validate_datasets(resources_folder_path: str) -> None:
     ----------
     resources_folder_path: the root folder where to search dataset subfolders in
     """
+    utils.configure_log()
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)
     validations.validate_datasets(resources_folder_path)
@@ -80,6 +83,7 @@ def force_vacuum(
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     only_older_than_days: number of days from the last run of autovacuum that triggers the vacuum of the table
     """
+    utils.configure_log()
     logger.info("starting catalogue db vacuum")
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
@@ -104,6 +108,7 @@ def info(connection_string: str | None = None) -> None:
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'.
     """
+    utils.configure_log()
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
@@ -121,6 +126,7 @@ def init_db(connection_string: str | None = None) -> None:
     ----------
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
+    utils.configure_log()
     logger.info(
         "starting initialization of catalogue db structure (version %s)"
         % database.DB_VERSION
@@ -156,6 +162,7 @@ def update_catalogue(
     force: if True, run update regardless input folders has no changes from last update (default False)
     delete_orphans: if True, delete resources not involved in the update process (default False)
     """
+    utils.configure_log()
     # input validation
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)

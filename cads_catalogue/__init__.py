@@ -22,10 +22,6 @@ except ImportError:  # pragma: no cover
     # Local copy or not installed with setuptools
     __version__ = "999"
 
-import logging
-import sys
-
-import structlog
 
 from .database import Licence, Resource, ResourceLicence, init_database
 from .entry_points import info, main, update_catalogue
@@ -44,26 +40,3 @@ __all__ = [
     "update_catalogue",
     "main",
 ]
-
-# FIXME: this overwrites basicConfig in every package that imports it
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    stream=sys.stdout,
-)
-
-structlog.configure(
-    processors=[
-        structlog.stdlib.filter_by_level,
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M.%S"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.JSONRenderer(),
-    ],
-    wrapper_class=structlog.stdlib.BoundLogger,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
