@@ -28,7 +28,6 @@ from cads_catalogue import (
     maintenance,
     manager,
     messages,
-    object_storage,
     validations,
 )
 
@@ -95,18 +94,6 @@ def force_vacuum(
         logger.exception("problem during db vacuum, error follows")
     finally:
         conn.close()
-
-
-@app.command()
-def test_bucket(bucket_name: str = "test-bucket") -> None:
-    """Test connection to the database located at URI `connection_string`.
-
-    Parameters
-    ----------
-    bucket_name: name of a bucket where to test.
-    """
-    storage_settings = config.ensure_storage_settings(config.storagesettings)
-    object_storage.test_bucket(storage_settings, bucket_name)
 
 
 @app.command()
