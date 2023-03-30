@@ -19,14 +19,12 @@ import json
 import os
 import pathlib
 import urllib.parse
-import urllib.request
 from typing import Any
 
 import minio  # type: ignore
 import structlog
 from minio import commonconfig, versioningconfig
 
-THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
 
 DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
@@ -39,7 +37,7 @@ DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
             "Resource": ["arn:aws:s3:::%(bucket_name)s"],
         },
         {
-            "Action": ["s3:GetObject", "s3:GetObjectVersion"],
+            "Action": ["s3:GetObject"],
             "Effect": "Allow",
             "Principal": {"AWS": ["*"]},
             "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
