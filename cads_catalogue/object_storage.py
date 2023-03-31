@@ -37,7 +37,7 @@ DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
             "Resource": ["arn:aws:s3:::%(bucket_name)s"],
         },
         {
-            "Action": ["s3:GetObject"],
+            "Action": ["s3:GetObject", "s3:GetObjectVersion"],
             "Effect": "Allow",
             "Principal": {"AWS": ["*"]},
             "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
@@ -64,6 +64,7 @@ PUBLIC_POLICY_TEMPLATE: dict[str, Any] = {
                 "s3:AbortMultipartUpload",
                 "s3:DeleteObject",
                 "s3:GetObject",
+                "s3:GetObjectVersion",
                 "s3:ListMultipartUploadParts",
             ],
             "Effect": "Allow",
