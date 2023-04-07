@@ -1,4 +1,3 @@
-
 import hashlib
 import json
 import os
@@ -7,7 +6,6 @@ from typing import Any
 import minio  # type: ignore
 import pytest
 import pytest_mock
-from minio import commonconfig, versioningconfig
 
 from cads_catalogue import object_storage
 
@@ -30,7 +28,7 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
     file_path = os.path.join(
         TESTDATA_PATH, "cads-licences", "licence-to-use-copernicus-products.pdf"
     )
-    with open(file_path, 'rb') as fp:
+    with open(file_path, "rb") as fp:
         text = fp.read()
         sha256 = hashlib.sha256(text).hexdigest()
     expected_url = f"{bucket_name}/licence-to-use-copernicus-products_{sha256}.pdf"
@@ -67,7 +65,7 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
         bucket_name,
         f"licence-to-use-copernicus-products_{sha256}.pdf",
         file_path,
-        content_type='application/pdf'
+        content_type="application/pdf",
     )
     patch7.assert_called_once_with(bucket_name, ro_policy)
 
@@ -78,7 +76,9 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
     # calling with a subpath and a bucket
     subpath = "licences/mypath"
     bucket_name = "mybucket"
-    expected_url = f"{bucket_name}/licences/mypath/licence-to-use-copernicus-products_{sha256}.pdf"
+    expected_url = (
+        f"{bucket_name}/licences/mypath/licence-to-use-copernicus-products_{sha256}.pdf"
+    )
 
     ro_policy = json.dumps(object_storage.DOWNLOAD_POLICY_TEMPLATE) % {
         "bucket_name": bucket_name
@@ -94,6 +94,6 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
         bucket_name,
         f"{subpath}/licence-to-use-copernicus-products_{sha256}.pdf",
         file_path,
-        content_type='application/pdf'
+        content_type="application/pdf",
     )
     patch7.assert_called_once_with(bucket_name, ro_policy)

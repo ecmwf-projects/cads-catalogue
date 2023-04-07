@@ -108,8 +108,7 @@ def test_update_catalogue(
         },
     ]
     patch = mocker.patch(
-        "cads_catalogue.object_storage.store_file",
-        return_value="an url"
+        "cads_catalogue.object_storage.store_file", return_value="an url"
     )
     last_commit1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
     last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
