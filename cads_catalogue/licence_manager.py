@@ -84,7 +84,7 @@ def licence_sync(
             subpath=subpath,
             force=True,
             **storage_kws,
-        )[0]
+        )
         setattr(db_licence, column_name, file_url)
     return db_licence
 

@@ -190,7 +190,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
         document_storage_url="http://public-storage/",
     )
     mocker.patch.object(
-        object_storage, "store_file", return_value=("an url", "a version")
+        object_storage, "store_file", return_value="an url"
     )
     resource = {"resource_uid": "a-dataset"}
     no_image_block = {"id": "abstract", "type": "a type", "content": "a content"}
@@ -319,7 +319,7 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
         document_storage_url="http://public-storage/",
     )
     mocker.patch.object(
-        object_storage, "store_file", return_value=("an url", "a version")
+        object_storage, "store_file", return_value="an url"
     )
     layout_path = os.path.join(str(tmpdir), "layout.json")
     resource = {"resource_uid": "a-dataset"}

@@ -422,7 +422,7 @@ def resource_sync(
             subpath=subpath,
             force=True,
             **storage_settings.storage_kws,
-        )[0]
+        )
     dataset_query_obj = session.query(database.Resource).filter_by(
         resource_uid=resource["resource_uid"]
     )

@@ -35,7 +35,7 @@ def test_licence_sync(
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
-        return_value=("an url", "a version"),
+        return_value="an url",
     )
     # start without any licence in the db
     with session_obj() as session:

@@ -1012,7 +1012,7 @@ def test_resource_sync(
     }
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch.object(
-        object_storage, "store_file", return_value=("an url", "a version")
+        object_storage, "store_file", return_value="an url"
     )
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
