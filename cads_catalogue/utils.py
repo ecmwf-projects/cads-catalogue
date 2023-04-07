@@ -66,7 +66,7 @@ def get_last_commit_hash(git_folder: str | pathlib.Path):
 
 def guess_type(file_name, default="application/octet-stream"):
     """Try to guess the mimetypes of a file."""
-    guessed = mimetypes.MimeTypes().guess_type(file_name)[0]
+    guessed = mimetypes.MimeTypes().guess_type(file_name, False)[0]
     return guessed or default
 
 
