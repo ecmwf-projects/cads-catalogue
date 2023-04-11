@@ -1069,9 +1069,8 @@ def test_resource_sync(
         "bucket_name": "mycatalogue_bucket",
         "subpath": "resources/reanalysis-era5-land",
         "force": True,
-        "access_key": "admin1",
-        "secret_key": "secret1",
-        "secure": False,
+        "aws_access_key_id": "admin1",
+        "aws_secret_access_key": "secret1",
     } in [pm.kwargs for pm in patch.mock_calls]
     patch.reset_mock()
 

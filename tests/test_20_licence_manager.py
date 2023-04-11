@@ -58,9 +58,8 @@ def test_licence_sync(
         "bucket_name": "mycatalogue_bucket",
         "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
         "force": True,
-        "access_key": "admin1",
-        "secret_key": "secret1",
-        "secure": False,
+        "aws_access_key_id": "admin1",
+        "aws_secret_access_key": "secret1",
     } in [pm.kwargs for pm in patch.mock_calls]
     patch.reset_mock()
 

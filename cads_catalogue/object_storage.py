@@ -18,10 +18,10 @@ import hashlib
 import json
 import os
 import pathlib
-import urllib.parse
 from typing import Any
 
-import minio  # type: ignore
+import boto3
+import botocore
 import structlog
 
 from cads_catalogue import utils
@@ -98,12 +98,14 @@ UPLOAD_POLICY_TEMPLATE: dict[str, Any] = {
 }
 
 
-def set_bucket_policy(client: minio.api.Minio, bucket_name: str, policy: str) -> None:
+def set_bucket_policy(
+    client: boto3.session.Session.client, bucket_name: str, policy: str  # type: ignore
+) -> None:
     """Set anonymous policy to a bucket.
 
     Parameters
     ----------
-    client: minio client object
+    client: boto3 client object
     bucket_name: name of the bucket
     policy: one of 'private', 'public', 'upload', 'download'
     """
@@ -114,7 +116,7 @@ def set_bucket_policy(client: minio.api.Minio, bucket_name: str, policy: str) ->
         "upload": UPLOAD_POLICY_TEMPLATE,
     }
     policy_json = json.dumps(policy_map[policy]) % {"bucket_name": bucket_name}
-    client.set_bucket_policy(bucket_name, policy_json)
+    client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)  # type: ignore
 
 
 def store_file(
@@ -123,6 +125,7 @@ def store_file(
     bucket_name: str = "cads-catalogue",  # type: ignore
     subpath: str = "",
     force: bool = False,
+    use_client: Any = None,
     **storage_kws: Any,
 ) -> str:
     """Store a file in the object storage.
@@ -140,6 +143,7 @@ def store_file(
     bucket_name: name of the bucket to use inside the object storage
     subpath: optional folder path inside the bucket (created if not existing)
     force: if True, force to create the bucket if not existing (default to False)
+    use_client: if specified, use this client instead of a new boto3 client (used in tests)
     storage_kws: dictionary of parameters used to pass to the storage client
 
     Returns
@@ -150,33 +154,77 @@ def store_file(
         raise ValueError(
             "file not found or not provided as absolute path: %r" % file_path
         )
-    client = minio.Minio(
-        urllib.parse.urlparse(object_storage_url).netloc, **storage_kws
-    )
+    if use_client:
+        client = use_client
+    else:
+        client = boto3.client("s3", endpoint_url=object_storage_url, **storage_kws)
     # NOTE: version retrieval is not supported in the public endpoint of the storage,
     # so the file is stored using a prefix including the SHA256 hash of the file content
-    if not client.bucket_exists(bucket_name):
-        if force:
-            client.make_bucket(bucket_name)
-            set_bucket_policy(client, bucket_name, "download")
-        else:
-            raise ValueError(
-                "the bucket %r does not exist in the object storage" % bucket_name
-            )
+    try:
+        client.head_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":  # bucket does not exist
+            if force:
+                client.create_bucket(Bucket=bucket_name)
+                set_bucket_policy(client, bucket_name, "download")
+            else:
+                raise ValueError(
+                    "the bucket %r does not exist in the object storage" % bucket_name
+                )
     with open(file_path, "rb") as fp:
         data = fp.read()
         source_sha256 = hashlib.sha256(data).hexdigest()
     file_name = os.path.basename(file_path)
     file_prefix, file_ext = os.path.splitext(file_name)
     object_name = os.path.join(subpath, f"{file_prefix}_{source_sha256}{file_ext}")
+    try:
+        client.head_object(Bucket=bucket_name, Key=object_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":  # file does not exist
+            client.upload_file(
+                Filename=file_path,
+                Bucket=bucket_name,
+                Key=object_name,
+                ExtraArgs={"ContentType": utils.guess_type(file_name)},
+            )
 
-    existing_objects = list(client.list_objects(bucket_name, object_name))
-    if not existing_objects:
-        client.fput_object(
-            bucket_name,
-            object_name,
-            file_path,
-            content_type=utils.guess_type(file_name),
-        )
     download_rel_url = "%s/%s" % (bucket_name, object_name)
     return download_rel_url
+
+
+def delete_bucket(
+    bucket_name: str, object_storage_url: str, force: bool = False, **storage_kws: Any
+) -> None:
+    """
+    Delete a bucket.
+
+    Parameters
+    ----------
+    bucket_name: name of the bucket to use inside the object storage
+    object_storage_url: endpoint URL of the object storage
+    force: if True, remove also a not empty bucket (default False)
+    storage_kws: dictionary of parameters used to pass to the storage client
+    """
+    client = boto3.client("s3", endpoint_url=object_storage_url, **storage_kws)
+    try:
+        client.head_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":  # bucket does not exist
+            logger.warning(f"bucket {bucket_name} does not exist")
+        return
+    try:
+        client.delete_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "BucketNotEmpty":
+            if force:
+                for i, obj in enumerate(
+                    client.list_objects_v2(Bucket=bucket_name)["Contents"]
+                ):
+                    client.delete_object(Bucket=bucket_name, Key=obj["Key"])
+                    if i % 1000 == 0:
+                        logger.info(
+                            f"removed %i files from the bucket {bucket_name}..."
+                        )
+            else:
+                logger.error(f"bucket {bucket_name} is not empty")
+    logger.info(f"bucket {bucket_name} successfully removed")

@@ -71,9 +71,8 @@ class ObjectStorageSettings(pydantic.BaseSettings):
     def storage_kws(self) -> dict[str, str | bool | None]:
         """Return a dictionary to be used with the storage client."""
         return {
-            "access_key": self.storage_admin,
-            "secret_key": self.storage_password,
-            "secure": False,
+            "aws_access_key_id": self.storage_admin,
+            "aws_secret_access_key": self.storage_password,
         }
 
 
