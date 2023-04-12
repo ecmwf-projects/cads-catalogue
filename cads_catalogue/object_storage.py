@@ -97,6 +97,16 @@ UPLOAD_POLICY_TEMPLATE: dict[str, Any] = {
     ],
 }
 
+CORS_CONFIG: dict[str, Any] = {
+    "CORSRules": [
+        {
+            "AllowedHeaders": ["Accept", "Content-Type"],
+            "AllowedMethods": ["GET", "HEAD"],
+            "AllowedOrigins": ["*"],
+        }
+    ]
+}
+
 
 def set_bucket_policy(
     client: boto3.session.Session.client, bucket_name: str, policy: str  # type: ignore
@@ -117,6 +127,24 @@ def set_bucket_policy(
     }
     policy_json = json.dumps(policy_map[policy]) % {"bucket_name": bucket_name}
     client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)  # type: ignore
+
+
+def set_bucket_cors(
+    client: boto3.session.Session.client,  # type: ignore
+    bucket_name: str,
+    config: dict[str, Any] | None = None,
+) -> None:
+    """Configure CORS for the bucket.
+
+    Parameters
+    ----------
+    client: boto3 client object
+    bucket_name: name of the bucket
+    config: CORS configuration to use (default is CORS_CONFIG)
+    """
+    if config is None:
+        config = CORS_CONFIG
+    client.put_bucket_cors(Bucket=bucket_name, CORSConfiguration=config)  # type: ignore
 
 
 def store_file(
@@ -171,6 +199,11 @@ def store_file(
                 raise ValueError(
                     "the bucket %r does not exist in the object storage" % bucket_name
                 )
+    try:
+        client.get_bucket_cors(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchCORSConfiguration":
+            set_bucket_cors(client, bucket_name)
     with open(file_path, "rb") as fp:
         data = fp.read()
         source_sha256 = hashlib.sha256(data).hexdigest()

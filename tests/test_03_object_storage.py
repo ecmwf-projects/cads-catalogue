@@ -35,6 +35,14 @@ class DummyBotoClient:
         error = botocore.exceptions.ClientError(error_response, "head object")
         raise error
 
+    def get_bucket_cors(self, Bucket):
+        error_response = {"Error": {"Code": "NoSuchCORSConfiguration"}}
+        error = botocore.exceptions.ClientError(error_response, "get bucket cors")
+        raise error
+
+    def put_bucket_cors(self, Bucket, CORSConfiguration):
+        pass
+
     def upload_file(self, Filename, Bucket, Key, ExtraArgs):
         pass
 
@@ -80,6 +88,8 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
     put_bucket_policy = mocker.spy(DummyBotoClient, "put_bucket_policy")
     head_object = mocker.spy(DummyBotoClient, "head_object")
     upload_file = mocker.spy(DummyBotoClient, "upload_file")
+    get_bucket_cors = mocker.spy(DummyBotoClient, "get_bucket_cors")
+    put_bucket_cors = mocker.spy(DummyBotoClient, "put_bucket_cors")
 
     res = object_storage.store_file(
         file_path, object_storage_url, force=True, use_client=use_client, **storage_kws
@@ -113,6 +123,12 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
         Key=f"licence-to-use-copernicus-products_{sha256}.pdf",
         ExtraArgs={"ContentType": "application/pdf"},
     )
+    get_bucket_cors.assert_called_once_with(use_client, Bucket=bucket_name)
+    put_bucket_cors.assert_called_once_with(
+        use_client,
+        Bucket=bucket_name,
+        CORSConfiguration=object_storage.CORS_CONFIG,
+    )
 
     for spy in [
         head_bucket,
@@ -120,6 +136,8 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
         put_bucket_policy,
         head_object,
         upload_file,
+        get_bucket_cors,
+        put_bucket_cors,
     ]:
         spy.reset_mock()
 
@@ -167,4 +185,10 @@ def test_store_file(mocker: pytest_mock.MockerFixture) -> None:
         Key=f"licences/mypath/licence-to-use-copernicus-products_{sha256}.pdf",
         Filename=file_path,
         ExtraArgs={"ContentType": "application/pdf"},
+    )
+    get_bucket_cors.assert_called_once_with(use_client, Bucket=bucket_name)
+    put_bucket_cors.assert_called_once_with(
+        use_client,
+        Bucket=bucket_name,
+        CORSConfiguration=object_storage.CORS_CONFIG,
     )
