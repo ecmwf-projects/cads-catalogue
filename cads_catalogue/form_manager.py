@@ -94,12 +94,9 @@ def transform_licences_blocks(
     # get licence's metadata from db, but take list of licence uids from resource dictionary
     req_licences = []
     for licence_uid in resource["licence_uids"]:
-        licence_obj = (
-            session.query(database.Licence)
-            .filter_by(licence_uid=licence_uid)
-            .order_by(database.Licence.revision.desc())
-            .first()
-        )
+        licence_obj = session.scalars(
+            sa.select(database.Licence).filter_by(licence_uid=licence_uid).limit(1)
+        ).first()
         if not licence_obj:
             raise ValueError("licence_uid = %r not found" % licence_uid)
         req_licences.append(licence_obj)
