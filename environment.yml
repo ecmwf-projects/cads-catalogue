@@ -11,7 +11,7 @@ dependencies:
 - psycopg2
 - pydantic
 - python-frontmatter
-- sqlalchemy==1.4*
+- sqlalchemy==2.0.9
 - sqlalchemy-utils
 - structlog
 - typer
