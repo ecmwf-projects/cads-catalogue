@@ -185,11 +185,10 @@ def update_catalogue(
         must_reset_structure = True
     else:
         with session_obj.begin() as session:  # type: ignore
+            import pdb; pdb.set_trace()
             try:
-                assert (
-                    session.query(database.DBRelease).first().db_release_version
-                    == database.DB_VERSION
-                )
+                statement = sa.select(database.DBRelease.db_release_version)
+                session.execute(statement).first() == database.DB_VERSION
             except Exception:  # noqa
                 # TODO: exit with error log. User should call manually the init/update db script
                 logger.warning("detected an old catalogue db structure")
