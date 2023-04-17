@@ -143,7 +143,7 @@ def store_form_by_data(
             subpath=subpath,
             force=True,
             **storage_settings.storage_kws,
-        )[0]
+        )
     finally:
         shutil.rmtree(tempdir_path)
     return form_url

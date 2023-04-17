@@ -17,6 +17,7 @@
 import datetime
 import json
 import logging
+import mimetypes
 import pathlib
 import subprocess
 import sys
@@ -61,6 +62,12 @@ def get_last_commit_hash(git_folder: str | pathlib.Path):
     if proc.returncode != 0:
         raise ValueError(err.decode("utf-8"))
     return out.decode("ascii").strip()
+
+
+def guess_type(file_name, default="application/octet-stream"):
+    """Try to guess the mimetypes of a file."""
+    guessed = mimetypes.MimeTypes().guess_type(file_name, False)[0]
+    return guessed or default
 
 
 def object_as_dict(obj: Any) -> dict[str, Any]:

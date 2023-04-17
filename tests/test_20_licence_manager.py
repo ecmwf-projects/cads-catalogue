@@ -35,7 +35,7 @@ def test_licence_sync(
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file",
-        return_value=("an url", "a version"),
+        return_value="an url",
     )
     # start without any licence in the db
     with session_obj() as session:
@@ -58,9 +58,8 @@ def test_licence_sync(
         "bucket_name": "mycatalogue_bucket",
         "subpath": "licences/CCI-data-policy-for-satellite-surface-radiation-budget",
         "force": True,
-        "access_key": "admin1",
-        "secret_key": "secret1",
-        "secure": False,
+        "aws_access_key_id": "admin1",
+        "aws_secret_access_key": "secret1",
     } in [pm.kwargs for pm in patch.mock_calls]
     patch.reset_mock()
 

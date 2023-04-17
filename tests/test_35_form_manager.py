@@ -161,7 +161,7 @@ def test_transform_form(
         document_storage_url="http://public-storage/",
     )
     mocker.patch.object(
-        object_storage, "store_file", return_value=("an url for form.json", "a version")
+        object_storage, "store_file", return_value="an url for form.json"
     )
     # add some licences to work on
     licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")

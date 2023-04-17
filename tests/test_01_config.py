@@ -103,9 +103,8 @@ def test_ensure_storage_settings(
         temp_environ[k] = v
     effective_settings = config.ensure_storage_settings()
     assert effective_settings.storage_kws == {
-        "access_key": "admin1",
-        "secret_key": "secret1",
-        "secure": False,
+        "aws_access_key_id": "admin1",
+        "aws_secret_access_key": "secret1",
     }
 
     assert config.storagesettings == effective_settings
@@ -120,9 +119,8 @@ def test_ensure_storage_settings(
         "document_storage_url": "my/url",
     }
     my_settings_storage_kws = {
-        "access_key": "admin1",
-        "secret_key": "secret1",
-        "secure": False,
+        "aws_access_key_id": "admin1",
+        "aws_secret_access_key": "secret1",
     }
     mysettings = config.ObjectStorageSettings(**my_settings_dict)
     effective_settings = config.ensure_storage_settings(mysettings)

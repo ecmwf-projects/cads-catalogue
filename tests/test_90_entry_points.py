@@ -80,9 +80,8 @@ def test_update_catalogue(
     doc_storage_url = "http://mypublic-storage/"
     bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+        "aws_access_key_id": "storage_user",
+        "aws_secret_access_key": "storage_password",
     }
     expected_licences = [
         {
@@ -108,8 +107,7 @@ def test_update_catalogue(
         },
     ]
     patch = mocker.patch(
-        "cads_catalogue.object_storage.store_file",
-        return_value=("an url", "a version"),
+        "cads_catalogue.object_storage.store_file", return_value="an url"
     )
     last_commit1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
     last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
@@ -140,8 +138,8 @@ def test_update_catalogue(
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["access_key"],
-            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
@@ -168,9 +166,8 @@ def test_update_catalogue(
         "bucket_name": bucket_name,
         "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+        "aws_access_key_id": "storage_user",
+        "aws_secret_access_key": "storage_password",
     } in [mp.kwargs for mp in patch.mock_calls]
     # check object storage calls
     expected_calls = [  # these are only some
@@ -367,8 +364,8 @@ def test_update_catalogue(
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["access_key"],
-            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
@@ -403,8 +400,8 @@ def test_update_catalogue(
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["access_key"],
-            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
@@ -481,8 +478,8 @@ def test_update_catalogue(
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["access_key"],
-            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
@@ -519,9 +516,8 @@ def test_transaction_update_catalogue(
     doc_storage_url = "http://mypublic-storage/"
     bucket_name = "my_bucket"
     object_storage_kws: dict[str, Any] = {
-        "access_key": "storage_user",
-        "secret_key": "storage_password",
-        "secure": False,
+        "aws_access_key_id": "storage_user",
+        "aws_secret_access_key": "storage_password",
     }
     # create the db empty
     engine = database.init_database(connection_string)
@@ -538,7 +534,7 @@ def test_transaction_update_catalogue(
     # simulate the object storage working...
     mocker.patch(
         "cads_catalogue.object_storage.store_file",
-        return_value=("an url", "a version"),
+        return_value="an url",
     )
     # ... but impose the store_dataset fails to work...
     mocker.patch.object(
@@ -562,8 +558,8 @@ def test_transaction_update_catalogue(
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
             "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["access_key"],
-            "STORAGE_PASSWORD": object_storage_kws["secret_key"],
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
         },
     )

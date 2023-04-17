@@ -18,12 +18,13 @@ import hashlib
 import json
 import os
 import pathlib
-import urllib.parse
 from typing import Any
 
-import minio  # type: ignore
+import boto3
+import botocore
 import structlog
-from minio import commonconfig, versioningconfig
+
+from cads_catalogue import utils
 
 logger = structlog.get_logger(__name__)
 
@@ -96,13 +97,25 @@ UPLOAD_POLICY_TEMPLATE: dict[str, Any] = {
     ],
 }
 
+CORS_CONFIG: dict[str, Any] = {
+    "CORSRules": [
+        {
+            "AllowedHeaders": ["Accept", "Content-Type"],
+            "AllowedMethods": ["GET", "HEAD"],
+            "AllowedOrigins": ["*"],
+        }
+    ]
+}
 
-def set_bucket_policy(client: minio.api.Minio, bucket_name: str, policy: str) -> None:
+
+def set_bucket_policy(
+    client: boto3.session.Session.client, bucket_name: str, policy: str  # type: ignore
+) -> None:
     """Set anonymous policy to a bucket.
 
     Parameters
     ----------
-    client: minio client object
+    client: boto3 client object
     bucket_name: name of the bucket
     policy: one of 'private', 'public', 'upload', 'download'
     """
@@ -113,7 +126,25 @@ def set_bucket_policy(client: minio.api.Minio, bucket_name: str, policy: str) ->
         "upload": UPLOAD_POLICY_TEMPLATE,
     }
     policy_json = json.dumps(policy_map[policy]) % {"bucket_name": bucket_name}
-    client.set_bucket_policy(bucket_name, policy_json)
+    client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)  # type: ignore
+
+
+def set_bucket_cors(
+    client: boto3.session.Session.client,  # type: ignore
+    bucket_name: str,
+    config: dict[str, Any] | None = None,
+) -> None:
+    """Configure CORS for the bucket.
+
+    Parameters
+    ----------
+    client: boto3 client object
+    bucket_name: name of the bucket
+    config: CORS configuration to use (default is CORS_CONFIG)
+    """
+    if config is None:
+        config = CORS_CONFIG
+    client.put_bucket_cors(Bucket=bucket_name, CORSConfiguration=config)  # type: ignore
 
 
 def store_file(
@@ -122,17 +153,16 @@ def store_file(
     bucket_name: str = "cads-catalogue",  # type: ignore
     subpath: str = "",
     force: bool = False,
+    use_client: Any = None,
     **storage_kws: Any,
-) -> tuple[str, str]:
+) -> str:
     """Store a file in the object storage.
 
     Store a file at `file_path` in the object storage, in the bucket `bucket_name`.
     If subpath is supplied, the file is stored in subpath/file_name.
     If force is True, a bucket `bucket_name` is created if not existing. Note that in such case
-    the bucket is versioned and with 'download' access policy for anonymous.
-    Return the tuple (download_url, version), where:
-    * download_url is the download URL of the stored file, relative to the object storage
-    * version is the version stored in the object storage (None if not versioned)
+    the bucket has 'download' access policy for anonymous.
+    Return the download URL of the stored file, relative to the object storage.
 
     Parameters
     ----------
@@ -141,6 +171,7 @@ def store_file(
     bucket_name: name of the bucket to use inside the object storage
     subpath: optional folder path inside the bucket (created if not existing)
     force: if True, force to create the bucket if not existing (default to False)
+    use_client: if specified, use this client instead of a new boto3 client (used in tests)
     storage_kws: dictionary of parameters used to pass to the storage client
 
     Returns
@@ -151,57 +182,82 @@ def store_file(
         raise ValueError(
             "file not found or not provided as absolute path: %r" % file_path
         )
-    client = minio.Minio(
-        urllib.parse.urlparse(object_storage_url).netloc, **storage_kws
-    )
-    if not client.bucket_exists(bucket_name):
-        if force:
-            client.make_bucket(bucket_name)
-            client.set_bucket_versioning(
-                bucket_name, versioningconfig.VersioningConfig(commonconfig.ENABLED)
-            )
-            set_bucket_policy(client, bucket_name, "download")
-        else:
-            raise ValueError(
-                "the bucket %r does not exist in the object storage" % bucket_name
-            )
-    file_name = os.path.basename(file_path)
-    object_name = os.path.join(subpath, file_name)
-    logger.debug(
-        "BEGIN process to save file %s on object storage with name %s"
-        % (file_name, object_name)
-    )
+    if use_client:
+        client = use_client
+    else:
+        client = boto3.client("s3", endpoint_url=object_storage_url, **storage_kws)
+    # NOTE: version retrieval is not supported in the public endpoint of the storage,
+    # so the file is stored using a prefix including the SHA256 hash of the file content
+    try:
+        client.head_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":  # bucket does not exist
+            if force:
+                client.create_bucket(Bucket=bucket_name)
+                set_bucket_policy(client, bucket_name, "download")
+            else:
+                raise ValueError(
+                    "the bucket %r does not exist in the object storage" % bucket_name
+                )
+    try:
+        client.get_bucket_cors(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchCORSConfiguration":
+            set_bucket_cors(client, bucket_name)
     with open(file_path, "rb") as fp:
-        text = fp.read()
-        source_sha256 = hashlib.sha256(text).hexdigest()
-        logger.debug(f"source_sha256: {source_sha256}")
-    # check if destination already exists under some version
-    # NOTE: 'include_user_meta' does not work, so use stat_object for the results
-    existing_objects = client.list_objects(
-        bucket_name, object_name, include_user_meta=True, include_version=True
-    )
-    for existing_object in existing_objects:
-        version_id = existing_object.version_id
-        logger.debug(f"found stored with version id: {version_id}")
-        obj_with_metadata = client.stat_object(
-            bucket_name, object_name, version_id=version_id
-        )
-        # NOTE: when writing, metadata keys are prefixed by "x-amz-meta-"
-        destination_sha256 = obj_with_metadata.metadata.get("x-amz-meta-sha256")
-        logger.debug(f"destination_sha256: {destination_sha256}")
-        if destination_sha256 and destination_sha256 == source_sha256:
-            # already on the object storage: do not upload
-            logger.debug(
-                f"NOT SAVING file: already found on object storage, version_id:{version_id}"
+        data = fp.read()
+        source_sha256 = hashlib.sha256(data).hexdigest()
+    file_name = os.path.basename(file_path)
+    file_prefix, file_ext = os.path.splitext(file_name)
+    object_name = os.path.join(subpath, f"{file_prefix}_{source_sha256}{file_ext}")
+    try:
+        client.head_object(Bucket=bucket_name, Key=object_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":  # file does not exist
+            client.upload_file(
+                Filename=file_path,
+                Bucket=bucket_name,
+                Key=object_name,
+                ExtraArgs={"ContentType": utils.guess_type(file_name)},
             )
-            break
-    else:  # never gone on break: effective upload
-        logger.debug("confirm SAVING file: not found on object storage")
-        res = client.fput_object(
-            bucket_name, object_name, file_path, metadata={"sha256": source_sha256}
-        )
-        version_id = res.version_id
-        logger.debug(f"new version_id: {version_id}")
-    download_url = "%s/%s?versionId=%s" % (bucket_name, object_name, version_id)
-    ret_value = (download_url, version_id)
-    return ret_value
+
+    download_rel_url = "%s/%s" % (bucket_name, object_name)
+    return download_rel_url
+
+
+def delete_bucket(
+    bucket_name: str, object_storage_url: str, force: bool = False, **storage_kws: Any
+) -> None:
+    """
+    Delete a bucket.
+
+    Parameters
+    ----------
+    bucket_name: name of the bucket to use inside the object storage
+    object_storage_url: endpoint URL of the object storage
+    force: if True, remove also a not empty bucket (default False)
+    storage_kws: dictionary of parameters used to pass to the storage client
+    """
+    client = boto3.client("s3", endpoint_url=object_storage_url, **storage_kws)
+    try:
+        client.head_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":  # bucket does not exist
+            logger.warning(f"bucket {bucket_name} does not exist")
+        return
+    try:
+        client.delete_bucket(Bucket=bucket_name)
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "BucketNotEmpty":
+            if force:
+                for i, obj in enumerate(
+                    client.list_objects_v2(Bucket=bucket_name)["Contents"]
+                ):
+                    client.delete_object(Bucket=bucket_name, Key=obj["Key"])
+                    if i % 1000 == 0:
+                        logger.info(
+                            f"removed %i files from the bucket {bucket_name}..."
+                        )
+            else:
+                logger.error(f"bucket {bucket_name} is not empty")
+    logger.info(f"bucket {bucket_name} successfully removed")

@@ -13,7 +13,7 @@ classifiers = [
   "Topic :: Scientific/Engineering"
 ]
 dependencies = [
-  "minio",
+  "boto3",
   "pydantic",
   "python-frontmatter",
   "sqlalchemy",

@@ -19,6 +19,7 @@ dependencies:
 - pytest-mock
 - sqlalchemy-stubs
 - pip:
+  - boto3-stubs
   - pytest-postgresql
   - types-Markdown
   - types-PyYAML

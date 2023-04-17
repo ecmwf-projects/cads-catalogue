@@ -73,7 +73,7 @@ def manage_image_section(
                         subpath=subpath,
                         force=True,
                         **storage_settings.storage_kws,
-                    )[0]
+                    )
                     # update cache of the upload urls
                     images_stored[image_abs_path] = urllib.parse.urljoin(
                         storage_settings.document_storage_url, image_rel_url
@@ -296,7 +296,7 @@ def store_layout_by_data(
             subpath=subpath,
             force=True,
             **storage_settings.storage_kws,
-        )[0]
+        )
     finally:
         shutil.rmtree(tempdir_path)
     return layout_url
