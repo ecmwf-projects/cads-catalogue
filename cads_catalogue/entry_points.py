@@ -185,10 +185,10 @@ def update_catalogue(
         must_reset_structure = True
     else:
         with session_obj.begin() as session:  # type: ignore
-            import pdb; pdb.set_trace()
             try:
-                statement = sa.select(database.DBRelease.db_release_version)
-                session.execute(statement).first() == database.DB_VERSION
+                session.execute(
+                    sa.select(database.DBRelease.db_release_version).limit(1)
+                ).scalars().first() == database.DB_VERSION
             except Exception:  # noqa
                 # TODO: exit with error log. User should call manually the init/update db script
                 logger.warning("detected an old catalogue db structure")
@@ -231,7 +231,7 @@ def update_catalogue(
         )
 
         # update hashes from the catalogue_updates table
-        session.query(database.CatalogueUpdate).delete()
+        session.execute(sa.delete(database.CatalogueUpdate))
         new_update_info = database.CatalogueUpdate(
             catalogue_repo_commit=resource_hash,
             licence_repo_commit=licence_hash,

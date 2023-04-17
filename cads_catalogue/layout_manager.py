@@ -23,8 +23,8 @@ import tempfile
 import urllib.parse
 from typing import Any, List
 
+import sqlalchemy as sa
 import structlog
-from sqlalchemy.orm.session import Session
 
 from cads_catalogue import config, database, object_storage
 
@@ -227,7 +227,7 @@ def manage_licence_section(
 
 
 def transform_licences_blocks(
-    session: Session,
+    session: sa.orm.session.Session,
     layout_data: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ):
@@ -245,7 +245,7 @@ def transform_licences_blocks(
     """
     new_data = copy.deepcopy(layout_data)
     doc_storage_url = storage_settings.document_storage_url
-    all_licences = session.query(database.Licence).all()
+    all_licences = session.scalars(sa.select(database.Licence)).all()
 
     # search all licence blocks inside body/main/sections:
     body = new_data.get("body", {})
@@ -303,7 +303,7 @@ def store_layout_by_data(
 
 
 def transform_layout(
-    session: Session,
+    session: sa.orm.session.Session,
     resource_folder_path: str | pathlib.Path,
     resource: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,

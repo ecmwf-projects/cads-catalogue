@@ -22,8 +22,8 @@ import pathlib
 import shutil
 from typing import Any, List
 
+import sqlalchemy as sa
 import structlog
-from sqlalchemy.orm.session import Session
 
 from cads_catalogue import config, database, object_storage
 
@@ -31,7 +31,7 @@ logger = structlog.get_logger(__name__)
 
 
 def licence_sync(
-    session: Session,
+    session: sa.orm.session.Session,
     licence_uid: str,
     licences: list[dict[str, Any]],
     storage_settings: config.ObjectStorageSettings,
@@ -58,19 +58,21 @@ def licence_sync(
             "more than 1 licence for slag %r in loaded licences" % licence_uid
         )
     loaded_licence = loaded_licences[0]
-    db_licence = (
-        session.query(database.Licence)
+    db_licence = session.scalars(
+        sa.select(database.Licence)
         .filter_by(licence_uid=licence_uid, revision=loaded_licence["revision"])
-        .first()
-    )
+        .limit(1)
+    ).first()
     if not db_licence:
         db_licence = database.Licence(**loaded_licence)
         session.add(db_licence)
         logger.debug("added db licence %r" % licence_uid)
     else:
-        session.query(database.Licence).filter_by(
-            licence_id=db_licence.licence_id
-        ).update(loaded_licence)
+        session.execute(
+            sa.update(database.Licence)
+            .filter_by(licence_id=db_licence.licence_id)
+            .values(**loaded_licence)
+        )
         logger.debug("updated db licence %r" % licence_uid)
 
     for column_name in ["download_filename", "md_filename"]:
@@ -148,7 +150,7 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
 
 
 def update_catalogue_licences(
-    session: Session,
+    session: sa.orm.session.Session,
     licences_folder_path: str,
     storage_settings: config.ObjectStorageSettings,
 ) -> List[str]:
@@ -185,7 +187,7 @@ def update_catalogue_licences(
 
 
 def remove_orphan_licences(
-    session: Session, keep_licences: List[str], resources: List[str]
+    session: sa.orm.session.Session, keep_licences: List[str], resources: List[str]
 ):
     """
     Remove all licences that not are in the list of `keep_licences` and unrelated to any resource.
@@ -196,9 +198,11 @@ def remove_orphan_licences(
     keep_licences: list of licence uids to keep
     resources: list of resource_uid
     """
-    licences_to_delete = session.query(database.Licence).filter(
-        database.Licence.licence_uid.notin_(keep_licences)
-    )
+    licences_to_delete = session.scalars(
+        sa.select(database.Licence).filter(
+            database.Licence.licence_uid.notin_(keep_licences)
+        )
+    ).all()
     for licence_to_delete in licences_to_delete:
         related_dataset_uids = [r.resource_uid for r in licence_to_delete.resources]  # type: ignore
         if set(related_dataset_uids).intersection(set(resources)):

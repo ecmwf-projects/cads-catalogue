@@ -19,8 +19,8 @@ import pathlib
 from typing import Any, Dict, List
 
 import frontmatter
+import sqlalchemy as sa
 import structlog
-from sqlalchemy.orm.session import Session
 
 from cads_catalogue import database
 
@@ -29,7 +29,7 @@ logger = structlog.get_logger(__name__)
 
 
 def message_sync(
-    session: Session,
+    session: sa.orm.session.Session,
     msg: dict[str, Any],
 ) -> database.Message:
     """
@@ -55,23 +55,26 @@ def message_sync(
                 clause = database.Resource.resource_uid.like(pattern)
             else:
                 clause = database.Resource.resource_uid == resource_uid
-            for resource_obj in session.query(database.Resource).filter(clause):
+            for resource_obj in session.execute(
+                sa.select(database.Resource).filter(clause)
+            ).scalars():
                 if not resource_obj:
                     raise ValueError("resource_uid = %r not found" % resource_uid)
                 db_resources[resource_uid] = db_resources.get(resource_uid, [])
                 db_resources[resource_uid].append(resource_obj)
-
-    db_message = (
-        session.query(database.Message).filter_by(message_uid=message_uid).first()
-    )
+    db_message = session.scalars(
+        sa.select(database.Message).filter_by(message_uid=message_uid).limit(1)
+    ).first()
     if not db_message:
         db_message = database.Message(**message)
         session.add(db_message)
         logger.debug("added db message %r" % message_uid)
     else:
-        session.query(database.Message).filter_by(
-            message_id=db_message.message_id
-        ).update(message)
+        session.execute(
+            sa.update(database.Message)
+            .filter_by(message_id=db_message.message_id)
+            .values(**message)
+        )
         logger.debug("updated db message %r" % message_uid)
 
     db_message.resources = []  # type: ignore
@@ -163,7 +166,7 @@ def load_messages(root_msg_folder: str | pathlib.Path) -> List[dict[str, Any]]:
 
 
 def update_catalogue_messages(
-    session: Session,
+    session: sa.orm.session.Session,
     messages_folder_path: str | pathlib.Path,
     remove_orphans: bool = True,
 ):
@@ -202,6 +205,11 @@ def update_catalogue_messages(
     msgs_to_delete = session.query(database.Message).filter(
         database.Message.message_uid.notin_(involved_msg_ids)
     )
+    msgs_to_delete = session.scalars(
+        sa.select(database.Message).filter(
+            database.Message.message_uid.notin_(involved_msg_ids)
+        )
+    ).all()
     for msg_to_delete in msgs_to_delete:
         msg_to_delete.resources = []  # type: ignore
         session.delete(msg_to_delete)
