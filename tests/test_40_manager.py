@@ -3,7 +3,7 @@ import os.path
 
 import pytest
 import pytest_mock
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy as sa
 
 from cads_catalogue import (
     config,
@@ -39,7 +39,7 @@ def dummy_get_last_commit_hash2(folder):
 
 
 def test_is_db_to_update(
-    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+    session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_get_last_commit_hash1)
     resource_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json")
@@ -1001,7 +1001,7 @@ def test_load_resource_from_folder() -> None:
 
 
 def test_resource_sync(
-    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+    session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
     my_settings_dict = {
         "object_storage_url": "object/storage/url",
@@ -1034,7 +1034,7 @@ def test_resource_sync(
             )
         session.commit()
         db_licences = session.execute(
-            "select licence_uid, licence_id from licences order by licence_uid"
+            sa.text("select licence_uid, licence_id from licences order by licence_uid")
         ).all()
         uid_id_licence_map = dict(db_licences)
     patch.reset_mock()
@@ -1047,7 +1047,10 @@ def test_resource_sync(
     with session_obj() as session:
         manager.resource_sync(session, resource, storage_settings)
         session.commit()
-        assert len(session.query(database.Resource).first().keywords) == 7
+        assert (
+            len(session.scalars(sa.select(database.Resource).limit(1)).first().keywords)
+            == 7
+        )
 
     assert patch.call_count == 2
     expected_args_object_storage_calls = [
@@ -1086,13 +1089,13 @@ def test_resource_sync(
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
         session.commit()
-        all_db_resources = session.query(database.Resource).all()
+        all_db_resources = session.scalars(sa.select(database.Resource)).all()
         assert (
             len(all_db_resources[0].keywords) == len(all_db_resources[1].keywords) == 7
         )
 
     with session_obj() as session:
-        all_db_resources = session.query(database.Resource).all()
+        all_db_resources = session.scalars(sa.select(database.Resource)).all()
 
         utils.compare_resources_with_dumped_file(
             all_db_resources,
@@ -1100,22 +1103,28 @@ def test_resource_sync(
             exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
         assert session.execute(
-            "select resource_id, licence_id "
-            "from resources_licences "
-            "order by resource_id, licence_id"
+            sa.text(
+                "select resource_id, licence_id "
+                "from resources_licences "
+                "order by resource_id, licence_id"
+            )
         ).all() == [
             (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
             (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
         ]
         assert session.execute(
-            "select parent_resource_id, child_resource_id "
-            "from related_resources "
-            "order by parent_resource_id"
+            sa.text(
+                "select parent_resource_id, child_resource_id "
+                "from related_resources "
+                "order by parent_resource_id"
+            )
         ).all() == [(1, 2), (2, 1)]
         assert session.execute(
-            "select resource_id, keyword_id "
-            "from resources_keywords "
-            "order by resource_id, keyword_id"
+            sa.text(
+                "select resource_id, keyword_id "
+                "from resources_keywords "
+                "order by resource_id, keyword_id"
+            )
         ).all() == [
             (1, 1),
             (1, 2),
@@ -1156,25 +1165,29 @@ def test_resource_sync(
         session.commit()
 
     with session_obj() as session:
-        all_db_resources = session.query(database.Resource).all()
+        all_db_resources = session.scalars(sa.select(database.Resource)).all()
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
             exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
         assert session.execute(
-            "select resource_id, licence_id "
-            "from resources_licences "
-            "order by resource_id, licence_id"
+            sa.text(
+                "select resource_id, licence_id "
+                "from resources_licences "
+                "order by resource_id, licence_id"
+            )
         ).all() == [
             (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
             (2, uid_id_licence_map["eumetsat-cm-saf"]),
             (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
         ]
         assert session.execute(
-            "select parent_resource_id, child_resource_id "
-            "from related_resources "
-            "order by parent_resource_id"
+            sa.text(
+                "select parent_resource_id, child_resource_id "
+                "from related_resources "
+                "order by parent_resource_id"
+            )
         ).all() == [(1, 2)]
 
     # reset globals for tests following

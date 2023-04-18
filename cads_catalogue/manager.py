@@ -19,7 +19,7 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Tuple
+from typing import Any, List, Sequence, Tuple
 
 import sqlalchemy as sa
 import structlog
@@ -474,7 +474,7 @@ def resource_sync(
 
 
 def find_related_resources(
-    resources: list[database.Resource],
+    resources: Sequence[database.Resource],
     only_involving_uid=None,
 ) -> list[tuple[database.Resource, database.Resource]]:
     """Return couples of resources related each other.
@@ -570,14 +570,11 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
     keep_resource_uids: list of uids of resources to save
     """
     # remote not involved resources from the db
-    datasets_to_delete = session.query(database.Resource).filter(
-        database.Resource.resource_uid.notin_(keep_resource_uids)
-    )
     datasets_to_delete = session.scalars(
         sa.select(database.Resource).filter(
             database.Resource.resource_uid.notin_(keep_resource_uids)
         )
-    ).all()
+    )
     for dataset_to_delete in datasets_to_delete:
         dataset_to_delete.licences = []  # type: ignore
         dataset_to_delete.messages = []  # type: ignore

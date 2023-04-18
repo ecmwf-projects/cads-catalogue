@@ -35,7 +35,7 @@ branch = true
 
 [tool.mypy]
 exclude = "tests/data"
-plugins = "sqlmypy"
+plugins = "sqlalchemy.ext.mypy.plugin"
 strict = false
 
 [[tool.mypy.overrides]]

@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sqlalchemy.engine
+import sqlalchemy as sa
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 def force_vacuum(
-    conn: sqlalchemy.engine.Connection, only_older_than_days: int | None = None
+    conn: sa.engine.Connection, only_older_than_days: int | None = None
 ) -> None:
     """
     Force run 'vacuum analyze' on all tables.
@@ -35,10 +35,13 @@ def force_vacuum(
     only_older_than_days: number of days from the last run of autovacuum that triggers the vacuum of the table
     """
     if only_older_than_days is None:
-        sql = "SELECT relname FROM pg_stat_all_tables WHERE schemaname = 'public'"
+        sql = sa.text(
+            "SELECT relname FROM pg_stat_all_tables WHERE schemaname = 'public'"
+        )
     else:
         days = int(only_older_than_days)
-        sql = """
+        sql = sa.text(
+            """
         SELECT relname FROM pg_stat_all_tables
         WHERE schemaname = 'public'
         AND (
@@ -51,12 +54,15 @@ def force_vacuum(
              (last_autoanalyze < last_analyze OR last_autoanalyze is null)
              AND last_analyze < now() - interval '%s day'
              )
-        )""" % (
-            days,
-            days,
+        )"""
+            % (
+                days,
+                days,
+            )
         )
     tables = conn.execute(sql).scalars()
     for table in tables:
         logger.debug("running VACUUM ANALYZE for table %s" % table)
-        vacuum_sql = "VACUUM ANALYZE %s" % table
+        vacuum_sql = sa.text("VACUUM ANALYZE %s" % table)
         conn.execute(vacuum_sql)
+        conn.commit()

@@ -186,9 +186,12 @@ def update_catalogue(
     else:
         with session_obj.begin() as session:  # type: ignore
             try:
-                session.execute(
-                    sa.select(database.DBRelease.db_release_version).limit(1)
-                ).scalars().first() == database.DB_VERSION
+                assert (
+                    session.scalars(
+                        sa.select(database.DBRelease.db_release_version).limit(1)
+                    ).first()
+                    == database.DB_VERSION
+                )
             except Exception:  # noqa
                 # TODO: exit with error log. User should call manually the init/update db script
                 logger.warning("detected an old catalogue db structure")
@@ -219,6 +222,7 @@ def update_catalogue(
         involved_licences = licence_manager.update_catalogue_licences(
             session, licences_folder_path, storage_settings
         )
+
         involved_resource_uids = manager.update_catalogue_resources(
             session, resources_folder_path, storage_settings
         )
