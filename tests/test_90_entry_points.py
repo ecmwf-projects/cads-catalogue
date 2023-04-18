@@ -319,7 +319,7 @@ def test_update_catalogue(
             .scalar_one()
             .resources
         ]
-    ) == [
+    ) == [  # type: ignore
         "reanalysis-era5-land",
         "reanalysis-era5-land-monthly-means",
         "reanalysis-era5-pressure-levels",
@@ -434,7 +434,7 @@ def test_update_catalogue(
         assert (
             session.scalars(sa.select(database.DBRelease).limit(1))
             .first()
-            .db_release_version
+            .db_release_version  # type: ignore
             == database.DB_VERSION
         )
         licences = [
@@ -463,9 +463,9 @@ def test_update_catalogue(
 
         catalog_updates = session.scalars(sa.select(database.CatalogueUpdate)).all()
         assert len(catalog_updates) == 1
-        assert catalog_updates[0].catalogue_repo_commit == last_commit1
-        assert catalog_updates[0].licence_repo_commit == last_commit2
-        assert catalog_updates[0].update_time > update_time1
+        assert catalog_updates[0].catalogue_repo_commit == last_commit1  # type: ignore
+        assert catalog_updates[0].licence_repo_commit == last_commit2  # type: ignore
+        assert catalog_updates[0].update_time > update_time1  # type: ignore
 
     caplog.clear()
 
