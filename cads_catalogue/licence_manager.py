@@ -202,7 +202,7 @@ def remove_orphan_licences(
         sa.select(database.Licence).filter(
             database.Licence.licence_uid.notin_(keep_licences)
         )
-    ).all()
+    )
     for licence_to_delete in licences_to_delete:
         related_dataset_uids = [r.resource_uid for r in licence_to_delete.resources]  # type: ignore
         if set(related_dataset_uids).intersection(set(resources)):

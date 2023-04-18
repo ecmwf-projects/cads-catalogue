@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import datetime
+from typing import List
 
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -22,7 +23,7 @@ import sqlalchemy_utils
 from cads_catalogue import config
 
 metadata = sa.MetaData()
-BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
+BaseModel = sa.orm.declarative_base(metadata=metadata)
 
 
 DB_VERSION = 10  # to increment at each structure change
@@ -108,8 +109,11 @@ class Keyword(BaseModel):
     category_value = sa.Column(sa.String)
     keyword_name = sa.Column(sa.String)
 
-    resources = sa.orm.relationship(
-        "Resource", secondary="resources_keywords", back_populates="keywords"
+    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
+        "Resource",
+        secondary="resources_keywords",
+        back_populates="keywords",
+        uselist=True,
     )
 
 
@@ -133,11 +137,12 @@ class Message(BaseModel):
     live = sa.Column(sa.Boolean)
     status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
 
-    resources = sa.orm.relationship(
+    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
         "Resource",
         secondary="resources_messages",
         back_populates="messages",
         lazy="joined",
+        uselist=True,
     )
 
 
@@ -203,20 +208,27 @@ class Resource(BaseModel):
     variables = sa.Column(sa.dialects.postgresql.JSONB)
 
     # relationship attributes
-    licences = sa.orm.relationship(
-        "Licence", secondary="resources_licences", back_populates="resources"
+    licences: sa.orm.Mapped[List["Licence"]] = sa.orm.relationship(
+        "Licence",
+        secondary="resources_licences",
+        back_populates="resources",
+        uselist=True,
     )
-    messages = sa.orm.relationship(
-        "Message", secondary="resources_messages", back_populates="resources"
+    messages: sa.orm.Mapped[List["Message"]] = sa.orm.relationship(
+        "Message",
+        secondary="resources_messages",
+        back_populates="resources",
+        uselist=True,
     )
-    related_resources = sa.orm.relationship(
+    related_resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
         "Resource",
         secondary=related_resources,
         primaryjoin=resource_id == related_resources.c.child_resource_id,
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
         backref=sa.orm.backref("back_related_resources"),  # type: ignore
+        uselist=True,
     )
-    keywords = sa.orm.relationship(
+    keywords: sa.orm.Mapped[List["Keyword"]] = sa.orm.relationship(
         "Keyword", secondary="resources_keywords", back_populates="resources"
     )
 
@@ -236,8 +248,11 @@ class Licence(BaseModel):
         sa.Enum("portal", "dataset", name="licence_scope"), default="dataset"
     )
 
-    resources = sa.orm.relationship(
-        "Resource", secondary="resources_licences", back_populates="licences"
+    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
+        "Resource",
+        secondary="resources_licences",
+        back_populates="licences",
+        uselist=True,
     )
 
     __table_args__ = (

@@ -3,7 +3,7 @@ import os.path
 
 import pytest
 import pytest_mock
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy as sa
 
 from cads_catalogue import (
     config,
@@ -33,7 +33,7 @@ def create_layout_for_test(path, sections=[], aside={}):
     return base_data
 
 
-def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
+def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
     my_settings_dict = {
         "object_storage_url": "object/storage/url",
         "storage_admin": "admin1",
@@ -49,7 +49,7 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
         for licence in licences:
             session.add(database.Licence(**licence))
         session.commit()
-        all_licences = session.query(database.Licence).all()
+        all_licences = session.scalars(sa.select(database.Licence)).all()
     # create a test layout.json
     layout_path = os.path.join(str(tmpdir), "layout.json")
     block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence"}
@@ -179,6 +179,7 @@ def test_transform_licences_blocks(tmpdir, session_obj: sessionmaker):
         },
     }
     assert new_layout_data == expected
+    session.close()
 
 
 def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None:

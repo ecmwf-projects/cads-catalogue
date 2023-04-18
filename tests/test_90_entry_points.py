@@ -9,7 +9,6 @@ import pytest_mock
 import sqlalchemy as sa
 import sqlalchemy_utils
 from psycopg import Connection
-from sqlalchemy.orm import sessionmaker
 from typer.testing import CliRunner
 
 from cads_catalogue import (
@@ -37,7 +36,7 @@ def test_init_db(postgresql: Connection[str]) -> None:
     )
     engine = sa.create_engine(connection_string)
     conn = engine.connect()
-    query = (
+    query = sa.text(
         "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
     )
     result = runner.invoke(
@@ -72,7 +71,7 @@ def test_update_catalogue(
     )
     sqlalchemy_utils.drop_database(connection_string)
     engine = sa.create_engine(connection_string)
-    session_obj = sessionmaker(engine)
+    session_obj = sa.orm.sessionmaker(engine)
     licence_path = os.path.join(
         TESTDATA_PATH, "cads-licences/licence-to-use-copernicus-products.pdf"
     )
@@ -200,14 +199,16 @@ def test_update_catalogue(
 
     # check db content
     with session_obj() as session:
-        resources = session.query(database.Resource).order_by(
-            database.Resource.resource_uid
-        )
+        resources = session.execute(
+            sa.select(database.Resource).order_by(database.Resource.resource_uid)
+        ).scalars()
         utils.compare_resources_with_dumped_file(
             resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
         )
 
-    assert session.execute("select count(*) from messages").scalars().one() == 6
+    assert (
+        session.execute(sa.text("select count(*) from messages")).scalars().one() == 6
+    )
     expected_msgs = [
         {
             "message_uid": "contents/2023/2023-01-archived-warning.md",
@@ -294,7 +295,9 @@ def test_update_catalogue(
             "status": "fixed",
         },
     ]
-    db_msgs = session.query(database.Message).order_by(database.Message.message_uid)
+    db_msgs = session.scalars(
+        sa.select(database.Message).order_by(database.Message.message_uid)
+    ).unique()
     for db_msg in db_msgs:
         msg_dict = utils.object_as_dict(db_msg)
         expected_msg = [
@@ -305,9 +308,13 @@ def test_update_catalogue(
     assert sorted(
         [
             r.resource_uid
-            for r in session.query(database.Message)
-            .filter_by(message_uid="contents/2023/2023-01-archived-warning.md")
-            .one()
+            for r in session.execute(
+                sa.select(database.Message).filter_by(
+                    message_uid="contents/2023/2023-01-archived-warning.md"
+                )
+            )
+            .unique()
+            .scalar_one()
             .resources
         ]
     ) == [
@@ -319,27 +326,28 @@ def test_update_catalogue(
     ]
 
     licences = [
-        utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+        utils.object_as_dict(ll)
+        for ll in session.scalars(sa.select(database.Licence)).all()
     ]
     assert len(licences) == len(expected_licences)
     for expected_licence in expected_licences:
-        effective_found = (
-            session.query(database.Licence)
-            .filter_by(licence_uid=expected_licence["licence_uid"])
-            .all()
-        )
+        effective_found = session.scalars(
+            sa.select(database.Licence).filter_by(
+                licence_uid=expected_licence["licence_uid"]
+            )
+        ).all()
         assert effective_found
         for field in ["revision", "title", "download_filename"]:
             assert getattr(effective_found[0], field) == expected_licence[field]
 
-    resl = (
-        session.query(database.Resource)
-        .filter_by(resource_uid="reanalysis-era5-single-levels")
-        .one()
-    )
+    resl = session.execute(
+        sa.select(database.Resource).filter_by(
+            resource_uid="reanalysis-era5-single-levels"
+        )
+    ).scalar_one()
     assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
 
-    catalog_updates = session.query(database.CatalogueUpdate).all()
+    catalog_updates = session.scalars(sa.select(database.CatalogueUpdate)).all()
     assert len(catalog_updates) == 1
     assert catalog_updates[0].catalogue_repo_commit == last_commit1
     assert catalog_updates[0].licence_repo_commit == last_commit2
@@ -422,33 +430,36 @@ def test_update_catalogue(
 
     with session_obj() as session:
         assert (
-            session.query(database.DBRelease).first().db_release_version
+            session.scalars(sa.select(database.DBRelease).limit(1))
+            .first()
+            .db_release_version
             == database.DB_VERSION
         )
         licences = [
-            utils.object_as_dict(ll) for ll in session.query(database.Licence).all()
+            utils.object_as_dict(ll)
+            for ll in session.scalars(sa.select(database.Licence)).all()
         ]
         assert len(licences) == len(expected_licences)
         for expected_licence in expected_licences:
-            effective_found = (
-                session.query(database.Licence)
-                .filter_by(licence_uid=expected_licence["licence_uid"])
-                .all()
-            )
+            effective_found = session.scalars(
+                sa.select(database.Licence).filter_by(
+                    licence_uid=expected_licence["licence_uid"]
+                )
+            ).all()
             assert effective_found
             for field in ["revision", "title", "download_filename"]:
                 assert getattr(effective_found[0], field) == expected_licence[field]
 
-        resl = (
-            session.query(database.Resource)
-            .filter_by(resource_uid="reanalysis-era5-single-levels")
-            .one()
-        )
+        resl = session.execute(
+            sa.select(database.Resource).filter_by(
+                resource_uid="reanalysis-era5-single-levels"
+            )
+        ).scalar_one()
         assert (
             resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
         )
 
-        catalog_updates = session.query(database.CatalogueUpdate).all()
+        catalog_updates = session.scalars(sa.select(database.CatalogueUpdate)).all()
         assert len(catalog_updates) == 1
         assert catalog_updates[0].catalogue_repo_commit == last_commit1
         assert catalog_updates[0].licence_repo_commit == last_commit2
@@ -457,8 +468,8 @@ def test_update_catalogue(
     caplog.clear()
 
     # simulate an update of the structure
-    session.query(database.DBRelease).update(
-        {"db_release_version": database.DB_VERSION - 1}
+    session.execute(
+        sa.update(database.DBRelease).values(db_release_version=database.DB_VERSION - 1)
     )
     session.commit()
     result = runner.invoke(
@@ -522,14 +533,20 @@ def test_transaction_update_catalogue(
     # create the db empty
     engine = database.init_database(connection_string)
     # add some dummy data
-    engine.execute(
-        "INSERT INTO licences (licence_uid, revision, title, download_filename, md_filename) "
-        "VALUES ('a-licence', 1, 'a licence', 'a file.pdf', 'a file.md')"
+    conn = engine.connect()
+    conn.execute(
+        sa.text(
+            "INSERT INTO licences (licence_uid, revision, title, download_filename, md_filename) "
+            "VALUES ('a-licence', 1, 'a licence', 'a file.pdf', 'a file.md')"
+        )
     )
-    engine.execute(
-        "INSERT INTO resources (resource_uid, abstract, description, type) "
-        "VALUES ('dummy-dataset', 'a dummy ds', '[]', 'dataset')"
+    conn.execute(
+        sa.text(
+            "INSERT INTO resources (resource_uid, abstract, description, type) "
+            "VALUES ('dummy-dataset', 'a dummy ds', '[]', 'dataset')"
+        )
     )
+    conn.commit()
 
     # simulate the object storage working...
     mocker.patch(
@@ -569,11 +586,11 @@ def test_transaction_update_catalogue(
     error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
     for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
         assert len([e for e in error_messages if dataset_name in e]) >= 1
-    session_obj = sessionmaker(engine)
+    session_obj = sa.orm.sessionmaker(engine)
     # ...anyway the licence content is updated...(uninvolved licence is removed)
     with session_obj() as session:
         licences = session.execute(
-            "select licence_uid from licences order by lower(licence_uid)"
+            sa.text("select licence_uid from licences order by lower(licence_uid)")
         ).all()
         assert licences == [
             ("CCI-data-policy-for-satellite-surface-radiation-budget",),
@@ -582,7 +599,7 @@ def test_transaction_update_catalogue(
         ]
         #  ....but the resources must stay unchanged
         resources = session.execute(
-            "select resource_uid, abstract, description, type from resources"
+            sa.text("select resource_uid, abstract, description, type from resources")
         ).all()
         assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
 

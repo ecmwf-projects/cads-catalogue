@@ -55,9 +55,9 @@ def message_sync(
                 clause = database.Resource.resource_uid.like(pattern)
             else:
                 clause = database.Resource.resource_uid == resource_uid
-            for resource_obj in session.execute(
+            for resource_obj in session.scalars(
                 sa.select(database.Resource).filter(clause)
-            ).scalars():
+            ):
                 if not resource_obj:
                     raise ValueError("resource_uid = %r not found" % resource_uid)
                 db_resources[resource_uid] = db_resources.get(resource_uid, [])
@@ -202,14 +202,11 @@ def update_catalogue_messages(
         return involved_msg_ids
 
     # remove not loaded messages from the db
-    msgs_to_delete = session.query(database.Message).filter(
-        database.Message.message_uid.notin_(involved_msg_ids)
-    )
     msgs_to_delete = session.scalars(
         sa.select(database.Message).filter(
             database.Message.message_uid.notin_(involved_msg_ids)
         )
-    ).all()
+    )
     for msg_to_delete in msgs_to_delete:
         msg_to_delete.resources = []  # type: ignore
         session.delete(msg_to_delete)

@@ -5,7 +5,7 @@ import urllib.parse
 from typing import Any
 
 import pytest_mock
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy as sa
 
 from cads_catalogue import (
     config,
@@ -26,7 +26,7 @@ def create_form_for_test(path, items=[]):
     return items
 
 
-def test_build_licence_block(session_obj: sessionmaker):
+def test_build_licence_block(session_obj: sa.orm.sessionmaker):
     doc_storage_url = "http://my/url/"
 
     # add some licences to work on
@@ -36,7 +36,7 @@ def test_build_licence_block(session_obj: sessionmaker):
         for licence in licences:
             session.add(database.Licence(**licence))
         session.commit()
-        req_licences = session.query(database.Licence).all()
+        req_licences = session.scalars(sa.select(database.Licence)).all()
     req_licences = sorted(req_licences, key=operator.attrgetter("licence_uid"))
 
     new_block = form_manager.build_licence_block(req_licences, doc_storage_url)
@@ -84,9 +84,10 @@ def test_build_licence_block(session_obj: sessionmaker):
         "name": "licences",
         "type": "LicenceWidget",
     }
+    session.close()
 
 
-def test_transform_licences_blocks(session_obj: sessionmaker):
+def test_transform_licences_blocks(session_obj: sa.orm.sessionmaker):
     oss = config.ObjectStorageSettings(
         object_storage_url="http://myobject-storage:myport/",
         storage_admin="storage_user",
@@ -102,7 +103,7 @@ def test_transform_licences_blocks(session_obj: sessionmaker):
         for licence in licences:
             session.add(database.Licence(**licence))
         session.commit()
-        req_licences = session.query(database.Licence).all()
+        req_licences = session.scalars(sa.select(database.Licence)).all()
     req_licences = sorted(req_licences, key=operator.attrgetter("licence_uid"))
     resource = {
         "resource_uid": "a-dataset",
@@ -148,10 +149,11 @@ def test_transform_licences_blocks(session_obj: sessionmaker):
             },
         },
     ]
+    session.close()
 
 
 def test_transform_form(
-    tmpdir, session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+    tmpdir, session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
 ):
     oss = config.ObjectStorageSettings(
         object_storage_url="http://myobject-storage:myport/",
@@ -170,7 +172,7 @@ def test_transform_form(
         for licence in licences:
             session.add(database.Licence(**licence))
         session.commit()
-        req_licences = session.query(database.Licence).all()
+        req_licences = session.scalars(sa.select(database.Licence)).all()
     req_licences = sorted(req_licences, key=operator.attrgetter("licence_uid"))
 
     resource = {
@@ -235,3 +237,4 @@ def test_transform_form(
             },
         },
     ]
+    session.close()

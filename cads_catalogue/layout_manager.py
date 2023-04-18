@@ -21,7 +21,7 @@ import pathlib
 import shutil
 import tempfile
 import urllib.parse
-from typing import Any, List
+from typing import Any, List, Sequence
 
 import sqlalchemy as sa
 import structlog
@@ -188,7 +188,7 @@ def build_licence_blocks(
 
 
 def manage_licence_section(
-    all_licences: List[database.Licence],
+    all_licences: Sequence[database.Licence],
     section: dict[str, Any],
     doc_storage_url: str,
 ):
