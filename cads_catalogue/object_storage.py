@@ -203,7 +203,10 @@ def store_file(
         client.get_bucket_cors(Bucket=bucket_name)
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchCORSConfiguration":
-            set_bucket_cors(client, bucket_name)
+            try:
+                set_bucket_cors(client, bucket_name)
+            except:
+                logger.warning(f"unable to set CORS policy on bucket {bucket_name}")
     with open(file_path, "rb") as fp:
         data = fp.read()
         source_sha256 = hashlib.sha256(data).hexdigest()
