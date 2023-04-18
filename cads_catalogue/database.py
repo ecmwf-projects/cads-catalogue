@@ -15,10 +15,11 @@
 # limitations under the License.
 
 import datetime
-from typing import List
+from typing import Any, List
 
 import sqlalchemy as sa
 import sqlalchemy_utils
+from sqlalchemy.dialects import postgresql as dialect_postgresql  # needed for mypy
 
 from cads_catalogue import config
 
@@ -163,14 +164,16 @@ class Resource(BaseModel):
 
     # internal functionality related
     adaptor = sa.Column(sa.String)
-    adaptor_configuration = sa.Column(sa.dialects.postgresql.JSONB)
-    constraints_data = sa.Column(sa.dialects.postgresql.JSONB)
-    form_data = sa.Column(sa.dialects.postgresql.JSONB)
-    mapping = sa.Column(sa.dialects.postgresql.JSONB)
-    related_resources_keywords = sa.Column(sa.dialects.postgresql.ARRAY(sa.String))
+    adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
+    constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
+    form_data: Any = sa.Column(dialect_postgresql.JSONB)
+    mapping: Any = sa.Column(dialect_postgresql.JSONB)
+    related_resources_keywords: List[str] = sa.Column(
+        dialect_postgresql.ARRAY(sa.String)
+    )
 
     # geo extent
-    geo_extent = sa.Column(sa.dialects.postgresql.JSONB)
+    geo_extent: Any = sa.Column(dialect_postgresql.JSONB)
 
     # date/time
     begin_date = sa.Column(sa.Date)
@@ -185,8 +188,8 @@ class Resource(BaseModel):
     abstract = sa.Column(sa.String, nullable=False)
     citation = sa.Column(sa.String)
     contactemail = sa.Column(sa.String)
-    description = sa.Column(sa.dialects.postgresql.JSONB, nullable=False)
-    documentation = sa.Column(sa.dialects.postgresql.JSONB)
+    description: Any = sa.Column(dialect_postgresql.JSONB, nullable=False)
+    documentation: Any = sa.Column(dialect_postgresql.JSONB)
     doi = sa.Column(sa.String)
     ds_contactemail = sa.Column(sa.String)
     ds_responsible_organisation = sa.Column(sa.String)
@@ -205,7 +208,7 @@ class Resource(BaseModel):
     type = sa.Column(sa.String, nullable=False)
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
-    variables = sa.Column(sa.dialects.postgresql.JSONB)
+    variables: Any = sa.Column(dialect_postgresql.JSONB)
 
     # relationship attributes
     licences: sa.orm.Mapped[List["Licence"]] = sa.orm.relationship(

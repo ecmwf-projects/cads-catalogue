@@ -20,6 +20,7 @@ dependencies:
 - pip:
   - boto3-stubs
   - pytest-postgresql
+  - sqlalchemy[mypy]
   - types-Markdown
   - types-PyYAML
   - types-sqlalchemy-utils
