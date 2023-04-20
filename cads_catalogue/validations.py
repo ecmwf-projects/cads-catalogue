@@ -25,6 +25,25 @@ from cads_catalogue import layout_manager, utils
 logger = logging.getLogger(__name__)
 
 
+def check_values(input_obj, values_to_exclude=[]):
+    """Check recursively if input list/dict has forbidden values."""
+    if type(input_obj) is dict:
+        for key, value in input_obj.items():
+            if values_to_exclude and value in values_to_exclude:
+                value_repr = value is None and "'null'" or repr(value)
+                logger.error(f"found key {key} with a forbidden value: {value_repr}")
+                continue
+            check_values(value, values_to_exclude=values_to_exclude)
+    elif type(input_obj) is list:
+        for item in input_obj:
+            if values_to_exclude and item in values_to_exclude:
+                item_repr = item is None and "'null'" or repr(item)
+                logger.error(f"found unexpected item {item_repr}")
+                continue
+            check_values(item, values_to_exclude=values_to_exclude)
+    return
+
+
 def validate_base_json(folder, file_name, required=True):
     """Do a base validation of a json file inside a folder."""
     logger.info(f"-starting validation of {file_name}-")
@@ -85,7 +104,10 @@ def validate_adaptors(dataset_folder):
 def validate_constraints(dataset_folder):
     """Validate constraints.json of a dataset."""
     file_name = "constraints.json"
-    validate_base_json(dataset_folder, file_name)
+    data = validate_base_json(dataset_folder, file_name)
+    if not data:
+        return
+    check_values(data, values_to_exclude=[None])
 
 
 def validate_form(dataset_folder):
@@ -276,4 +298,5 @@ def validate_datasets(datasets_folder: str) -> None:
             logger.debug(f"excluding folder {resource_uid}")
             continue
         validate_dataset(dataset_folder)
+        print()
     logger.info("----end of validations----")

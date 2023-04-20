@@ -205,7 +205,7 @@ def store_file(
         if e.response["Error"]["Code"] == "NoSuchCORSConfiguration":
             try:
                 set_bucket_cors(client, bucket_name)
-            except:
+            except Exception:  # noqa:
                 logger.warning(f"unable to set CORS policy on bucket {bucket_name}")
     with open(file_path, "rb") as fp:
         data = fp.read()
