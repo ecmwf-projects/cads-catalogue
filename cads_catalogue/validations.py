@@ -298,4 +298,5 @@ def validate_datasets(datasets_folder: str) -> None:
             logger.debug(f"excluding folder {resource_uid}")
             continue
         validate_dataset(dataset_folder)
+        print()
     logger.info("----end of validations----")

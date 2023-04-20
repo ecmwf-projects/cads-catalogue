@@ -47,7 +47,7 @@ def validate_dataset(resource_folder_path: str) -> None:
     ----------
     resource_folder_path: dataset folder path
     """
-    utils.configure_log(logfmt="%(levelname).4s - %(message)s")
+    utils.configure_log(logfmt="%(levelname)-7s %(message)s")
     if not os.path.isdir(resource_folder_path):
         raise ValueError("%r is not a folder" % resource_folder_path)
     validations.validate_dataset(resource_folder_path)
@@ -62,7 +62,7 @@ def validate_datasets(resources_folder_path: str) -> None:
     ----------
     resources_folder_path: the root folder where to search dataset subfolders in
     """
-    utils.configure_log(logfmt="%(levelname).4s - %(message)s")
+    utils.configure_log(logfmt="%(levelname)-7s %(message)s")
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)
     validations.validate_datasets(resources_folder_path)
