@@ -25,53 +25,22 @@ from cads_catalogue import layout_manager, utils
 logger = logging.getLogger(__name__)
 
 
-def check_dict_values(input_dict, values_to_exclude=[], types_to_exclude=[]):
-    """Check if input dictionary has forbidden values."""
-    for key, value in input_dict.items():
-        if values_to_exclude and value in values_to_exclude:
-            logger.error(f"found key {key} with a forbidden value: {value}")
-        current_value_type = type(value)
-        if types_to_exclude and current_value_type in types_to_exclude:
-            type_to_exclude_repr = repr(current_value_type)
-            logger.error(
-                f"found key {key} with a forbidden type: {type_to_exclude_repr}"
-            )
-        if current_value_type is list and list not in types_to_exclude:
-            check_list_values(
-                value,
-                values_to_exclude=values_to_exclude,
-                types_to_exclude=types_to_exclude,
-            )
-        elif current_value_type is dict and dict not in types_to_exclude:
-            check_dict_values(
-                value,
-                values_to_exclude=values_to_exclude,
-                types_to_exclude=types_to_exclude,
-            )
-    return
-
-
-def check_list_values(input_list, values_to_exclude=[], types_to_exclude=[]):
-    """Check recursively if input list has forbidden values."""
-    for item in input_list:
-        if values_to_exclude and item in values_to_exclude:
-            logger.error(f"found unexpected item {item}")
-        current_item_type = type(item)
-        if types_to_exclude and current_item_type in types_to_exclude:
-            type_to_exclude_repr = repr(current_item_type)
-            logger.error(f"found unexpected item type: {type_to_exclude_repr}")
-        if current_item_type is list and list not in types_to_exclude:
-            check_list_values(
-                item,
-                values_to_exclude=values_to_exclude,
-                types_to_exclude=types_to_exclude,
-            )
-        elif current_item_type is dict and dict not in types_to_exclude:
-            check_dict_values(
-                item,
-                values_to_exclude=values_to_exclude,
-                types_to_exclude=types_to_exclude,
-            )
+def check_values(input_obj, values_to_exclude=[]):
+    """Check recursively if input list/dict has forbidden values."""
+    if type(input_obj) is dict:
+        for key, value in input_obj.items():
+            if values_to_exclude and value in values_to_exclude:
+                value_repr = value is None and "'null'" or repr(value)
+                logger.error(f"found key {key} with a forbidden value: {value_repr}")
+                continue
+            check_values(value, values_to_exclude=values_to_exclude)
+    elif type(input_obj) is list:
+        for item in input_obj:
+            if values_to_exclude and item in values_to_exclude:
+                item_repr = item is None and "'null'" or repr(item)
+                logger.error(f"found unexpected item {item_repr}")
+                continue
+            check_values(item, values_to_exclude=values_to_exclude)
     return
 
 
@@ -138,10 +107,7 @@ def validate_constraints(dataset_folder):
     data = validate_base_json(dataset_folder, file_name)
     if not data:
         return
-    if type(data) is dict:
-        logger.error("expected list for data in constraints.json")
-        return
-    check_list_values(data, values_to_exclude=[None])
+    check_values(data, values_to_exclude=[None])
 
 
 def validate_form(dataset_folder):
