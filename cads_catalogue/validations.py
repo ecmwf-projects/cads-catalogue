@@ -206,6 +206,8 @@ def validate_metadata_json(dataset_folder):
             try:
                 datetime.datetime.strptime(value, "%Y-%m-%d")
             except:  # noqa
+                if date_field == "end_date" and value == "now":
+                    continue
                 logger.error(
                     f"value '{value}' not parsable as a valid date: use format YYYY-MM-DD"
                 )
