@@ -25,7 +25,7 @@ metadata = sa.MetaData()
 BaseModel = sa.ext.declarative.declarative_base(metadata=metadata)
 
 
-DB_VERSION = 10  # to increment at each structure change
+DB_VERSION = 11  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -188,7 +188,6 @@ class Resource(BaseModel):
     ds_responsible_organisation_role = sa.Column(sa.String)
     file_format = sa.Column(sa.String)
     format_version = sa.Column(sa.String)
-    fulltext = sa.Column(sa.String)
     hidden = sa.Column(sa.Boolean, default=False)
     lineage = sa.Column(sa.String)
     representative_fraction = sa.Column(sa.Float)
@@ -201,6 +200,16 @@ class Resource(BaseModel):
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
     variables = sa.Column(sa.dialects.postgresql.JSONB)
+
+    # fulltextsearch-related
+    fulltext = sa.Column(sa.String)
+    fulltext_tsv = sa.Column(
+        sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
+        sa.Computed(
+            "to_tsvector('english', coalesce(title, '') || abstract || coalesce(fulltext, ''))",
+            persisted=True,
+        ),
+    )
 
     # relationship attributes
     licences = sa.orm.relationship(
@@ -218,6 +227,10 @@ class Resource(BaseModel):
     )
     keywords = sa.orm.relationship(
         "Keyword", secondary="resources_keywords", back_populates="resources"
+    )
+
+    __table_args__ = (
+        sa.Index("idx_fulltext_tsv", fulltext_tsv, postgresql_using="gin"),
     )
 
 
