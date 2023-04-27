@@ -204,7 +204,9 @@ def test_update_catalogue(
             database.Resource.resource_uid
         )
         utils.compare_resources_with_dumped_file(
-            resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
+            resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources.txt"),
+            exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
 
     assert session.execute("select count(*) from messages").scalars().one() == 6

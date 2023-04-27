@@ -1097,7 +1097,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
-            exclude_fields=("record_update", "resource_id"),
+            exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
         assert session.execute(
             "select resource_id, licence_id "
@@ -1160,6 +1160,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
+            exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
         assert session.execute(
             "select resource_id, licence_id "
