@@ -17,10 +17,10 @@ dependencies:
 - postgresql
 - psycopg
 - pytest-mock
-- sqlalchemy-stubs
 - pip:
   - boto3-stubs
   - pytest-postgresql
+  - sqlalchemy[mypy]
   - types-Markdown
   - types-PyYAML
   - types-sqlalchemy-utils

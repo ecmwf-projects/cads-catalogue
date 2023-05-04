@@ -2,7 +2,7 @@ import operator
 import os.path
 
 import pytest_mock
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy as sa
 
 from cads_catalogue import config, database, licence_manager, utils
 
@@ -11,7 +11,7 @@ TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
 def test_licence_sync(
-    session_obj: sessionmaker, mocker: pytest_mock.MockerFixture
+    session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
     my_settings_dict = {
         "object_storage_url": "object/storage/url",
@@ -41,7 +41,7 @@ def test_licence_sync(
     with session_obj() as session:
         licence_manager.licence_sync(session, licence_uid, licences, storage_settings)
         session.commit()
-        db_licences = session.query(database.Licence).all()
+        db_licences = session.scalars(sa.select(database.Licence)).all()
         assert len(db_licences) == 1
         assert utils.object_as_dict(db_licences[0]) == licence_md
 
@@ -79,7 +79,7 @@ def test_licence_sync(
     with session_obj() as session:
         licence_manager.licence_sync(session, licence_uid, licences, storage_settings)
         session.commit()
-        db_licences = session.query(database.Licence).all()
+        db_licences = session.scalars(sa.select(database.Licence)).all()
         assert len(db_licences) == 1
         assert utils.object_as_dict(db_licences[0]) == licence_md2
 

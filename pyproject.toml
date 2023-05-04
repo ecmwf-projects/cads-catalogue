@@ -16,7 +16,7 @@ dependencies = [
   "boto3",
   "pydantic",
   "python-frontmatter",
-  "sqlalchemy",
+  "sqlalchemy>=2.0.9",
   "sqlalchemy_utils",
   "structlog",
   "typer"
@@ -35,7 +35,7 @@ branch = true
 
 [tool.mypy]
 exclude = "tests/data"
-plugins = "sqlmypy"
+plugins = "sqlalchemy.ext.mypy.plugin"
 strict = false
 
 [[tool.mypy.overrides]]

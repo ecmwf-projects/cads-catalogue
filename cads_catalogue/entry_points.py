@@ -187,7 +187,9 @@ def update_catalogue(
         with session_obj.begin() as session:  # type: ignore
             try:
                 assert (
-                    session.query(database.DBRelease).first().db_release_version
+                    session.scalars(
+                        sa.select(database.DBRelease.db_release_version).limit(1)
+                    ).first()
                     == database.DB_VERSION
                 )
             except Exception:  # noqa
@@ -220,6 +222,7 @@ def update_catalogue(
         involved_licences = licence_manager.update_catalogue_licences(
             session, licences_folder_path, storage_settings
         )
+
         involved_resource_uids = manager.update_catalogue_resources(
             session, resources_folder_path, storage_settings
         )
@@ -232,7 +235,7 @@ def update_catalogue(
         )
 
         # update hashes from the catalogue_updates table
-        session.query(database.CatalogueUpdate).delete()
+        session.execute(sa.delete(database.CatalogueUpdate))
         new_update_info = database.CatalogueUpdate(
             catalogue_repo_commit=resource_hash,
             licence_repo_commit=licence_hash,

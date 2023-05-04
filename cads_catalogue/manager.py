@@ -19,10 +19,10 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Tuple
+from typing import Any, List, Sequence, Tuple
 
+import sqlalchemy as sa
 import structlog
-from sqlalchemy.orm.session import Session
 
 from cads_catalogue import (
     config,
@@ -47,7 +47,7 @@ OBJECT_STORAGE_UPLOAD_FILES = {
 
 
 def is_db_to_update(
-    session: Session,
+    session: sa.orm.session.Session,
     resources_folder_path: str | pathlib.Path,
     licences_folder_path: str | pathlib.Path,
     messages_folder_path: str | pathlib.Path,
@@ -69,11 +69,11 @@ def is_db_to_update(
     resource_hash = None
     licence_hash = None
     message_hash = None
-    last_update_record = (
-        session.query(database.CatalogueUpdate)
+    last_update_record = session.scalars(
+        sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
-        .first()
-    )
+        .limit(1)
+    ).first()
     try:
         resource_hash = utils.get_last_commit_hash(resources_folder_path)
     except Exception:  # noqa
@@ -377,7 +377,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
 
 
 def resource_sync(
-    session: Session,
+    session: sa.orm.session.Session,
     resource: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ) -> database.Resource:
@@ -400,12 +400,12 @@ def resource_sync(
 
     db_licences = dict()
     for licence_uid in licence_uids:
-        licence_obj = (
-            session.query(database.Licence)
+        licence_obj = session.scalars(
+            sa.select(database.Licence)
             .filter_by(licence_uid=licence_uid)
             .order_by(database.Licence.revision.desc())
-            .first()
-        )
+            .limit(1)
+        ).first()
         if not licence_obj:
             raise ValueError("licence_uid = %r not found" % licence_uid)
         db_licences[licence_uid] = licence_obj
@@ -423,15 +423,20 @@ def resource_sync(
             force=True,
             **storage_settings.storage_kws,
         )
-    dataset_query_obj = session.query(database.Resource).filter_by(
+    dataset_query_stmt = sa.select(database.Resource).filter_by(
         resource_uid=resource["resource_uid"]
     )
-    if not dataset_query_obj.all():
+    dataset_query_obj = session.execute(dataset_query_stmt).scalars().all()
+    if not dataset_query_obj:
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
     else:
-        dataset_query_obj.update(dataset)
-        dataset_obj = dataset_query_obj.one()
+        session.execute(
+            sa.update(database.Resource)
+            .filter_by(resource_uid=resource["resource_uid"])
+            .values(**dataset)
+        )
+        dataset_obj = session.execute(dataset_query_stmt).scalar_one()
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
@@ -446,7 +451,9 @@ def resource_sync(
             "category_value": category_value,
             "keyword_name": keyword,
         }
-        keyword_obj = session.query(database.Keyword).filter_by(**kw_md).first()
+        keyword_obj = session.scalars(
+            sa.select(database.Keyword).filter_by(**kw_md).limit(1)
+        ).first()
         if not keyword_obj:
             keyword_obj = database.Keyword(**kw_md)
         dataset_obj.keywords.append(keyword_obj)  # type: ignore
@@ -454,7 +461,7 @@ def resource_sync(
     # clean related_resources
     dataset_obj.related_resources = []  # type: ignore
     dataset_obj.back_related_resources = []  # type: ignore
-    all_db_resources = session.query(database.Resource).all()
+    all_db_resources = session.scalars(sa.select(database.Resource)).all()
 
     # recompute related resources
     related_resources = find_related_resources(
@@ -467,7 +474,7 @@ def resource_sync(
 
 
 def find_related_resources(
-    resources: list[database.Resource],
+    resources: Sequence[database.Resource],
     only_involving_uid=None,
 ) -> list[tuple[database.Resource, database.Resource]]:
     """Return couples of resources related each other.
@@ -509,7 +516,7 @@ def find_related_resources(
 
 
 def update_catalogue_resources(
-    session: Session,
+    session: sa.orm.session.Session,
     resources_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
 ) -> List[str]:
@@ -553,7 +560,7 @@ def update_catalogue_resources(
     return input_resource_uids
 
 
-def remove_datasets(session: Session, keep_resource_uids: List[str]):
+def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[str]):
     """
     Remove all datasets that not are in the list of `keep_resource_uids`.
 
@@ -563,8 +570,10 @@ def remove_datasets(session: Session, keep_resource_uids: List[str]):
     keep_resource_uids: list of uids of resources to save
     """
     # remote not involved resources from the db
-    datasets_to_delete = session.query(database.Resource).filter(
-        database.Resource.resource_uid.notin_(keep_resource_uids)
+    datasets_to_delete = session.scalars(
+        sa.select(database.Resource).filter(
+            database.Resource.resource_uid.notin_(keep_resource_uids)
+        )
     )
     for dataset_to_delete in datasets_to_delete:
         dataset_to_delete.licences = []  # type: ignore

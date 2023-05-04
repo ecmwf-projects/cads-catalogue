@@ -16,13 +16,14 @@
 
 from typing import List, Tuple
 
-from sqlalchemy.orm.session import Session
+import sqlalchemy as sa
 
 from cads_catalogue import database
 
 """
 usage example:
 
+import sqlalchemy as sa
 from cads_catalogue import database
 from cads_catalogue.faceted_search import get_datasets_by_keywords, get_faceted_stats
 
@@ -31,7 +32,7 @@ session = session_obj()
 
 # consider all the datasets (but you can start with a filtered set of resources,
 # for example a result of a text search on the title)
-datasets = session.query(database.Resource).all()
+datasets = session.scalars(sa.select(database.Resource)).all()
 
 # Build keywords_dict: a dictionary where keys are the selected categories
 # and the values are the lists of the values selected for the corresponding category.
@@ -54,7 +55,7 @@ faceted_stats = get_faceted_stats(session, results_ids)
 
 
 def get_faceted_stats(
-    session: Session, resource_ids: List[int]
+    session: sa.orm.session.Session, resource_ids: List[int]
 ) -> List[Tuple[str, str, int]]:
     """
     Return list of (category_name, category_value, number of datasets).
@@ -79,7 +80,7 @@ def get_faceted_stats(
     """ % ",".join(
         ["%s" % r for r in resource_ids]
     )
-    result = session.execute(sql).all()
+    result = session.execute(sa.text(sql)).all()
     return result  # type: ignore
 
 
