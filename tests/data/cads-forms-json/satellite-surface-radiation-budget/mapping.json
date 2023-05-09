@@ -1,53 +1,69 @@
 {
-    "options": {
-        "wants_ymd": true
-    },
+    "selection_limit": 54000,
+    "selection_limit_ignore": [
+        "area"
+    ],
     "remap": {
-        "climate_data_record_type": {
-            "interim_climate_data_record": "icdr",
-            "thematic_climate_data_record": "tcdr"
-        },
         "origin": {
-            "esa": "esa_cci",
-            "eumetsat": "cmsaf"
+            "eumetsat": "cmsaf",
+            "esa": "esa_cci"
+        },
+        "climate_data_record_type": {
+            "thematic_climate_data_record": "tcdr",
+            "interim_climate_data_record": "icdr"
+        },
+        "variable": {
+            "surface_net_downward_shortwave_flux": "SNS",
+            "surface_net_downward_radiative_flux": "SRB",
+            "all_variables": "esa_cci",
+            "surface_upwelling_shortwave_flux": "SRS",
+            "surface_net_downward_longwave_flux": "SNL",
+            "surface_upwelling_longwave_flux": "SOL",
+            "surface_downwelling_shortwave_flux": "SIS",
+            "surface_downwelling_longwave_flux": "SDL"
+        },
+        "sensor_on_satellite": {
+            "slstr_on_sentinel_3b_i": "SLSTR_ORAC_Sentinel-3b",
+            "aatsr_on_envisat": "AATSR_ORAC_ENVISAT",
+            "avhrr_on_multiple_satellites": "AVHRR",
+            "slstr_on_sentinel_3a": "SLSTR_ORAC_Sentinel-3a",
+            "atsr2_on_ers2": "ATSR2_ORAC_ERS2",
+            "slstr_on_sentinel_3a_and_3b": "SLSTR_ORAC_Sentinel-3a+b"
+        },
+        "version": {
+            "v2_0": "v2.0",
+            "v2_0_1": "v2.0.1"
+        },
+        "month": {
+            "november": "11",
+            "january": "01",
+            "september": "09",
+            "october": "10",
+            "april": "04",
+            "june": "06",
+            "february": "02",
+            "may": "05",
+            "december": "12",
+            "march": "03",
+            "july": "07",
+            "august": "08"
         },
         "product_family": {
             "cci": "CCI",
             "clara": "CLARA"
         },
-        "sensor_on_satellite": {
-            "aatsr_on_envisat": "AATSR_ORAC_ENVISAT",
-            "atsr2_on_ers2": "ATSR2_ORAC_ERS2",
-            "avhrr_on_multiple_satellites": "AVHRR",
-            "slstr_on_sentinel_3a_is_under_investigation": "SLSTR_ORAC_Sentinel-3a",
-            "slstr_on_sentinel_3b_is_under_investigation": "SLSTR_ORAC_Sentinel-3b"
-        },
         "time_aggregation": {
-            "daily_mean": "DM",
-            "monthly_mean": "MM"
+            "monthly_mean": "MM",
+            "daily_mean": "DM"
         },
-        "variable": {
-            "all_variables": "esa_cci",
-            "surface_downwelling_longwave_flux": "SDL",
-            "surface_downwelling_shortwave_flux": "SIS",
-            "surface_net_downward_longwave_flux": "SNL",
-            "surface_net_downward_radiative_flux": "SRB",
-            "surface_net_downward_shortwave_flux": "SNS",
-            "surface_upwelling_longwave_flux": "SOL",
-            "surface_upwelling_shortwave_flux": "SRS"
-        },
-        "version": {
-            "v2_0": "v2.0",
-            "v2_0_1": "v2.0.1",
-            "v2_1": "v2.1",
-            "v2_2": "v2.2"
-        }
+        "year": {},
+        "day": {},
+        "product_version": {},
+        "CCI_file_version": {}
     },
-    "rename": {
-        "format": "resultcombiner"
+    "options": {
+        "wants_ymd": true
     },
-    "selection_limit": 1200,
-    "selection_limit_ignore": [
-        "area"
-    ]
+    "rename": {},
+    "force": {}
 }
