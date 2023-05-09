@@ -1,32 +1,46 @@
 {
-    "options": {
-        "wants_ymd": true
-    },
-    "remap": {
-        "reference_dataset": {
-            "cru": "CRU",
-            "cru_and_gpcc": "CRU+GPCC"
-        },
-        "variable": {
-            "grid_point_altitude": "ASurf",
-            "near_surface_air_temperature": "Tair",
-            "near_surface_specific_humidity": "Qair",
-            "near_surface_wind_speed": "Wind",
-            "rainfall_flux": "Rainf",
-            "snowfall_flux": "Snowf",
-            "surface_air_pressure": "PSurf",
-            "surface_downwelling_longwave_radiation": "LWdown",
-            "surface_downwelling_shortwave_radiation": "SWdown"
-        },
-        "version": {
-            "deprecated (1.0)": "1.0"
-        }
-    },
-    "rename": {
-        "format": "resultcombiner"
-    },
     "selection_limit": 1000,
     "selection_limit_ignore": [
         "area"
-    ]
+    ],
+    "remap": {
+        "version": {
+            "deprecated (1.0)": "1.0"
+        },
+        "variable": {
+            "near_surface_air_temperature": "Tair",
+            "surface_downwelling_longwave_radiation": "LWdown",
+            "surface_downwelling_shortwave_radiation": "SWdown",
+            "surface_air_pressure": "PSurf",
+            "snowfall_flux": "Snowf",
+            "near_surface_wind_speed": "Wind",
+            "near_surface_specific_humidity": "Qair",
+            "rainfall_flux": "Rainf",
+            "grid_point_altitude": "ASurf"
+        },
+        "reference_dataset": {
+            "cru_and_gpcc": "CRU+GPCC",
+            "cru": "CRU"
+        },
+        "month": {
+            "july": "07",
+            "november": "11",
+            "january": "01",
+            "october": "10",
+            "december": "12",
+            "march": "03",
+            "june": "06",
+            "august": "08",
+            "april": "04",
+            "september": "09",
+            "february": "02",
+            "may": "05"
+        },
+        "year": {}
+    },
+    "options": {
+        "wants_ymd": true
+    },
+    "rename": {},
+    "force": {}
 }

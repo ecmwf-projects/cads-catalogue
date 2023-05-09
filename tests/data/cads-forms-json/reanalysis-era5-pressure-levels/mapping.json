@@ -1,13 +1,103 @@
 {
+    "selection_limit": 1000000.0,
+    "selection_limit_ignore": [
+        "area",
+        "grid"
+    ],
+    "remap": {
+        "pressure_level": {
+            "450_hpa": "450",
+            "175_hpa": "175",
+            "225_hpa": "225",
+            "800_hpa": "800",
+            "825_hpa": "825",
+            "10_hpa": "10",
+            "975_hpa": "975",
+            "250_hpa": "250",
+            "1000_hpa": "1000",
+            "875_hpa": "875",
+            "125_hpa": "125",
+            "50_hpa": "50",
+            "7_hpa": "7",
+            "900_hpa": "900",
+            "950_hpa": "950",
+            "20_hpa": "20",
+            "200_hpa": "200",
+            "600_hpa": "600",
+            "650_hpa": "650",
+            "1_hpa": "1",
+            "30_hpa": "30",
+            "700_hpa": "700",
+            "350_hpa": "350",
+            "550_hpa": "550",
+            "750_hpa": "750",
+            "300_hpa": "300",
+            "3_hpa": "3",
+            "150_hpa": "150",
+            "775_hpa": "775",
+            "400_hpa": "400",
+            "5_hpa": "5",
+            "500_hpa": "500",
+            "70_hpa": "70",
+            "925_hpa": "925",
+            "2_hpa": "2",
+            "850_hpa": "850",
+            "100_hpa": "100"
+        },
+        "variable": {
+            "specific_snow_water_content": "76",
+            "fraction_of_cloud_cover": "248",
+            "specific_rain_water_content": "75",
+            "potential_vorticity": "60",
+            "temperature": "130",
+            "relative_humidity": "157",
+            "specific_humidity": "133",
+            "specific_cloud_liquid_water_content": "246",
+            "ozone_mass_mixing_ratio": "203",
+            "geopotential": "129",
+            "divergence": "155",
+            "vorticity": "138",
+            "vertical_velocity": "135",
+            "specific_cloud_ice_water_content": "247",
+            "u_component_of_wind": "131",
+            "v_component_of_wind": "132"
+        },
+        "product_type": {
+            "ensemble_spread": "spread",
+            "ensemble_members": "members",
+            "ensemble_mean": "mean"
+        },
+        "month": {
+            "march": "03",
+            "may": "05",
+            "april": "04",
+            "july": "07",
+            "november": "11",
+            "october": "10",
+            "june": "06",
+            "august": "08",
+            "december": "12",
+            "january": "01",
+            "february": "02",
+            "september": "09"
+        },
+        "levtype": {},
+        "class": {},
+        "expect": {},
+        "number": {},
+        "time": {},
+        "year": {},
+        "day": {}
+    },
     "force": {
+        "levtype": [
+            "pl"
+        ],
         "class": [
             "ea"
         ],
         "expect": [
             "any"
-        ],
-        "levtype": [
-            "pl"
         ],
         "number": [
             "all"
@@ -16,65 +106,5 @@
     "options": {
         "wants_dates": true
     },
-    "remap": {
-        "product_type": {
-            "ensemble_mean": "mean",
-            "ensemble_members": "members",
-            "ensemble_spread": "spread"
-        },
-        "time": {
-            "00:00": "00:00:00",
-            "01:00": "01:00:00",
-            "02:00": "02:00:00",
-            "03:00": "03:00:00",
-            "04:00": "04:00:00",
-            "05:00": "05:00:00",
-            "06:00": "06:00:00",
-            "07:00": "07:00:00",
-            "08:00": "08:00:00",
-            "09:00": "09:00:00",
-            "10:00": "10:00:00",
-            "11:00": "11:00:00",
-            "12:00": "12:00:00",
-            "13:00": "13:00:00",
-            "14:00": "14:00:00",
-            "15:00": "15:00:00",
-            "16:00": "16:00:00",
-            "17:00": "17:00:00",
-            "18:00": "18:00:00",
-            "19:00": "19:00:00",
-            "20:00": "20:00:00",
-            "21:00": "21:00:00",
-            "22:00": "22:00:00",
-            "23:00": "23:00:00"
-        },
-        "variable": {
-            "divergence": "155",
-            "fraction_of_cloud_cover": "248",
-            "geopotential": "129",
-            "ozone_mass_mixing_ratio": "203",
-            "potential_vorticity": "60",
-            "relative_humidity": "157",
-            "specific_cloud_ice_water_content": "247",
-            "specific_cloud_liquid_water_content": "246",
-            "specific_humidity": "133",
-            "specific_rain_water_content": "75",
-            "specific_snow_water_content": "76",
-            "temperature": "130",
-            "u_component_of_wind": "131",
-            "v_component_of_wind": "132",
-            "vertical_velocity": "135",
-            "vorticity": "138"
-        }
-    },
-    "rename": {
-        "pressure_level": "levelist",
-        "product_type": "dataset",
-        "variable": "param"
-    },
-    "selection_limit": 120000,
-    "selection_limit_ignore": [
-        "area",
-        "grid"
-    ]
+    "rename": {}
 }

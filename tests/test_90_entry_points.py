@@ -157,8 +157,14 @@ def test_update_catalogue(
     spy4.reset_mock()
 
     assert (
-        patch.call_count == 45
-    )  # len(licences)+len(OBJECT_STORAGE_UPLOAD_FILES)*len(resources)
+        patch.call_count == 46
+    )
+    # num.licences * 2 = 6
+    # num.datasets overview.png * 2 = 16
+    # num.datasets layout.json = 8
+    # num.datasets form.json = 8
+    # num.datasets constraints.json = 8
+
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
     assert {
