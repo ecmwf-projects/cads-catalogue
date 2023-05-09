@@ -156,9 +156,7 @@ def test_update_catalogue(
     assert spy4.call_count == 8
     spy4.reset_mock()
 
-    assert (
-        patch.call_count == 46
-    )
+    assert patch.call_count == 46
     # num.licences * 2 = 6
     # num.datasets overview.png * 2 = 16
     # num.datasets layout.json = 8
@@ -209,7 +207,9 @@ def test_update_catalogue(
             sa.select(database.Resource).order_by(database.Resource.resource_uid)
         ).scalars()
         utils.compare_resources_with_dumped_file(
-            resources, os.path.join(TESTDATA_PATH, "dumped_resources.txt")
+            resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources.txt"),
+            exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
 
     assert (

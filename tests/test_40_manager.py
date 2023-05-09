@@ -1,4 +1,5 @@
 import os.path
+from typing import Any
 
 import pytest
 import pytest_mock
@@ -111,7 +112,7 @@ def test_load_resource_from_folder() -> None:
     constraints_fp = open(os.path.join(resource_folder_path, "constraints.json"))
     form_fp = open(os.path.join(resource_folder_path, "form.json"))
     resource = manager.load_resource_from_folder(resource_folder_path)
-    expected_resource = {
+    expected_resource: dict[str, Any] = {
         "resource_uid": "reanalysis-era5-land",
         "constraints": os.path.join(
             TESTDATA_PATH, "cads-forms-json/reanalysis-era5-land/constraints.json"
@@ -1753,7 +1754,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
-            exclude_fields=("record_update", "resource_id"),
+            exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
         assert session.execute(
             sa.text(
@@ -1822,6 +1823,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
+            exclude_fields=("record_update", "resource_id", "fulltext_tsv"),
         )
         assert session.execute(
             sa.text(
