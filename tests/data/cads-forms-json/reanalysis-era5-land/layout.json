@@ -14,95 +14,95 @@
               "type": "thumb-markdown",
               "content": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past. \n\nERA5-Land uses as input to control the simulated land fields ERA5 atmospheric variables, such as air temperature and air humidity. This is called the atmospheric forcing. Without the constraint of the atmospheric forcing, the model-based estimates can rapidly deviate from reality. Therefore, while observations are not directly used in the production of ERA5-Land, they have an indirect influence through the atmospheric forcing used to run the simulation. In addition, the input air temperature, air humidity and pressure used to run ERA5-Land are corrected to account for the altitude difference between the grid of the forcing and the higher resolution grid of ERA5-Land. This correction is called 'lapse rate correction'.    \n\nThe ERA5-Land dataset, as any other simulation, provides estimates which have some degree of uncertainty. Numerical models can only provide a more or less accurate representation of the real physical processes governing different components of the Earth System. In general, the uncertainty of model estimates grows as we go back in time, because the number of observations available to create a good quality atmospheric forcing is lower. ERA5-land parameter fields can currently be used in combination with the uncertainty of the equivalent ERA5 fields. \n\nThe temporal and spatial resolutions of ERA5-Land makes this dataset very useful for all kind of land surface applications such as flood or drought forecasting. The temporal and spatial resolution of this dataset, the period covered in time, as well as the fixed grid used for the data distribution at any period enables decisions makers, businesses and individuals to access and use more accurate information on land states.\n\n\n",
               "image": {
-                "url": "overview.png",
-                "alt": ""
+                "type": "image",
+                "url": "overview.png"
               }
             },
             {
               "type": "table",
-              "id": "data-description",
-              "caption": "Data-description",
+              "id": "data_description",
+              "caption": "Data description",
               "structure": {
                 "headings": [
                   {
-                    "id": "data-type",
-                    "label": "Data-type"
+                    "id": "file_format",
+                    "label": "File format"
                   },
                   {
-                    "id": "file-format",
-                    "label": "File-format"
-                  },
-                  {
-                    "id": "horizontal-coverage",
-                    "label": "Horizontal-coverage"
-                  },
-                  {
-                    "id": "horizontal-resolution",
-                    "label": "Horizontal-resolution"
+                    "id": "data_type",
+                    "label": "Data type"
                   },
                   {
                     "id": "projection",
                     "label": "Projection"
                   },
                   {
-                    "id": "temporal-coverage",
-                    "label": "Temporal-coverage"
+                    "id": "horizontal_coverage",
+                    "label": "Horizontal coverage"
                   },
                   {
-                    "id": "temporal-resolution",
-                    "label": "Temporal-resolution"
+                    "id": "horizontal_resolution",
+                    "label": "Horizontal resolution"
                   },
                   {
-                    "id": "update-frequency",
-                    "label": "Update-frequency"
+                    "id": "vertical_coverage",
+                    "label": "Vertical coverage"
                   },
                   {
-                    "id": "vertical-coverage",
-                    "label": "Vertical-coverage"
+                    "id": "vertical_resolution",
+                    "label": "Vertical resolution"
                   },
                   {
-                    "id": "vertical-resolution",
-                    "label": "Vertical-resolution"
+                    "id": "temporal_coverage",
+                    "label": "Temporal coverage"
+                  },
+                  {
+                    "id": "temporal_resolution",
+                    "label": "Temporal resolution"
+                  },
+                  {
+                    "id": "update_frequency",
+                    "label": "Update frequency"
                   }
                 ],
                 "orientation": "horizontal"
               },
               "content": [
                 {
-                  "data-type": "Gridded"
+                  "file_format": "GRIB"
                 },
                 {
-                  "file-format": "GRIB"
-                },
-                {
-                  "horizontal-coverage": "Global"
-                },
-                {
-                  "horizontal-resolution": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
+                  "data_type": "Gridded"
                 },
                 {
                   "projection": "Regular latitude-longitude grid"
                 },
                 {
-                  "temporal-coverage": "January 1950 to present"
+                  "horizontal_coverage": "Global"
                 },
                 {
-                  "temporal-resolution": "Hourly"
+                  "horizontal_resolution": "0.1\u00b0 x 0.1\u00b0; Native resolution is 9 km."
                 },
                 {
-                  "update-frequency": "Monthly with a delay of about three months relatively to actual date."
+                  "vertical_coverage": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
                 },
                 {
-                  "vertical-coverage": "From 2 m above the surface level, to a soil depth of 289 cm.\n"
+                  "vertical_resolution": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
                 },
                 {
-                  "vertical-resolution": "4 levels of the ECMWF surface model: Layer 1: 0 -7cm, Layer 2: 7 -28cm, Layer 3: 28-100cm, Layer 4: 100-289cm\nSome parameters are defined at 2 m over the surface.\n"
+                  "temporal_coverage": "January 1950 to present"
+                },
+                {
+                  "temporal_resolution": "Hourly"
+                },
+                {
+                  "update_frequency": "Monthly with a delay of about three months relatively to actual date."
                 }
               ]
             },
             {
               "type": "table",
-              "id": "main-variables",
+              "id": "main_variables",
               "caption": "Main variables",
               "structure": {
                 "orientation": "vertical",
@@ -125,12 +125,12 @@
                 {
                   "name": "10m u-component of wind",
                   "description": "Eastward component of the 10m wind. It is the horizontal speed of air moving towards the east, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the V component of 10m wind to give the speed and direction of the horizontal 10m wind.",
-                  "units": "ms<sup>-1</sup>"
+                  "units": "m s\u207b\u00b9"
                 },
                 {
                   "name": "10m v-component of wind",
                   "description": "Northward component of the 10m wind. It is the horizontal speed of air moving towards the north, at a height of ten metres above the surface of the Earth, in metres per second. Care should be taken when comparing this variable with observations, because wind observations vary on small space and time scales and are affected by the local terrain, vegetation and buildings that are represented only on average in the ECMWF Integrated Forecasting System. This variable can be combined with the U component of 10m wind to give the speed and direction of the horizontal 10m wind.",
-                  "units": "ms<sup>-1</sup>"
+                  "units": "m s\u207b\u00b9"
                 },
                 {
                   "name": "2m dewpoint temperature",
@@ -145,22 +145,22 @@
                 {
                   "name": "Evaporation from bare soil",
                   "description": "The amount of evaporation from bare soil at the top of the land surface. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Evaporation from open water surfaces excluding oceans",
                   "description": "Amount of evaporation from surface water storage like lakes and inundated areas but excluding oceans. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Evaporation from the top of canopy",
                   "description": "The amount of evaporation from the canopy interception reservoir at the top of the canopy. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Evaporation from vegetation transpiration",
                   "description": "Amount of evaporation from vegetation transpiration. This has the same meaning as root extraction i.e. the amount of water extracted from the different soil layers. This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Forecast albedo",
@@ -205,12 +205,12 @@
                 {
                   "name": "Leaf area index, high vegetation",
                   "description": "One-half of the total green leaf area per unit horizontal ground surface area for high vegetation type.",
-                  "units": "m<sup>2</sup>m<sup>-2</sup>"
+                  "units": "m\u00b2 m\u207b\u00b2"
                 },
                 {
                   "name": "Leaf area index, low vegetation",
                   "description": "One-half of the total green leaf area per unit horizontal ground surface area for low vegetation type.",
-                  "units": "m<sup>2</sup>m<sup>-2</sup>"
+                  "units": "m\u00b2 m\u207b\u00b2"
                 },
                 {
                   "name": "Potential evaporation",
@@ -225,7 +225,7 @@
                 {
                   "name": "Skin reservoir content",
                   "description": "Amount of water in the vegetation canopy and/or in a thin layer on the soil. It represents the amount of rain intercepted by foliage, and water from dew. The maximum amount of 'skin reservoir content' a grid box can hold depends on the type of vegetation, and may be zero.  Water leaves the 'skin reservoir' by evaporation.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Skin temperature",
@@ -245,7 +245,7 @@
                 {
                   "name": "Snow density",
                   "description": "Mass of snow per cubic metre in the snow layer. The ECMWF Integrated Forecast System (IFS) model represents snow as a single additional layer over the uppermost soil level. The snow may cover all or part of the grid box.",
-                  "units": "kgm<sup>-3</sup>"
+                  "units": "kg m\u207b\u00b3"
                 },
                 {
                   "name": "Snow depth",
@@ -255,22 +255,22 @@
                 {
                   "name": "Snow depth water equivalent",
                   "description": "Depth of snow from the snow-covered area of a grid box. Its units are metres of water equivalent, so it is the depth the water would have if the snow melted and was spread evenly over the whole grid box. The ECMWF Integrated Forecast System represents snow as a single additional layer over the uppermost soil level. The snow may cover all or part of the grid box.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Snow evaporation",
                   "description": "Evaporation from snow averaged over the grid box (to find flux over snow, divide by snow fraction). This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Snowfall",
                   "description": "Accumulated total snow that has fallen to the Earth's surface. It consists of snow due to the large-scale atmospheric flow (horizontal scales greater than around a few hundred metres) and convection where smaller scale areas (around 5km to a few hundred kilometres) of warm air rise. If snow has melted during the period over which this variable was accumulated, then it will be higher than the snow depth. This variable is the total amount of water accumulated from the beginning of the forecast time to the end of the forecast step. The units given measure the depth the water would have if the snow melted and was spread evenly over the grid box. Care should be taken when comparing model variables with observations, because observations are often local to a particular point in space and time, rather than representing averages over a model grid box and model time step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Snowmelt",
                   "description": "Melting of snow averaged over the grid box (to find melt over snow, divide by snow fraction). This variable is accumulated from the beginning of the forecast time to the end of the forecast step.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Soil temperature level 1",
@@ -300,17 +300,17 @@
                 {
                   "name": "Surface latent heat flux",
                   "description": "Exchange of latent heat with the surface through turbulent diffusion. This variables is accumulated from the beginning of the forecast time to the end of the forecast step. By model convention, downward fluxes are positive.",
-                  "units": "Jm<sup>-2</sup>"
+                  "units": "J m\u207b\u00b2"
                 },
                 {
                   "name": "Surface net solar radiation",
                   "description": "Amount of solar radiation (also known as shortwave radiation) reaching the surface of the Earth (both direct and diffuse) minus the amount reflected by the Earth's surface (which is governed by the albedo).Radiation from the Sun (solar, or shortwave, radiation) is partly reflected back to space by clouds and particles in the atmosphere (aerosols) and some of it is absorbed. The rest is incident on the Earth's surface, where some of it is reflected. The difference between downward and reflected solar radiation is the surface net solar radiation. This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
-                  "units": "Jm<sup>-2</sup>"
+                  "units": "J m\u207b\u00b2"
                 },
                 {
                   "name": "Surface net thermal radiation",
                   "description": "Net thermal radiation at the surface. Accumulated field from the beginning of the forecast time to the end of the forecast step. By model convention downward fluxes are positive.",
-                  "units": "Jm<sup>-2</sup>"
+                  "units": "J m\u207b\u00b2"
                 },
                 {
                   "name": "Surface pressure",
@@ -325,17 +325,17 @@
                 {
                   "name": "Surface sensible heat flux",
                   "description": "Transfer of heat between the Earth's surface and the atmosphere through the effects of turbulent air motion (but excluding any heat transfer resulting from condensation or evaporation). The magnitude of the sensible heat flux is governed by the difference in temperature between the surface and the overlying atmosphere, wind speed and the surface roughness. For example, cold air overlying a warm surface would produce a sensible heat flux from the land (or ocean) into the atmosphere. This is a single level variable and it is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
-                  "units": "Jm<sup>-2</sup>"
+                  "units": "J m\u207b\u00b2"
                 },
                 {
                   "name": "Surface solar radiation downwards",
                   "description": "Amount of solar radiation (also known as shortwave radiation) reaching the surface of the Earth. This variable comprises both direct and diffuse solar radiation. Radiation from the Sun (solar, or shortwave, radiation) is partly reflected back to space by clouds and particles in the atmosphere (aerosols) and some of it is absorbed.  The rest is incident on the Earth's surface (represented by this variable). To a reasonably good approximation, this variable is the model equivalent of what would be measured by a pyranometer (an instrument used for measuring solar radiation) at the surface. However, care should be taken when comparing model variables with observations, because observations are often local to a particular point in space and time, rather than representing averages over a  model grid box and model time step. This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
-                  "units": "Jm<sup>-2</sup>"
+                  "units": "J m\u207b\u00b2"
                 },
                 {
                   "name": "Surface thermal radiation downwards",
                   "description": "Amount of thermal (also known as longwave or terrestrial) radiation emitted by the atmosphere and clouds that reaches the Earth's surface. The surface of the Earth emits thermal radiation, some of which is absorbed by the atmosphere and clouds. The atmosphere and clouds likewise emit thermal radiation in all directions, some of which reaches the surface (represented by this variable). This variable is accumulated from the beginning of the forecast time to the end of the forecast step. The units are joules per square metre (J m^-2). To convert to watts per square metre (W m^-2), the accumulated values should be divided by the accumulation period expressed in seconds. The ECMWF convention for vertical fluxes is positive downwards.",
-                  "units": "Jm<sup>-2</sup>"
+                  "units": "J m\u207b\u00b2"
                 },
                 {
                   "name": "Temperature of snow layer",
@@ -345,7 +345,7 @@
                 {
                   "name": "Total evaporation",
                   "description": "Accumulated amount of water that has evaporated from the Earth's surface, including a simplified representation of transpiration (from vegetation), into vapour in the air above. This variable is accumulated from the beginning of the forecast to the end of the forecast step. The ECMWF Integrated Forecasting System convention is that downward fluxes are positive. Therefore, negative values indicate evaporation and positive values indicate condensation.",
-                  "units": "mofwaterequivalent"
+                  "units": "m of water equivalent"
                 },
                 {
                   "name": "Total precipitation",
@@ -355,22 +355,22 @@
                 {
                   "name": "Volumetric soil water layer 1",
                   "description": "Volume of water in soil layer 1 (0 - 7 cm) of the ECMWF Integrated Forecasting System. The surface is at 0 cm. The volumetric soil water is associated with the soil texture (or classification), soil depth, and the underlying groundwater level.",
-                  "units": "m<sup>3</sup>m<sup>-3</sup>"
+                  "units": "m\u00b3 m\u207b\u00b3"
                 },
                 {
                   "name": "Volumetric soil water layer 2",
                   "description": "Volume of water in soil layer 2 (7 -28 cm) of the ECMWF Integrated Forecasting System.",
-                  "units": "m<sup>3</sup>m<sup>-3</sup>"
+                  "units": "m\u00b3 m\u207b\u00b3"
                 },
                 {
                   "name": "Volumetric soil water layer 3",
                   "description": "Volume of water in soil layer 3 (28-100 cm) of the ECMWF Integrated Forecasting System.",
-                  "units": "m<sup>3</sup>m<sup>-3</sup>"
+                  "units": "m\u00b3 m\u207b\u00b3"
                 },
                 {
                   "name": "Volumetric soil water layer 4",
                   "description": "Volume of water in soil layer 4 (100-289 cm) of the ECMWF Integrated Forecasting System.",
-                  "units": "m<sup>3</sup>m<sup>-3</sup>"
+                  "units": "m\u00b3 m\u207b\u00b3"
                 }
               ]
             }
@@ -388,10 +388,10 @@
             {
               "id": "all_docs-0",
               "type": "link",
-              "new-window": true,
               "href": "https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation",
               "title": "ERA5-Land online documentation",
-              "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above."
+              "description": "Further and more detailed information relating to the ERA5-Land dataset can be found in the Copernicus Knowledge Base web link above.",
+              "new-window": true
             }
           ]
         }
@@ -401,34 +401,60 @@
       "blocks": [
         {
           "id": "contact",
-          "title": "Contact",
           "type": "section",
-          "open": true,
+          "title": "Contact",
           "blocks": [
             {
               "id": "portal",
               "type": "link",
-              "new-window": true,
               "href": "https://support.ecmwf.int",
-              "title": "ECMWF Support Portal"
+              "title": "ECMWF Support Portal",
+              "new-window": true
             }
           ]
         },
         {
-          "id": "licence",
           "title": "Licence",
-          "type": "button",
-          "scope": "licence",
-          "action": "modal",
-          "licences": [
-            "licence-to-use-copernicus-products"
+          "id": "licence",
+          "type": "section",
+          "blocks": [
+            {
+              "type": "licence",
+              "licence-id": "licence-to-use-copernicus-products",
+              "id": "licence-to-use-copernicus-products"
+            }
           ]
         },
         {
-          "id": "publication_date-section",
-          "title": "Publication date",
+          "id": "references",
           "type": "section",
-          "open": true,
+          "title": "References",
+          "blocks": [
+            {
+              "id": "citation",
+              "type": "button",
+              "title": "_name",
+              "action": "modal",
+              "content": "\\*\\*Citing the data:\\*\\*\n\n\\*Period 1981-present:\\*\n\nMu\u00f1oz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\n\n\\*Period 1950-1980:\\*\n\nMu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac\n\n\\*\\*Citing the web Catalogue entry\\*\\*\n\nMu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on DD-MMM-YYYY), 10.24381/cds.e2161bac"
+            },
+            {
+              "id": "acknowledgement",
+              "type": "button",
+              "title": "_name",
+              "action": "modal",
+              "content": "All users of data uploaded on the Climate Data Store (CDS) must:\n\n* provide clear and visible attribution to the Copernicus programme by referencing the web catalogue entry\n* acknowledge according to the data licence\n* cite each product used\n\n\n\n Please refer to [How to acknowledge, cite and reference data published on the Climate Data Store](https://confluence.ecmwf.int/x/srnICw) for complete details."
+            },
+            {
+              "id": "doi",
+              "type": "markdown",
+              "content": "DOI: [10.24381/cds.e2161bac](https://doi.org/10.24381/cds.e2161bac)"
+            }
+          ]
+        },
+        {
+          "id": "publication_date",
+          "type": "section",
+          "title": "Publication date",
           "blocks": [
             {
               "id": "publication_date-markdown",
@@ -438,46 +464,28 @@
           ]
         },
         {
-          "id": "update_date-section",
-          "title": "Update date",
+          "id": "update_date",
           "type": "section",
-          "open": true,
+          "title": "Update date",
           "blocks": [
             {
               "id": "update_date-markdown",
               "type": "markdown",
-              "content": "2022-12-02"
+              "content": "2023-02-17"
             }
           ]
-        },
-        {
-          "id": "references",
-          "title": "",
-          "type": "section",
-          "open": true,
-          "blocks": [
-            {
-              "id": "citation",
-              "type": "button",
-              "content": "**How to cite this dataset**\n\nAll users of data uploaded on the Climate Data Store (CDS) must provide clear and visible attribution to the Copernicus programme and are asked to cite and reference the dataset provider. Please refer to How to acknowledge, cite and reference data published on the Climate Data Store for complete details.\n\n(1) Acknowledge according to the licence to use Copernicus Products.\n\n(2) Cite each dataset version used:\n\n- Mu\u00f1oz Sabater, J., (2019): ERA5-Land hourly data from 1981 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac \n\n- Mu\u00f1oz Sabater, J., (2021): ERA5-Land hourly data from 1950 to 1980. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.e2161bac ",
-              "action": "popup",
-              "scope": "popup",
-              "title": "Citation",
-              "copy_to_clipboard": true
-            }
-          ]
-        },
-        {
-          "id": "related_applications",
-          "type": "related_entries",
-          "title": "Related applications",
-          "content": "applications"
         },
         {
           "id": "related_dataset",
           "type": "related_entries",
-          "title": "Related datasets",
-          "content": "datasets"
+          "content": "datasets",
+          "title": "Related datasets"
+        },
+        {
+          "id": "related_applications",
+          "type": "related_entries",
+          "content": "applications",
+          "title": "Related applications"
         }
       ]
     }
