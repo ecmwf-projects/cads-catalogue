@@ -1,4 +1,5 @@
 import os.path
+from typing import Any
 
 import pytest
 import pytest_mock
@@ -111,7 +112,7 @@ def test_load_resource_from_folder() -> None:
     constraints_fp = open(os.path.join(resource_folder_path, "constraints.json"))
     form_fp = open(os.path.join(resource_folder_path, "form.json"))
     resource = manager.load_resource_from_folder(resource_folder_path)
-    expected_resource = {
+    expected_resource: dict[str, Any] = {
         "resource_uid": "reanalysis-era5-land",
         "constraints": os.path.join(
             TESTDATA_PATH, "cads-forms-json/reanalysis-era5-land/constraints.json"
