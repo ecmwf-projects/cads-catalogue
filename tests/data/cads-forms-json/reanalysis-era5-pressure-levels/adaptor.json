@@ -1,0 +1,120 @@
+{
+    "entry_point": "cads_adaptors:LegacyCdsAdaptor",
+    "collection_id": "reanalysis-era5-pressure-levels",
+    "url": "https://cds.climate.copernicus.eu/api/v2",
+    "key": "155265:cd60cf87-5f89-4ef4-8350-3817254b3884",
+    "embargo": {
+        "days": 5,
+        "hours": 0
+    },
+    "mapping": {
+        "selection_limit": 1000000.0,
+        "selection_limit_ignore": [
+            "area",
+            "grid"
+        ],
+        "remap": {
+            "pressure_level": {
+                "350_hpa": "350",
+                "100_hpa": "100",
+                "3_hpa": "3",
+                "50_hpa": "50",
+                "125_hpa": "125",
+                "875_hpa": "875",
+                "20_hpa": "20",
+                "7_hpa": "7",
+                "225_hpa": "225",
+                "10_hpa": "10",
+                "900_hpa": "900",
+                "400_hpa": "400",
+                "30_hpa": "30",
+                "750_hpa": "750",
+                "775_hpa": "775",
+                "1000_hpa": "1000",
+                "850_hpa": "850",
+                "975_hpa": "975",
+                "600_hpa": "600",
+                "550_hpa": "550",
+                "825_hpa": "825",
+                "950_hpa": "950",
+                "450_hpa": "450",
+                "650_hpa": "650",
+                "250_hpa": "250",
+                "175_hpa": "175",
+                "150_hpa": "150",
+                "5_hpa": "5",
+                "500_hpa": "500",
+                "700_hpa": "700",
+                "800_hpa": "800",
+                "200_hpa": "200",
+                "925_hpa": "925",
+                "70_hpa": "70",
+                "2_hpa": "2",
+                "300_hpa": "300",
+                "1_hpa": "1"
+            },
+            "variable": {
+                "geopotential": "129",
+                "u_component_of_wind": "131",
+                "specific_cloud_liquid_water_content": "246",
+                "ozone_mass_mixing_ratio": "203",
+                "fraction_of_cloud_cover": "248",
+                "potential_vorticity": "60",
+                "vertical_velocity": "135",
+                "temperature": "130",
+                "vorticity": "138",
+                "specific_snow_water_content": "76",
+                "specific_humidity": "133",
+                "v_component_of_wind": "132",
+                "specific_cloud_ice_water_content": "247",
+                "divergence": "155",
+                "specific_rain_water_content": "75",
+                "relative_humidity": "157"
+            },
+            "product_type": {
+                "ensemble_spread": "spread",
+                "ensemble_members": "members",
+                "ensemble_mean": "mean"
+            },
+            "month": {
+                "january": "01",
+                "september": "09",
+                "november": "11",
+                "june": "06",
+                "february": "02",
+                "may": "05",
+                "december": "12",
+                "april": "04",
+                "march": "03",
+                "october": "10",
+                "august": "08",
+                "july": "07"
+            },
+            "class": {},
+            "number": {},
+            "expect": {},
+            "levtype": {},
+            "time": {},
+            "year": {},
+            "day": {}
+        },
+        "force": {
+            "class": [
+                "ea"
+            ],
+            "number": [
+                "all"
+            ],
+            "expect": [
+                "any"
+            ],
+            "levtype": [
+                "pl"
+            ]
+        },
+        "options": {
+            "wants_dates": true
+        },
+        "rename": {}
+    }
+}
