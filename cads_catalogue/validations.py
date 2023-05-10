@@ -64,48 +64,56 @@ def validate_base_json(folder, file_name, required=True):
 
 
 def validate_stringchoicewidget(widget_data: dict[str, Any]):
-    """Do a validation of StringChoiceWidget"""
-    w_type = widget_data.get('type', 'StringChoiceWidget')
-    w_name = widget_data.get('name')
+    """Do a validation of StringChoiceWidget."""
+    w_type = widget_data.get("type", "StringChoiceWidget")
+    w_name = widget_data.get("name")
     if not w_name:
-        logger.error(f"{w_type} without required key 'name'")
+        logger.error(f"found {w_type} without required key 'name'")
         return
-    if 'details' not in widget_data:
-        logger.error(f"{w_type} '{w_name}' without required key 'details'")
+    if "details" not in widget_data:
+        logger.error(f"found {w_type} named '{w_name}' without required key 'details'")
         return
-    details = widget_data['details']
+    details = widget_data["details"]
     try:
         assert details
         assert isinstance(details, dict)
     except AssertionError:
-        logger.error(f"key 'details' of {w_type} '{w_name}' must be a not empty dictionary")
+        logger.error(
+            f"key 'details' of {w_type} named '{w_name}' must be a not empty dictionary"
+        )
         return
-    if 'default' not in details:
-        logger.error(f"{w_type} '{w_name}' without a default value")
+    if "default" not in details:
+        logger.error(f"found {w_type} named '{w_name}' without a default value")
         return
-    default = details['default']
+    default = details["default"]
     try:
         assert default
         assert isinstance(default, list)
         assert len(default) == 1
     except AssertionError:
-        logger.error(f"default of {w_type} '{w_name}' must be defined as a list of one element")
+        logger.error(
+            f"default of {w_type} named '{w_name}' must be defined as a list of one element"
+        )
         return
 
-    if 'values' not in widget_data:
-        logger.error(f"{w_type} '{w_name}' without required key 'values'")
+    if "values" not in details:
+        logger.error(f"found {w_type} named '{w_name}' without a list of values")
         return
-    values = widget_data['values']
+    values = details["values"]
     try:
         assert values
         assert isinstance(values, list)
         assert len(values)
     except AssertionError:
-        logger.error(f"key 'values' of {w_type} '{w_name}' must be a not empty list")
+        logger.error(
+            f"key 'values' of {w_type} named '{w_name}' must be a not empty list"
+        )
         return
 
     if default[0] not in values:
-        logger.error(f"default of {w_type} '{w_name}' is not included in the allowed list of values")
+        logger.error(
+            f"default of {w_type} named '{w_name}' is not included in the allowed list of values"
+        )
         return
 
 
@@ -165,10 +173,10 @@ def validate_form(dataset_folder):
         return
     validators_map = {
         # widget type: validator function,
-        'StringChoiceWidget': validate_stringchoicewidget,
+        "StringChoiceWidget": validate_stringchoicewidget,
     }
     for widget_data in data:
-        w_type = widget_data.get('type')
+        w_type = widget_data.get("type")
         if w_type in validators_map:
             validators_map[w_type](widget_data)
 

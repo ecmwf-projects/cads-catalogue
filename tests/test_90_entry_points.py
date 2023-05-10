@@ -156,9 +156,7 @@ def test_update_catalogue(
     assert spy4.call_count == 8
     spy4.reset_mock()
 
-    assert (
-        patch.call_count == 46
-    )
+    assert patch.call_count == 46
     # num.licences * 2 = 6
     # num.datasets overview.png * 2 = 16
     # num.datasets layout.json = 8
