@@ -1,5 +1,4 @@
 import datetime
-import json
 import os.path
 import unittest.mock
 from typing import Any
@@ -509,7 +508,7 @@ def test_update_catalogue(
     spy2.reset_mock()
     # check warning log
     msg = "detected an old catalogue db structure"
-    assert msg in [json.loads(r.msg)["event"] for r in caplog.records]
+    assert msg in "".join([rrr.msg for rrr in caplog.records])
     caplog.clear()
     session.close()
 
