@@ -171,14 +171,14 @@ def validate_form(dataset_folder):
     data = validate_base_json(dataset_folder, file_name)
     if not data:
         return
-    validators_map = {
-        # widget type: validator function,
-        "StringChoiceWidget": validate_stringchoicewidget,
-    }
-    for widget_data in data:
-        w_type = widget_data.get("type")
-        if w_type in validators_map:
-            validators_map[w_type](widget_data)
+    # validators_map = {
+    #     # widget type: validator function,
+    #     "StringChoiceWidget": validate_stringchoicewidget,
+    # }
+    # for widget_data in data:
+    #     w_type = widget_data.get("type")
+    #     if w_type in validators_map:
+    #         validators_map[w_type](widget_data)
 
 
 def validate_layout(dataset_folder):
