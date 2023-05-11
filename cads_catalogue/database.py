@@ -214,7 +214,7 @@ class Resource(BaseModel):
     fulltext_tsv: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
-            "to_tsvector('english', coalesce(title, '') || ' ' || abstract || ' ' | coalesce(fulltext, ''))",
+            "to_tsvector('english', coalesce(title, '') || ' ' || abstract || ' ' || coalesce(fulltext, ''))",
             persisted=True,
         ),
     )
