@@ -27,7 +27,7 @@ metadata = sa.MetaData()
 BaseModel = sa.orm.declarative_base(metadata=metadata)
 
 
-DB_VERSION = 11  # to increment at each structure change
+DB_VERSION = 12  # to increment at each structure change
 
 
 class DBRelease(BaseModel):
@@ -214,7 +214,7 @@ class Resource(BaseModel):
     fulltext_tsv: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
-            "to_tsvector('english', coalesce(title, '') || abstract || coalesce(fulltext, ''))",
+            "to_tsvector('english', coalesce(title, '') || ' ' || abstract || ' ' | coalesce(fulltext, ''))",
             persisted=True,
         ),
     )
