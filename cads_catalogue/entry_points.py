@@ -17,7 +17,6 @@
 import os.path
 
 import sqlalchemy as sa
-import sqlalchemy_utils
 import structlog
 import typer
 
@@ -119,23 +118,21 @@ def info(connection_string: str | None = None) -> None:
 
 
 @app.command()
-def init_db(connection_string: str | None = None) -> None:
-    """Create the database structure.
+def init_db(connection_string: str | None = None, force: bool = False) -> None:
+    """Create the database if not exist and update the structure.
 
     Parameters
     ----------
-    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param force: if True, drop the database structure and build again from scratch
     """
     utils.configure_log()
-    logger.info(
-        "starting initialization of catalogue db structure (version %s)"
-        % database.DB_VERSION
-    )
+    logger.info("starting initialization of catalogue db structure")
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
-    database.init_database(connection_string)
-    logger.info("successfully created the catalogue db structure")
+    database.init_database(connection_string, force=force)
+    logger.info("successfully created/updated the catalogue db structure")
 
 
 @app.command()
@@ -177,27 +174,8 @@ def update_catalogue(
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
 
-    # create db/check structure
-    must_reset_structure = False
-    if not sqlalchemy_utils.database_exists(engine.url):
-        logger.info("creating catalogue db")
-        sqlalchemy_utils.create_database(engine.url)
-        must_reset_structure = True
-    else:
-        with session_obj.begin() as session:  # type: ignore
-            try:
-                assert (
-                    session.scalars(
-                        sa.select(database.DBRelease.db_release_version).limit(1)
-                    ).first()
-                    == database.DB_VERSION
-                )
-            except Exception:  # noqa
-                # TODO: exit with error log. User should call manually the init/update db script
-                logger.warning("detected an old catalogue db structure")
-                must_reset_structure = True
-    if must_reset_structure:
-        init_db(connection_string)
+    # create db if not exists and update the structure
+    database.init_database(connection_string)
 
     # get storage parameters from environment
     storage_settings = config.ensure_storage_settings(config.storagesettings)

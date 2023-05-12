@@ -10,6 +10,7 @@ import sqlalchemy_utils
 from psycopg import Connection
 from typer.testing import CliRunner
 
+import alembic.config
 from cads_catalogue import (
     config,
     database,
@@ -39,7 +40,8 @@ def test_init_db(postgresql: Connection[str]) -> None:
         "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
     )
     result = runner.invoke(
-        entry_points.app, ["init-db", "--connection-string", connection_string]
+        entry_points.app,
+        ["init-db", "--connection-string", connection_string, "--force"],
     )
 
     assert result.exit_code == 0
@@ -114,6 +116,7 @@ def test_update_catalogue(
         "cads-forms-json", last_commit1, "cads-licences", last_commit2, last_commit3
     )
     mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
+    mocker.patch.object(alembic.config, "main")
     spy1 = mocker.spy(sqlalchemy_utils, "create_database")
     spy2 = mocker.spy(database, "init_database")
     spy3 = mocker.spy(licence_manager, "load_licences_from_folder")
@@ -139,6 +142,10 @@ def test_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
+            "CATALOGUE_DB_NAME": postgresql.info.dbname,
+            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
+            "CATALOGUE_DB_HOST": postgresql.info.host,
+            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     # check no errors
@@ -351,7 +358,6 @@ def test_update_catalogue(
         )
     ).scalar_one()
     assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
-
     catalog_updates = session.scalars(sa.select(database.CatalogueUpdate)).all()
     assert len(catalog_updates) == 1
     assert catalog_updates[0].catalogue_repo_commit == last_commit1
@@ -380,14 +386,18 @@ def test_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
+            "CATALOGUE_DB_NAME": postgresql.info.dbname,
+            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
+            "CATALOGUE_DB_HOST": postgresql.info.host,
+            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     assert result.exit_code == 0
     # check db is not created
     spy1.assert_not_called()
     spy1.reset_mock()
-    # check db structure not initialized
-    spy2.assert_not_called()
+    # check db structure
+    spy2.assert_called_once()
     spy2.reset_mock()
     # check no attempt to load licences and resources
     spy3.assert_not_called()
@@ -416,14 +426,18 @@ def test_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
+            "CATALOGUE_DB_NAME": postgresql.info.dbname,
+            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
+            "CATALOGUE_DB_HOST": postgresql.info.host,
+            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     assert result.exit_code == 0
     # check db is not created
     spy1.assert_not_called()
     spy1.reset_mock()
-    # check db structure not initialized
-    spy2.assert_not_called()
+    # check db structure
+    spy2.assert_called_once()
     spy2.reset_mock()
     # check forced load of licences and resources
     spy3.assert_called_once()
@@ -434,12 +448,6 @@ def test_update_catalogue(
     # check nothing changes in the db
 
     with session_obj() as session:
-        assert (
-            session.scalars(sa.select(database.DBRelease).limit(1))
-            .first()
-            .db_release_version  # type: ignore
-            == database.DB_VERSION
-        )
         licences = [
             utils.object_as_dict(ll)
             for ll in session.scalars(sa.select(database.Licence)).all()
@@ -472,46 +480,6 @@ def test_update_catalogue(
 
     caplog.clear()
 
-    # simulate an update of the structure
-    session.execute(
-        sa.update(database.DBRelease).values(db_release_version=database.DB_VERSION - 1)
-    )
-    session.commit()
-    result = runner.invoke(
-        entry_points.app,
-        [
-            "update-catalogue",
-            "--connection-string",
-            connection_string,
-            "--force",
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
-            "--messages-folder-path",
-            TEST_MESSAGES_DATA_PATH,
-            "--licences-folder-path",
-            TEST_LICENCES_DATA_PATH,
-        ],
-        env={
-            "OBJECT_STORAGE_URL": object_storage_url,
-            "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
-            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
-            "CATALOGUE_BUCKET": bucket_name,
-        },
-    )
-    assert result.exit_code == 0
-    # check db is not created
-    spy1.assert_not_called()
-    spy1.reset_mock()
-    # check db structure is initialized
-    spy2.assert_called_once()
-    spy2.reset_mock()
-    # check warning log
-    msg = "detected an old catalogue db structure"
-    assert msg in "".join([rrr.msg for rrr in caplog.records])
-    caplog.clear()
-    session.close()
-
     # reset globals for tests following
     mocker.resetall()
     config.dbsettings = None
@@ -524,6 +492,7 @@ def test_transaction_update_catalogue(
     mocker: pytest_mock.MockerFixture,
 ) -> None:
     """Here we want to test that transactions are managed outside the update catalogue script."""
+    mocker.patch.object(alembic.config, "main")
     connection_string = (
         f"postgresql+psycopg2://{postgresql.info.user}:"
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
@@ -536,7 +505,7 @@ def test_transaction_update_catalogue(
         "aws_secret_access_key": "storage_password",
     }
     # create the db empty
-    engine = database.init_database(connection_string)
+    engine = database.init_database(connection_string, force=True)
     # add some dummy data
     conn = engine.connect()
     conn.execute(
@@ -583,6 +552,10 @@ def test_transaction_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
+            "CATALOGUE_DB_NAME": postgresql.info.dbname,
+            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
+            "CATALOGUE_DB_HOST": postgresql.info.host,
+            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     # ...without raising any
