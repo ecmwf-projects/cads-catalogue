@@ -252,7 +252,7 @@ def validate_metadata_json(dataset_folder):
         "use_limitation",
     ]
     for optional_field in optional_fields:
-        if optional_field not in data or not data.get(optional_field):
+        if optional_field not in data or data.get(optional_field) is None:
             logger.info(
                 f"optional field not found or empty: '{optional_field}', "
                 f"consider to include a value"
