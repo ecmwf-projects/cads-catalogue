@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import alembic
 import sqlalchemy as sa
 
+import alembic
 import cads_catalogue.config
 import cads_catalogue.utils
 
@@ -33,7 +33,9 @@ def run_migrations_offline() -> None:
     script output.
     """
     cads_catalogue.utils.configure_log()
-    db_settings = cads_catalogue.config.ensure_settings(cads_catalogue.config.dbsettings)
+    db_settings = cads_catalogue.config.ensure_settings(
+        cads_catalogue.config.dbsettings
+    )
     url = db_settings.connection_string
     alembic.context.configure(
         url=url,
@@ -51,7 +53,9 @@ def run_migrations_online() -> None:
     In this scenario we need to create an Engine
     and associate a connection with the alembic.context.
     """
-    db_settings = cads_catalogue.config.ensure_settings(cads_catalogue.config.dbsettings)
+    db_settings = cads_catalogue.config.ensure_settings(
+        cads_catalogue.config.dbsettings
+    )
     engine = sa.create_engine(db_settings.connection_string)
     with engine.connect() as connection:
         alembic.context.configure(
