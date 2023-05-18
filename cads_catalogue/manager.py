@@ -311,6 +311,9 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         "responsible_organisation_website"
     )
     metadata["resource_update"] = data.get("update_date")
+    metadata["resource_update"] = data.get("update_date")
+    if not metadata["resource_update"]:
+        metadata["resource_update"] = data.get("publication_date")
     metadata["title"] = data.get("title")
     metadata["topic"] = data.get("topic")
     metadata["type"] = data.get("resource_type")
