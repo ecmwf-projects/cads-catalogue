@@ -45,7 +45,9 @@ def test_init_db(postgresql: Connection[str]) -> None:
     )
 
     assert result.exit_code == 0
-    assert set(conn.execute(query).scalars()) == set(database.metadata.tables)  # type: ignore
+    assert set(conn.execute(query).scalars()) == set(database.metadata.tables).union(
+        {"alembic_version"}
+    )
 
 
 def get_last_commit_factory(folder1, commit1, folder2, commit2, else_commit3):
@@ -142,10 +144,6 @@ def test_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
-            "CATALOGUE_DB_NAME": postgresql.info.dbname,
-            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
-            "CATALOGUE_DB_HOST": postgresql.info.host,
-            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     # check no errors
@@ -386,10 +384,6 @@ def test_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
-            "CATALOGUE_DB_NAME": postgresql.info.dbname,
-            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
-            "CATALOGUE_DB_HOST": postgresql.info.host,
-            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     assert result.exit_code == 0
@@ -426,10 +420,6 @@ def test_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
-            "CATALOGUE_DB_NAME": postgresql.info.dbname,
-            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
-            "CATALOGUE_DB_HOST": postgresql.info.host,
-            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     assert result.exit_code == 0
@@ -552,10 +542,6 @@ def test_transaction_update_catalogue(
             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
             "CATALOGUE_BUCKET": bucket_name,
-            "CATALOGUE_DB_NAME": postgresql.info.dbname,
-            "CATALOGUE_DB_PASSWORD": postgresql.info.password,
-            "CATALOGUE_DB_HOST": postgresql.info.host,
-            "CATALOGUE_DB_USER": postgresql.info.user,
         },
     )
     # ...without raising any

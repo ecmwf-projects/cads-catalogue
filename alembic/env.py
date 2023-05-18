@@ -16,9 +16,10 @@
 
 import sqlalchemy as sa
 
-import alembic
-import cads_catalogue.config
-import cads_catalogue.utils
+import alembic.context
+import cads_catalogue
+
+config = alembic.context.config
 
 
 def run_migrations_offline() -> None:
@@ -33,13 +34,10 @@ def run_migrations_offline() -> None:
     script output.
     """
     cads_catalogue.utils.configure_log()
-    db_settings = cads_catalogue.config.ensure_settings(
-        cads_catalogue.config.dbsettings
-    )
-    url = db_settings.connection_string
+    url = config.get_main_option("sqlalchemy.url")
     alembic.context.configure(
         url=url,
-        target_metadata=cads_catalogue.database.metadata,
+        target_metadata=cads_catalogue.database.BaseModel.metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
@@ -53,10 +51,13 @@ def run_migrations_online() -> None:
     In this scenario we need to create an Engine
     and associate a connection with the alembic.context.
     """
-    db_settings = cads_catalogue.config.ensure_settings(
-        cads_catalogue.config.dbsettings
+    cads_catalogue.utils.configure_log()
+    engine = sa.engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=sa.pool.NullPool,
     )
-    engine = sa.create_engine(db_settings.connection_string)
+
     with engine.connect() as connection:
         alembic.context.configure(
             connection=connection, target_metadata=cads_catalogue.database.metadata
