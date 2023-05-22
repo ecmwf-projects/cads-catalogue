@@ -15,27 +15,19 @@
 # limitations under the License.
 
 import datetime
+import os
 from typing import Any, List
 
 import sqlalchemy as sa
 import sqlalchemy_utils
 from sqlalchemy.dialects import postgresql as dialect_postgresql  # needed for mypy
 
+import alembic.command
+import alembic.config
 from cads_catalogue import config
 
 metadata = sa.MetaData()
 BaseModel = sa.orm.declarative_base(metadata=metadata)
-
-
-DB_VERSION = 12  # to increment at each structure change
-
-
-class DBRelease(BaseModel):
-    """Information about current structure version."""
-
-    __tablename__ = "db_release"
-
-    db_release_version = sa.Column(sa.Integer, primary_key=True)
 
 
 class CatalogueUpdate(BaseModel):
@@ -299,12 +291,11 @@ def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessio
     return session_obj
 
 
-def init_database(connection_string: str) -> sa.engine.Engine:
-    """Create the database (if not existing) and inizialize the structure.
+def init_database(connection_string: str, force: bool = False) -> sa.engine.Engine:
+    """Make sure the db located at URI `connection_string` exists updated and return the engine object.
 
-    Parameters
-    ----------
-    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param force: if True, drop the database structure and build again from scratch
 
     Returns
     -------
@@ -312,13 +303,24 @@ def init_database(connection_string: str) -> sa.engine.Engine:
         the sqlalchemy engine object
     """
     engine = sa.create_engine(connection_string)
+    migration_directory = os.path.abspath(os.path.join(__file__, "..", ".."))
+    os.chdir(migration_directory)
+    alembic_config_path = os.path.join(migration_directory, "alembic.ini")
+    alembic_cfg = alembic.config.Config(alembic_config_path)
+    alembic_cfg.set_main_option("sqlalchemy.url", connection_string)
     if not sqlalchemy_utils.database_exists(engine.url):
         sqlalchemy_utils.create_database(engine.url)
-    # cleanup and create the schema
-    metadata.drop_all(engine)
-    metadata.create_all(engine)
-    session_obj = sa.orm.sessionmaker(engine)
-    # add structure version
-    with session_obj.begin() as session:  # type: ignore
-        session.add(DBRelease(db_release_version=DB_VERSION))
+        # cleanup and create the schema
+        BaseModel.metadata.drop_all(engine)
+        BaseModel.metadata.create_all(engine)
+        alembic.command.stamp(alembic_cfg, "head")
+    elif force:
+        # cleanup and create the schema
+        # NOTE: tables no more in metadata are not removed with drop_all
+        BaseModel.metadata.drop_all(engine)
+        BaseModel.metadata.create_all(engine)
+        alembic.command.stamp(alembic_cfg, "head")
+    else:
+        # update db structure
+        alembic.command.upgrade(alembic_cfg, "head")
     return engine

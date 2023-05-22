@@ -13,7 +13,7 @@ def test_force_vacuum(
         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
     )
     engine = sa.create_engine(connection_string, isolation_level="AUTOCOMMIT")
-    database.init_database(connection_string)
+    database.init_database(connection_string, force=True)
     conn = engine.connect()
     sql = sa.text("SELECT relname FROM pg_stat_all_tables WHERE schemaname = 'public'")
     all_tables = conn.execute(sql).scalars().all()
