@@ -313,12 +313,13 @@ def export_to_csv(cads_licences_folder: str, csv_path: str) -> None:
             licence = {
                 "licence_uid": json_data["licence_uid"],
                 "revision": json_data["revision"],
+                "scope": json_data["scope"],
             }
             licences.append(licence)
 
-    with open("licences.csv", "w") as fp:
+    with open(csv_path, "w") as fp:
         writer = csv.DictWriter(
-            fp, fieldnames=["licence_uid", "revision"], delimiter=";"
+            fp, fieldnames=["licence_uid", "revision", "scope"], delimiter=";"
         )
         writer.writeheader()
         for licence in licences:
