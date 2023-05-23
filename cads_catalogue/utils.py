@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import datetime
+import html.parser
 import json
 import logging
 import mimetypes
@@ -25,6 +26,26 @@ from typing import Any
 
 import structlog
 from sqlalchemy import inspect
+
+
+class TagReplacerParser(html.parser.HTMLParser):
+    """Translate a html text replacing tag data by some functions"""
+    def __init__(self, replacer_map):
+        super(TagReplacerParser, self).__init__()
+        self.replacer_map = replacer_map
+        self.default_replace = lambda t: t
+        self.replacer = self.default_replace
+        self.output_text = ""
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.replacer_map:
+            self.replacer = self.replacer_map[tag]
+
+    def handle_endtag(self, tag):
+        self.replacer = self.default_replace
+
+    def handle_data(self, data):
+        self.output_text += self.replacer(data)
 
 
 def compare_resources_with_dumped_file(
@@ -70,6 +91,13 @@ def guess_type(file_name, default="application/octet-stream"):
     return guessed or default
 
 
+def normalize_text(text: str) -> str:
+    """Normalize a string containing html codes."""
+    # TODO
+    pass
+
+
+
 def object_as_dict(obj: Any) -> dict[str, Any]:
     """Convert a sqlalchemy object in a python dictionary."""
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
@@ -111,3 +139,19 @@ def str2bool(value: str, raise_if_unknown=True, default=False):
     if raise_if_unknown:
         raise ValueError("unparsable value for boolean: %r" % value)
     return default
+
+
+def subscript_text(text: str) -> str:
+    """Subscript a text."""
+    normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
+    sub_s = "ₐ₈CDₑբGₕᵢⱼₖₗₘₙₒₚQᵣₛₜᵤᵥwₓᵧZₐ♭꜀ᑯₑբ₉ₕᵢⱼₖₗₘₙₒₚ૧ᵣₛₜᵤᵥwₓᵧ₂₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎"
+    res = text.maketrans(''.join(normal), ''.join(sub_s))
+    return text.translate(res)
+
+
+def superscript_text(text: str) -> str:
+    """Superscript a text."""
+    normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
+    super_s = "ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖ۹ʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾"
+    res = text.maketrans(''.join(normal), ''.join(super_s))
+    return text.translate(res)
