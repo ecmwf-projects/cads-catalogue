@@ -22,6 +22,22 @@ def test_get_last_commit_hash(mocker: pytest_mock.MockerFixture) -> None:
         utils.get_last_commit_hash("/not/exists")
 
 
+def test_normalize_abstract():
+    replacer_map = {"sup": utils.superscript_text, "sub": utils.subscript_text}
+    text = (
+        "This dataset provides <sup>observations</sup> of atmospheric methane (CH<SUB>4</SUB>) "
+        "more he <b>C</b>opernicus <b>E</b>uropean <b>R</b>egional <b>R</b>e<b>A</b>n"
+    )
+    parser = utils.TagReplacer(replacer_map)
+    parser.feed(text)
+
+    assert (
+        parser.output_text
+        == "This dataset provides ᵒᵇˢᵉʳᵛᵃᵗᶦᵒⁿˢ of atmospheric methane (CH₄) "
+        "more he Copernicus European Regional ReAn"
+    )
+
+
 def test_str2bool() -> None:
     true_values = ["true", "1", "t", "True", "TRUE", "Y", "yes"]
     for value in true_values:
