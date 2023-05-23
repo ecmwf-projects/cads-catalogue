@@ -28,17 +28,18 @@ import structlog
 from sqlalchemy import inspect
 
 
-class TagReplacerParser(html.parser.HTMLParser):
-    """Translate a html text replacing tag data by some functions"""
+class TagReplacer(html.parser.HTMLParser):
+    """Translate a html text replacing tag data by some functions."""
+
     def __init__(self, replacer_map):
-        super(TagReplacerParser, self).__init__()
+        super(TagReplacer, self).__init__()
         self.replacer_map = replacer_map
         self.default_replace = lambda t: t
         self.replacer = self.default_replace
         self.output_text = ""
 
     def handle_starttag(self, tag, attrs):
-        if tag in self.replacer_map:
+        if tag.lower() in self.replacer_map:
             self.replacer = self.replacer_map[tag]
 
     def handle_endtag(self, tag):
@@ -91,11 +92,14 @@ def guess_type(file_name, default="application/octet-stream"):
     return guessed or default
 
 
-def normalize_text(text: str) -> str:
+def normalize_abstract(text: str) -> str:
     """Normalize a string containing html codes."""
-    # TODO
-    pass
-
+    if not text:
+        return text
+    replacer_map = {"sup": superscript_text, "sub": subscript_text}
+    parser = TagReplacer(replacer_map)
+    parser.feed(text)
+    return parser.output_text
 
 
 def object_as_dict(obj: Any) -> dict[str, Any]:
@@ -145,7 +149,7 @@ def subscript_text(text: str) -> str:
     """Subscript a text."""
     normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
     sub_s = "ₐ₈CDₑբGₕᵢⱼₖₗₘₙₒₚQᵣₛₜᵤᵥwₓᵧZₐ♭꜀ᑯₑբ₉ₕᵢⱼₖₗₘₙₒₚ૧ᵣₛₜᵤᵥwₓᵧ₂₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎"
-    res = text.maketrans(''.join(normal), ''.join(sub_s))
+    res = text.maketrans("".join(normal), "".join(sub_s))
     return text.translate(res)
 
 
@@ -153,5 +157,5 @@ def superscript_text(text: str) -> str:
     """Superscript a text."""
     normal = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-=()"
     super_s = "ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖ۹ʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾"
-    res = text.maketrans(''.join(normal), ''.join(super_s))
+    res = text.maketrans("".join(normal), "".join(super_s))
     return text.translate(res)

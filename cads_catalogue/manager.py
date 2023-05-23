@@ -253,18 +253,18 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     with open(metadata_file_path) as fp:
         data = json.load(fp)
 
-    metadata["abstract"] = data["abstract"]  # required
+    metadata["abstract"] = utils.normalize_abstract(data["abstract"])  # required
     metadata["begin_date"] = data.get("begin_date")
     metadata["citation"] = data.get("citation")
     metadata["contactemail"] = data.get("contactemail")
-    metadata["description"] = []
+    metadata["description"] = []  # type: ignore
     for key, value in data.get("description", dict()).items():
         item = {
             "id": key,
             "label": key.replace("-", " ").capitalize(),
             "value": value,
         }
-        metadata["description"].append(item)
+        metadata["description"].append(item)  # type: ignore
     metadata["doi"] = data.get("doi")
     metadata["ds_contactemail"] = data.get("ds_contactemail")
     metadata["ds_responsible_organisation"] = data.get("ds_responsible_organisation")
@@ -278,9 +278,9 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["format_version"] = data.get("format_version")
     bboxes = ("bboxN", "bboxS", "bboxE", "bboxW")
     if [data.get(box) for box in bboxes] == [None] * 4:
-        metadata["geo_extent"] = None
+        metadata["geo_extent"] = None  # type: ignore
     else:
-        metadata["geo_extent"] = {
+        metadata["geo_extent"] = {  # type: ignore
             "bboxN": data.get("bboxN"),
             "bboxS": data.get("bboxS"),
             "bboxE": data.get("bboxE"),
@@ -288,11 +288,11 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         }
     if "hidden" in data:
         if isinstance(data["hidden"], bool):
-            metadata["hidden"] = data["hidden"]
+            metadata["hidden"] = data["hidden"]  # type: ignore
         else:
-            metadata["hidden"] = utils.str2bool(data["hidden"])
+            metadata["hidden"]: bool = utils.str2bool(data["hidden"])  # type: ignore
     else:
-        metadata["hidden"] = False
+        metadata["hidden"] = False  # type: ignore
     metadata["keywords"] = data.get("keywords", [])
 
     # NOTE: licence_uids is for relationship, not a db field
