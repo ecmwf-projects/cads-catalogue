@@ -1,7 +1,7 @@
 exclude: tests/data/
 repos:
 - repo: https://github.com/cruft/cruft
-  rev: 2.11.1
+  rev: 2.15.0
   hooks:
   - id: cruft
     entry: cruft update -y

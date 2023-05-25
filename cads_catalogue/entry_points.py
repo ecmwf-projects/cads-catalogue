@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import os.path
+from typing import Optional
 
 import sqlalchemy as sa
 import structlog
@@ -69,7 +70,7 @@ def validate_datasets(resources_folder_path: str) -> None:
 
 @app.command()
 def force_vacuum(
-    connection_string: str | None = None, only_older_than_days: int | None = None
+    connection_string: Optional[str] = None, only_older_than_days: Optional[int] = None
 ) -> None:
     """
     Force run 'vacuum analyze' on all tables.
@@ -100,7 +101,7 @@ def force_vacuum(
 
 
 @app.command()
-def info(connection_string: str | None = None) -> None:
+def info(connection_string: Optional[str] = None) -> None:
     """Test connection to the database located at URI `connection_string`.
 
     Parameters
@@ -118,7 +119,7 @@ def info(connection_string: str | None = None) -> None:
 
 
 @app.command()
-def init_db(connection_string: str | None = None, force: bool = False) -> None:
+def init_db(connection_string: Optional[str] = None, force: bool = False) -> None:
     """Create the database if not exist and update the structure.
 
     Parameters
@@ -140,7 +141,7 @@ def update_catalogue(
     resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
-    connection_string: str | None = None,
+    connection_string: Optional[str] = None,
     force: bool = False,
     delete_orphans: bool = False,
 ) -> None:

@@ -19,7 +19,7 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
 import structlog
@@ -38,7 +38,6 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_LICENCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cds-licences")
 )
-
 # form.json and layout.json are managed separately
 OBJECT_STORAGE_UPLOAD_FILES = {
     "constraints.json": "constraints",
@@ -51,7 +50,7 @@ def is_db_to_update(
     resources_folder_path: str | pathlib.Path,
     licences_folder_path: str | pathlib.Path,
     messages_folder_path: str | pathlib.Path,
-) -> Tuple[bool, str | None, str | None, str | None]:
+) -> Tuple[bool, Optional[str], Optional[str], Optional[str]]:
     """
     Compare current and last run's status of repo folders and return if the database is to update.
 

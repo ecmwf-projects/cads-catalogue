@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 import pydantic
 
 dbsettings = None
@@ -29,13 +31,15 @@ class SqlalchemySettings(pydantic.BaseSettings):
     """
 
     catalogue_db_user: str = "catalogue"
-    catalogue_db_password: str | None = None
+    catalogue_db_password: Optional[str] = None
     catalogue_db_host: str = "catalogue-db"
     catalogue_db_name: str = "catalogue"
     pool_recycle: int = 60
 
     @pydantic.validator("catalogue_db_password")
-    def password_must_be_set(cls: pydantic.BaseSettings, v: str | None) -> str | None:
+    def password_must_be_set(
+        cls: pydantic.BaseSettings, v: Optional[str]
+    ) -> Optional[str]:
         """Validate postgresql password."""
         if v is None:
             raise ValueError("catalogue_db_password must be set")
