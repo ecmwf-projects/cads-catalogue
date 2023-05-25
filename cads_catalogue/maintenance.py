@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import Optional
+
 import sqlalchemy as sa
 import structlog
 
@@ -21,7 +23,7 @@ logger = structlog.get_logger(__name__)
 
 
 def force_vacuum(
-    conn: sa.engine.Connection, only_older_than_days: int | None = None
+    conn: sa.engine.Connection, only_older_than_days: Optional[int] = None
 ) -> None:
     """
     Force run 'vacuum analyze' on all tables.

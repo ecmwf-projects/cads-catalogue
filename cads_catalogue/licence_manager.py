@@ -298,7 +298,7 @@ def migrate_from_cds_licences(
 
 def export_to_csv(cads_licences_folder: str, csv_path: str) -> None:
     """
-    Export (uid, revision) of cads-licences on a csv.
+    Export (uid, revision, scope) of cads-licences to a csv.
 
     Parameters
     ----------
