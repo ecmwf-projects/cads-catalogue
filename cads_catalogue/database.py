@@ -239,7 +239,7 @@ class Resource(BaseModel):
     )
 
     __table_args__ = (
-        sa.Index("idx_search_field", search_field, postgresql_using="gin"),
+        sa.Index("idx_resources_search_field", search_field, postgresql_using="gin"),
     )
 
 
