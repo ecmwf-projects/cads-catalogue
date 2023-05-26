@@ -33,7 +33,10 @@ def upgrade() -> None:
         ),
     )
     op.create_index(
-        "idx_resources_search_field", "resources", ["search_field"], postgresql_using="gin"
+        "idx_resources_search_field",
+        "resources",
+        ["search_field"],
+        postgresql_using="gin",
     )
 
 
