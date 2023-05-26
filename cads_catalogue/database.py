@@ -203,7 +203,7 @@ class Resource(BaseModel):
 
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
-    fulltext_tsv: str = sa.Column(
+    search_field: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
             "setweight(to_tsvector('english', coalesce(title, '')), 'A')  || ' ' || "
@@ -239,7 +239,7 @@ class Resource(BaseModel):
     )
 
     __table_args__ = (
-        sa.Index("idx_fulltext_tsv", fulltext_tsv, postgresql_using="gin"),
+        sa.Index("idx_search_field", search_field, postgresql_using="gin"),
     )
 
 
