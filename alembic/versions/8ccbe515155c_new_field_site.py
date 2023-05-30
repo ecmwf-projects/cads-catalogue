@@ -1,0 +1,27 @@
+"""new field 'site'
+
+Revision ID: 8ccbe515155c
+Revises: 472c0db250df
+Create Date: 2023-05-30 11:01:24.691827
+
+"""
+from alembic import op
+import sqlalchemy as sa
+
+
+# revision identifiers, used by Alembic.
+revision = '8ccbe515155c'
+down_revision = '472c0db250df'
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    op.add_column(
+        "resources",
+        sa.Column("site", sa.String, index=True)
+    )
+
+
+def downgrade() -> None:
+    op.drop_column("resources", "site")
