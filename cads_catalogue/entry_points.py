@@ -143,7 +143,7 @@ def update_catalogue(
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
     connection_string: Optional[str] = None,
     force: bool = False,
-    delete_orphans: bool = False,
+    delete_orphans: bool = True,
 ) -> None:
     """Update the database with the catalogue data.
 
@@ -158,7 +158,7 @@ def update_catalogue(
     licences_folder_path: path to the root folder containing metadata files for licences
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     force: if True, run update regardless input folders has no changes from last update (default False)
-    delete_orphans: if True, delete resources not involved in the update process (default False)
+    delete_orphans: if True, delete resources not involved in the update process (default True)
     """
     utils.configure_log()
     # input validation

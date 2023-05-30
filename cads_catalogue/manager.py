@@ -578,8 +578,8 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         )
     )
     for dataset_to_delete in datasets_to_delete:
-        dataset_to_delete.licences = []  # type: ignore
-        dataset_to_delete.messages = []  # type: ignore
-        dataset_to_delete.related_resources = []  # type: ignore
+        dataset_to_delete.licences = []
+        dataset_to_delete.messages = []
+        dataset_to_delete.related_resources = []
         session.delete(dataset_to_delete)
         logger.info("removed resource %s" % dataset_to_delete.resource_uid)
