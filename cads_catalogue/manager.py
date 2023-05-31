@@ -190,6 +190,7 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
         ("mapping.json", "mapping"),
     ]
     for file_name, db_field in json_files_db_map:
+        metadata[db_field] = None
         file_path = os.path.join(folder_path, file_name)
         if os.path.isfile(file_path):
             with open(file_path) as fp:
