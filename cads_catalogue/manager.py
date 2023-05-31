@@ -183,7 +183,7 @@ def load_adaptor_information(folder_path: str | pathlib.Path) -> dict[str, Any]:
     -------
     dict: dictionary of metadata collected
     """
-    metadata = dict()
+    metadata = dict()  # type: ignore
     json_files_db_map = [
         ("adaptor.json", "adaptor_configuration"),
         ("constraints.json", "constraints_data"),
