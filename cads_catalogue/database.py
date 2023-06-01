@@ -194,6 +194,7 @@ class Resource(BaseModel):
     responsible_organisation = sa.Column(sa.String)
     responsible_organisation_role = sa.Column(sa.String)
     responsible_organisation_website = sa.Column(sa.String)
+    portal = sa.Column(sa.String, index=True)
     title = sa.Column(sa.String)
     topic = sa.Column(sa.String)
     type = sa.Column(sa.String, nullable=False)

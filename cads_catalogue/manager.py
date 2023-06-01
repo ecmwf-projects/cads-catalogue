@@ -314,6 +314,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["resource_update"] = data.get("update_date")
     if not metadata["resource_update"]:
         metadata["resource_update"] = data.get("publication_date")
+    metadata["portal"] = data.get("portal", "c3s")
     metadata["title"] = data.get("title")
     metadata["topic"] = data.get("topic")
     metadata["type"] = data.get("resource_type")
@@ -579,8 +580,8 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         )
     )
     for dataset_to_delete in datasets_to_delete:
-        dataset_to_delete.licences = []  # type: ignore
-        dataset_to_delete.messages = []  # type: ignore
-        dataset_to_delete.related_resources = []  # type: ignore
+        dataset_to_delete.licences = []
+        dataset_to_delete.messages = []
+        dataset_to_delete.related_resources = []
         session.delete(dataset_to_delete)
         logger.info("removed resource %s" % dataset_to_delete.resource_uid)

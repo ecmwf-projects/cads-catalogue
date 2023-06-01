@@ -529,6 +529,7 @@ def test_transaction_update_catalogue(
             "--connection-string",
             connection_string,
             "--force",
+            "--no-delete-orphans",
             "--resources-folder-path",
             TEST_RESOURCES_DATA_PATH,
             "--messages-folder-path",
@@ -561,11 +562,57 @@ def test_transaction_update_catalogue(
             ("eumetsat-cm-saf",),
             ("licence-to-use-copernicus-products",),
         ]
-        #  ....but the resources must stay unchanged
+        #  ...but the resources must stay unchanged
         resources = session.execute(
             sa.text("select resource_uid, abstract, description, type from resources")
         ).all()
         assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
+
+    # run again without the "no-delete-orphans" options: uninvolved datasets should be removed
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--force",
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    # ...without raising any
+    assert result.exit_code == 0
+    # ...but there is an error log for each dataset
+    error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
+    for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
+        assert len([e for e in error_messages if dataset_name in e]) >= 1
+    session_obj = sa.orm.sessionmaker(engine)
+    # ...anyway the licence content is updated...(uninvolved licence is removed)
+    with session_obj() as session:
+        licences = session.execute(
+            sa.text("select licence_uid from licences order by lower(licence_uid)")
+        ).all()
+        assert licences == [
+            ("CCI-data-policy-for-satellite-surface-radiation-budget",),
+            ("eumetsat-cm-saf",),
+            ("licence-to-use-copernicus-products",),
+        ]
+        #  ...and the uninvolved resources are removed too
+        resources = session.execute(
+            sa.text("select resource_uid, abstract, description, type from resources")
+        ).all()
+        assert resources == []
 
     # reset globals for tests following
     config.dbsettings = None
