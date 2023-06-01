@@ -1640,7 +1640,7 @@ def test_load_resource_from_folder() -> None:
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
         "resource_update": "2023-02-17",
-        "site": "CDS",
+        "portal": "c3s",
         "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",

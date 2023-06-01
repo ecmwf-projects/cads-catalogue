@@ -17,8 +17,9 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("resources", sa.Column("site", sa.String, index=True))
+    op.add_column("resources", sa.Column("portal", sa.String, index=True))
+    op.execute("UPDATE resources SET portal='c3s'")
 
 
 def downgrade() -> None:
-    op.drop_column("resources", "site")
+    op.drop_column("resources", "portal")
