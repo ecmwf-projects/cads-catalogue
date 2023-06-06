@@ -1,9 +1,8 @@
 ---
-date: 2023-01-15T11:27:13Z
+date: 2023-02-16T11:27:13Z
 summary: A **brief description** of the message
-severity: critical
-live: false
-status: fixed
+severity: warning
+live: true
 ---
  
 # main message content

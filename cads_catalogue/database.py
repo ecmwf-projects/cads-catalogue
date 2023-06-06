@@ -118,6 +118,7 @@ class Message(BaseModel):
     message_id = sa.Column(sa.Integer, primary_key=True)
     message_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     date = sa.Column(sa.DateTime, nullable=False)
+    portal = sa.Column(sa.String, index=True)
     summary = sa.Column(sa.String, nullable=True)
     url = sa.Column(sa.String)
     severity = sa.Column(
@@ -128,7 +129,6 @@ class Message(BaseModel):
     content = sa.Column(sa.String)
     is_global = sa.Column(sa.Boolean)
     live = sa.Column(sa.Boolean)
-    status = sa.Column(sa.Enum("ongoing", "closed", "fixed", name="msg_status"))
 
     resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
         "Resource",

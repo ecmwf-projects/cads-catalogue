@@ -217,92 +217,129 @@ def test_update_catalogue(
         )
 
     assert (
-        session.execute(sa.text("select count(*) from messages")).scalars().one() == 6
+        session.execute(sa.text("select count(*) from messages")).scalars().one() == 9
     )
     expected_msgs = [
         {
-            "message_uid": "contents/2023/2023-01-archived-warning.md",
-            "date": datetime.datetime(2023, 1, 11, 11, 27, 13),
-            "summary": None,
-            "url": None,
-            "severity": "warning",
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here. This is the full text "
+            "message.",
+            "date": datetime.datetime(2021, 1, 14, 11, 27, 13),
+            "entries": [],
+            "is_global": True,
+            "live": True,
+            "message_uid": "portals/c3s/2023/Jan/2021-01-example-of-info-active.md",
+            "portal": "c3s",
+            "severity": "info",
+            "summary": "a summary of the message",
+        },
+        {
             "content": "# message main body for archived warning message for some "
             "entries \n"
             " \n"
             "Wider **markdown syntax** allowed here. In this example:\n"
             "* *summary* is missing, so only this main body message is used\n"
             "* *status* is missing (indeed actually is not used yet)",
+            "date": datetime.datetime(2023, 1, 11, 11, 27, 13),
+            "entries": ["reanalysis-era5-xxx", "satellite-surface-radiation-budget"],
             "is_global": False,
             "live": False,
-            "status": "ongoing",
+            "message_uid": "contents/2023/2023-01-archived-warning.md",
+            "severity": "warning",
+            "summary": None,
         },
         {
-            "message_uid": "contents/2023/2023-01-era5-issue-456.md",
-            "date": datetime.datetime(2023, 1, 12, 11, 27, 13),
-            "summary": "example of active critical content message",
-            "url": None,
-            "severity": "critical",
             "content": "# message main body for active critical message for some "
             "datasets \n"
             " \n"
             "Wider **markdown syntax** allowed here.",
+            "date": datetime.datetime(2023, 1, 12, 11, 27, 13),
+            "entries": ["reanalysis-era5-land", "satellite-surface-radiation-budget"],
             "is_global": False,
             "live": True,
-            "status": "ongoing",
+            "message_uid": "contents/2023/2023-01-era5-issue-456.md",
+            "severity": "critical",
+            "summary": "example of active critical content message",
         },
         {
-            "message_uid": "contents/foo-bar/this-will-be-also-taken.md",
-            "date": datetime.datetime(2023, 1, 13, 11, 27, 13),
-            "summary": "example of expired critical content message",
-            "url": None,
-            "severity": "critical",
             "content": "# message main body for archived critical message for some "
             "datasets \n"
             " \n"
             "Wider **markdown syntax** allowed here.",
+            "date": datetime.datetime(2023, 1, 13, 11, 27, 13),
+            "entries": ["reanalysis-era5-land", "satellite-surface-xxx"],
             "is_global": False,
             "live": False,
-            "status": "ongoing",
+            "message_uid": "contents/foo-bar/this-will-be-also-taken.md",
+            "severity": "critical",
+            "summary": "example of expired critical content message",
         },
         {
-            "message_uid": "portal/2023/Jan/2021-01-example-of-info-active.md",
-            "date": datetime.datetime(2021, 1, 14, 11, 27, 13),
-            "summary": "a summary of the message",
-            "url": None,
-            "severity": "info",
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
+            "date": datetime.datetime(2023, 1, 15, 11, 27, 13),
+            "entries": [],
+            "is_global": True,
+            "live": False,
+            "message_uid": "portals/c3s/2023/Jan/2023-01-example-of-archived-critical.md",
+            "portal": "c3s",
+            "severity": "critical",
+            "summary": "A **brief description** of the message",
+        },
+        {
+            "content": "# main message content\n"
+            " \n"
+            "Wider **markdown syntax** allowed here.",
+            "date": datetime.datetime(2023, 1, 16, 11, 27, 13),
+            "entries": [],
+            "is_global": True,
+            "live": True,
+            "message_uid": "portals/c3s/2023/Jan/2023-01-example-warning-active.md",
+            "portal": "c3s",
+            "severity": "warning",
+            "summary": "A **brief description** of the message",
+        },
+        {
             "content": "# main message content\n"
             " \n"
             "Wider **markdown syntax** allowed here. This is the full text "
             "message.",
+            "date": datetime.datetime(2023, 2, 14, 11, 27, 13),
+            "entries": [],
             "is_global": True,
             "live": True,
-            "status": "fixed",
+            "message_uid": "portals/ads/2023/02/2021-02-example-of-info-active.md",
+            "portal": "ads",
+            "severity": "info",
+            "summary": "a summary of the message",
         },
         {
-            "message_uid": "portal/2023/Jan/2023-01-example-of-archived-critical.md",
-            "date": datetime.datetime(2023, 1, 15, 11, 27, 13),
-            "summary": "A **brief description** of the message",
-            "url": None,
-            "severity": "critical",
             "content": "# main message content\n"
             " \n"
             "Wider **markdown syntax** allowed here.",
+            "date": datetime.datetime(2023, 2, 15, 11, 27, 13),
+            "entries": [],
             "is_global": True,
             "live": False,
-            "status": "fixed",
+            "message_uid": "portals/ads/2023/02/2023-02-example-of-archived-critical.md",
+            "portal": "ads",
+            "severity": "critical",
+            "summary": "A **brief description** of the message",
         },
         {
-            "message_uid": "portal/2023/Jan/2023-01-example-warning-active.md",
-            "date": datetime.datetime(2023, 1, 16, 11, 27, 13),
-            "summary": "A **brief description** of the message",
-            "url": None,
-            "severity": "warning",
             "content": "# main message content\n"
             " \n"
             "Wider **markdown syntax** allowed here.",
+            "date": datetime.datetime(2023, 2, 16, 11, 27, 13),
+            "entries": [],
             "is_global": True,
             "live": True,
-            "status": "fixed",
+            "message_uid": "portals/ads/2023/02/2023-02-example-warning-active.md",
+            "portal": "ads",
+            "severity": "warning",
+            "summary": "A **brief description** of the message",
         },
     ]
     db_msgs = session.scalars(
@@ -314,6 +351,8 @@ def test_update_catalogue(
             m for m in expected_msgs if m["message_uid"] == db_msg.message_uid
         ][0]
         for k, v in expected_msg.items():
+            if k == "entries":
+                continue
             assert msg_dict[k] == expected_msg[k]
     assert sorted(
         [
