@@ -92,6 +92,8 @@ def test_update_catalogue(
             "revision": 4,
             "title": "CCI product licence",
             "download_filename": "an url",
+            "portal": None,
+            "scope": "dataset",
         },
         {
             "licence_id": 2,
@@ -99,13 +101,26 @@ def test_update_catalogue(
             "revision": 1,
             "title": "EUMETSAT CM SAF products licence",
             "download_filename": "an url",
+            "portal": None,
+            "scope": "dataset",
         },
         {
             "licence_id": 3,
+            "licence_uid": "data-protection-privacy-statement",
+            "revision": 24,
+            "title": "Data protection and privacy statement",
+            "download_filename": "an url",
+            "portal": "c3s",
+            "scope": "portal",
+        },
+        {
+            "licence_id": 4,
             "licence_uid": "licence-to-use-copernicus-products",
             "revision": 12,
             "title": "Licence to use Copernicus Products",
             "download_filename": "an url",
+            "portal": None,
+            "scope": "dataset",
         },
     ]
     patch = mocker.patch(
@@ -160,8 +175,8 @@ def test_update_catalogue(
     assert spy4.call_count == 8
     spy4.reset_mock()
 
-    assert patch.call_count == 46
-    # num.licences * 2 = 6
+    assert patch.call_count == 48
+    # num.licences * 2 = 8
     # num.datasets overview.png * 2 = 16
     # num.datasets layout.json = 8
     # num.datasets form.json = 8
@@ -591,13 +606,14 @@ def test_transaction_update_catalogue(
     for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
         assert len([e for e in error_messages if dataset_name in e]) >= 1
     session_obj = sa.orm.sessionmaker(engine)
-    # ...anyway the licence content is updated...(uninvolved licence is removed)
+    # ...anyway the licence content is updated...(uninvolved licences are removed)
     with session_obj() as session:
         licences = session.execute(
             sa.text("select licence_uid from licences order by lower(licence_uid)")
         ).all()
         assert licences == [
             ("CCI-data-policy-for-satellite-surface-radiation-budget",),
+            ("data-protection-privacy-statement",),
             ("eumetsat-cm-saf",),
             ("licence-to-use-copernicus-products",),
         ]
@@ -637,13 +653,14 @@ def test_transaction_update_catalogue(
     for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
         assert len([e for e in error_messages if dataset_name in e]) >= 1
     session_obj = sa.orm.sessionmaker(engine)
-    # ...anyway the licence content is updated...(uninvolved licence is removed)
+    # ...anyway the licence content is updated...(uninvolved licences are removed)
     with session_obj() as session:
         licences = session.execute(
             sa.text("select licence_uid from licences order by lower(licence_uid)")
         ).all()
         assert licences == [
             ("CCI-data-policy-for-satellite-surface-radiation-budget",),
+            ("data-protection-privacy-statement",),
             ("eumetsat-cm-saf",),
             ("licence-to-use-copernicus-products",),
         ]

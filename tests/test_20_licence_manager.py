@@ -31,6 +31,7 @@ def test_licence_sync(
         "download_filename": "an url",
         "scope": "dataset",
         "md_filename": "an url",
+        "portal": None,
     }
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
@@ -74,6 +75,7 @@ def test_licence_sync(
         "download_filename": "an url",
         "scope": "dataset",
         "md_filename": "an url",
+        "portal": None,
     }
     licences = [updated_licence]
     with session_obj() as session:
@@ -104,6 +106,21 @@ def test_load_licences_from_folder() -> None:
             "revision": 4,
             "title": "CCI product licence",
             "scope": "dataset",
+            "portal": None,
+        },
+        {
+            "download_filename": os.path.join(
+                licences_folder_path,
+                "2021_CDS_Privacy Statement_v2.4.pdf",
+            ),
+            "md_filename": os.path.join(
+                licences_folder_path, "data-protection-privacy-statementv24.md"
+            ),
+            "licence_uid": "data-protection-privacy-statement",
+            "revision": 24,
+            "title": "Data protection and privacy statement",
+            "scope": "portal",
+            "portal": "c3s",
         },
         {
             "download_filename": os.path.join(
@@ -117,6 +134,7 @@ def test_load_licences_from_folder() -> None:
                 licences_folder_path,
                 "eumetsat-cm-safv1.md",
             ),
+            "portal": None,
         },
         {
             "download_filename": os.path.join(
@@ -130,6 +148,7 @@ def test_load_licences_from_folder() -> None:
                 licences_folder_path,
                 "licence-to-use-copernicus-productsv12.md",
             ),
+            "portal": None,
         },
     ]
     licences = sorted(
