@@ -271,10 +271,14 @@ def update_catalogue_messages(
         return involved_msg_ids
 
     # remove not loaded messages from the db
-    msgs_to_delete = session.scalars(
-        sa.select(cads_catalogue.database.Message).filter(
-            cads_catalogue.database.Message.message_uid.notin_(involved_msg_ids)
+    msgs_to_delete = (
+        session.scalars(
+            sa.select(cads_catalogue.database.Message).filter(
+                cads_catalogue.database.Message.message_uid.notin_(involved_msg_ids)
+            )
         )
+        .unique()
+        .all()
     )
     for msg_to_delete in msgs_to_delete:
         msg_to_delete.resources = []
