@@ -62,9 +62,9 @@ def test_build_licence_block(session_obj: sa.orm.sessionmaker):
                     "contents_url": urllib.parse.urljoin(
                         doc_storage_url, req_licences[1].md_filename
                     ),
-                    "id": "eumetsat-cm-saf",
-                    "label": "EUMETSAT CM SAF products licence",
-                    "revision": 1,
+                    "id": "data-protection-privacy-statement",
+                    "label": "Data protection and privacy statement",
+                    "revision": 24,
                 },
                 {
                     "attachment_url": urllib.parse.urljoin(
@@ -72,6 +72,17 @@ def test_build_licence_block(session_obj: sa.orm.sessionmaker):
                     ),
                     "contents_url": urllib.parse.urljoin(
                         doc_storage_url, req_licences[2].md_filename
+                    ),
+                    "id": "eumetsat-cm-saf",
+                    "label": "EUMETSAT CM SAF products licence",
+                    "revision": 1,
+                },
+                {
+                    "attachment_url": urllib.parse.urljoin(
+                        doc_storage_url, req_licences[3].download_filename
+                    ),
+                    "contents_url": urllib.parse.urljoin(
+                        doc_storage_url, req_licences[3].md_filename
                     ),
                     "id": "licence-to-use-copernicus-products",
                     "label": "Licence to use Copernicus Products",
@@ -172,7 +183,9 @@ def test_transform_form(
         for licence in licences:
             session.add(database.Licence(**licence))
         session.commit()
-        req_licences = session.scalars(sa.select(database.Licence)).all()
+        req_licences = session.scalars(
+            sa.select(database.Licence).filter_by(scope="dataset")
+        ).all()
     req_licences = sorted(req_licences, key=operator.attrgetter("licence_uid"))
 
     resource = {

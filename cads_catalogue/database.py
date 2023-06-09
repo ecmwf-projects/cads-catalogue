@@ -255,6 +255,7 @@ class Licence(BaseModel):
     title = sa.Column(sa.String, nullable=False)
     download_filename = sa.Column(sa.String, nullable=False)
     md_filename = sa.Column(sa.String, nullable=False)
+    portal = sa.Column(sa.String)
     scope = sa.Column(
         sa.Enum("portal", "dataset", name="licence_scope"), default="dataset"
     )

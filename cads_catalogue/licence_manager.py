@@ -124,7 +124,12 @@ def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str,
                 }
                 for key in licence:
                     assert licence[key], "%r is required" % key
+                licence["portal"] = json_data.get("portal")
                 assert licence["scope"] in ("dataset", "portal")
+                if licence["scope"] == "portal":
+                    assert licence[
+                        "portal"
+                    ], "when scope is 'portal', key 'portal' is required"
                 assert os.path.isfile(licence["download_filename"])
                 assert os.path.isfile(licence["md_filename"])
             except Exception:  # noqa
