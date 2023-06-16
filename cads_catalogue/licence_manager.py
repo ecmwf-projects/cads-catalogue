@@ -404,6 +404,8 @@ def export_to_csv(cads_licences_folder: str, csv_path: str) -> None:
                 "revision": json_data["revision"],
                 "scope": json_data["scope"],
             }
+            if "portal" in json_data:
+                licence["portal"] = json_data["portal"]
             licences.append(licence)
 
     with open(csv_path, "w") as fp:
