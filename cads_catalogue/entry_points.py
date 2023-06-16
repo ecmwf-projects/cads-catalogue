@@ -39,6 +39,26 @@ logger = structlog.get_logger(__name__)
 
 
 @app.command()
+def validate_licences(licences_folder_path: str) -> None:
+    """
+    Validate contents as valid licences for the catalogue manager.
+
+    Parameters
+    ----------
+    licences_folder_path: the root folder where to search dataset subfolders in
+    """
+    utils.configure_log(logfmt="%(levelname)-7s %(message)s")
+    if not os.path.isdir(licences_folder_path):
+        raise ValueError("%r is not a folder" % licences_folder_path)
+    logger.info(
+        f"----starting validations of licences at path {licences_folder_path}----"
+    )
+    licence_manager.load_licences_from_folder(licences_folder_path)
+    print()
+    logger.info("----end of licence validations----")
+
+
+@app.command()
 def validate_dataset(resource_folder_path: str) -> None:
     """
     Validate a dataset folder for the catalogue manager.
