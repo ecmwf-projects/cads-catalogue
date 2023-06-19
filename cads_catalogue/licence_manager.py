@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import csv
 import glob
 import json
@@ -207,9 +208,8 @@ def load_licences_from_folder(licences_folder: str) -> List[dict[str, Any]]:
     # remove duplicated uid-revision
     duplicated = []
     keys = [(lic["licence_uid"], lic["revision"]) for lic in licences_md.values()]
-    from collections import Counter
 
-    for key, occurrences in Counter(keys).items():
+    for key, occurrences in collections.Counter(keys).items():
         if occurrences > 1:
             paths = [
                 k
@@ -224,7 +224,7 @@ def load_licences_from_folder(licences_folder: str) -> List[dict[str, Any]]:
     # remove older revisions
     olders = []
     keys = [lic["licence_uid"] for lic in licences_md.values()]
-    for key, occurrences in Counter(keys).items():
+    for key, occurrences in collections.Counter(keys).items():
         if occurrences > 1:
             paths = [k for k in licences_md if licences_md[k]["licence_uid"] == key]
             max_revision = max([licences_md[p]["revision"] for p in paths])
