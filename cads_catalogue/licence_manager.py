@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import csv
 import glob
 import json
@@ -91,67 +92,150 @@ def licence_sync(
     return db_licence
 
 
-def load_licences_from_folder(folder_path: str | pathlib.Path) -> list[dict[str, Any]]:
-    """Load licences metadata from json files contained in a folder.
+def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
+    """
+    Validate and load licence metadata from an input json file.
 
     Parameters
     ----------
-    folder_path: the folder path where to look for json files
+    json_filepath: input json file
 
     Returns
     -------
-    list: list of dictionaries of metadata collected
+    licence metadata extracted or None
     """
-    licences: List[dict[str, Any]] = []
-    json_filepaths = glob.glob(os.path.join(folder_path, "*.json"))
+    licences_folder = os.path.dirname(json_filepath)
+    required_keys = {
+        "licence_uid",
+        "revision",
+        "title",
+        "download_filename",
+        "md_filename",
+        "scope",
+    }
+    optional_keys = {"portal"}
+
+    if not os.path.isfile(json_filepath):
+        return None
+    if "deprecated" in os.path.basename(json_filepath).lower():
+        logger.warning(
+            "licence file %r is deprecated: it will not be loaded" % json_filepath
+        )
+        return None
+
+    with open(json_filepath) as fp:
+        try:
+            json_data = json.load(fp)
+            assert isinstance(
+                json_data, dict
+            ), f"json file {json_filepath} must be a dictionary"
+        except Exception:  # noqa
+            logger.exception(
+                "licence file %r not compliant, error follows" % json_filepath
+            )
+            return None
+
+    found_keys = set(json_data.keys())
+    not_found_required = required_keys - found_keys
+    if not_found_required:
+        logger.error(
+            "licence file %r not compliant: required keys not found: %r"
+            % (json_filepath, not_found_required)
+        )
+        return None
+    extra_found = found_keys - required_keys - optional_keys
+    if extra_found:
+        logger.warning(
+            "licence file %r has extra keys not used: %r" % (json_filepath, extra_found)
+        )
+
+    try:
+        licence_md = {
+            "licence_uid": json_data["licence_uid"],
+            "revision": int(json_data["revision"]),
+            "title": json_data["title"],
+            "download_filename": os.path.abspath(
+                os.path.join(licences_folder, json_data["download_filename"])
+            ),
+            "md_filename": os.path.abspath(
+                os.path.join(licences_folder, json_data["md_filename"])
+            ),
+            "scope": json_data["scope"],
+        }
+        for key in licence_md:
+            assert licence_md[key], "%r is required" % key
+        licence_md["portal"] = json_data.get("portal")
+        assert licence_md["scope"] in (
+            "dataset",
+            "portal",
+        ), "scope must be 'dataset' or 'portal'"
+        if licence_md["scope"] == "portal":
+            assert licence_md[
+                "portal"
+            ], "when scope is 'portal', key 'portal' is required"
+        assert os.path.isfile(
+            licence_md["download_filename"]
+        ), f"file {licence_md['download_filename']} not found"
+        assert os.path.isfile(
+            licence_md["md_filename"]
+        ), f"file {licence_md['md_filename']} not found"
+    except Exception:  # noqa
+        logger.exception(
+            "licence file %r is not compliant, error follows" % json_filepath
+        )
+        return None
+
+    return licence_md
+
+
+def load_licences_from_folder(licences_folder: str) -> List[dict[str, Any]]:
+    """
+    Load and report from a folder containing licences metadata for the catalogue manager.
+
+    Parameters
+    ----------
+    licences_folder: the root folder where to search dataset subfolders in
+    """
+    json_filepaths = glob.glob(os.path.join(licences_folder, "*.json"))
+    licences_md: dict[str, Any] = dict()
+
     for json_filepath in json_filepaths:
-        if "deprecated" in os.path.basename(json_filepath).lower():
+        licence_md = load_licence_md(json_filepath)
+        if not licence_md:
             continue
-        with open(json_filepath) as fp:
-            try:
-                json_data = json.load(fp)
-                licence = {
-                    "licence_uid": json_data["licence_uid"],
-                    "revision": int(json_data["revision"]),
-                    "title": json_data["title"],
-                    "download_filename": os.path.abspath(
-                        os.path.join(folder_path, json_data["download_filename"])
-                    ),
-                    "md_filename": os.path.abspath(
-                        os.path.join(folder_path, json_data["md_filename"])
-                    ),
-                    "scope": json_data["scope"],
-                }
-                for key in licence:
-                    assert licence[key], "%r is required" % key
-                licence["portal"] = json_data.get("portal")
-                assert licence["scope"] in ("dataset", "portal")
-                if licence["scope"] == "portal":
-                    assert licence[
-                        "portal"
-                    ], "when scope is 'portal', key 'portal' is required"
-                assert os.path.isfile(licence["download_filename"])
-                assert os.path.isfile(licence["md_filename"])
-            except Exception:  # noqa
-                logger.exception(
-                    "licence file %r is not compliant: ignored" % json_filepath
-                )
-                continue
-            already_loaded = [
-                (i, r)
-                for i, r in enumerate(licences)
-                if r["licence_uid"] == licence["licence_uid"]
+        licences_md[json_filepath] = licence_md
+
+    # remove duplicated uid-revision
+    duplicated = []
+    keys = [(lic["licence_uid"], lic["revision"]) for lic in licences_md.values()]
+
+    for key, occurrences in collections.Counter(keys).items():
+        if occurrences > 1:
+            paths = [
+                k
+                for k in licences_md
+                if (licences_md[k]["licence_uid"], licences_md[k]["revision"]) == key
             ]
-            if already_loaded:
-                logger.warning(
-                    "found multiple licence slags %s in folder %s. Consider to remove the older revisions"
-                    % (licence["licence_uid"], folder_path)
-                )
-                if already_loaded[0][1]["revision"] < licence["revision"]:
-                    licences[already_loaded[0][0]] = licence
-            else:
-                licences.append(licence)
-    return licences
+            duplicated += paths
+    for path in duplicated:
+        logger.error(f"licence file {path} ignored: uid and revision in more files")
+        del licences_md[path]
+
+    # remove older revisions
+    olders = []
+    keys = [lic["licence_uid"] for lic in licences_md.values()]
+    for key, occurrences in collections.Counter(keys).items():
+        if occurrences > 1:
+            paths = [k for k in licences_md if licences_md[k]["licence_uid"] == key]
+            max_revision = max([licences_md[p]["revision"] for p in paths])
+            for path in paths:
+                if licences_md[path]["revision"] != max_revision:
+                    olders.append(path)
+    for path in olders:
+        logger.error(f"licence file {path} ignored: more recent revision already found")
+        del licences_md[path]
+
+    return list(licences_md.values())
 
 
 def update_catalogue_licences(
@@ -320,6 +404,8 @@ def export_to_csv(cads_licences_folder: str, csv_path: str) -> None:
                 "revision": json_data["revision"],
                 "scope": json_data["scope"],
             }
+            if "portal" in json_data:
+                licence["portal"] = json_data["portal"]
             licences.append(licence)
 
     with open(csv_path, "w") as fp:
