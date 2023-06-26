@@ -159,6 +159,7 @@ class Resource(BaseModel):
     adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
     constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
     form_data: Any = sa.Column(dialect_postgresql.JSONB)
+    sources_hash = sa.Column(sa.String)
     mapping: Any = sa.Column(dialect_postgresql.JSONB)
     related_resources_keywords: List[str] = sa.Column(
         dialect_postgresql.ARRAY(sa.String)

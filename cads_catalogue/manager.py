@@ -130,6 +130,36 @@ def is_db_to_update(
     return is_to_update, resource_hash, licence_hash, message_hash
 
 
+def is_resource_to_update(session, resource_folder_path):
+    """Return a tuple (is_to_update, source_hash) to understand if the resource is to update.
+
+    is_to_update is True if input folder has been changed since last update of the datataset, False otherwise;
+    source_hash is a hash of the resource_folder_path.
+
+    Parameters
+    ----------
+    session:
+    resource_folder_path: input folder of the dataset
+
+    Returns
+    -------
+    True if input folder has changed, False otherwise.
+    """
+    folder_hash = str(utils.folder2hash(resource_folder_path).hexdigest())
+    resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+    resource_obj = session.scalars(
+        sa.select(database.Resource).filter_by(resource_uid=resource_uid).limit(1)
+    ).first()
+    if not resource_obj:
+        return True, folder_hash
+    db_resource_hash = resource_obj.sources_hash
+    if not db_resource_hash:
+        return True, folder_hash
+    if folder_hash != db_resource_hash:
+        return True, folder_hash
+    return False, folder_hash
+
+
 def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load absolute paths of files that should be uploaded to the object storage.
 
@@ -523,6 +553,7 @@ def update_catalogue_resources(
     session: sa.orm.session.Session,
     resources_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
+    force: bool = False,
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -532,6 +563,7 @@ def update_catalogue_resources(
     session: opened SQLAlchemy session
     resources_folder_path: path to the root folder containing metadata files for resources
     storage_settings: object with settings to access the object storage
+    force: if True, no skipping of dataset update based on detected changes of sources is made
 
     Returns
     -------
@@ -547,7 +579,16 @@ def update_catalogue_resources(
         input_resource_uids.append(resource_uid)
         try:
             with session.begin_nested():
+                to_update, sources_hash = is_resource_to_update(
+                    session, resource_folder_path
+                )
+                if not to_update and not force:
+                    logger.info(
+                        "resource update %s skipped: no change detected" % resource_uid
+                    )
+                    continue
                 resource = load_resource_from_folder(resource_folder_path)
+                resource["sources_hash"] = sources_hash
                 logger.info("resource %s loaded successful" % resource_uid)
                 resource = layout_manager.transform_layout(
                     session, resource_folder_path, resource, storage_settings

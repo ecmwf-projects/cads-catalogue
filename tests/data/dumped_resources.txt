@@ -2,6 +2,7 @@
     {
         "resource_id": 5,
         "resource_uid": "cams-global-reanalysis-eac4",
+        "sources_hash": "48a771d06e98670e3aa8fff982c05d8a",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -2418,6 +2419,7 @@
     {
         "resource_id": 2,
         "resource_uid": "cams-global-reanalysis-eac4-monthly",
+        "sources_hash": "19848060eb1e485b587e22ac28e8141e",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -4679,6 +4681,7 @@
     {
         "resource_id": 1,
         "resource_uid": "derived-near-surface-meteorological-variables",
+        "sources_hash": "a1208340405b01afb52f50a5423a87cb",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -5320,6 +5323,7 @@
     {
         "resource_id": 7,
         "resource_uid": "reanalysis-era5-land",
+        "sources_hash": "3f4c4222ee3d7e599dff640815c0a11f",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -7592,6 +7596,7 @@
     {
         "resource_id": 6,
         "resource_uid": "reanalysis-era5-land-monthly-means",
+        "sources_hash": "7aa517648c000579fa38380d5641632f",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -8809,6 +8814,7 @@
     {
         "resource_id": 8,
         "resource_uid": "reanalysis-era5-pressure-levels",
+        "sources_hash": "9c313d4668a1544424097d928b1c1a55",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -12801,6 +12807,7 @@
     {
         "resource_id": 3,
         "resource_uid": "reanalysis-era5-single-levels",
+        "sources_hash": "4653b89428b6943c6f1c4c750cd50824",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -36511,6 +36518,7 @@
     {
         "resource_id": 4,
         "resource_uid": "satellite-surface-radiation-budget",
+        "sources_hash": "04709d4d341b23ea755b29c77d3d5815",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
