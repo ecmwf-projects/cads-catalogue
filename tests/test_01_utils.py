@@ -12,6 +12,26 @@ TEST_RESOURCES_DATA_PATH = os.path.abspath(
 )
 
 
+def test_file2hash() -> None:
+    test_file_path = os.path.join(
+        TEST_RESOURCES_DATA_PATH, "cams-global-reanalysis-eac4", "constraints.json"
+    )
+    assert (
+        utils.file2hash(test_file_path).hexdigest()
+        == "1ef896811caf39dd7b3fb7093f8862c6"
+    )
+
+
+def test_folder2hash() -> None:
+    test_file_path = os.path.join(
+        TEST_RESOURCES_DATA_PATH, "cams-global-reanalysis-eac4"
+    )
+    assert (
+        utils.folder2hash(test_file_path).hexdigest()
+        == "48a771d06e98670e3aa8fff982c05d8a"
+    )
+
+
 def test_get_last_commit_hash(mocker: pytest_mock.MockerFixture) -> None:
     spy1 = mocker.spy(subprocess, "Popen")
     ret_value = utils.get_last_commit_hash(THIS_PATH)

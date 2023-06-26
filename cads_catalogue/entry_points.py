@@ -223,7 +223,7 @@ def update_catalogue(
         )
 
         involved_resource_uids = manager.update_catalogue_resources(
-            session, resources_folder_path, storage_settings
+            session, resources_folder_path, storage_settings, force=force
         )
         messages.update_catalogue_messages(session, messages_folder_path)
 

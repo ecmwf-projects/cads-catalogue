@@ -524,6 +524,60 @@ def test_update_catalogue(
 
     caplog.clear()
 
+    # run a fourth time simulating a new commit adding a file on 1 dataset, without forcing:
+    # updating is skipped for all the other datasets because the hash of the input folders
+    # didn't change
+    session.execute(
+        sa.update(database.CatalogueUpdate).values(
+            **{
+                "catalogue_repo_commit": "aaa",
+                "licence_repo_commit": "bbb",
+                "message_repo_commit": "ccc",
+            }
+        )
+    )
+    session.execute(
+        sa.update(database.Resource)
+        .filter_by(resource_uid="reanalysis-era5-pressure-levels")
+        .values(**{"sources_hash": "anewhash"})
+    )
+    session.commit()
+
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db is not created
+    spy1.assert_not_called()
+    spy1.reset_mock()
+    # check db structure
+    spy2.assert_called_once()
+    spy2.reset_mock()
+    # check load of licences
+    spy3.assert_called_once()
+    spy3.reset_mock()
+    # check sync of resources not run for all datasets except 1
+    spy4.assert_called_once()
+    spy4.reset_mock()
+
     # reset globals for tests following
     mocker.resetall()
     config.dbsettings = None

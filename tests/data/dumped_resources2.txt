@@ -1594,6 +1594,7 @@
             }
         ],
         "form_data": "content of form.json",
+        "sources_hash": null,
         "mapping": null,
         "related_resources_keywords": [],
         "geo_extent": {
@@ -2116,6 +2117,7 @@
             }
         ],
         "form_data": "content of form.json",
+        "sources_hash": null,
         "mapping": {
             "force": {
                 "day": [
