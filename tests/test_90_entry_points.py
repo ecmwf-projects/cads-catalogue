@@ -228,7 +228,13 @@ def test_update_catalogue(
         utils.compare_resources_with_dumped_file(
             resources,
             os.path.join(TESTDATA_PATH, "dumped_resources.txt"),
-            exclude_fields=("record_update", "resource_id", "search_field"),
+            # note: expected sources_hash can be different on some platforms
+            exclude_fields=(
+                "record_update",
+                "resource_id",
+                "search_field",
+                "sources_hash",
+            ),
         )
 
     assert (
