@@ -474,7 +474,7 @@ def resource_sync(
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
-        dataset_obj.licences.append(db_licences[licence_uid])  # type: ignore
+        dataset_obj.licences.append(db_licences[licence_uid])
 
     # build again related keywords
     dataset_obj.keywords = []  # type: ignore
@@ -490,10 +490,10 @@ def resource_sync(
         ).first()
         if not keyword_obj:
             keyword_obj = database.Keyword(**kw_md)
-        dataset_obj.keywords.append(keyword_obj)  # type: ignore
+        dataset_obj.keywords.append(keyword_obj)
 
     # clean related_resources
-    dataset_obj.related_resources = []  # type: ignore
+    dataset_obj.related_resources = []
     dataset_obj.back_related_resources = []  # type: ignore
     all_db_resources = session.scalars(sa.select(database.Resource)).all()
 
@@ -502,7 +502,7 @@ def resource_sync(
         all_db_resources, only_involving_uid=dataset_obj.resource_uid
     )
     for res1, res2 in related_resources:
-        res1.related_resources.append(res2)  # type: ignore
+        res1.related_resources.append(res2)
 
     return dataset_obj
 
@@ -537,13 +537,13 @@ def find_related_resources(
             and res2.resource_uid != only_involving_uid
         ):
             continue
-        res1_keywords = set([r.keyword_name for r in res1.keywords])  # type: ignore
-        res2_keywords = set([r.keyword_name for r in res2.keywords])  # type: ignore
+        res1_keywords = set([r.keyword_name for r in res1.keywords])
+        res2_keywords = set([r.keyword_name for r in res2.keywords])
         if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
             relationships_found.append((res1, res2))
             continue
-        res1_rel_res_kws = set(res1.related_resources_keywords)  # type: ignore
-        res2_rel_res_kws = set(res2.related_resources_keywords)  # type: ignore
+        res1_rel_res_kws = set(res1.related_resources_keywords)
+        res2_rel_res_kws = set(res2.related_resources_keywords)
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found

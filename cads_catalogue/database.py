@@ -233,7 +233,7 @@ class Resource(BaseModel):
         secondary=related_resources,
         primaryjoin=resource_id == related_resources.c.child_resource_id,
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
-        backref=sa.orm.backref("back_related_resources"),  # type: ignore
+        backref=sa.orm.backref("back_related_resources"),
         uselist=True,
     )
     keywords: sa.orm.Mapped[List["Keyword"]] = sa.orm.relationship(
