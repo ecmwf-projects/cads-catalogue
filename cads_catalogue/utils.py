@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import datetime
+import hashlib
 import html.parser
 import json
 import logging
@@ -90,6 +91,33 @@ def guess_type(file_name, default="application/octet-stream"):
     """Try to guess the mimetypes of a file."""
     guessed = mimetypes.MimeTypes().guess_type(file_name, False)[0]
     return guessed or default
+
+
+def file2hash(file_path, the_hash=None):
+    """Return a MD5 hash object of the file content."""
+    if the_hash is None:
+        the_hash = hashlib.md5()
+    with open(str(file_path), "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            the_hash.update(chunk)
+    return the_hash
+
+
+def folder2hash(folder_path, the_hash=None, ignore_names=(".git",)):
+    """Return a MD5 hash object of the folder contents."""
+    if the_hash is None:
+        the_hash = hashlib.md5()
+    for path in sorted(
+        pathlib.Path(folder_path).iterdir(), key=lambda p: str(p).lower()
+    ):
+        if path.name in ignore_names:
+            continue
+        the_hash.update(path.name.encode())
+        if path.is_file():
+            the_hash = file2hash(path, the_hash)
+        elif path.is_dir():
+            the_hash = folder2hash(path, the_hash)
+    return the_hash
 
 
 def normalize_abstract(text: str) -> str:
