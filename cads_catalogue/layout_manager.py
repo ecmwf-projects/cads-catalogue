@@ -264,6 +264,53 @@ def transform_licences_blocks(
     return new_data
 
 
+def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
+    """Transform layout.json data according to CIM Quality Assessment layout.
+
+    Parameters
+    ----------
+    layout_data: data of the layout.json to transform
+    cim_layout_path: path to the file containing CIM Quality Assessment
+
+    Returns
+    -------
+    dict: dictionary of layout_data modified
+    """
+    remove_tab = True
+    remove_aside = True
+    qa_tab_blocks = None
+    qa_aside_blocks = None
+    if os.path.exists(cim_layout_path):
+        with open(cim_layout_path) as fp:
+            cim_layout_data = json.load(fp)
+        qa_tab = cim_layout_data.get("quality_assurance_tab", {})
+        qa_tab_blocks = qa_tab.get("blocks")
+        if qa_tab_blocks is not None:
+            remove_tab = False
+        qa_aside = cim_layout_data.get("quality_assurance_aside", {})
+        qa_aside_blocks = qa_aside.get("blocks")
+        if qa_aside_blocks is not None:
+            remove_aside = False
+    new_data = copy.deepcopy(layout_data)
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
+
+    for i, section in enumerate(copy.deepcopy(sections)):
+        if section.get("id") == "quality_assurance_tab":
+            if remove_tab:
+                del sections[i]
+            else:
+                sections[i]["blocks"] = qa_tab_blocks
+        elif section.get("id") == "quality_assurance_aside":
+            if remove_aside:
+                del sections[i]
+            else:
+                sections[i]["blocks"] = qa_aside_blocks
+
+    return new_data
+
+
 def store_layout_by_data(
     layout_data: dict[str, Any],
     resource: dict[str, Any],
@@ -335,6 +382,10 @@ def transform_layout(
         layout_data, resource_folder_path, resource, storage_settings
     )
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
+    cim_layout_path = os.path.join(
+        resource_folder_path, resource["resource_uid"], "quality_assurance.layout.json"
+    )
+    layout_data = transform_cim_blocks(layout_data, cim_layout_path)
     logger.debug(f"output layout_data: {layout_data}")
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
     logger.debug(f"layout url: {resource['layout']}")
