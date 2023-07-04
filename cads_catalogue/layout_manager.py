@@ -305,6 +305,7 @@ def store_layout_by_data(
 def transform_layout(
     session: sa.orm.session.Session,
     resource_folder_path: str | pathlib.Path,
+    cim_folder_path: str | pathlib.Path,
     resource: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ):
@@ -316,6 +317,7 @@ def transform_layout(
     session: opened SQLAlchemy session
     resource_folder_path: folder path where to find layout.json
     resource: metadata of a loaded resource from files
+    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     storage_settings: object with settings to access the object storage
 
     Returns

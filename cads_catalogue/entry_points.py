@@ -210,9 +210,13 @@ def update_catalogue(
             resource_hash,
             licence_hash,
             message_hash,
-            cimlayout_hash
+            cimlayout_hash,
         ) = manager.is_db_to_update(
-            session, resources_folder_path, licences_folder_path, messages_folder_path, cim_folder_path
+            session,
+            resources_folder_path,
+            licences_folder_path,
+            messages_folder_path,
+            cim_folder_path,
         )
         if not force and not is_db_to_update:
             logger.info(
@@ -226,7 +230,11 @@ def update_catalogue(
         )
 
         involved_resource_uids = manager.update_catalogue_resources(
-            session, resources_folder_path, cim_folder_path, storage_settings, force=force
+            session,
+            resources_folder_path,
+            cim_folder_path,
+            storage_settings,
+            force=force,
         )
         messages.update_catalogue_messages(session, messages_folder_path)
 
@@ -242,7 +250,7 @@ def update_catalogue(
             catalogue_repo_commit=resource_hash,
             licence_repo_commit=licence_hash,
             message_repo_commit=message_hash,
-            cim_repo_commit=cimlayout_hash
+            cim_repo_commit=cimlayout_hash,
         )
         session.add(new_update_info)
         logger.info(

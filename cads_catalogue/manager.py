@@ -50,7 +50,8 @@ def is_db_to_update(
     resources_folder_path: str | pathlib.Path,
     licences_folder_path: str | pathlib.Path,
     messages_folder_path: str | pathlib.Path,
-) -> Tuple[bool, Optional[str], Optional[str], Optional[str]]:
+    cim_folder_path: str | pathlib.Path,
+) -> Tuple[bool, Optional[str], Optional[str], Optional[str], Optional[str]]:
     """
     Compare current and last run's status of repo folders and return if the database is to update.
 
@@ -60,6 +61,7 @@ def is_db_to_update(
     resources_folder_path: the folder path where to look for metadata files of all the resources
     licences_folder_path: the folder path where to look for metadata files of all the licences
     messages_folder_path: the folder path where to look for metadata files of all the messages
+    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
 
     Returns
     -------
@@ -68,6 +70,7 @@ def is_db_to_update(
     resource_hash = None
     licence_hash = None
     message_hash = None
+    cim_repo_hash = None
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
@@ -96,16 +99,23 @@ def is_db_to_update(
             % messages_folder_path
         )
 
+    try:
+        cim_repo_hash = utils.get_last_commit_hash(cim_folder_path)
+    except Exception:  # noqa
+        logger.exception(
+            "no check on commit hash for folder %r, error follows" % cim_folder_path
+        )
+
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
         is_to_update = True
-        return is_to_update, resource_hash, licence_hash, message_hash
+        return is_to_update, resource_hash, licence_hash, message_hash, cim_repo_hash
 
     # last_update_record exists
     last_resource_hash = getattr(last_update_record, "catalogue_repo_commit")
     last_licence_hash = getattr(last_update_record, "licence_repo_commit")
     last_message_hash = getattr(last_update_record, "message_repo_commit")
-
+    last_cim_hash = getattr(last_update_record, "cim_repo_commit")
     if not last_resource_hash:
         logger.warning("no information of last resource repository commit")
     elif last_resource_hash != resource_hash:
@@ -118,16 +128,21 @@ def is_db_to_update(
         logger.warning("no information of last message repository commit")
     elif last_message_hash != message_hash:
         logger.info("detected update of message repository")
+    if not last_cim_hash:
+        logger.warning("no information of last CIM repository commit")
+    elif last_cim_hash != cim_repo_hash:
+        logger.info("detected update of CIM repository")
 
     if last_resource_hash and (
         last_resource_hash,
         last_licence_hash,
         last_message_hash,
-    ) == (resource_hash, licence_hash, message_hash):
+        last_cim_hash,
+    ) == (resource_hash, licence_hash, message_hash, cim_repo_hash):
         is_to_update = False
     else:
         is_to_update = True
-    return is_to_update, resource_hash, licence_hash, message_hash
+    return is_to_update, resource_hash, licence_hash, message_hash, cim_repo_hash
 
 
 def is_resource_to_update(session, resource_folder_path):
@@ -552,6 +567,7 @@ def find_related_resources(
 def update_catalogue_resources(
     session: sa.orm.session.Session,
     resources_folder_path: str | pathlib.Path,
+    cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
 ) -> List[str]:
@@ -563,6 +579,7 @@ def update_catalogue_resources(
     session: opened SQLAlchemy session
     resources_folder_path: path to the root folder containing metadata files for resources
     storage_settings: object with settings to access the object storage
+    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     force: if True, no skipping of dataset update based on detected changes of sources is made
 
     Returns
@@ -591,7 +608,11 @@ def update_catalogue_resources(
                 resource["sources_hash"] = sources_hash
                 logger.info("resource %s loaded successful" % resource_uid)
                 resource = layout_manager.transform_layout(
-                    session, resource_folder_path, resource, storage_settings
+                    session,
+                    resource_folder_path,
+                    cim_folder_path,
+                    resource,
+                    storage_settings,
                 )
                 resource = form_manager.transform_form(
                     session, resource_folder_path, resource, storage_settings
