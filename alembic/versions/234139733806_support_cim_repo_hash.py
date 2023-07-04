@@ -1,4 +1,4 @@
-"""support cim repo hash
+"""support cim repo hash.
 
 Revision ID: 234139733806
 Revises: ffb034573c96
@@ -9,10 +9,9 @@ import sqlalchemy as sa
 
 from alembic import op
 
-
 # revision identifiers, used by Alembic.
-revision = '234139733806'
-down_revision = 'ffb034573c96'
+revision = "234139733806"
+down_revision = "ffb034573c96"
 branch_labels = None
 depends_on = None
 

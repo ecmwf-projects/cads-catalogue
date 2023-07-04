@@ -1,0 +1,111 @@
+{
+  "quality_assurance_tab": {
+    "blocks": [ {
+      "id": "fitness-for-purpose",
+      "type": "thumb-markdown",
+      "content": "The CDS datasets are assessed by the Evaluation and Quality Control (EQC) function of C3S independently of the data supplier. EQC encompasses a framework of processes aimed to assure technical and scientific quality harmonized across all dataset types available through the CDS. During the EQC process, the documentation provided with the dataset is scrutinized and data are checked for usability and reliability.\n\nA reanalysis provides a synthesized estimate of the climate state generated from a combination of a numerical model and as many observations as possible of the Earth system. Observations can be directly assimilated into the numerical simulation or used indirectly through the forcings of the simulation. The climate estimates can be global or regional, spanning from a few years to almost two centuries.\n\nERA5 is the fifth generation ECMWF reanalysis for the global climate and weather from the twentieth century to present. ERA5 provides hourly global estimates for a large number of atmospheric, ocean-wave and land-surface quantities. An uncertainty estimate is sampled by an underlying 10-member ensemble at three-hourly intervals and reduced spatial resolution.\n\nHersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2018): ERA5 hourly data on pressure levels from 1979 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.bd0915c6; Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2019): ERA5 monthly averaged data on pressure levels from 1979 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). (Accessed on < DD-MMM-YYYY >), 10.24381/cds.6860a573\n"
+    }, {
+      "collapsed": false,
+      "blocks": [ {
+        "blocks": [ ],
+        "id": "trends-and-variability",
+        "type": "section",
+        "title": "Trends and variability"
+      } ],
+      "id": "quality-assessments",
+      "type": "accordion",
+      "title": "Quality Assessments"
+    } ]
+  },
+  "quality_assurance_aside": {
+    "blocks": [ {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "general_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "accuracy_and_consistency_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "reliable_access_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "versioning_and_archiving_qc",
+        "type": "markdown",
+        "content": ""
+      } ],
+      "id": "general",
+      "type": "accordion",
+      "title": "1. General"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "data_records_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "consistency_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "uncertainty_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "updates_qc",
+        "type": "markdown",
+        "content": ""
+      } ],
+      "id": "data_records",
+      "type": "accordion",
+      "title": "2. Data record"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "metadata_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "discovery_and_use_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "interoperability_qc",
+        "type": "markdown",
+        "content": ""
+      } ],
+      "id": "metadata",
+      "type": "accordion",
+      "title": "3. Metadata"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "documentation_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "content_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "scientific_basis_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "quality_control_qc",
+        "type": "markdown",
+        "content": ""
+      }, {
+        "id": "user_guidance_qc",
+        "type": "markdown",
+        "content": ""
+      } ],
+      "id": "documentation",
+      "type": "accordion",
+      "title": "4. Documentation"
+    } ]
+  }
+}

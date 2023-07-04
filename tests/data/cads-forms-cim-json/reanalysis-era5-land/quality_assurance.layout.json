@@ -1,0 +1,141 @@
+{
+  "quality_assurance_tab": {
+      "blocks": [
+          {
+              "id": "fitness-for-purpose",
+              "type": "thumb-markdown",
+              "content": "ERA5 is the fifth generation of ECMWF atmospheric global reanalysis [1]. It provides data with 0.25°x 0.25° spatial resolution, hourly and monthly temporal resolution, covering the period from 1940 to the present time (5 days behind real-time for the hourly catalog, and 1 month behind real-time for the monthly one) without gaps in space and/or time. \nERA5 is based 4D-Var data assimilation in CY41R2 of ECMWF’s Integrated Forecast System (IFS). The IFS is coupled to a soil model, the parameters of which are also designated as surface parameters and an ocean wave model[1].  \nERA5 data are produced on 137 hybrid vertical levels with the top level at 0.01 hPa.\n\n**Summary for the Quality assurance, scientific quality assessment, and suitability to specific studies** \n\n -  ERA5 is a mature dataset to meet the list of requirements of the reanalysis data category. The dataset has reliable access on CADS, stable and regular update, and is well documented. In terms of the Metadata and data record, ERA5 metadata is informative and follows the recommended standards. ERA5 provides an estimate of the relative, random uncertainty through \"spread\" of 10 ensemble members. The quality control and formal validation results are available for limited ECVs, albeit large number of available literatures paid particular attention to investigating ERA5 quality for different ECVs since the production of the dataset. \n\n - The scientific quality of the ERA5 is a function of the variable, domain, and period. Overall, the ERA5 evaluation, the high spatial and temporal resolution of the dataset, along with the length of its temporal coverage (more than 80 years) allow the dataset to be suitable for the climate and earth system model studies.  \n\n - For the assessed ECVs, the dataset shows a good and consistent representation of the climatological pattern.  The completeness and long temporal coverage of ERA5 make it suitable for conducting variability and trend studies, and it reflect a reasonable representation of both interannual and seasonal variability of selected ECVs. However, it is strongly recommended that users check the data homogeneity for trend and variability studies/applications. The merging of the parallel streams of ERA5 during the dataset production and/or changes in the assimilation systems or assimilated data over time can introduce artifact heterogeneity in the data and affect the reliability of trend and variability studies\n"
+          },
+          {
+              "collapsed": false,
+              "blocks": [
+                  {
+                      "blocks": [],
+                      "id": "trends-and-variability",
+                      "type": "section",
+                      "title": "Trends and variability"
+                  }
+              ],
+              "id": "quality-assessments",
+              "type": "accordion",
+              "title": "Quality Assessments"
+          }
+      ]
+  },
+  "quality_assurance_aside": {
+      "blocks": [
+          {
+              "collapsed": true,
+              "blocks": [
+                  {
+                      "id": "general_qc",
+                      "type": "markdown",
+                      "content": "**General**: Fully meet requirements"
+                  },
+                  {
+                      "id": "accuracy_and_consistency_qc",
+                      "type": "markdown",
+                      "content": "**Accuracy and Consistency**: Fully meet requirements"
+                  },
+                  {
+                      "id": "reliable_access_qc",
+                      "type": "markdown",
+                      "content": "**Reliable Access**: Inconsistent when reading"
+                  },
+                  {
+                      "id": "versioning_and_archiving_qc",
+                      "type": "markdown",
+                      "content": "**Versioning and Archiving**: Fully meet requirements"
+                  }
+              ],
+              "id": "general",
+              "type": "accordion",
+              "title": "1. General"
+          },
+          {
+              "collapsed": true,
+              "blocks": [
+                  {
+                      "id": "data_records_qc",
+                      "type": "markdown",
+                      "content": "**Data record**: Fully meet requirements"
+                  },
+                  {
+                      "id": "consistency_qc",
+                      "type": "markdown",
+                      "content": "**Consistency**: Fully meet requirements"
+                  },
+                  {
+                      "id": "uncertainty_qc",
+                      "type": "markdown",
+                      "content": "**Uncertainty**: Fully meet requirements"
+                  },
+                  {
+                      "id": "updates_qc",
+                      "type": "markdown",
+                      "content": "**Updates**: Fully meet requirements"
+                  }
+              ],
+              "id": "data_records",
+              "type": "accordion",
+              "title": "2. Data record"
+          },
+          {
+              "collapsed": true,
+              "blocks": [
+                  {
+                      "id": "metadata_qc",
+                      "type": "markdown",
+                      "content": "**Metadata**: Fully meet requirements"
+                  },
+                  {
+                      "id": "discovery_and_use_qc",
+                      "type": "markdown",
+                      "content": "**Discovery and Use**: Fully meet requirements"
+                  },
+                  {
+                      "id": "interoperability_qc",
+                      "type": "markdown",
+                      "content": "**Interoperability**: Fully meet requirements"
+                  }
+              ],
+              "id": "metadata",
+              "type": "accordion",
+              "title": "3. Metadata"
+          },
+          {
+              "collapsed": true,
+              "blocks": [
+                  {
+                      "id": "documentation_qc",
+                      "type": "markdown",
+                      "content": "**Documentation**: Fully meet requirements"
+                  },
+                  {
+                      "id": "content_qc",
+                      "type": "markdown",
+                      "content": "**Content**: Fully meet requirements"
+                  },
+                  {
+                      "id": "scientific_basis_qc",
+                      "type": "markdown",
+                      "content": "**Scientific Basis**: Fully meet requirements"
+                  },
+                  {
+                      "id": "quality_control_qc",
+                      "type": "markdown",
+                      "content": "**Quality Control**: N/A"
+                  },
+                  {
+                      "id": "user_guidance_qc",
+                      "type": "markdown",
+                      "content": "**User Guidance**: Fully meet requirements"
+                  }
+              ],
+              "id": "documentation",
+              "type": "accordion",
+              "title": "4. Documentation"
+          }
+      ]
+  }
+}
