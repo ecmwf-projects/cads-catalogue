@@ -42,6 +42,7 @@ class CatalogueUpdate(BaseModel):
     catalogue_repo_commit = sa.Column(sa.String)
     licence_repo_commit = sa.Column(sa.String)
     message_repo_commit = sa.Column(sa.String)
+    cim_repo_commit = sa.Column(sa.String)
 
 
 class ResourceLicence(BaseModel):
