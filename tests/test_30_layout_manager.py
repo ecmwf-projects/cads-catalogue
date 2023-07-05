@@ -603,3 +603,219 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
             },
         },
     }
+
+
+def test_transform_cim_blocks(tmpdir):
+    layout_path = os.path.join(str(tmpdir), "layout.json")
+    cim_layout_path = os.path.join(str(tmpdir), "quality_assurance.layout.json")
+    test_sections_1 = [
+        {
+            "id": "overview",
+            "blocks": [
+                {"id": "abstract1", "type": "a type", "content": "a content"},
+                {"id": "abstract2", "type": "a type", "content": "a content"},
+            ],
+        },
+        {
+            "id": "overview2",
+            "blocks": [
+                {"id": "abstract3", "type": "a type", "content": "a content"},
+                {
+                    "id": "abstract4",
+                    "type": "thumb-markdown",
+                    "content": "a content",
+                    "image": {
+                        "url": "http://public-storage/an url",
+                        "alt": "alternative text",
+                    },
+                },
+                {"id": "abstract5", "type": "a type", "content": "a content"},
+            ],
+        },
+    ]
+    test_aside_1 = {
+        "blocks": [
+            {"id": "abstract1", "type": "a type", "content": "a content"},
+            {"id": "abstract2", "type": "a type", "content": "a content"},
+            {
+                "id": "abstract3",
+                "type": "thumb-markdown",
+                "content": "a content",
+                "image": {
+                    "url": "http://public-storage/an url",
+                    "alt": "alternative text",
+                },
+            },
+            {"id": "abstract4", "type": "a type", "content": "a content"},
+        ]
+    }
+    # test case 1: not existing cim layout, not existing layout sections
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_1, aside=test_aside_1
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == layout_data
+
+    # test case 2: not existing cim layout, existing only layout section
+    new_section = {
+        "title": "Quality assurance, or whatever",
+        "id": "quality_assurance_tab",
+        "blocks": [],
+    }
+    test_sections_2 = [test_sections_1[0], new_section, test_sections_1[1]]
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_2, aside=test_aside_1
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": test_sections_1,
+            },
+            "aside": test_aside_1,
+        },
+    }
+
+    # test case 3: not existing cim layout, existing only aside block
+    new_aside_block = {
+        "title": "QA or whatever",
+        "id": "quality_assurance_aside",
+        "type": "section",
+    }
+    test_aside_2 = {
+        "blocks": test_aside_1["blocks"][:2]
+        + [new_aside_block]
+        + test_aside_1["blocks"][2:]
+    }
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_1, aside=test_aside_2
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": test_sections_1,
+            },
+            "aside": test_aside_1,
+        },
+    }
+
+    # test case 4: existing cim layout, not existing section/aside on layout
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_1, aside=test_aside_1
+    )
+    cim_layout_path = os.path.join(
+        TESTDATA_PATH,
+        "cads-forms-cim-json",
+        "reanalysis-era5-land",
+        "quality_assurance.layout.json",
+    )
+    with open(cim_layout_path) as fp:
+        cim_layout_data = json.load(fp)
+        quality_assurance_tab_blocks = cim_layout_data["quality_assurance_tab"][
+            "blocks"
+        ]
+        quality_assurance_aside_blocks = cim_layout_data["quality_assurance_aside"][
+            "blocks"
+        ]
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == layout_data
+
+    # test case 5: existing cim layout, existing only layout section
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_2, aside=test_aside_1
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": [
+                    test_sections_1[0],
+                    {
+                        "title": "Quality assurance, or whatever",
+                        "id": "quality_assurance_tab",
+                        "blocks": quality_assurance_tab_blocks,
+                    },
+                    test_sections_1[1],
+                ]
+            },
+            "aside": test_aside_1,
+        },
+    }
+
+    # test case 6: existing cim layout, existing only aside block
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_1, aside=test_aside_2
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": test_sections_1,
+            },
+            "aside": {
+                "blocks": test_aside_1["blocks"][:2]
+                + [
+                    {
+                        "title": "QA or whatever",
+                        "id": "quality_assurance_aside",
+                        "type": "section",
+                        "blocks": quality_assurance_aside_blocks,
+                    }
+                ]
+                + test_aside_1["blocks"][2:]
+            },
+        },
+    }
+
+    # test case 7: existing cim layout, existing both section and aside blocks
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_2, aside=test_aside_2
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": [
+                    test_sections_1[0],
+                    {
+                        "title": "Quality assurance, or whatever",
+                        "id": "quality_assurance_tab",
+                        "blocks": quality_assurance_tab_blocks,
+                    },
+                    test_sections_1[1],
+                ]
+            },
+            "aside": {
+                "blocks": test_aside_1["blocks"][:2]
+                + [
+                    {
+                        "title": "QA or whatever",
+                        "id": "quality_assurance_aside",
+                        "type": "section",
+                        "blocks": quality_assurance_aside_blocks,
+                    }
+                ]
+                + test_aside_1["blocks"][2:]
+            },
+        },
+    }

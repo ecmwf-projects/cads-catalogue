@@ -295,6 +295,8 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     body = new_data.get("body", {})
     body_main = body.get("main", {})
     sections = body_main.get("sections", [])
+    aside = body.get("aside", {})
+    aside_blocks = aside.get("blocks", [])
 
     for i, section in enumerate(copy.deepcopy(sections)):
         if section.get("id") == "quality_assurance_tab":
@@ -302,12 +304,15 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
                 del sections[i]
             else:
                 sections[i]["blocks"] = qa_tab_blocks
-        elif section.get("id") == "quality_assurance_aside":
-            if remove_aside:
-                del sections[i]
-            else:
-                sections[i]["blocks"] = qa_aside_blocks
+            break
 
+    for i, aside_block in enumerate(copy.deepcopy(aside_blocks)):
+        if aside_block.get("id") == "quality_assurance_aside":
+            if remove_aside:
+                del aside_blocks[i]
+            else:
+                aside_blocks[i]["blocks"] = qa_aside_blocks
+            break
     return new_data
 
 
@@ -378,14 +383,14 @@ def transform_layout(
     with open(layout_file_path) as fp:
         layout_data = json.load(fp)
         logger.debug(f"input layout_data: {layout_data}")
+    cim_layout_path = os.path.join(
+        cim_folder_path, resource["resource_uid"], "quality_assurance.layout.json"
+    )
+    layout_data = transform_cim_blocks(layout_data, cim_layout_path)
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
-    cim_layout_path = os.path.join(
-        resource_folder_path, resource["resource_uid"], "quality_assurance.layout.json"
-    )
-    layout_data = transform_cim_blocks(layout_data, cim_layout_path)
     logger.debug(f"output layout_data: {layout_data}")
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
     logger.debug(f"layout url: {resource['layout']}")
