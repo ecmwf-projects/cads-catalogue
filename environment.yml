@@ -10,7 +10,8 @@ dependencies:
 - alembic
 - boto3
 - psycopg2
-- pydantic
+- pydantic>=2
+- pydantic-settings
 - python-frontmatter
 - sqlalchemy>=2.0.9
 - sqlalchemy-utils

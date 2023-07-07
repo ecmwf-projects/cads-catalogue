@@ -16,12 +16,13 @@
 from typing import Optional
 
 import pydantic
+import pydantic_settings
 
 dbsettings = None
 storagesettings = None
 
 
-class SqlalchemySettings(pydantic.BaseSettings):
+class SqlalchemySettings(pydantic_settings.BaseSettings):
     """Postgres-specific API settings.
 
     - ``catalogue_db_user``: postgres username.
@@ -36,9 +37,9 @@ class SqlalchemySettings(pydantic.BaseSettings):
     catalogue_db_name: str = "catalogue"
     pool_recycle: int = 60
 
-    @pydantic.validator("catalogue_db_password")
+    @pydantic.field_validator("catalogue_db_password")
     def password_must_be_set(
-        cls: pydantic.BaseSettings, v: Optional[str]
+        cls: pydantic_settings.BaseSettings, v: Optional[str]
     ) -> Optional[str]:
         """Validate postgresql password."""
         if v is None:
@@ -55,7 +56,7 @@ class SqlalchemySettings(pydantic.BaseSettings):
         )
 
 
-class ObjectStorageSettings(pydantic.BaseSettings):
+class ObjectStorageSettings(pydantic_settings.BaseSettings):
     """Set of settings to use the object storage with the catalogue manager.
 
     - ``object_storage_url``: object storage URL (internal)
