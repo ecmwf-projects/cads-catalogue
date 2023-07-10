@@ -240,6 +240,7 @@ def load_fulltext(folder_path: str | pathlib.Path) -> dict[str, Any]:
     Parameters
     ----------
     folder_path: root folder path where to collect metadata of a resource
+
     Returns
     -------
     dict: dictionary of metadata collected
