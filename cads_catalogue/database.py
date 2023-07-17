@@ -102,8 +102,8 @@ class Keyword(BaseModel):
     category_value = sa.Column(sa.String)
     keyword_name = sa.Column(sa.String)
 
-    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
-        "Resource",
+    resources: sa.orm.Mapped[List["BaseResource"]] = sa.orm.relationship(
+        "BaseResource",
         secondary="resources_keywords",
         back_populates="keywords",
         uselist=True,
@@ -130,17 +130,17 @@ class Message(BaseModel):
     is_global = sa.Column(sa.Boolean)
     live = sa.Column(sa.Boolean)
 
-    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
+    resources: sa.orm.Mapped[List["BaseResource"]] = sa.orm.relationship(
         "Resource",
         secondary="resources_messages",
         back_populates="messages",
-        lazy="joined",
         uselist=True,
+        enable_typechecks=False,
     )
 
 
-class Resource(BaseModel):
-    """Resource ORM model."""
+class BaseResource(BaseModel):
+    """Base Resource ORM model."""
 
     __tablename__ = "resources"
 
@@ -154,17 +154,6 @@ class Resource(BaseModel):
     layout = sa.Column(sa.String)
     previewimage = sa.Column(sa.String)
 
-    # internal functionality related
-    adaptor = sa.Column(sa.String)
-    adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
-    constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
-    form_data: Any = sa.Column(dialect_postgresql.JSONB)
-    sources_hash = sa.Column(sa.String)
-    mapping: Any = sa.Column(dialect_postgresql.JSONB)
-    related_resources_keywords: List[str] = sa.Column(
-        dialect_postgresql.ARRAY(sa.String)
-    )
-
     # geo extent
     geo_extent: Any = sa.Column(dialect_postgresql.JSONB)
 
@@ -177,34 +166,14 @@ class Resource(BaseModel):
     )
     resource_update = sa.Column(sa.Date)  # update_date of the source file
 
-    # other metadata
     abstract = sa.Column(sa.String, nullable=False)
-    citation = sa.Column(sa.String)
-    contactemail = sa.Column(sa.String)
-    description: Any = sa.Column(dialect_postgresql.JSONB, nullable=False)
     documentation: Any = sa.Column(dialect_postgresql.JSONB)
     doi = sa.Column(sa.String)
-    ds_contactemail = sa.Column(sa.String)
-    ds_responsible_organisation = sa.Column(sa.String)
-    ds_responsible_organisation_role = sa.Column(sa.String)
-    file_format = sa.Column(sa.String)
-    format_version = sa.Column(sa.String)
     hidden = sa.Column(sa.Boolean, default=False)
-    lineage = sa.Column(sa.String)
-    representative_fraction = sa.Column(sa.Float)
-    responsible_organisation = sa.Column(sa.String)
-    responsible_organisation_role = sa.Column(sa.String)
-    responsible_organisation_website = sa.Column(sa.String)
     portal = sa.Column(sa.String, index=True)
     title = sa.Column(sa.String)
-    topic = sa.Column(sa.String)
-    type = sa.Column(sa.String, nullable=False)
-    unit_measure = sa.Column(sa.String)
-    use_limitation = sa.Column(sa.String)
-    variables: Any = sa.Column(dialect_postgresql.JSONB)
 
     # fulltextsearch-related
-    fulltext = sa.Column(sa.String)
     search_field: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
@@ -228,20 +197,65 @@ class Resource(BaseModel):
         back_populates="resources",
         uselist=True,
     )
-    related_resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
-        "Resource",
+    related_resources: sa.orm.Mapped[List["BaseResource"]] = sa.orm.relationship(
+        "BaseResource",
         secondary=related_resources,
         primaryjoin=resource_id == related_resources.c.child_resource_id,
         secondaryjoin=resource_id == related_resources.c.parent_resource_id,
-        backref=sa.orm.backref("back_related_resources"),
+        backref=sa.orm.backref(
+            "back_related_resources",
+            enable_typechecks=False,
+        ),
         uselist=True,
+        enable_typechecks=False,
     )
     keywords: sa.orm.Mapped[List["Keyword"]] = sa.orm.relationship(
-        "Keyword", secondary="resources_keywords", back_populates="resources"
+        "Keyword",
+        secondary="resources_keywords",
+        back_populates="resources",
     )
 
     __table_args__ = (
         sa.Index("idx_resources_search_field", search_field, postgresql_using="gin"),
+    )
+
+
+class Resource(BaseResource):
+    """Full resource ORM model."""
+
+    constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
+    form_data: Any = sa.Column(dialect_postgresql.JSONB)
+    description: Any = sa.Column(dialect_postgresql.JSONB, nullable=False)
+    variables: Any = sa.Column(dialect_postgresql.JSONB)
+    lineage = sa.Column(sa.String)
+    representative_fraction = sa.Column(sa.Float)
+    responsible_organisation = sa.Column(sa.String)
+    responsible_organisation_role = sa.Column(sa.String)
+    responsible_organisation_website = sa.Column(sa.String)
+    topic = sa.Column(sa.String)
+    type = sa.Column(sa.String, nullable=False)
+    unit_measure = sa.Column(sa.String)
+    use_limitation = sa.Column(sa.String)
+
+    # fulltextsearch-related
+    fulltext = sa.Column(sa.String)
+
+    # other metadata
+    citation = sa.Column(sa.String)
+    contactemail = sa.Column(sa.String)
+    ds_contactemail = sa.Column(sa.String)
+    ds_responsible_organisation = sa.Column(sa.String)
+    ds_responsible_organisation_role = sa.Column(sa.String)
+    file_format = sa.Column(sa.String)
+    format_version = sa.Column(sa.String)
+
+    # internal functionality related
+    adaptor = sa.Column(sa.String)
+    adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
+    sources_hash = sa.Column(sa.String)
+    mapping: Any = sa.Column(dialect_postgresql.JSONB)
+    related_resources_keywords: List[str] = sa.Column(
+        dialect_postgresql.ARRAY(sa.String)
     )
 
 
@@ -261,8 +275,8 @@ class Licence(BaseModel):
         sa.Enum("portal", "dataset", name="licence_scope"), default="dataset"
     )
 
-    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
-        "Resource",
+    resources: sa.orm.Mapped[List["BaseResource"]] = sa.orm.relationship(
+        "BaseResource",
         secondary="resources_licences",
         back_populates="licences",
         uselist=True,
