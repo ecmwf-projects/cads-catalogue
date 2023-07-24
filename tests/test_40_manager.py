@@ -1827,17 +1827,21 @@ def test_resource_sync(
             os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
             exclude_fields=("record_update", "resource_id", "search_field"),
         )
-        assert session.execute(
-            sa.text(
-                "select resource_id, licence_id "
-                "from resources_licences "
-                "order by resource_id, licence_id"
-            )
-        ).all() == [
-            (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
-            (2, uid_id_licence_map["eumetsat-cm-saf"]),
-            (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
-        ]
+        assert set(
+            session.execute(
+                sa.text(
+                    "select resource_id, licence_id "
+                    "from resources_licences "
+                    "order by resource_id, licence_id"
+                )
+            ).all()
+        ) == set(
+            [
+                (1, uid_id_licence_map["licence-to-use-copernicus-products"]),
+                (2, uid_id_licence_map["eumetsat-cm-saf"]),
+                (2, uid_id_licence_map["licence-to-use-copernicus-products"]),
+            ]
+        )
         assert session.execute(
             sa.text(
                 "select parent_resource_id, child_resource_id "
