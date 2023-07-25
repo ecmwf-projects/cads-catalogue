@@ -64,8 +64,7 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
         field_data = str(resource.get(source_field))
         if field_data:
             ret_value.update(field_data.encode("utf-8"))
-    ret_value = ret_value.hexdigest()
-    return ret_value
+    return ret_value.hexdigest()  # type: ignore
 
 
 def is_db_to_update(
