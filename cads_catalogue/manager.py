@@ -63,9 +63,7 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
     for source_field in source_fields:
         field_data = resource.get(source_field)
         if field_data:
-            ret_value.update(
-                json.dumps(resource.get(source_field), sort_keys=True).encode("utf-8")
-            )
+            ret_value.update(json.dumps(field_data, sort_keys=True).encode("utf-8"))
     return ret_value.hexdigest()  # type: ignore
 
 
