@@ -2,6 +2,7 @@
     {
         "resource_id": 5,
         "resource_uid": "cams-global-reanalysis-eac4",
+        "sources_hash": "48a771d06e98670e3aa8fff982c05d8a",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -12,7 +13,6 @@
             "url": "https://ads.atmosphere.copernicus.eu/api/v2",
             "entry_point": "adaptor"
         },
-        "adaptor_properties_hash": "a69f15381443885890129f8ffb2c9f46",
         "constraints_data": [
             {
                 "date": [
@@ -1303,7 +1303,6 @@
                 }
             }
         ],
-        "sources_hash": "48a771d06e98670e3aa8fff982c05d8a",
         "mapping": {
             "force": {
                 "type": [
@@ -1540,7 +1539,7 @@
         "begin_date": "2003-01-01",
         "end_date": "2021-06-30",
         "publication_date": "2020-02-06",
-        "record_update": "2023-07-25 14:42:42.469851+02:00",
+        "record_update": "2023-05-18 14:08:02.116615+02:00",
         "resource_update": "2020-02-06",
         "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\n\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\n\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\n\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window.",
         "citation": "{\"Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019/\"}",
@@ -2415,11 +2414,12 @@
             }
         ],
         "fulltext": null,
-        "search_field": "'12':78B,313B '2003':299B '3':322B '4':10B '4d':332B '4d-var':331B 'abl':187B 'account':338B 'accur':289B 'across':28B 'air':69B 'allow':124B,163B,206B 'although':272B,301B 'alway':247B 'analysi':108B,303B 'around':235B 'assimil':56B,184B,274B,334B,351B 'atmospher':7B,19B,43B,106B,204B,218B 'avail':89B,226B,297B 'back':132B,159B 'base':44B,58B 'benefit':176B 'best':99B 'bias':190B 'call':54B,107B 'cam':1A 'centr':67B,72B 'chang':267B 'chemistri':51B 'chunk':306B 'collect':153B 'combin':22B,86B 'complet':34B 'composit':8B,20B 'consid':305B 'consist':36B 'constraint':142B 'conveni':256B 'coverag':213B 'data':24B,55B,199B,202B,212B,278B,308B 'dataset':37B,130B,259B 'decad':136B 'direct':223B 'drastic':268B 'eac4':4A,5B,294B,318B 'ecmwf':6B,15B,81B 'estim':100B,189B,208B,230B,290B,320B 'everi':74B,321B 'evolut':348B 'exact':341B 'forecast':71B,84B,114B,146B 'format':251B 'fourth':13B 'generat':14B 'global':2A,16B,33B 'globe':237B 'go':157B,317B 'good':197B 'good-qual':196B 'grid':233B 'hole':279B 'hour':77B,79B,314B,323B 'improv':113B,168B 'ingest':166B 'initi':281B 'issu':116B,144B 'law':47B 'lead':286B 'less':288B 'locat':210B 'long':245B 'low':215B 'made':327B 'make':252B 'mani':76B 'method':61B,335B 'model':23B,40B,205B,347B 'much':282B 'network':284B 'new':98B 'newli':88B 'numer':64B 'observ':26B,90B,154B,173B,192B,224B,264B,345B 'one':316B 'onward':300B 'optim':93B 'origin':172B 'output':241B 'period':246B 'physic':49B 'point':234B 'pollut':219B 'poor':201B 'popular':258B 'possibl':328B 'predict':66B 'previous':83B 'principl':53B 'procedur':304B 'produc':96B 'product':182B 'provid':319B 'provis':127B,228B 'qualiti':70B,178B,198B 'reanalysi':3A,9B,17B,21B,117B,137B,181B,253B 'reason':293B 'regular':240B 'resolv':277B 'sift':195B 'span':131B 'sparser':283B 'state':103B 'system':185B,265B,275B 'take':337B 'time':145B,151B,161B,242B,270B,342B 'updat':112B 'use':38B,62B,248B 'var':333B 'version':169B 'way':94B,122B 'weather':65B 'window':311B,352B 'within':349B 'work':118B,261B 'world':30B 'worldwid':324B"
+        "search_field": "'12':78,313 '2003':299 '3':322 '4':10 '4d':332 '4d-var':331 'abl':187 'account':338 'accur':289 'across':28 'air':69 'allow':124,163,206 'although':272,301 'alway':247 'analysi':108,303 'around':235 'assimil':56,184,274,334,351 'atmospher':7,19,43,106,204,218 'avail':89,226,297 'back':132,159 'base':44,58 'benefit':176 'best':99 'bias':190 'call':54,107 'cam':1 'centr':67,72 'chang':267 'chemistri':51 'chunk':306 'collect':153 'combin':22,86 'complet':34 'composit':8,20 'consid':305 'consist':36 'constraint':142 'conveni':256 'coverag':213 'data':24,55,199,202,212,278,308 'dataset':37,130,259 'decad':136 'direct':223 'drastic':268 'eac4':4,5,294,318 'ecmwf':6,15,81 'estim':100,189,208,230,290,320 'everi':74,321 'evolut':348 'exact':341 'forecast':71,84,114,146 'format':251 'fourth':13 'generat':14 'global':2,16,33 'globe':237 'go':157,317 'good':197 'good-qual':196 'grid':233 'hole':279 'hour':77,79,314,323 'improv':113,168 'ingest':166 'initi':281 'issu':116,144 'law':47 'lead':286 'less':288 'locat':210 'long':245 'low':215 'made':327 'make':252 'mani':76 'method':61,335 'model':23,40,205,347 'much':282 'network':284 'new':98 'newli':88 'numer':64 'observ':26,90,154,173,192,224,264,345 'one':316 'onward':300 'optim':93 'origin':172 'output':241 'period':246 'physic':49 'point':234 'pollut':219 'poor':201 'popular':258 'possibl':328 'predict':66 'previous':83 'principl':53 'procedur':304 'produc':96 'product':182 'provid':319 'provis':127,228 'qualiti':70,178,198 'reanalysi':3,9,17,21,117,137,181,253 'reason':293 'regular':240 'resolv':277 'sift':195 'span':131 'sparser':283 'state':103 'system':185,265,275 'take':337 'time':145,151,161,242,270,342 'updat':112 'use':38,62,248 'var':333 'version':169 'way':94,122 'weather':65 'window':311,352 'within':349 'work':118,261 'world':30 'worldwid':324"
     },
     {
         "resource_id": 2,
         "resource_uid": "cams-global-reanalysis-eac4-monthly",
+        "sources_hash": "19848060eb1e485b587e22ac28e8141e",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -2429,7 +2429,6 @@
             "key": "11325:b5c65565-ef76-4e44-adfb-ae7050f293c6",
             "url": "https://ads.atmosphere.copernicus.eu/api/v2"
         },
-        "adaptor_properties_hash": "1cede861e0c4ff7c58318d5bba2961f1",
         "constraints_data": [
             {
                 "year": [
@@ -4017,7 +4016,6 @@
                 }
             }
         ],
-        "sources_hash": "19848060eb1e485b587e22ac28e8141e",
         "mapping": {
             "force": {
                 "day": [
@@ -4173,7 +4171,7 @@
         "begin_date": "2003-01-01",
         "end_date": "2021-06-30",
         "publication_date": "2020-02-06",
-        "record_update": "2023-07-25 14:42:42.309650+02:00",
+        "record_update": "2023-05-18 14:08:01.949741+02:00",
         "resource_update": "2020-02-06",
         "abstract": "EAC4 (ECMWF Atmospheric Composition Reanalysis 4) is the fourth generation ECMWF global reanalysis of atmospheric composition. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using a model of the atmosphere based on the laws of physics and chemistry. This principle, called data assimilation, is based on the method used by numerical weather prediction centres and air quality forecasting centres, where every so many hours (12 hours at ECMWF) a previous forecast is combined with newly available observations in an optimal way to produce a new best estimate of the state of the atmosphere, called analysis, from which an updated, improved forecast is issued. Reanalysis works in the same way to allow for the provision of a dataset spanning back more than a decade. Reanalysis does not have the constraint of issuing timely forecasts, so there is more time to collect observations, and when going further back in time, to allow for the ingestion of improved versions of the original observations, which all benefit the quality of the reanalysis product.\\n\\nThe assimilation system is able to estimate biases between observations and to sift good-quality data from poor data. The atmosphere model allows for estimates at locations where data coverage is low or for atmospheric pollutants for which no direct observations are available. The provision of estimates at each grid point around the globe for each regular output time, over a long period, always using the same format, makes reanalysis a very convenient and popular dataset to work with.\\n\\nThe observing system has changed drastically over time, and although the assimilation system can resolve data holes, the initially much sparser networks will lead to less accurate estimates. For this reason, EAC4 is only available from 2003 onwards.\\n\\nAlthough the analysis procedure considers chunks of data in a window of 12 hours in one go, EAC4 provides estimates every 3 hours, worldwide. This is made possible by the 4D-Var assimilation method, which takes account of the exact timing of the observations and model evolution within the assimilation window.",
         "citation": "{\"Inness et al. (2019), http://www.atmos-chem-phys.net/19/3515/2019\"}",
@@ -4678,11 +4676,12 @@
             }
         ],
         "fulltext": null,
-        "search_field": "'12':81B,319B '2003':304B '3':328B '4':13B '4d':338B '4d-var':337B 'abl':191B 'account':344B 'accur':294B 'across':31B 'air':72B 'allow':127B,166B,210B 'although':277B 'alway':251B 'analysi':111B,309B 'around':239B 'assimil':59B,188B,279B,340B,357B 'atmospher':10B,22B,46B,109B,208B,222B 'avail':92B,230B,302B 'averag':6A 'back':135B,162B 'base':47B,61B 'benefit':179B 'best':102B 'bias':194B 'call':57B,110B 'cam':1A 'centr':70B,75B 'chang':272B 'chemistri':54B 'chunk':312B 'collect':156B 'combin':25B,89B 'complet':37B 'composit':11B,23B 'consid':311B 'consist':39B 'constraint':145B 'conveni':260B 'coverag':217B 'data':27B,58B,203B,206B,216B,283B,314B 'dataset':40B,133B,263B 'decad':139B 'direct':227B 'drastic':273B 'eac4':4A,8B,299B,324B 'ecmwf':9B,18B,84B 'estim':103B,193B,212B,234B,295B,326B 'everi':77B,327B 'evolut':354B 'exact':347B 'field':7A 'forecast':74B,87B,117B,149B 'format':255B 'fourth':16B 'generat':17B 'global':2A,19B,36B 'globe':241B 'go':160B,323B 'good':201B 'good-qual':200B 'grid':237B 'hole':284B 'hour':80B,82B,320B,329B 'improv':116B,171B 'ingest':169B 'initi':286B 'issu':119B,147B 'law':50B 'lead':291B 'less':293B 'locat':214B 'long':249B 'low':219B 'made':333B 'make':256B 'mani':79B 'method':64B,341B 'model':26B,43B,209B,353B 'month':5A 'much':287B 'n':186B,267B,306B 'nalthough':307B 'network':289B 'new':101B 'newli':91B 'nthe':187B,268B 'numer':67B 'observ':29B,93B,157B,176B,196B,228B,269B,351B 'one':322B 'onward':305B 'optim':96B 'origin':175B 'output':245B 'period':250B 'physic':52B 'point':238B 'pollut':223B 'poor':205B 'popular':262B 'possibl':334B 'predict':69B 'previous':86B 'principl':56B 'procedur':310B 'produc':99B 'product':185B 'provid':325B 'provis':130B,232B 'qualiti':73B,181B,202B 'reanalysi':3A,12B,20B,24B,120B,140B,184B,257B 'reason':298B 'regular':244B 'resolv':282B 'sift':199B 'span':134B 'sparser':288B 'state':106B 'system':189B,270B,280B 'take':343B 'time':148B,154B,164B,246B,275B,348B 'updat':115B 'use':41B,65B,252B 'var':339B 'version':172B 'way':97B,125B 'weather':68B 'window':317B,358B 'within':355B 'work':121B,265B 'world':33B 'worldwid':330B"
+        "search_field": "'12':81,319 '2003':304 '3':328 '4':13 '4d':338 '4d-var':337 'abl':191 'account':344 'accur':294 'across':31 'air':72 'allow':127,166,210 'although':277 'alway':251 'analysi':111,309 'around':239 'assimil':59,188,279,340,357 'atmospher':10,22,46,109,208,222 'avail':92,230,302 'averag':6 'back':135,162 'base':47,61 'benefit':179 'best':102 'bias':194 'call':57,110 'cam':1 'centr':70,75 'chang':272 'chemistri':54 'chunk':312 'collect':156 'combin':25,89 'complet':37 'composit':11,23 'consid':311 'consist':39 'constraint':145 'conveni':260 'coverag':217 'data':27,58,203,206,216,283,314 'dataset':40,133,263 'decad':139 'direct':227 'drastic':273 'eac4':4,8,299,324 'ecmwf':9,18,84 'estim':103,193,212,234,295,326 'everi':77,327 'evolut':354 'exact':347 'field':7 'forecast':74,87,117,149 'format':255 'fourth':16 'generat':17 'global':2,19,36 'globe':241 'go':160,323 'good':201 'good-qual':200 'grid':237 'hole':284 'hour':80,82,320,329 'improv':116,171 'ingest':169 'initi':286 'issu':119,147 'law':50 'lead':291 'less':293 'locat':214 'long':249 'low':219 'made':333 'make':256 'mani':79 'method':64,341 'model':26,43,209,353 'month':5 'much':287 'n':186,267,306 'nalthough':307 'network':289 'new':101 'newli':91 'nthe':187,268 'numer':67 'observ':29,93,157,176,196,228,269,351 'one':322 'onward':305 'optim':96 'origin':175 'output':245 'period':250 'physic':52 'point':238 'pollut':223 'poor':205 'popular':262 'possibl':334 'predict':69 'previous':86 'principl':56 'procedur':310 'produc':99 'product':185 'provid':325 'provis':130,232 'qualiti':73,181,202 'reanalysi':3,12,20,24,120,140,184,257 'reason':298 'regular':244 'resolv':282 'sift':199 'span':134 'sparser':288 'state':106 'system':189,270,280 'take':343 'time':148,154,164,246,275,348 'updat':115 'use':41,65,252 'var':339 'version':172 'way':97,125 'weather':68 'window':317,358 'within':355 'work':121,265 'world':33 'worldwid':330"
     },
     {
         "resource_id": 1,
         "resource_uid": "derived-near-surface-meteorological-variables",
+        "sources_hash": "a1208340405b01afb52f50a5423a87cb",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -4695,7 +4694,6 @@
             ],
             "entry_point": "cads_adaptors:UrlCdsAdaptor"
         },
-        "adaptor_properties_hash": "ecf1911da4bb67042825eeee574fea9d",
         "constraints_data": [
             {
                 "year": [],
@@ -5237,7 +5235,6 @@
                 }
             }
         ],
-        "sources_hash": "a1208340405b01afb52f50a5423a87cb",
         "mapping": {
             "force": {},
             "remap": {
@@ -5294,7 +5291,7 @@
         "begin_date": "1979-01-01",
         "end_date": "2018-12-31",
         "publication_date": "2020-02-11",
-        "record_update": "2023-07-25 14:42:42.273303+02:00",
+        "record_update": "2023-05-18 14:08:01.913620+02:00",
         "resource_update": "2020-02-11",
         "abstract": "This dataset provides bias-corrected reconstruction of near-surface meteorological variables derived from the fifth generation of the European Centre for Medium-Range Weather Forecasts  (ECMWF) atmospheric reanalyses (ERA5). It is intended to be used as a meteorological forcing dataset for land surface and hydrological models.",
         "citation": null,
@@ -5321,11 +5318,12 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'1979':6A '2019':8A 'atmospher':44B 'bias':12A,19B 'bias-correct':11A,18B 'centr':36B 'correct':13A,20B 'dataset':16B,57B 'deriv':9A,28B 'ecmwf':43B 'era5':46B 'european':35B 'fifth':31B 'forc':56B 'forecast':42B 'generat':32B 'hydrolog':62B 'intend':49B 'land':59B 'medium':39B 'medium-rang':38B 'meteorolog':3A,26B,55B 'model':63B 'near':1A,24B 'near-surfac':23B 'provid':17B 'rang':40B 'reanalys':45B 'reanalysi':14A 'reconstruct':21B 'surfac':2A,25B,60B 'use':52B 'variabl':4A,27B 'weather':41B"
+        "search_field": "'1979':6 '2019':8 'atmospher':44 'bias':12,19 'bias-correct':11,18 'centr':36 'correct':13,20 'dataset':16,57 'deriv':9,28 'ecmwf':43 'era5':46 'european':35 'fifth':31 'forc':56 'forecast':42 'generat':32 'hydrolog':62 'intend':49 'land':59 'medium':39 'medium-rang':38 'meteorolog':3,26,55 'model':63 'near':1,24 'near-surfac':23 'provid':17 'rang':40 'reanalys':45 'reanalysi':14 'reconstruct':21 'surfac':2,25,60 'use':52 'variabl':4,27 'weather':41"
     },
     {
         "resource_id": 7,
         "resource_uid": "reanalysis-era5-land",
+        "sources_hash": "3f4c4222ee3d7e599dff640815c0a11f",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -5473,7 +5471,6 @@
                 }
             }
         },
-        "adaptor_properties_hash": "d438ae8e43fd3d28f86506224392d4d5",
         "constraints_data": [
             {
                 "day": [
@@ -7556,7 +7553,6 @@
                 }
             }
         ],
-        "sources_hash": "3f4c4222ee3d7e599dff640815c0a11f",
         "mapping": null,
         "related_resources_keywords": [],
         "geo_extent": {
@@ -7568,7 +7564,7 @@
         "begin_date": "1950-01-01",
         "end_date": "2023-02-11",
         "publication_date": "2019-07-12",
-        "record_update": "2023-07-25 14:42:42.553211+02:00",
+        "record_update": "2023-05-18 14:08:02.202002+02:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.",
         "citation": null,
@@ -7595,11 +7591,12 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'1950':7A 'accur':88B 'across':61B 'back':83B 'climat':52B,92B 'combin':55B 'compar':34B 'complet':67B 'compon':47B 'consist':19B,69B 'data':5A,57B,78B 'dataset':16B,70B 'decad':29B,82B 'descript':89B 'ecmwf':50B 'enhanc':32B 'era5':2A,11B,36B,38B,51B 'era5-land':1A,10B,37B 'evolut':23B 'global':66B 'goe':80B 'hour':4A 'land':3A,12B,25B,39B,46B 'law':73B 'model':56B 'observ':59B 'past':95B 'physic':75B 'present':9A 'produc':42B,77B 'provid':17B,86B 'reanalysi':15B,53B,54B,76B 'replay':44B 'resolut':33B 'sever':28B,81B 'time':85B 'use':71B 'variabl':26B 'view':20B 'world':63B"
+        "search_field": "'1950':7 'accur':88 'across':61 'back':83 'climat':52,92 'combin':55 'compar':34 'complet':67 'compon':47 'consist':19,69 'data':5,57,78 'dataset':16,70 'decad':29,82 'descript':89 'ecmwf':50 'enhanc':32 'era5':2,11,36,38,51 'era5-land':1,10,37 'evolut':23 'global':66 'goe':80 'hour':4 'land':3,12,25,39,46 'law':73 'model':56 'observ':59 'past':95 'physic':75 'present':9 'produc':42,77 'provid':17,86 'reanalysi':15,53,54,76 'replay':44 'resolut':33 'sever':28,81 'time':85 'use':71 'variabl':26 'view':20 'world':63"
     },
     {
         "resource_id": 6,
         "resource_uid": "reanalysis-era5-land-monthly-means",
+        "sources_hash": "7aa517648c000579fa38380d5641632f",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -7746,7 +7743,6 @@
                 }
             }
         },
-        "adaptor_properties_hash": "8fc5de7036d57c7035ab6cdd175f216a",
         "constraints_data": [
             {
                 "time": [
@@ -8665,7 +8661,6 @@
                 }
             }
         ],
-        "sources_hash": "40b9faaa0719118373b8d9303b0f9875",
         "mapping": {
             "force": {
                 "day": [
@@ -8787,7 +8782,7 @@
         "begin_date": "1950-01-01",
         "end_date": "2022-12-01",
         "publication_date": "2019-06-23",
-        "record_update": "2023-07-25 14:42:42.512642+02:00",
+        "record_update": "2023-05-18 14:08:02.159498+02:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.",
         "citation": null,
@@ -8814,11 +8809,12 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
-        "search_field": "'1950':8A 'accur':89B 'across':62B 'averag':5A 'back':84B 'biospher':104C 'c3s':106C 'climat':53B,93B,97C 'combin':56B 'compar':35B 'complet':68B 'compon':48B 'condit':107C 'consist':20B,70B 'copernicus':105C 'data':6A,58B,79B 'dataset':17B,71B 'decad':30B,83B 'descript':90B 'ecmwf':51B 'enhanc':33B 'era5':2A,12B,37B,39B,52B,101C 'era5-land':1A,11B,38B 'evolut':24B 'global':67B 'goe':81B 'hydrolog':102C 'land':3A,13B,26B,40B,47B,100C 'law':74B 'mean':110C 'model':57B 'month':4A,109C 'observ':60B 'past':96B,99C 'physic':76B,103C 'present':10A 'produc':43B,78B 'provid':18B,87B 'reanalysi':16B,54B,55B,77B,98C 'replay':45B 'resolut':34B 'sever':29B,82B 'time':86B 'use':72B 'variabl':27B,108C 'view':21B 'world':64B"
+        "search_field": "'1950':8 'accur':89 'across':62 'averag':5 'back':84 'biospher':104 'c3s':106 'climat':53,93,97 'combin':56 'compar':35 'complet':68 'compon':48 'condit':107 'consist':20,70 'copernicus':105 'data':6,58,79 'dataset':17,71 'decad':30,83 'descript':90 'ecmwf':51 'enhanc':33 'era5':2,12,37,39,52,101 'era5-land':1,11,38 'evolut':24 'global':67 'goe':81 'hydrolog':102 'land':3,13,26,40,47,100 'law':74 'mean':110 'model':57 'month':4,109 'observ':60 'past':96,99 'physic':76,103 'present':10 'produc':43,78 'provid':18,87 'reanalysi':16,54,55,77,98 'replay':45 'resolut':34 'sever':29,82 'time':86 'use':72 'variabl':27,108 'view':21 'world':64"
     },
     {
         "resource_id": 8,
         "resource_uid": "reanalysis-era5-pressure-levels",
+        "sources_hash": "9c313d4668a1544424097d928b1c1a55",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -8944,7 +8940,6 @@
             "entry_point": "cads_adaptors:LegacyCdsAdaptor",
             "collection_id": "reanalysis-era5-pressure-levels"
         },
-        "adaptor_properties_hash": "c67aaecc321198b58082d0d2a2ac8e86",
         "constraints_data": [
             {
                 "day": [
@@ -12660,7 +12655,6 @@
                 }
             }
         ],
-        "sources_hash": "9c313d4668a1544424097d928b1c1a55",
         "mapping": {
             "force": {
                 "class": [
@@ -12781,7 +12775,7 @@
         "begin_date": "1959-01-01",
         "end_date": "2023-02-11",
         "publication_date": "2018-06-14",
-        "record_update": "2023-07-25 14:42:42.594710+02:00",
+        "record_update": "2023-05-18 14:08:02.241176+02:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.",
         "citation": null,
@@ -12808,11 +12802,12 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'-1978':44B '1950':36B,43B '1959':8A,50B '4':27B '7':29B 'avail':34B 'back':46B 'climat':21B,38B 'current':31B 'data':3A,32B,39B 'decad':30B 'ecmwf':16B 'entri':41B 'era':63B 'era-interim':62B 'era5':1A,11B,59B 'extens':47B 'fifth':14B 'final':52B 'generat':15B 'global':20B 'hour':2A 'interim':64B 'level':6A 'onward':51B 'page':58B 'past':26B 'plus':54B 'preliminari':45B 'present':10A 'pressur':5A 'reanalysi':17B,65B 'releas':53B 'replac':60B 'store':40B 'time':55B 'updat':56B 'weather':23B"
+        "search_field": "'-1978':44 '1950':36,43 '1959':8,50 '4':27 '7':29 'avail':34 'back':46 'climat':21,38 'current':31 'data':3,32,39 'decad':30 'ecmwf':16 'entri':41 'era':63 'era-interim':62 'era5':1,11,59 'extens':47 'fifth':14 'final':52 'generat':15 'global':20 'hour':2 'interim':64 'level':6 'onward':51 'page':58 'past':26 'plus':54 'preliminari':45 'present':10 'pressur':5 'reanalysi':17,65 'releas':53 'replac':60 'store':40 'time':55 'updat':56 'weather':23"
     },
     {
         "resource_id": 3,
         "resource_uid": "reanalysis-era5-single-levels",
+        "sources_hash": "4653b89428b6943c6f1c4c750cd50824",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -13142,7 +13137,6 @@
             },
             "entry_point": "cads_adaptors:MarsCdsAdaptor"
         },
-        "adaptor_properties_hash": "084d41397226a25b0c3b281948d46cc5",
         "constraints_data": [
             {
                 "day": [
@@ -36165,7 +36159,6 @@
                 }
             }
         ],
-        "sources_hash": "4653b89428b6943c6f1c4c750cd50824",
         "mapping": {
             "force": {
                 "class": [
@@ -36493,7 +36486,7 @@
         "begin_date": "1959-01-01",
         "end_date": "2023-02-11",
         "publication_date": "2018-06-14",
-        "record_update": "2023-07-25 14:42:42.368310+02:00",
+        "record_update": "2023-05-18 14:08:02.013891+02:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.",
         "citation": null,
@@ -36520,11 +36513,12 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'-1978':44B '1950':36B,43B '1959':8A,50B '4':27B '7':29B 'avail':34B 'back':46B 'climat':21B,38B 'current':31B 'data':3A,32B,39B 'decad':30B 'ecmwf':16B 'entri':41B 'era':63B 'era-interim':62B 'era5':1A,11B,59B 'extens':47B 'fifth':14B 'final':52B 'generat':15B 'global':20B 'hour':2A 'interim':64B 'level':6A 'onward':51B 'page':58B 'past':26B 'plus':54B 'preliminari':45B 'present':10A 'reanalysi':17B,65B 'releas':53B 'replac':60B 'singl':5A 'store':40B 'time':55B 'updat':56B 'weather':23B"
+        "search_field": "'-1978':44 '1950':36,43 '1959':8,50 '4':27 '7':29 'avail':34 'back':46 'climat':21,38 'current':31 'data':3,32,39 'decad':30 'ecmwf':16 'entri':41 'era':63 'era-interim':62 'era5':1,11,59 'extens':47 'fifth':14 'final':52 'generat':15 'global':20 'hour':2 'interim':64 'level':6 'onward':51 'page':58 'past':26 'plus':54 'preliminari':45 'present':10 'reanalysi':17,65 'releas':53 'replac':60 'singl':5 'store':40 'time':55 'updat':56 'weather':23"
     },
     {
         "resource_id": 4,
         "resource_uid": "satellite-surface-radiation-budget",
+        "sources_hash": "04709d4d341b23ea755b29c77d3d5815",
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -36543,7 +36537,6 @@
                 ]
             }
         },
-        "adaptor_properties_hash": "b4c9a477d4185b5dbc6127f51c58f1aa",
         "constraints_data": [
             {
                 "day": [],
@@ -38345,7 +38338,6 @@
                 }
             }
         ],
-        "sources_hash": "04709d4d341b23ea755b29c77d3d5815",
         "mapping": {
             "force": {},
             "remap": {
@@ -38425,7 +38417,7 @@
         "begin_date": "1982-01-01",
         "end_date": "2021-12-01",
         "publication_date": "2020-10-20",
-        "record_update": "2023-07-25 14:42:42.427120+02:00",
+        "record_update": "2023-05-18 14:08:02.069322+02:00",
         "resource_update": "2020-10-20",
         "abstract": "",
         "citation": null,
@@ -38452,6 +38444,6 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'1982':5A 'budget':3A 'deriv':8A 'observ':11A 'present':7A 'radiat':2A 'satellit':10A 'surfac':1A"
+        "search_field": "'1982':5 'budget':3 'deriv':8 'observ':11 'present':7 'radiat':2 'satellit':10 'surfac':1"
     }
 ]

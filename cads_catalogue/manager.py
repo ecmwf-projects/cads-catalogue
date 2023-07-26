@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import glob
-import hashlib
 import itertools
 import json
 import os
@@ -44,27 +43,6 @@ OBJECT_STORAGE_UPLOAD_FILES = {
     "constraints.json": "constraints",
     "overview.png": "previewimage",
 }
-
-
-def compute_config_hash(resource: dict[str, Any]) -> str:
-    """Compute a configuration hash on the basis of some other fields.
-
-    Parameters
-    ----------
-    resource: dictionary of the resource metadata
-    """
-    source_fields = [
-        "constraints_data",
-        "mapping",
-        "form_data",
-        "adaptor_configuration",
-    ]
-    ret_value = hashlib.md5()
-    for source_field in source_fields:
-        field_data = resource.get(source_field)
-        if field_data:
-            ret_value.update(json.dumps(field_data, sort_keys=True).encode("utf-8"))
-    return ret_value.hexdigest()  # type: ignore
 
 
 def is_db_to_update(
@@ -619,7 +597,6 @@ def update_catalogue_resources(
                 resource = form_manager.transform_form(
                     session, resource_folder_path, resource, storage_settings
                 )
-                resource["adaptor_properties_hash"] = compute_config_hash(resource)
                 resource_sync(session, resource, storage_settings)
             logger.info("resource %s db sync successful" % resource_uid)
         except Exception:  # noqa
