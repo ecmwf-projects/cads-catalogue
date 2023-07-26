@@ -157,7 +157,6 @@ class Resource(BaseModel):
     # internal functionality related
     adaptor = sa.Column(sa.String)
     adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
-    adaptor_properties_hash = sa.Column(sa.String)
     constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
     form_data: Any = sa.Column(dialect_postgresql.JSONB)
     sources_hash = sa.Column(sa.String)
