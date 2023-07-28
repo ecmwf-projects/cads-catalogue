@@ -1,0 +1,111 @@
+{
+  "quality_assurance_tab": {
+    "blocks": [ {
+      "id": "fitness-for-purpose",
+      "type": "thumb-markdown",
+      "content": "# Title for insitu-gridded-observations-nordic\n\nThis is really a sample text used for testing the CIM - GitHub integration.\n\n## This is a subsection\n\nThis is really a sample text used for testing the CIM - GitHub integration. This is really a sample text used for testing the CIM - GitHub integration. This is really a sample text used for testing the CIM - GitHub integration. This is really a sample text used for testing the CIM - GitHub integration. A large text is written here. A large text is written here. A large text is written here. A large text is written here.\n A large text is written here.\n A large text is written here. A large text is written here.\n A large text is written here. A large text is written here. A large text is written here.\n\n ![Captura de pantalla 2023-06-23 a las 13.31.33.png](https://s3.cds.ecmwf.int/swift/v1/AUTH_3e237111c3a144df8e0e0980577062b4/cds2-backoffice-dev-images/cim-localdocument_28b6c87c-fb51-4b28-8318-99ec2ad1e3bf)"
+    }, {
+      "collapsed": false,
+      "blocks": [ {
+        "blocks": [ ],
+        "id": "trends-and-variability",
+        "type": "section",
+        "title": "Trends and variability"
+      } ],
+      "id": "quality-assessments",
+      "type": "accordion",
+      "title": "Quality Assessments"
+    } ]
+  },
+  "quality_assurance_aside": {
+    "blocks": [ {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "general_qc",
+        "type": "markdown",
+        "content": "**General**: Fully meet requirements"
+      }, {
+        "id": "accuracy_and_consistency_qc",
+        "type": "markdown",
+        "content": "**Accuracy and Consistency**: Fully meet requirements"
+      }, {
+        "id": "reliable_access_qc",
+        "type": "markdown",
+        "content": "**Reliable Access**: Not fully meet"
+      }, {
+        "id": "versioning_and_archiving_qc",
+        "type": "markdown",
+        "content": "**Versioning and Archiving**: Not fully meet versioning and archiving."
+      } ],
+      "id": "general",
+      "type": "accordion",
+      "title": "1. General"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "data_records_qc",
+        "type": "markdown",
+        "content": "**Data record**: Fully meet requirements"
+      }, {
+        "id": "consistency_qc",
+        "type": "markdown",
+        "content": "**Consistency**: Fully meet requirements"
+      }, {
+        "id": "uncertainty_qc",
+        "type": "markdown",
+        "content": "**Uncertainty**: Fully meet requirements"
+      }, {
+        "id": "updates_qc",
+        "type": "markdown",
+        "content": "**Updates**: Fully meet requirements"
+      } ],
+      "id": "data_records",
+      "type": "accordion",
+      "title": "2. Data record"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "metadata_qc",
+        "type": "markdown",
+        "content": "**Metadata**: Fully meet requirements"
+      }, {
+        "id": "discovery_and_use_qc",
+        "type": "markdown",
+        "content": "**Discovery and Use**: Fully meet requirements"
+      }, {
+        "id": "interoperability_qc",
+        "type": "markdown",
+        "content": "**Interoperability**: Fully meet requirements"
+      } ],
+      "id": "metadata",
+      "type": "accordion",
+      "title": "3. Metadata"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "documentation_qc",
+        "type": "markdown",
+        "content": "**Documentation**: Fully meet requirements"
+      }, {
+        "id": "content_qc",
+        "type": "markdown",
+        "content": "**Content**: Fully meet requirements"
+      }, {
+        "id": "scientific_basis_qc",
+        "type": "markdown",
+        "content": "**Scientific Basis**: Fully meet requirements"
+      }, {
+        "id": "quality_control_qc",
+        "type": "markdown",
+        "content": "**Quality Control**: N/A"
+      }, {
+        "id": "user_guidance_qc",
+        "type": "markdown",
+        "content": "**User Guidance**: Fully meet requirements"
+      } ],
+      "id": "documentation",
+      "type": "accordion",
+      "title": "4. Documentation"
+    } ]
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "quality_assurance_tab": {
+    "blocks": [ {
+      "id": "fitness-for-purpose",
+      "type": "thumb-markdown",
+      "content": ""
+    }, {
+      "collapsed": false,
+      "blocks": [ {
+        "blocks": [ ],
+        "id": "trends-and-variability",
+        "type": "section",
+        "title": "Trends and variability"
+      } ],
+      "id": "quality-assessments",
+      "type": "accordion",
+      "title": "Quality Assessments"
+    } ]
+  },
+  "quality_assurance_aside": {
+    "blocks": [ {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "general_qc",
+        "type": "markdown",
+        "content": "**General**: N/A"
+      }, {
+        "id": "accuracy_and_consistency_qc",
+        "type": "markdown",
+        "content": "**Accuracy and Consistency**: N/A"
+      }, {
+        "id": "reliable_access_qc",
+        "type": "markdown",
+        "content": "**Reliable Access**: N/A"
+      }, {
+        "id": "versioning_and_archiving_qc",
+        "type": "markdown",
+        "content": "**Versioning and Archiving**: N/A"
+      } ],
+      "id": "general",
+      "type": "accordion",
+      "title": "1. General"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "data_records_qc",
+        "type": "markdown",
+        "content": "**Data record**: N/A"
+      }, {
+        "id": "consistency_qc",
+        "type": "markdown",
+        "content": "**Consistency**: N/A"
+      }, {
+        "id": "uncertainty_qc",
+        "type": "markdown",
+        "content": "**Uncertainty**: Fully meet requirements"
+      }, {
+        "id": "updates_qc",
+        "type": "markdown",
+        "content": "**Updates**: N/A"
+      } ],
+      "id": "data_records",
+      "type": "accordion",
+      "title": "2. Data record"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "metadata_qc",
+        "type": "markdown",
+        "content": "**Metadata**: Fully meet requirements"
+      }, {
+        "id": "discovery_and_use_qc",
+        "type": "markdown",
+        "content": "**Discovery and Use**: Fully meet requirements"
+      }, {
+        "id": "interoperability_qc",
+        "type": "markdown",
+        "content": "**Interoperability**: N/A"
+      } ],
+      "id": "metadata",
+      "type": "accordion",
+      "title": "3. Metadata"
+    }, {
+      "collapsed": true,
+      "blocks": [ {
+        "id": "documentation_qc",
+        "type": "markdown",
+        "content": "**Documentation**: Fully meet requirements"
+      }, {
+        "id": "content_qc",
+        "type": "markdown",
+        "content": "**Content**: N/A"
+      }, {
+        "id": "scientific_basis_qc",
+        "type": "markdown",
+        "content": "**Scientific Basis**: Fully meet requirements"
+      }, {
+        "id": "quality_control_qc",
+        "type": "markdown",
+        "content": "**Quality Control**: Fully meet requirements"
+      }, {
+        "id": "user_guidance_qc",
+        "type": "markdown",
+        "content": "**User Guidance**: Fully meet requirements"
+      } ],
+      "id": "documentation",
+      "type": "accordion",
+      "title": "4. Documentation"
+    } ]
+  }
+}

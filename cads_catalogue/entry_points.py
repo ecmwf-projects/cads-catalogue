@@ -161,6 +161,7 @@ def update_catalogue(
     resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
+    cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),
     connection_string: Optional[str] = None,
     force: bool = False,
     delete_orphans: bool = True,
@@ -176,6 +177,7 @@ def update_catalogue(
     resources_folder_path: path to the root folder containing metadata files for resources
     messages_folder_path: path to the root folder containing metadata files for system messages
     licences_folder_path: path to the root folder containing metadata files for licences
+    cim_folder_path: str = path to the root folder containing CIM generated Quality Assessment layouts
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     force: if True, run update regardless input folders has no changes from last update (default False)
     delete_orphans: if True, delete resources not involved in the update process (default True)
@@ -208,8 +210,13 @@ def update_catalogue(
             resource_hash,
             licence_hash,
             message_hash,
+            cimlayout_hash,
         ) = manager.is_db_to_update(
-            session, resources_folder_path, licences_folder_path, messages_folder_path
+            session,
+            resources_folder_path,
+            licences_folder_path,
+            messages_folder_path,
+            cim_folder_path,
         )
         if not force and not is_db_to_update:
             logger.info(
@@ -223,7 +230,11 @@ def update_catalogue(
         )
 
         involved_resource_uids = manager.update_catalogue_resources(
-            session, resources_folder_path, storage_settings, force=force
+            session,
+            resources_folder_path,
+            cim_folder_path,
+            storage_settings,
+            force=force,
         )
         messages.update_catalogue_messages(session, messages_folder_path)
 
@@ -239,6 +250,7 @@ def update_catalogue(
             catalogue_repo_commit=resource_hash,
             licence_repo_commit=licence_hash,
             message_repo_commit=message_hash,
+            cim_repo_commit=cimlayout_hash,
         )
         session.add(new_update_info)
         logger.info(

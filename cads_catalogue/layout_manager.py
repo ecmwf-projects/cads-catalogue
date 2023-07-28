@@ -264,6 +264,58 @@ def transform_licences_blocks(
     return new_data
 
 
+def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
+    """Transform layout.json data according to CIM Quality Assessment layout.
+
+    Parameters
+    ----------
+    layout_data: data of the layout.json to transform
+    cim_layout_path: path to the file containing CIM Quality Assessment
+
+    Returns
+    -------
+    dict: dictionary of layout_data modified
+    """
+    remove_tab = True
+    remove_aside = True
+    qa_tab_blocks = None
+    qa_aside_blocks = None
+    if os.path.exists(cim_layout_path):
+        with open(cim_layout_path) as fp:
+            cim_layout_data = json.load(fp)
+        qa_tab = cim_layout_data.get("quality_assurance_tab", {})
+        qa_tab_blocks = qa_tab.get("blocks")
+        if qa_tab_blocks is not None:
+            remove_tab = False
+        qa_aside = cim_layout_data.get("quality_assurance_aside", {})
+        qa_aside_blocks = qa_aside.get("blocks")
+        if qa_aside_blocks is not None:
+            remove_aside = False
+    new_data = copy.deepcopy(layout_data)
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
+    aside = body.get("aside", {})
+    aside_blocks = aside.get("blocks", [])
+
+    for i, section in enumerate(copy.deepcopy(sections)):
+        if section.get("id") == "quality_assurance_tab":
+            if remove_tab:
+                del sections[i]
+            else:
+                sections[i]["blocks"] = qa_tab_blocks
+            break
+
+    for i, aside_block in enumerate(copy.deepcopy(aside_blocks)):
+        if aside_block.get("id") == "quality_assurance_aside":
+            if remove_aside:
+                del aside_blocks[i]
+            else:
+                aside_blocks[i]["blocks"] = qa_aside_blocks
+            break
+    return new_data
+
+
 def store_layout_by_data(
     layout_data: dict[str, Any],
     resource: dict[str, Any],
@@ -305,6 +357,7 @@ def store_layout_by_data(
 def transform_layout(
     session: sa.orm.session.Session,
     resource_folder_path: str | pathlib.Path,
+    cim_folder_path: str | pathlib.Path,
     resource: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ):
@@ -316,6 +369,7 @@ def transform_layout(
     session: opened SQLAlchemy session
     resource_folder_path: folder path where to find layout.json
     resource: metadata of a loaded resource from files
+    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     storage_settings: object with settings to access the object storage
 
     Returns
@@ -329,6 +383,10 @@ def transform_layout(
     with open(layout_file_path) as fp:
         layout_data = json.load(fp)
         logger.debug(f"input layout_data: {layout_data}")
+    cim_layout_path = os.path.join(
+        cim_folder_path, resource["resource_uid"], "quality_assurance.layout.json"
+    )
+    layout_data = transform_cim_blocks(layout_data, cim_layout_path)
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
