@@ -207,10 +207,11 @@ def update_catalogue(
         # check if source folders have changed from last registered update
         (
             is_db_to_update,
-            resource_hash,
+            catalogue_hash,
+            metadata_hash,
             licence_hash,
             message_hash,
-            cimlayout_hash,
+            cim_hash,
         ) = manager.is_db_to_update(
             session,
             resources_folder_path,
@@ -247,15 +248,23 @@ def update_catalogue(
         # update hashes from the catalogue_updates table
         session.execute(sa.delete(database.CatalogueUpdate))
         new_update_info = database.CatalogueUpdate(
-            catalogue_repo_commit=resource_hash,
+            catalogue_repo_commit=catalogue_hash,
+            metadata_repo_commit=metadata_hash,
             licence_repo_commit=licence_hash,
             message_repo_commit=message_hash,
-            cim_repo_commit=cimlayout_hash,
+            cim_repo_commit=cim_hash,
         )
         session.add(new_update_info)
         logger.info(
-            "%sdb update with input git hashes: %r, %r, %r"
-            % (force and "forced " or "", resource_hash, licence_hash, message_hash)
+            "%sdb update with input git hashes: %r, %r, %r, %r, %r"
+            % (
+                force and "forced " or "",
+                catalogue_hash,
+                metadata_hash,
+                licence_hash,
+                message_hash,
+                cim_hash,
+            )
         )
 
 

@@ -18,61 +18,78 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 
 
-def dummy_get_last_commit_hash1(folder):
-    """Use for testing is_db_to_update."""
-    if "cads-forms-json" in folder:
-        return "5f662d202e4084dd569567bab0957c8a56f79c0f"
-    elif "cads-licences" in folder:
-        return "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
-    elif "cads-messages" in folder:
-        return "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69"
-    else:
-        return "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b"
+def get_last_commit_factory(expected_values):
+    def dummy_get_last_commit_hash(folder):
+        """Use for testing is_db_to_update."""
+        for i, repo_name in enumerate(
+            [
+                "catalogue",
+                "cads-forms-json",
+                "cads-licences",
+                "cads-messages",
+                "cads-forms-cim-json",
+            ]
+        ):
+            if repo_name in folder.split(os.path.sep)[-1]:
+                return expected_values[i]
+        return None
 
-
-def dummy_get_last_commit_hash2(folder):
-    """Use for testing is_db_to_update."""
-    if "cads-forms-json" in folder:
-        return "5f662d202e4084dd569567bab0957c8a56f79aaa"
-    elif "cads-licences" in folder:
-        return "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
-    elif "cads-messages" in folder:
-        return "ebdb3b017a14a42fb75ea7b44992f3f178aa0ccc"
-    else:
-        return "3ae7a244a0f480e90fbcd3eb5e37742614fa3ddd"
+    return dummy_get_last_commit_hash
 
 
 def test_is_db_to_update(
     session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
-    mocker.patch.object(utils, "get_last_commit_hash", new=dummy_get_last_commit_hash1)
     resource_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-json")
     licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
     messages_folder_path = os.path.join(TESTDATA_PATH, "cads-messages")
-    cim_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-cim-messages")
-    last_c1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
-    last_l1 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
-    last_m1 = "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69"
-    last_cm = "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b"
-    c2 = "5f662d202e4084dd569567bab0957c8a56f79aaa"
-    l2 = "f0591ec408b59d32a46a5d08b9786641dffe5bbb"
-    m2 = "ebdb3b017a14a42fb75ea7b44992f3f178aa0ccc"
-    cm = "3ae7a244a0f480e90fbcd3eb5e37742614fa3ddd"
+    cim_folder_path = os.path.join(TESTDATA_PATH, "cads-forms-cim-json")
+    folder_commit_hashes = [
+        "e5658fef07333700272e36a43df0628efacb5f04",
+        "5f662d202e4084dd569567bab0957c8a56f79c0f",
+        "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+        "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69",
+        "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b",
+    ]
+    mocker.patch.object(
+        utils, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
+    )
+    new_db_commit_hash = "e5658fef07333700272e36a43df0628efacbaaaa"
     with session_obj() as session:
-        # begin with empty table
+        # check with (initial) empty table
         assert manager.is_db_to_update(
             session,
             resource_folder_path,
             licences_folder_path,
             messages_folder_path,
             cim_folder_path,
-        ) == (True, last_c1, last_l1, last_m1, last_cm)
-        # insert a catalogue update
+        ) == (True, *folder_commit_hashes)
+        # insert a catalogue update with the folder commit hashes
         new_record = database.CatalogueUpdate(
-            catalogue_repo_commit=last_c1,
-            licence_repo_commit=last_l1,
-            message_repo_commit=last_m1,
-            cim_repo_commit=last_cm,
+            catalogue_repo_commit=folder_commit_hashes[0],
+            metadata_repo_commit=folder_commit_hashes[1],
+            licence_repo_commit=folder_commit_hashes[2],
+            message_repo_commit=folder_commit_hashes[3],
+            cim_repo_commit=folder_commit_hashes[4],
+        )
+        session.add(new_record)
+        session.commit()
+        # check that now update can be skipped
+        assert manager.is_db_to_update(
+            session,
+            resource_folder_path,
+            licences_folder_path,
+            messages_folder_path,
+            cim_folder_path,
+        ) == (False, *folder_commit_hashes)
+        # simulate only stored cads-catalogue hash was different
+        session.execute(sa.delete(database.CatalogueUpdate))
+        new_record = database.CatalogueUpdate(
+            catalogue_repo_commit=new_db_commit_hash,
+            metadata_repo_commit=folder_commit_hashes[1],
+            licence_repo_commit=folder_commit_hashes[2],
+            message_repo_commit=folder_commit_hashes[3],
+            cim_repo_commit=folder_commit_hashes[4],
         )
         session.add(new_record)
         session.commit()
@@ -82,50 +99,7 @@ def test_is_db_to_update(
             licences_folder_path,
             messages_folder_path,
             cim_folder_path,
-        ) == (False, last_c1, last_l1, last_m1, last_cm)
-        # simulate a new repo update
-        mocker.patch.object(
-            utils, "get_last_commit_hash", new=dummy_get_last_commit_hash2
-        )
-        assert manager.is_db_to_update(
-            session,
-            resource_folder_path,
-            licences_folder_path,
-            messages_folder_path,
-            cim_folder_path,
-        ) == (True, c2, l2, m2, cm)
-        # update the db with only one right repo commit
-        new_record = database.CatalogueUpdate(
-            catalogue_repo_commit=c2,
-            licence_repo_commit=last_l1,
-            message_repo_commit=m2,
-            cim_repo_commit=cm,
-        )
-        session.add(new_record)
-        session.commit()
-        assert manager.is_db_to_update(
-            session,
-            resource_folder_path,
-            licences_folder_path,
-            messages_folder_path,
-            cim_folder_path,
-        ) == (True, c2, l2, m2, cm)
-        # update the db with both 4 right repo commit
-        new_record = database.CatalogueUpdate(
-            catalogue_repo_commit=c2,
-            licence_repo_commit=l2,
-            message_repo_commit=m2,
-            cim_repo_commit=cm,
-        )
-        session.add(new_record)
-        session.commit()
-        assert manager.is_db_to_update(
-            session,
-            resource_folder_path,
-            licences_folder_path,
-            messages_folder_path,
-            cim_folder_path,
-        ) == (False, c2, l2, m2, cm)
+        ) == (True, *folder_commit_hashes)
 
 
 def test_load_resource_for_object_storage() -> None:

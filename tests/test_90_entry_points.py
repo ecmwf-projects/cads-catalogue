@@ -50,17 +50,23 @@ def test_init_db(postgresql: Connection[str]) -> None:
     )
 
 
-def get_last_commit_factory(folder1, commit1, folder2, commit2, else_commit3):
-    def dummy_get_last_commit(folder):
+def get_last_commit_factory(expected_values):
+    def dummy_get_last_commit_hash(folder):
         """Use for testing is_db_to_update."""
-        if folder1 in folder:
-            return commit1
-        elif folder2 in folder:
-            return commit2
-        else:
-            return else_commit3
+        for i, repo_name in enumerate(
+            [
+                "catalogue",
+                "cads-forms-json",
+                "cads-licences",
+                "cads-messages",
+                "cads-forms-cim-json",
+            ]
+        ):
+            if repo_name in folder.split(os.path.sep)[-1]:
+                return expected_values[i]
+        return None
 
-    return dummy_get_last_commit
+    return dummy_get_last_commit_hash
 
 
 def test_update_catalogue(
@@ -126,13 +132,16 @@ def test_update_catalogue(
     patch = mocker.patch(
         "cads_catalogue.object_storage.store_file", return_value="an url"
     )
-    last_commit1 = "5f662d202e4084dd569567bab0957c8a56f79c0f"
-    last_commit2 = "f0591ec408b59d32a46a5d08b9786641dffe5c7e"
-    last_commit3 = "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69"
-    dummy_last_commit_function = get_last_commit_factory(
-        "cads-forms-json", last_commit1, "cads-licences", last_commit2, last_commit3
+    folder_commit_hashes = [
+        "e5658fef07333700272e36a43df0628efacb5f04",
+        "5f662d202e4084dd569567bab0957c8a56f79c0f",
+        "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+        "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69",
+        "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b",
+    ]
+    mocker.patch.object(
+        utils, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
     )
-    mocker.patch.object(utils, "get_last_commit_hash", new=dummy_last_commit_function)
     mocker.patch.object(alembic.config, "main")
     spy1 = mocker.spy(sqlalchemy_utils, "create_database")
     spy2 = mocker.spy(database, "init_database")
@@ -418,13 +427,14 @@ def test_update_catalogue(
     assert resl.related_resources[0].resource_uid == "reanalysis-era5-pressure-levels"
     catalog_updates = session.scalars(sa.select(database.CatalogueUpdate)).all()
     assert len(catalog_updates) == 1
-    assert catalog_updates[0].catalogue_repo_commit == last_commit1
-    assert catalog_updates[0].licence_repo_commit == last_commit2
-    assert catalog_updates[0].message_repo_commit == last_commit3
+    assert catalog_updates[0].catalogue_repo_commit == folder_commit_hashes[0]
+    assert catalog_updates[0].metadata_repo_commit == folder_commit_hashes[1]
+    assert catalog_updates[0].licence_repo_commit == folder_commit_hashes[2]
+    assert catalog_updates[0].message_repo_commit == folder_commit_hashes[3]
     update_time1 = catalog_updates[0].update_time
     session.close()
 
-    # run a second time: do not anything, commit hash are the same
+    # run a second time: do not anything, commit hashes are the same
     result = runner.invoke(
         entry_points.app,
         [
@@ -524,14 +534,16 @@ def test_update_catalogue(
 
         catalog_updates = session.scalars(sa.select(database.CatalogueUpdate)).all()
         assert len(catalog_updates) == 1
-        assert catalog_updates[0].catalogue_repo_commit == last_commit1  # type: ignore
-        assert catalog_updates[0].licence_repo_commit == last_commit2  # type: ignore
+        assert catalog_updates[0].catalogue_repo_commit == folder_commit_hashes[0]
+        assert catalog_updates[0].metadata_repo_commit == folder_commit_hashes[1]
+        assert catalog_updates[0].licence_repo_commit == folder_commit_hashes[2]
+        assert catalog_updates[0].message_repo_commit == folder_commit_hashes[3]
         assert catalog_updates[0].update_time > update_time1  # type: ignore
 
     caplog.clear()
 
     # run a fourth time simulating a new commit adding a file on 1 dataset, without forcing:
-    # updating is skipped for all the other datasets because the hash of the input folders
+    # updating is skipped for all the other datasets because the hashes of the input folders
     # didn't change
     session.execute(
         sa.update(database.CatalogueUpdate).values(
