@@ -154,7 +154,7 @@ def is_db_to_update(
         if not last_hash:
             logger.warning("no information of last %s repository commit" % repo_name)
         elif last_hash != current_hash:
-            logger.info("detected update of %s repository")
+            logger.info("detected update of %s repository" % repo_name)
 
     # set the bool value
     is_to_update = (
