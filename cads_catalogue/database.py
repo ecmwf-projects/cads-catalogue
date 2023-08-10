@@ -278,6 +278,23 @@ class Licence(BaseModel):
     )
 
 
+# create views
+c3s_view_stmt = sa.select(Resource).filter_by(portal="c3s")
+cams_view_stmt = sa.select(Resource).filter_by(portal="cams")
+
+
+class C3SView(BaseModel):
+    """C3S resources view."""
+
+    __table__ = sqlalchemy_utils.create_view("c3s_resources", c3s_view_stmt, metadata)  # type: ignore
+
+
+class CAMSView(BaseModel):
+    """CAMS resources view."""
+
+    __table__ = sqlalchemy_utils.create_view("cams_resources", cams_view_stmt, metadata)  # type: ignore
+
+
 def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessionmaker:
     """If `session_obj` is None, create a new session object.
 
