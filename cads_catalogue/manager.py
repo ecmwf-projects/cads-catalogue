@@ -73,9 +73,17 @@ def is_db_to_update(
     licences_folder_path: str | pathlib.Path,
     messages_folder_path: str | pathlib.Path,
     cim_folder_path: str | pathlib.Path,
-) -> Tuple[bool, Optional[str], Optional[str], Optional[str], Optional[str]]:
+) -> Tuple[
+    bool,
+    bool,
+    Optional[str],
+    Optional[str],
+    Optional[str],
+    Optional[str],
+    Optional[str],
+]:
     """
-    Compare current and last run's status of repo folders and return if the database is to update.
+    Compare current and last run's status of repo folders and return information if the database is to update.
 
     Parameters
     ----------
@@ -87,84 +95,73 @@ def is_db_to_update(
 
     Returns
     -------
-    (True or False | hash for resources, hash for licences)
+    (did_input_folders_change, did_catalogue_source_change, *last_commit_hashes)
     """
-    resource_hash = None
-    licence_hash = None
-    message_hash = None
-    cim_repo_hash = None
+    current_hashes = [None, None, None, None, None]
+
+    # load effective commit hashes from the folders
+    catalogue_folder_path = os.path.dirname(os.path.abspath(__file__))
+    for i, folder_path in enumerate(
+        [
+            catalogue_folder_path,
+            resources_folder_path,
+            licences_folder_path,
+            messages_folder_path,
+            cim_folder_path,
+        ]
+    ):
+        try:
+            current_hashes[i] = utils.get_last_commit_hash(folder_path)
+        except Exception:  # noqa
+            logger.exception(
+                "no check on commit hash for folder %r, error follows" % folder_path
+            )
+
+    # get last stored commit hashes from the db
+    last_hashes = [None, None, None, None, None]
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
         .limit(1)
     ).first()
-    try:
-        resource_hash = utils.get_last_commit_hash(resources_folder_path)
-    except Exception:  # noqa
-        logger.exception(
-            "no check on commit hash for folder %r, error follows"
-            % resources_folder_path
-        )
-    try:
-        licence_hash = utils.get_last_commit_hash(licences_folder_path)
-    except Exception:  # noqa
-        logger.exception(
-            "no check on commit hash for folder %r, error follows"
-            % licences_folder_path
-        )
-
-    try:
-        message_hash = utils.get_last_commit_hash(messages_folder_path)
-    except Exception:  # noqa
-        logger.exception(
-            "no check on commit hash for folder %r, error follows"
-            % messages_folder_path
-        )
-
-    try:
-        cim_repo_hash = utils.get_last_commit_hash(cim_folder_path)
-    except Exception:  # noqa
-        logger.exception(
-            "no check on commit hash for folder %r, error follows" % cim_folder_path
-        )
-
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
         is_to_update = True
-        return is_to_update, resource_hash, licence_hash, message_hash, cim_repo_hash
+        return is_to_update, True, *current_hashes  # type: ignore
+    for i, last_hash_attr in enumerate(
+        [
+            "catalogue_repo_commit",
+            "metadata_repo_commit",
+            "licence_repo_commit",
+            "message_repo_commit",
+            "cim_repo_commit",
+        ]
+    ):
+        last_hashes[i] = getattr(last_update_record, last_hash_attr)
 
-    # last_update_record exists
-    last_resource_hash = getattr(last_update_record, "catalogue_repo_commit")
-    last_licence_hash = getattr(last_update_record, "licence_repo_commit")
-    last_message_hash = getattr(last_update_record, "message_repo_commit")
-    last_cim_hash = getattr(last_update_record, "cim_repo_commit")
-    if not last_resource_hash:
-        logger.warning("no information of last resource repository commit")
-    elif last_resource_hash != resource_hash:
-        logger.info("detected update of resource repository")
-    if not last_licence_hash:
-        logger.warning("no information of last licence repository commit")
-    elif last_licence_hash != licence_hash:
-        logger.info("detected update of licence repository")
-    if not last_message_hash:
-        logger.warning("no information of last message repository commit")
-    elif last_message_hash != message_hash:
-        logger.info("detected update of message repository")
-    if not last_cim_hash:
-        logger.warning("no information of last CIM repository commit")
-    elif last_cim_hash != cim_repo_hash:
-        logger.info("detected update of CIM repository")
+    # logs what's happening
+    for i, repo_name in enumerate(
+        [
+            "catalogue manager",  # cads-catalogue
+            "dataset metadata",  # cads-forms-json
+            "licence",  # cads-licences
+            "message",  # cads-messages
+            "cim layouts",  # cads-forms-cim-json
+        ]
+    ):
+        last_hash = last_hashes[i]
+        current_hash = current_hashes[i]
+        if not last_hash:
+            logger.warning("no information of last %s repository commit" % repo_name)
+        elif last_hash != current_hash:
+            logger.info("detected update of %s repository" % repo_name)
 
-    if last_resource_hash and (
-        last_resource_hash,
-        last_licence_hash,
-        last_message_hash,
-        last_cim_hash,
-    ) == (resource_hash, licence_hash, message_hash, cim_repo_hash):
-        is_to_update = False
-    else:
-        is_to_update = True
-    return is_to_update, resource_hash, licence_hash, message_hash, cim_repo_hash
+    # set the bool value
+    is_to_update = (
+        last_hashes == [None, None, None, None, None] or last_hashes != current_hashes
+    )
+    did_catalogue_source_change = last_hashes[0] != current_hashes[0]
+    return is_to_update, did_catalogue_source_change, *current_hashes  # type: ignore
 
 
 def is_resource_to_update(session, resource_folder_path):
