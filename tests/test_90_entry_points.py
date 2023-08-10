@@ -548,7 +548,7 @@ def test_update_catalogue(
     session.execute(
         sa.update(database.CatalogueUpdate).values(
             **{
-                "catalogue_repo_commit": "aaa",
+                "metadata_repo_commit": "aaa",
                 "licence_repo_commit": "bbb",
                 "message_repo_commit": "ccc",
             }

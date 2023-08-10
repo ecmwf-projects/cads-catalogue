@@ -63,8 +63,8 @@ def test_is_db_to_update(
             licences_folder_path,
             messages_folder_path,
             cim_folder_path,
-        ) == (True, *folder_commit_hashes)
-        # insert a catalogue update with the folder commit hashes
+        ) == (True, True, *folder_commit_hashes)
+        # insert a db update with the folder commit hashes
         new_record = database.CatalogueUpdate(
             catalogue_repo_commit=folder_commit_hashes[0],
             metadata_repo_commit=folder_commit_hashes[1],
@@ -81,7 +81,7 @@ def test_is_db_to_update(
             licences_folder_path,
             messages_folder_path,
             cim_folder_path,
-        ) == (False, *folder_commit_hashes)
+        ) == (False, False, *folder_commit_hashes)
         # simulate only stored cads-catalogue hash was different
         session.execute(sa.delete(database.CatalogueUpdate))
         new_record = database.CatalogueUpdate(
@@ -99,7 +99,7 @@ def test_is_db_to_update(
             licences_folder_path,
             messages_folder_path,
             cim_folder_path,
-        ) == (True, *folder_commit_hashes)
+        ) == (True, True, *folder_commit_hashes)
 
 
 def test_load_resource_for_object_storage() -> None:

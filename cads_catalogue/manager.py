@@ -74,10 +74,16 @@ def is_db_to_update(
     messages_folder_path: str | pathlib.Path,
     cim_folder_path: str | pathlib.Path,
 ) -> Tuple[
-    bool, Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]
+    bool,
+    bool,
+    Optional[str],
+    Optional[str],
+    Optional[str],
+    Optional[str],
+    Optional[str],
 ]:
     """
-    Compare current and last run's status of repo folders and return if the database is to update.
+    Compare current and last run's status of repo folders and return information if the database is to update.
 
     Parameters
     ----------
@@ -89,7 +95,7 @@ def is_db_to_update(
 
     Returns
     -------
-    (True or False | hash for resources, hash for licences)
+    (did_input_folders_change, did_catalogue_source_change, *last_commit_hashes)
     """
     current_hashes = [None, None, None, None, None]
 
@@ -121,7 +127,7 @@ def is_db_to_update(
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
         is_to_update = True
-        return is_to_update, *current_hashes  # type: ignore
+        return is_to_update, True, *current_hashes  # type: ignore
     for i, last_hash_attr in enumerate(
         [
             "catalogue_repo_commit",
@@ -154,8 +160,8 @@ def is_db_to_update(
     is_to_update = (
         last_hashes == [None, None, None, None, None] or last_hashes != current_hashes
     )
-
-    return is_to_update, *current_hashes  # type: ignore
+    did_catalogue_source_change = last_hashes[0] != current_hashes[0]
+    return is_to_update, did_catalogue_source_change, *current_hashes  # type: ignore
 
 
 def is_resource_to_update(session, resource_folder_path):

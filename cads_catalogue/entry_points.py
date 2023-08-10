@@ -207,6 +207,7 @@ def update_catalogue(
         # check if source folders have changed from last registered update
         (
             is_db_to_update,
+            did_catalogue_repo_change,
             catalogue_hash,
             metadata_hash,
             licence_hash,
@@ -219,6 +220,8 @@ def update_catalogue(
             messages_folder_path,
             cim_folder_path,
         )
+        if did_catalogue_repo_change:
+            force = True
         if not force and not is_db_to_update:
             logger.info(
                 "catalogue update skipped: source files have not changed. "
