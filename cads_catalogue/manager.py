@@ -365,6 +365,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
 
     metadata["lineage"] = data.get("lineage")
     metadata["publication_date"] = data.get("publication_date")
+    metadata["qos_tags"] = data.get("qos_tags", [])
     metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
 
     metadata["representative_fraction"] = data.get("representative_fraction")
