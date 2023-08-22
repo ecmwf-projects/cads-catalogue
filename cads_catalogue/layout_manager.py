@@ -276,21 +276,20 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     -------
     dict: dictionary of layout_data modified
     """
+    if not os.path.exists(cim_layout_path):
+        return layout_data
     remove_tab = True
     remove_aside = True
-    qa_tab_blocks = None
-    qa_aside_blocks = None
-    if os.path.exists(cim_layout_path):
-        with open(cim_layout_path) as fp:
-            cim_layout_data = json.load(fp)
-        qa_tab = cim_layout_data.get("quality_assurance_tab", {})
-        qa_tab_blocks = qa_tab.get("blocks")
-        if qa_tab_blocks is not None:
-            remove_tab = False
-        qa_aside = cim_layout_data.get("quality_assurance_aside", {})
-        qa_aside_blocks = qa_aside.get("blocks")
-        if qa_aside_blocks is not None:
-            remove_aside = False
+    with open(cim_layout_path) as fp:
+        cim_layout_data = json.load(fp)
+    qa_tab = cim_layout_data.get("quality_assurance_tab", {})
+    qa_tab_blocks = qa_tab.get("blocks")
+    if qa_tab_blocks is not None:
+        remove_tab = False
+    qa_aside = cim_layout_data.get("quality_assurance_aside", {})
+    qa_aside_blocks = qa_aside.get("blocks")
+    if qa_aside_blocks is not None:
+        remove_aside = False
     new_data = copy.deepcopy(layout_data)
     body = new_data.get("body", {})
     body_main = body.get("main", {})
