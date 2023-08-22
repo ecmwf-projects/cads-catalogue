@@ -671,15 +671,7 @@ def test_transform_cim_blocks(tmpdir):
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
-    assert new_layout_data == {
-        "uid": "cams-global-reanalysis-eac4",
-        "body": {
-            "main": {
-                "sections": test_sections_1,
-            },
-            "aside": test_aside_1,
-        },
-    }
+    assert new_layout_data == layout_data
 
     # test case 3: not existing cim layout, existing only aside block
     new_aside_block = {
@@ -698,15 +690,7 @@ def test_transform_cim_blocks(tmpdir):
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
-    assert new_layout_data == {
-        "uid": "cams-global-reanalysis-eac4",
-        "body": {
-            "main": {
-                "sections": test_sections_1,
-            },
-            "aside": test_aside_1,
-        },
-    }
+    assert new_layout_data == layout_data
 
     # test case 4: existing cim layout, not existing section/aside on layout
     layout_data = create_layout_for_test(
