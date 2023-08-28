@@ -18,9 +18,7 @@ def test_init_database(postgresql: Connection[str]) -> None:
         "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
     )
     expected_tables_at_beginning: set[str] = set()
-    expected_tables_complete = set(database.metadata.tables).union(
-        {"alembic_version", "c3s_resources", "cams_resources"}
-    )
+    expected_tables_complete = set(database.metadata.tables).union({"alembic_version"})
     assert set(conn.execute(query).scalars()) == expected_tables_at_beginning  # type: ignore
 
     database.init_database(connection_string, force=True)
