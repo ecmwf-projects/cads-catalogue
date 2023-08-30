@@ -46,7 +46,7 @@ def test_init_db(postgresql: Connection[str]) -> None:
 
     assert result.exit_code == 0
     assert set(conn.execute(query).scalars()) == set(database.metadata.tables).union(
-        {"alembic_version", "c3s_resources", "cams_resources"}
+        {"alembic_version"}
     )
 
 
