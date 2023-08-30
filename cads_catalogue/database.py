@@ -176,9 +176,9 @@ class Resource(BaseModel):
     end_date = sa.Column(sa.Date)
     publication_date = sa.Column(sa.Date)
     record_update = sa.Column(
-        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow
+        sa.types.DateTime(timezone=True), default=datetime.datetime.utcnow  # db record last update date
     )
-    resource_update = sa.Column(sa.Date)  # update_date of the source file
+    resource_update = sa.Column(sa.Date)  # 'update_date' of the source file
 
     # other metadata
     abstract = sa.Column(sa.String, nullable=False)

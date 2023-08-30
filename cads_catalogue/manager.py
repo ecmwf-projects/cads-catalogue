@@ -1,5 +1,4 @@
 """utility module to load and store data in the catalogue database."""
-
 # Copyright 2022, European Union.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import glob
 import hashlib
 import itertools
@@ -481,6 +481,7 @@ def resource_sync(
 
     subpath = os.path.join("resources", dataset["resource_uid"])
     for _, db_field in OBJECT_STORAGE_UPLOAD_FILES.items():
+        dataset[db_field] = None
         file_path = dataset.get(db_field)
         if not file_path:
             continue
@@ -500,6 +501,7 @@ def resource_sync(
         dataset_obj = database.Resource(**dataset)
         session.add(dataset_obj)
     else:
+        dataset["record_update"] = datetime.datetime.utcnow()
         session.execute(
             sa.update(database.Resource)
             .filter_by(resource_uid=resource["resource_uid"])
