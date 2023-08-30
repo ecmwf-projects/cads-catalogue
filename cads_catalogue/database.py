@@ -199,6 +199,7 @@ class Resource(BaseModel):
     responsible_organisation_role = sa.Column(sa.String)
     responsible_organisation_website = sa.Column(sa.String)
     portal = sa.Column(sa.String, index=True)
+    qos_tags = sa.Column(dialect_postgresql.ARRAY(sa.String))
     title = sa.Column(sa.String)
     topic = sa.Column(sa.String)
     type = sa.Column(sa.String, nullable=False)
