@@ -481,9 +481,9 @@ def resource_sync(
 
     subpath = os.path.join("resources", dataset["resource_uid"])
     for _, db_field in OBJECT_STORAGE_UPLOAD_FILES.items():
-        dataset[db_field] = None
         file_path = dataset.get(db_field)
         if not file_path:
+            dataset[db_field] = None
             continue
         dataset[db_field] = object_storage.store_file(
             file_path,
