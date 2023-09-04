@@ -28,7 +28,13 @@ storagesettings = None
 
 @dataclasses.dataclass
 class SqlalchemySettings:
-    """Class to store variables from the environment."""
+    """Postgres-specific API settings.
+
+    - ``catalogue_db_user``: postgres username.
+    - ``catalogue_db_password``: postgres password.
+    - ``catalogue_db_host``: hostname for the connection.
+    - ``catalogue_db_name``: database name.
+    """
 
     catalogue_db_user: str = "catalogue"
     catalogue_db_password: Optional[str] = None
