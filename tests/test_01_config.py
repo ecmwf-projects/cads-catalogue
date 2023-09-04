@@ -76,10 +76,10 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
 
 def test_storagesettings(temp_environ: Any) -> None:
     # check settings must have a password set (no default)
-    temp_environ.pop("object_storage_url", default=None)
+    temp_environ.pop("storage_password", default=None)
     with pytest.raises(ValueError) as excinfo:
         config.ObjectStorageSettings()  # type: ignore
-    assert "object_storage_url" in str(excinfo.value)
+    assert "storage_password" in str(excinfo.value)
     config.storagesettings = None
 
     my_settings_dict = {

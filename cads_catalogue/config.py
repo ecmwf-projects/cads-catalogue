@@ -23,7 +23,7 @@ storagesettings = None
 
 # NOTE of class implementations inside this module:
 # - type annotation of class variables must be set (and values are properly cast)
-# - class variables with default = None are checked as required
+# - class variables with 'Optional[str] = None' are checked as required
 
 
 @dataclasses.dataclass
@@ -96,11 +96,11 @@ class ObjectStorageSettings:
     - ``document_storage_url``: object storage URL (public)
     """
 
-    object_storage_url: Optional[str] = None
-    storage_admin: Optional[str] = None
+    object_storage_url: str
+    storage_admin: str
+    catalogue_bucket: str
+    document_storage_url: str
     storage_password: Optional[str] = None
-    catalogue_bucket: Optional[str] = None
-    document_storage_url: Optional[str] = None
 
     def __init__(self, **kwargs):
         self.match_args = kwargs
