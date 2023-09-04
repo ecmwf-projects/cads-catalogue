@@ -16,7 +16,6 @@ classifiers = [
 dependencies = [
   "alembic",
   "boto3",
-  "pydantic<2",
   "python-frontmatter",
   "sqlalchemy>=2.0.9",
   "sqlalchemy_utils",
