@@ -26,6 +26,7 @@ storagesettings = None
 # - class variables with 'Optional[str] = None' are checked as required
 # - class inheritance seems to not work properly with dataclasses
 
+
 @dataclasses.dataclass
 class SqlalchemySettings:
     """Postgres-specific API settings.
