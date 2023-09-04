@@ -21,10 +21,10 @@ dbsettings = None
 storagesettings = None
 
 
-# NOTE of class implementations inside this module:
+# NOTES of class implementations inside this module:
 # - type annotation of class variables must be set (and values are properly cast)
 # - class variables with 'Optional[str] = None' are checked as required
-
+# - class inheritance seems to not work properly with dataclasses
 
 @dataclasses.dataclass
 class SqlalchemySettings:
