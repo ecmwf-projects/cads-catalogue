@@ -36,7 +36,7 @@ class SqlalchemySettings:
     - ``catalogue_db_name``: database name.
     """
 
-    catalogue_db_password: str
+    catalogue_db_password: str = dataclasses.field(repr=False)
     catalogue_db_user: str = "catalogue"
     catalogue_db_host: str = "catalogue-db"
     catalogue_db_name: str = "catalogue"
@@ -108,7 +108,7 @@ class ObjectStorageSettings:
 
     object_storage_url: str
     storage_admin: str
-    storage_password: str
+    storage_password: str = dataclasses.field(repr=False)
     catalogue_bucket: str
     document_storage_url: str
 
