@@ -15,15 +15,14 @@
 
 import dataclasses
 import os
-from typing import Optional
 
 dbsettings = None
 storagesettings = None
 
 
 # NOTES of class implementations inside this module:
-# - type annotation of class variables must be set (and values are properly cast)
-# - class variables with 'Optional[str] = None' are checked as required
+# - type annotation of class variables must be set (values are properly cast)
+# - class variables without a default are checked as not missing
 # - class inheritance seems to not work properly with dataclasses
 
 
@@ -37,8 +36,8 @@ class SqlalchemySettings:
     - ``catalogue_db_name``: database name.
     """
 
+    catalogue_db_password: str
     catalogue_db_user: str = "catalogue"
-    catalogue_db_password: Optional[str] = None
     catalogue_db_host: str = "catalogue-db"
     catalogue_db_name: str = "catalogue"
     pool_recycle: int = 60
@@ -68,7 +67,7 @@ class SqlalchemySettings:
         # automatic casting
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if field.type is not None and not isinstance(value, field.type):
+            if value != dataclasses.MISSING and not isinstance(value, field.type):
                 try:
                     setattr(self, field.name, field.type(value))
                 except:  # noqa
@@ -77,10 +76,14 @@ class SqlalchemySettings:
                     )
 
         # validations
+        # defined fields without a default must have a value
         for field in dataclasses.fields(self):
-            if field.default is None and getattr(self, field.name) is None:
-                #  not specified field, with default None
+            value = getattr(self, field.name)
+            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
                 raise ValueError(f"{field.name} must be set")
+        # catalogue_db_password must be set
+        if self.catalogue_db_password is None:
+            raise ValueError("catalogue_db_password must be set")
 
     @property
     def connection_string(self) -> str:
@@ -105,9 +108,9 @@ class ObjectStorageSettings:
 
     object_storage_url: str
     storage_admin: str
+    storage_password: str
     catalogue_bucket: str
     document_storage_url: str
-    storage_password: Optional[str] = None
 
     def __init__(self, **kwargs):
         self.match_args = kwargs
@@ -134,7 +137,7 @@ class ObjectStorageSettings:
         # automatic casting
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if field.type is not None and not isinstance(value, field.type):
+            if value != dataclasses.MISSING and not isinstance(value, field.type):
                 try:
                     setattr(self, field.name, field.type(value))
                 except:  # noqa
@@ -143,11 +146,14 @@ class ObjectStorageSettings:
                     )
 
         # validations
-        # import pdb; pdb.set_trace()
+        # defined fields without a default must have a value
         for field in dataclasses.fields(self):
-            if field.default is None and getattr(self, field.name) is None:
-                #  not specified field, with default None
+            value = getattr(self, field.name)
+            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
                 raise ValueError(f"{field.name} must be set")
+        # storage_password must be set
+        if self.storage_password is None:
+            raise ValueError("storage_password must be set")
 
     @property
     def storage_kws(self) -> dict[str, str | bool | None]:

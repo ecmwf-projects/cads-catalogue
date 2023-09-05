@@ -79,7 +79,7 @@ def test_storagesettings(temp_environ: Any) -> None:
     temp_environ.pop("storage_password", default=None)
     with pytest.raises(ValueError) as excinfo:
         config.ObjectStorageSettings()  # type: ignore
-    assert "storage_password" in str(excinfo.value)
+    assert "must be set" in str(excinfo.value)
     config.storagesettings = None
 
     my_settings_dict = {
