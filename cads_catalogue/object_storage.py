@@ -182,8 +182,8 @@ def store_file(
         client.head_object(Bucket=bucket_name, Key=object_name)
         logger.debug(f"file {object_name} already existing on bucket {bucket_name}")
     except botocore.exceptions.ClientError as e:
-        logger.info(f"uploading file {object_name} on bucket {bucket_name}")
         if e.response["Error"]["Code"] == "404":  # file does not exist
+            logger.info(f"uploading file {object_name} on bucket {bucket_name}")
             client.upload_file(
                 Filename=file_path,
                 Bucket=bucket_name,
