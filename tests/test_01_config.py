@@ -25,6 +25,19 @@ def test_sqlalchemysettings(temp_environ: Any) -> None:
     assert settings.catalogue_db_password == "a password"
     config.dbsettings = None
 
+    # take also other values from the environment
+    temp_environ["catalogue_db_password"] = "1"
+    temp_environ["catalogue_db_user"] = "2"
+    temp_environ["catalogue_db_host"] = "3"
+    temp_environ["catalogue_db_name"] = "4"
+    temp_environ["pool_recycle"] = "5"
+    settings = config.SqlalchemySettings()
+    assert settings.catalogue_db_password == "1"
+    assert settings.catalogue_db_user == "2"
+    assert settings.catalogue_db_host == "3"
+    assert settings.catalogue_db_name == "4"
+    assert settings.pool_recycle == 5
+
 
 def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) -> None:
     temp_environ["catalogue_db_password"] = "apassword"
@@ -66,7 +79,7 @@ def test_storagesettings(temp_environ: Any) -> None:
     temp_environ.pop("storage_password", default=None)
     with pytest.raises(ValueError) as excinfo:
         config.ObjectStorageSettings()  # type: ignore
-    assert "storage_password" in str(excinfo.value)
+    assert "must be set" in str(excinfo.value)
     config.storagesettings = None
 
     my_settings_dict = {

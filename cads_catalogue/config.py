@@ -13,15 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
-
-import pydantic
+import dataclasses
+import os
 
 dbsettings = None
 storagesettings = None
 
 
-class SqlalchemySettings(pydantic.BaseSettings):
+# NOTES of class implementations inside this module:
+# - type annotation of class variables must be set (values are properly cast)
+# - class variables without a default are checked as not missing
+# - class inheritance seems to not work properly with dataclasses
+
+
+@dataclasses.dataclass
+class SqlalchemySettings:
     """Postgres-specific API settings.
 
     - ``catalogue_db_user``: postgres username.
@@ -30,20 +36,54 @@ class SqlalchemySettings(pydantic.BaseSettings):
     - ``catalogue_db_name``: database name.
     """
 
+    catalogue_db_password: str = dataclasses.field(repr=False)
     catalogue_db_user: str = "catalogue"
-    catalogue_db_password: Optional[str] = None
     catalogue_db_host: str = "catalogue-db"
     catalogue_db_name: str = "catalogue"
     pool_recycle: int = 60
 
-    @pydantic.validator("catalogue_db_password")
-    def password_must_be_set(
-        cls: pydantic.BaseSettings, v: Optional[str]
-    ) -> Optional[str]:
-        """Validate postgresql password."""
-        if v is None:
+    def __init__(self, **kwargs):
+        self.match_args = kwargs
+        for field in dataclasses.fields(self):
+            if field.name in kwargs:
+                setattr(self, field.name, kwargs[field.name])
+            else:
+                setattr(self, field.name, field.default)
+        self.__post_init__()
+
+    def __post_init__(self):
+        # overwrite instance getting attributes from the environment
+        environ = os.environ.copy()
+        environ_lower = {k.lower(): v for k, v in environ.items()}
+        for field in dataclasses.fields(self):
+            if field.name in self.match_args:
+                # do not overwrite if passed to __init__
+                continue
+            if field.name in environ:
+                setattr(self, field.name, environ[field.name])
+            elif field.name in environ_lower:
+                setattr(self, field.name, environ_lower[field.name])
+
+        # automatic casting
+        for field in dataclasses.fields(self):
+            value = getattr(self, field.name)
+            if value != dataclasses.MISSING and not isinstance(value, field.type):
+                try:
+                    setattr(self, field.name, field.type(value))
+                except:  # noqa
+                    raise ValueError(
+                        f"{field.name} '{value}' has not type {repr(field.type)}"
+                    )
+
+        # validations
+        # defined fields without a default must have a value
+        for field in dataclasses.fields(self):
+            value = getattr(self, field.name)
+            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
+                raise ValueError(f"{field.name} must be set")
+        # catalogue_db_password must be set
+        if self.catalogue_db_password is None:
             raise ValueError("catalogue_db_password must be set")
-        return v
 
     @property
     def connection_string(self) -> str:
@@ -55,7 +95,8 @@ class SqlalchemySettings(pydantic.BaseSettings):
         )
 
 
-class ObjectStorageSettings(pydantic.BaseSettings):
+@dataclasses.dataclass(kw_only=True)
+class ObjectStorageSettings:
     """Set of settings to use the object storage with the catalogue manager.
 
     - ``object_storage_url``: object storage URL (internal)
@@ -67,9 +108,52 @@ class ObjectStorageSettings(pydantic.BaseSettings):
 
     object_storage_url: str
     storage_admin: str
-    storage_password: str
+    storage_password: str = dataclasses.field(repr=False)
     catalogue_bucket: str
     document_storage_url: str
+
+    def __init__(self, **kwargs):
+        self.match_args = kwargs
+        for field in dataclasses.fields(self):
+            if field.name in kwargs:
+                setattr(self, field.name, kwargs[field.name])
+            else:
+                setattr(self, field.name, field.default)
+        self.__post_init__()
+
+    def __post_init__(self):
+        # overwrite instance getting attributes from the environment
+        environ = os.environ.copy()
+        environ_lower = {k.lower(): v for k, v in environ.items()}
+        for field in dataclasses.fields(self):
+            if field.name in self.match_args:
+                # do not overwrite if passed to __init__
+                continue
+            if field.name in environ:
+                setattr(self, field.name, environ[field.name])
+            elif field.name in environ_lower:
+                setattr(self, field.name, environ_lower[field.name])
+
+        # automatic casting
+        for field in dataclasses.fields(self):
+            value = getattr(self, field.name)
+            if value != dataclasses.MISSING and not isinstance(value, field.type):
+                try:
+                    setattr(self, field.name, field.type(value))
+                except:  # noqa
+                    raise ValueError(
+                        f"{field.name} '{value}' has not type {repr(field.type)}"
+                    )
+
+        # validations
+        # defined fields without a default must have a value
+        for field in dataclasses.fields(self):
+            value = getattr(self, field.name)
+            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
+                raise ValueError(f"{field.name} must be set")
+        # storage_password must be set
+        if self.storage_password is None:
+            raise ValueError("storage_password must be set")
 
     @property
     def storage_kws(self) -> dict[str, str | bool | None]:
