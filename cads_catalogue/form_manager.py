@@ -138,7 +138,6 @@ def store_form_by_data(
             storage_settings.object_storage_url,
             bucket_name=storage_settings.catalogue_bucket,
             subpath=subpath,
-            force=True,
             **storage_settings.storage_kws,
         )
     finally:

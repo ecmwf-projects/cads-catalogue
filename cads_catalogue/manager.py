@@ -490,7 +490,6 @@ def resource_sync(
             storage_settings.object_storage_url,
             bucket_name=storage_settings.catalogue_bucket,
             subpath=subpath,
-            force=True,
             **storage_settings.storage_kws,
         )
     dataset_query_stmt = sa.select(database.Resource).filter_by(

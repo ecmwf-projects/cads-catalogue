@@ -85,7 +85,6 @@ def licence_sync(
             storage_settings.object_storage_url,  # type: ignore
             bucket_name=storage_settings.catalogue_bucket,  # type: ignore
             subpath=subpath,
-            force=True,
             **storage_kws,
         )
         setattr(db_licence, column_name, file_url)

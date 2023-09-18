@@ -71,7 +71,6 @@ def manage_image_section(
                         storage_settings.object_storage_url,
                         bucket_name=storage_settings.catalogue_bucket,
                         subpath=subpath,
-                        force=True,
                         **storage_settings.storage_kws,
                     )
                     # update cache of the upload urls
@@ -345,7 +344,6 @@ def store_layout_by_data(
             storage_settings.object_storage_url,
             bucket_name=storage_settings.catalogue_bucket,
             subpath=subpath,
-            force=True,
             **storage_settings.storage_kws,
         )
     finally:
