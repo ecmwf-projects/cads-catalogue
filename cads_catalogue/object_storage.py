@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import hashlib
-import json
 import os
 import pathlib
 from typing import Any
@@ -28,76 +27,8 @@ from cads_catalogue import utils
 
 logger = structlog.get_logger(__name__)
 
-DOWNLOAD_POLICY_TEMPLATE: dict[str, Any] = {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
-            "Effect": "Allow",
-            "Principal": {"AWS": ["*"]},
-            "Resource": ["arn:aws:s3:::%(bucket_name)s"],
-        },
-        {
-            "Action": ["s3:GetObject", "s3:GetObjectVersion"],
-            "Effect": "Allow",
-            "Principal": {"AWS": ["*"]},
-            "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
-        },
-    ],
-}
-PRIVATE_POLICY_TEMPLATE: dict[str, Any] = {}
-PUBLIC_POLICY_TEMPLATE: dict[str, Any] = {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "s3:GetBucketLocation",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-            ],
-            "Effect": "Allow",
-            "Principal": {"AWS": ["*"]},
-            "Resource": ["arn:aws:s3:::%(bucket_name)s"],
-        },
-        {
-            "Action": [
-                "s3:PutObject",
-                "s3:AbortMultipartUpload",
-                "s3:DeleteObject",
-                "s3:GetObject",
-                "s3:GetObjectVersion",
-                "s3:ListMultipartUploadParts",
-            ],
-            "Effect": "Allow",
-            "Principal": {"AWS": ["*"]},
-            "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
-        },
-    ],
-}
-UPLOAD_POLICY_TEMPLATE: dict[str, Any] = {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": ["s3:GetBucketLocation", "s3:ListBucketMultipartUploads"],
-            "Effect": "Allow",
-            "Principal": {"AWS": ["*"]},
-            "Resource": ["arn:aws:s3:::%(bucket_name)s"],
-        },
-        {
-            "Action": [
-                "s3:AbortMultipartUpload",
-                "s3:DeleteObject",
-                "s3:ListMultipartUploadParts",
-                "s3:PutObject",
-            ],
-            "Effect": "Allow",
-            "Principal": {"AWS": ["*"]},
-            "Resource": ["arn:aws:s3:::%(bucket_name)s/*"],
-        },
-    ],
-}
 
-CORS_CONFIG: dict[str, Any] = {
+DEFAULT_CORS_CONFIG: dict[str, Any] = {
     "CORSRules": [
         {
             "AllowedHeaders": ["Accept", "Content-Type"],
@@ -106,27 +37,6 @@ CORS_CONFIG: dict[str, Any] = {
         }
     ]
 }
-
-
-def set_bucket_policy(
-    client: boto3.session.Session.client, bucket_name: str, policy: str  # type: ignore
-) -> None:
-    """Set anonymous policy to a bucket.
-
-    Parameters
-    ----------
-    client: boto3 client object
-    bucket_name: name of the bucket
-    policy: one of 'private', 'public', 'upload', 'download'
-    """
-    policy_map = {
-        "download": DOWNLOAD_POLICY_TEMPLATE,
-        "private": PRIVATE_POLICY_TEMPLATE,
-        "public": PUBLIC_POLICY_TEMPLATE,
-        "upload": UPLOAD_POLICY_TEMPLATE,
-    }
-    policy_json = json.dumps(policy_map[policy]) % {"bucket_name": bucket_name}
-    client.put_bucket_policy(Bucket=bucket_name, Policy=policy_json)  # type: ignore
 
 
 def set_bucket_cors(
@@ -143,8 +53,85 @@ def set_bucket_cors(
     config: CORS configuration to use (default is CORS_CONFIG)
     """
     if config is None:
-        config = CORS_CONFIG
+        config = DEFAULT_CORS_CONFIG
     client.put_bucket_cors(Bucket=bucket_name, CORSConfiguration=config)  # type: ignore
+
+
+def is_bucket_read_only(client, bucket_name) -> bool:
+    """Return True if the bucket is read-only for all users."""
+    response = client.get_bucket_acl(Bucket=bucket_name)
+    try:
+        for grant in response["Grants"]:
+            grantee = grant["Grantee"]
+            if (
+                grantee["Type"] == "Group"
+                and grantee["URI"] == "http://acs.amazonaws.com/groups/global/AllUsers"
+            ):
+                return grant["Permission"] == "READ"
+    except KeyError:
+        logger.error(f"ACL of bucket {bucket_name} not parsable")
+    return False
+
+
+def is_bucket_existing(client, bucket_name) -> bool | None:
+    """Return True if the bucket exists."""
+    try:
+        client.head_bucket(Bucket=bucket_name)
+        return True
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            return False
+    return None
+
+
+def is_bucket_cors_set(client, bucket_name) -> bool | None:
+    """Return True if the bucket has CORS already set."""
+    ret_value = None
+    try:
+        client.get_bucket_cors(Bucket=bucket_name)
+        ret_value = True
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchCORSConfiguration":
+            ret_value = False
+    return ret_value
+
+
+def is_object_read_only(client, bucket, object_name):
+    """Return True if the object is stored with ACL read-only."""
+    response = client.get_object_acl(Bucket=bucket, Key=object_name)
+    try:
+        for grant in response["Grants"]:
+            grantee = grant["Grantee"]
+            if (
+                grantee["Type"] == "Group"
+                and grantee["URI"] == "http://acs.amazonaws.com/groups/global/AllUsers"
+            ):
+                return grant["Permission"] == "READ"
+    except KeyError:
+        logger.error(f"ACL of object {bucket}/{object_name} not parsable")
+    return False
+
+
+def setup_bucket(client, bucket_name) -> None:
+    """Create a public-read bucket (if not existing) and setup CORS."""
+    if not is_bucket_existing(client, bucket_name):
+        logger.info(f"creation of bucket {bucket_name}")
+        client.create_bucket(Bucket=bucket_name)
+        logger.info(f"setup ACL public-read on bucket {bucket_name}")
+        client.put_bucket_acl(ACL="public-read", Bucket=bucket_name)
+    else:
+        if not is_bucket_read_only(client, bucket_name):
+            logger.warning(f"setting ACL public-read on bucket {bucket_name}")
+            client.put_bucket_acl(ACL="public-read", Bucket=bucket_name)
+
+    if not is_bucket_cors_set(client, bucket_name):
+        logger.warning(f"setting CORS policy on bucket {bucket_name}")
+        try:
+            client.put_bucket_cors(
+                Bucket=bucket_name, CORSConfiguration=DEFAULT_CORS_CONFIG
+            )
+        except Exception:
+            logger.warning(f"unable to set CORS policy on bucket {bucket_name}")
 
 
 def store_file(
@@ -152,7 +139,6 @@ def store_file(
     object_storage_url: str,  # type: ignore
     bucket_name: str = "cads-catalogue",  # type: ignore
     subpath: str = "",
-    force: bool = False,
     use_client: Any = None,
     **storage_kws: Any,
 ) -> str:
@@ -160,8 +146,6 @@ def store_file(
 
     Store a file at `file_path` in the object storage, in the bucket `bucket_name`.
     If subpath is supplied, the file is stored in subpath/file_name.
-    If force is True, a bucket `bucket_name` is created if not existing. Note that in such case
-    the bucket has 'download' access policy for anonymous.
     Return the download URL of the stored file, relative to the object storage.
 
     Parameters
@@ -170,7 +154,6 @@ def store_file(
     object_storage_url: endpoint URL of the object storage
     bucket_name: name of the bucket to use inside the object storage
     subpath: optional folder path inside the bucket (created if not existing)
-    force: if True, force to create the bucket if not existing (default to False)
     use_client: if specified, use this client instead of a new boto3 client (used in tests)
     storage_kws: dictionary of parameters used to pass to the storage client
 
@@ -186,27 +169,9 @@ def store_file(
         client = use_client
     else:
         client = boto3.client("s3", endpoint_url=object_storage_url, **storage_kws)
+    setup_bucket(client, bucket_name)
     # NOTE: version retrieval is not supported in the public endpoint of the storage,
     # so the file is stored using a prefix including the SHA256 hash of the file content
-    try:
-        client.head_bucket(Bucket=bucket_name)
-    except botocore.exceptions.ClientError as e:
-        if e.response["Error"]["Code"] == "404":  # bucket does not exist
-            if force:
-                client.create_bucket(Bucket=bucket_name)
-                set_bucket_policy(client, bucket_name, "download")
-            else:
-                raise ValueError(
-                    "the bucket %r does not exist in the object storage" % bucket_name
-                )
-    try:
-        client.get_bucket_cors(Bucket=bucket_name)
-    except botocore.exceptions.ClientError as e:
-        if e.response["Error"]["Code"] == "NoSuchCORSConfiguration":
-            try:
-                set_bucket_cors(client, bucket_name)
-            except Exception:  # noqa:
-                logger.warning(f"unable to set CORS policy on bucket {bucket_name}")
     with open(file_path, "rb") as fp:
         data = fp.read()
         source_sha256 = hashlib.sha256(data).hexdigest()
@@ -215,15 +180,27 @@ def store_file(
     object_name = os.path.join(subpath, f"{file_prefix}_{source_sha256}{file_ext}")
     try:
         client.head_object(Bucket=bucket_name, Key=object_name)
+        logger.debug(f"file {object_name} already existing on bucket {bucket_name}")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "404":  # file does not exist
+            logger.info(f"uploading file {object_name} on bucket {bucket_name}")
             client.upload_file(
                 Filename=file_path,
                 Bucket=bucket_name,
                 Key=object_name,
-                ExtraArgs={"ContentType": utils.guess_type(file_name)},
+                ExtraArgs={
+                    "ContentType": utils.guess_type(file_name),
+                    "ACL": "public-read",
+                },
             )
-
+    else:
+        if not is_object_read_only(client, bucket_name, object_name):
+            logger.info(
+                f"setting ACL read-only on object {object_name} on bucket {bucket_name}"
+            )
+            client.put_object_acl(
+                Bucket=bucket_name, Key=object_name, ACL="public-read"
+            )
     download_rel_url = "%s/%s" % (bucket_name, object_name)
     return download_rel_url
 
@@ -253,14 +230,16 @@ def delete_bucket(
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "BucketNotEmpty":
             if force:
-                for i, obj in enumerate(
-                    client.list_objects_v2(Bucket=bucket_name)["Contents"]
-                ):
-                    client.delete_object(Bucket=bucket_name, Key=obj["Key"])
-                    if i % 1000 == 0:
-                        logger.info(
-                            f"removed %i files from the bucket {bucket_name}..."
-                        )
+                s3 = boto3.resource(
+                    "s3", endpoint_url=object_storage_url, **storage_kws
+                )
+                bucket = s3.Bucket(bucket_name)
+                bucket_versioning = s3.BucketVersioning(bucket_name)
+                if bucket_versioning.status == "Enabled":
+                    bucket.object_versions.delete()
+                else:
+                    bucket.objects.all().delete()
+                client.delete_bucket(Bucket=bucket_name)
             else:
                 logger.error(f"bucket {bucket_name} is not empty")
     logger.info(f"bucket {bucket_name} successfully removed")

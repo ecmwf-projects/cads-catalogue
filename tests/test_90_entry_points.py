@@ -195,7 +195,6 @@ def test_update_catalogue(
     assert (licence_path, object_storage_url) in [mp.args for mp in patch.mock_calls]
     assert {
         "bucket_name": bucket_name,
-        "force": True,
         "subpath": "licences/licence-to-use-copernicus-products",
         "aws_access_key_id": "storage_user",
         "aws_secret_access_key": "storage_password",
@@ -208,7 +207,6 @@ def test_update_catalogue(
             ),
             object_storage_url,
             bucket_name=bucket_name,
-            force=True,
             subpath="licences/licence-to-use-copernicus-products",
             **object_storage_kws,
         ),
@@ -221,7 +219,6 @@ def test_update_catalogue(
             ),
             object_storage_url,
             bucket_name=bucket_name,
-            force=True,
             subpath="resources/reanalysis-era5-land",
             **object_storage_kws,
         ),
