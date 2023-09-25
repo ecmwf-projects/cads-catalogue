@@ -36,14 +36,16 @@ class SqlalchemySettings:
     - ``catalogue_db_name``: database name.
     """
 
-    ro_catalogue_db_password: str = dataclasses.field(repr=False)
-    ro_catalogue_db_user: str
-    ro_catalogue_db_host: str
-    ro_catalogue_db_name: str
-    catalogue_db_password: str = dataclasses.field(repr=False)
-    catalogue_db_user: str = "catalogue"
-    catalogue_db_host: str = "catalogue-db"
-    catalogue_db_name: str = "catalogue"
+    read_db_user: str | None
+    read_db_password: str | None
+    write_db_user: str | None
+    write_db_password: str | None
+    db_host: str | None
+
+    catalogue_db_user: str | None = None
+    catalogue_db_password: str | None = None
+    catalogue_db_host: str | None = None
+    catalogue_db_name: str | None = None
 
     pool_recycle: int = 60
 
@@ -80,12 +82,13 @@ class SqlalchemySettings:
                         f"{field.name} '{value}' has not type {repr(field.type)}"
                     )
 
-        # defaults of ro_* fields
+        # defaults for backward-compatibility fields
         default_fields_map = {
-            "ro_catalogue_db_user": "catalogue_db_user",
-            "ro_catalogue_db_password": "catalogue_db_password",
-            "ro_catalogue_db_host": "catalogue_db_host",
-            "ro_catalogue_db_name": "catalogue_db_name",
+            "read_db_user": "catalogue_db_user",
+            "write_db_user": "catalogue_db_user",
+            "read_db_password": "catalogue_db_password",
+            "write_db_password": "catalogue_db_password",
+            "db_host": "catalogue_db_host",
         }
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
@@ -100,29 +103,23 @@ class SqlalchemySettings:
         # defined fields without a default must have a value
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
+            if field.default == dataclasses.MISSING and value in (
+                dataclasses.MISSING,
+                None,
+            ):
                 raise ValueError(f"{field.name} must be set")
-        # catalogue_db_password must be set
-        if self.catalogue_db_password is None:
-            raise ValueError("catalogue_db_password must be set")
 
     @property
     def connection_string(self) -> str:
         """Create reader psql connection string."""
-        return (
-            f"postgresql://{self.catalogue_db_user}"
-            f":{self.catalogue_db_password}@{self.catalogue_db_host}"
-            f"/{self.catalogue_db_name}"
-        )
+        url = f"postgresql://{self.write_db_user}:{self.write_db_password}@{self.db_host}/{self.catalogue_db_name}"
+        return url
 
     @property
     def connection_string_ro(self) -> str:
         """Create reader psql connection string in read-only mode."""
-        return (
-            f"postgresql://{self.ro_catalogue_db_user}"
-            f":{self.ro_catalogue_db_password}@{self.ro_catalogue_db_host}"
-            f"/{self.ro_catalogue_db_name}"
-        )
+        url = f"postgresql://{self.read_db_user}:{self.read_db_password}@{self.db_host}/{self.catalogue_db_name}"
+        return url
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -179,7 +176,10 @@ class ObjectStorageSettings:
         # defined fields without a default must have a value
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
+            if field.default == dataclasses.MISSING and value in (
+                dataclasses.MISSING,
+                None,
+            ):
                 raise ValueError(f"{field.name} must be set")
         # storage_password must be set
         if self.storage_password is None:

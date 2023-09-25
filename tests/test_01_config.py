@@ -6,72 +6,70 @@ import sqlalchemy as sa
 from cads_catalogue import config
 
 
-def test_sqlalchemysettings_1(temp_environ: Any) -> None:
+def test_sqlalchemysettings(temp_environ: Any) -> None:
     # check settings must have a password set (no default)
     temp_environ.pop("catalogue_db_password", default=None)
     with pytest.raises(ValueError) as excinfo:
         config.SqlalchemySettings()
-    assert "catalogue_db_password" in str(excinfo.value)
+    assert "read_db_user" in str(excinfo.value)
 
-
-def test_sqlalchemysettings_2(temp_environ: Any) -> None:
     # also an empty password can be set
+    temp_environ["catalogue_db_user"] = "user1"
+    temp_environ["catalogue_db_host"] = "host1"
+    temp_environ["catalogue_db_name"] = "dbname1"
     settings = config.SqlalchemySettings(catalogue_db_password="")
     assert settings.catalogue_db_password == ""
 
+    # check backward compatibility defaults
+    assert settings.__dict__ == {
+        "catalogue_db_user": "user1",
+        "catalogue_db_password": "",
+        "catalogue_db_host": "host1",
+        "catalogue_db_name": "dbname1",
+        "read_db_user": "user1",
+        "read_db_password": "",
+        "write_db_user": "user1",
+        "write_db_password": "",
+        "db_host": "host1",
+        "pool_recycle": 60,
+        "match_args": {"catalogue_db_password": ""},
+    }
 
-def test_sqlalchemysettings_3(temp_environ: Any) -> None:
-    # also a not empty password can be set
-    temp_environ["catalogue_db_password"] = "a password"
+    # use not backward compatibility variables
+    temp_environ["read_db_user"] = "ro_user"
+    temp_environ["read_db_password"] = "ro_password"
+    temp_environ["write_db_user"] = "rw_user"
+    temp_environ["write_db_password"] = "rw_password"
+    temp_environ["db_host"] = "new_db_host"
     settings = config.SqlalchemySettings()
-    assert settings.catalogue_db_password == "a password"
-
-
-def test_sqlalchemysettings_4(temp_environ: Any) -> None:
-    # take also other values from the environment
-    temp_environ["catalogue_db_password"] = "1"
-    temp_environ["catalogue_db_user"] = "2"
-    temp_environ["catalogue_db_host"] = "3"
-    temp_environ["catalogue_db_name"] = "4"
-    temp_environ["ro_catalogue_db_password"] = "5"
-    temp_environ["ro_catalogue_db_user"] = "6"
-    temp_environ["ro_catalogue_db_host"] = "7"
-    temp_environ["ro_catalogue_db_name"] = "8"
-    temp_environ["pool_recycle"] = "9"
-    settings = config.SqlalchemySettings()
-    assert settings.catalogue_db_password == "1"
-    assert settings.catalogue_db_user == "2"
-    assert settings.catalogue_db_host == "3"
-    assert settings.catalogue_db_name == "4"
-    assert settings.ro_catalogue_db_password == "5"
-    assert settings.ro_catalogue_db_user == "6"
-    assert settings.ro_catalogue_db_host == "7"
-    assert settings.ro_catalogue_db_name == "8"
-    assert settings.pool_recycle == 9
-
-
-def test_sqlalchemysettings_5(temp_environ: Any) -> None:
-    # check defaults for read-only fields
-    temp_environ["catalogue_db_password"] = "1"
-    temp_environ["catalogue_db_user"] = "2"
-    temp_environ["catalogue_db_host"] = "3"
-    temp_environ["catalogue_db_name"] = "4"
-    temp_environ["pool_recycle"] = "5"
-    settings = config.SqlalchemySettings()
-    assert settings.catalogue_db_password == "1"
-    assert settings.catalogue_db_user == "2"
-    assert settings.catalogue_db_host == "3"
-    assert settings.catalogue_db_name == "4"
-    assert settings.ro_catalogue_db_password == "1"
-    assert settings.ro_catalogue_db_user == "2"
-    assert settings.ro_catalogue_db_host == "3"
-    assert settings.ro_catalogue_db_name == "4"
-    assert settings.pool_recycle == 5
+    assert settings.__dict__ == {
+        "catalogue_db_user": "user1",
+        "catalogue_db_password": None,
+        "catalogue_db_host": "host1",
+        "catalogue_db_name": "dbname1",
+        "read_db_user": "ro_user",
+        "read_db_password": "ro_password",
+        "write_db_user": "rw_user",
+        "write_db_password": "rw_password",
+        "db_host": "new_db_host",
+        "pool_recycle": 60,
+        "match_args": {},
+    }
+    assert (
+        settings.connection_string
+        == "postgresql://rw_user:rw_password@new_db_host/dbname1"
+    )
+    assert (
+        settings.connection_string_ro
+        == "postgresql://ro_user:ro_password@new_db_host/dbname1"
+    )
 
 
 def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) -> None:
+    temp_environ["catalogue_db_user"] = "auser"
     temp_environ["catalogue_db_password"] = "apassword"
-    temp_environ["ro_catalogue_db_password"] = "ro_apassword"
+    temp_environ["catalogue_db_host"] = "ahost"
+    temp_environ["catalogue_db_name"] = "aname"
     # initially global settings is importable, but it is None
     assert config.dbsettings is None
 
@@ -79,11 +77,11 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
     effective_settings = config.ensure_settings()
     assert (
         effective_settings.connection_string
-        == "postgresql://catalogue:apassword@catalogue-db/catalogue"
+        == "postgresql://auser:apassword@ahost/aname"
     )
     assert (
         effective_settings.connection_string_ro
-        == "postgresql://catalogue:ro_apassword@catalogue-db/catalogue"
+        == "postgresql://auser:apassword@ahost/aname"
     )
     assert config.dbsettings == effective_settings
     config.dbsettings = None
@@ -93,21 +91,22 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
         "catalogue_db_user": "monica",
         "catalogue_db_password": "secret1",
         "catalogue_db_host": "myhost",
-        "catalogue_db_name": "mycatalogue",
-        "ro_catalogue_db_user": "monica2",
-        "ro_catalogue_db_password": "secret2",
-        "ro_catalogue_db_host": "myhost2",
-        "ro_catalogue_db_name": "mycatalogue2",
+        "catalogue_db_name": "mybroker",
+        "read_db_user": "ro_user",
+        "read_db_password": "ro_password",
+        "write_db_user": "rw_user",
+        "write_db_password": "rw_password",
+        "db_host": "new_db_host",
     }
     my_settings_connection_string = (
-        "postgresql://%(catalogue_db_user)s:%(catalogue_db_password)s"
-        "@%(catalogue_db_host)s/%(catalogue_db_name)s" % my_settings_dict
+        "postgresql://%(write_db_user)s:%(write_db_password)s"
+        "@%(db_host)s/%(catalogue_db_name)s" % my_settings_dict
     )
     my_settings_connection_string_ro = (
-        "postgresql://%(ro_catalogue_db_user)s:%(ro_catalogue_db_password)s"
-        "@%(ro_catalogue_db_host)s/%(ro_catalogue_db_name)s" % my_settings_dict
+        "postgresql://%(read_db_user)s:%(read_db_password)s"
+        "@%(db_host)s/%(catalogue_db_name)s" % my_settings_dict
     )
-    mysettings = config.SqlalchemySettings(**my_settings_dict)  # type: ignore
+    mysettings = config.SqlalchemySettings(**my_settings_dict)
     effective_settings = config.ensure_settings(mysettings)
 
     assert config.dbsettings == effective_settings
