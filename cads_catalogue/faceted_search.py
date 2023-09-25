@@ -27,7 +27,7 @@ import sqlalchemy as sa
 from cads_catalogue import database
 from cads_catalogue.faceted_search import get_datasets_by_keywords, get_faceted_stats
 
-session_obj = database.ensure_session_obj()
+session_obj = database.ensure_session_obj(read_only=True)
 session = session_obj()
 
 # consider all the datasets (but you can start with a filtered set of resources,

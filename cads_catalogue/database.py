@@ -279,24 +279,28 @@ class Licence(BaseModel):
     )
 
 
-def ensure_session_obj(session_obj: sa.orm.sessionmaker | None) -> sa.orm.sessionmaker:
-    """If `session_obj` is None, create a new session object.
+def ensure_session_obj(read_only: bool = False) -> sa.orm.sessionmaker:
+    """Create a new session object bound to the catalogue database.
 
     Parameters
     ----------
-    session_obj: sqlalchemy Session object
+    read_only: if True, return the sessionmaker object for read-only sessions (default False).
 
     Returns
     -------
     session_obj:
         a SQLAlchemy Session object
     """
-    if session_obj:
-        return session_obj
     settings = config.ensure_settings(config.dbsettings)
-    session_obj = sa.orm.sessionmaker(
-        sa.create_engine(settings.connection_string, pool_recycle=settings.pool_recycle)
-    )
+    if read_only:
+        engine = sa.create_engine(
+            settings.connection_string_ro, pool_recycle=settings.pool_recycle
+        )
+    else:
+        engine = sa.create_engine(
+            settings.connection_string, pool_recycle=settings.pool_recycle
+        )
+    session_obj = sa.orm.sessionmaker(engine)
     return session_obj
 
 
