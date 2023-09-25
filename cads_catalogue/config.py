@@ -36,10 +36,15 @@ class SqlalchemySettings:
     - ``catalogue_db_name``: database name.
     """
 
+    ro_catalogue_db_password: str = dataclasses.field(repr=False)
+    ro_catalogue_db_user: str
+    ro_catalogue_db_host: str
+    ro_catalogue_db_name: str
     catalogue_db_password: str = dataclasses.field(repr=False)
     catalogue_db_user: str = "catalogue"
     catalogue_db_host: str = "catalogue-db"
     catalogue_db_name: str = "catalogue"
+
     pool_recycle: int = 60
 
     def __init__(self, **kwargs):
@@ -75,6 +80,22 @@ class SqlalchemySettings:
                         f"{field.name} '{value}' has not type {repr(field.type)}"
                     )
 
+        # defaults of ro_* fields
+        default_fields_map = {
+            "ro_catalogue_db_user": "catalogue_db_user",
+            "ro_catalogue_db_password": "catalogue_db_password",
+            "ro_catalogue_db_host": "catalogue_db_host",
+            "ro_catalogue_db_name": "catalogue_db_name",
+        }
+        for field in dataclasses.fields(self):
+            value = getattr(self, field.name)
+            if field.name in default_fields_map and value in [
+                dataclasses.MISSING,
+                None,
+            ]:
+                default_value = getattr(self, default_fields_map[field.name])
+                setattr(self, field.name, default_value)
+
         # validations
         # defined fields without a default must have a value
         for field in dataclasses.fields(self):
@@ -92,6 +113,15 @@ class SqlalchemySettings:
             f"postgresql://{self.catalogue_db_user}"
             f":{self.catalogue_db_password}@{self.catalogue_db_host}"
             f"/{self.catalogue_db_name}"
+        )
+
+    @property
+    def connection_string_ro(self) -> str:
+        """Create reader psql connection string in read-only mode."""
+        return (
+            f"postgresql://{self.ro_catalogue_db_user}"
+            f":{self.ro_catalogue_db_password}@{self.ro_catalogue_db_host}"
+            f"/{self.ro_catalogue_db_name}"
         )
 
 
