@@ -182,6 +182,7 @@ def update_catalogue(
     force: if True, run update regardless input folders has no changes from last update (default False)
     delete_orphans: if True, delete resources not involved in the update process (default True)
     """
+    logger.info("start running update of the catalogue")
     utils.configure_log()
     # input validation
     if not os.path.isdir(resources_folder_path):
@@ -198,6 +199,7 @@ def update_catalogue(
     session_obj = sa.orm.sessionmaker(engine)
 
     # create db if not exists and update the structure
+    logger.info("start checking if database structure needs to be updated")
     database.init_database(connection_string)
 
     # get storage parameters from environment
@@ -205,6 +207,7 @@ def update_catalogue(
 
     with session_obj.begin() as session:  # type: ignore
         # check if source folders have changed from last registered update
+        logger.info("start checking git revision of source files")
         (
             is_db_to_update,
             did_catalogue_repo_change,
@@ -228,11 +231,11 @@ def update_catalogue(
                 "Use --force to update anyway."
             )
             return
-
+        logger.info("start db updating of licences")
         involved_licences = licence_manager.update_catalogue_licences(
             session, licences_folder_path, storage_settings
         )
-
+        logger.info("start db updating of datasets")
         involved_resource_uids = manager.update_catalogue_resources(
             session,
             resources_folder_path,
@@ -240,15 +243,19 @@ def update_catalogue(
             storage_settings,
             force=force,
         )
+        logger.info("start db updating of messages")
         messages.update_catalogue_messages(session, messages_folder_path)
 
         if delete_orphans:
+            logger.info("start db removing of orphan datasets")
             manager.remove_datasets(session, keep_resource_uids=involved_resource_uids)
+        logger.info("start db removing of orphan licences")
         licence_manager.remove_orphan_licences(
             session, keep_licences=involved_licences, resources=involved_resource_uids
         )
 
         # update hashes from the catalogue_updates table
+        logger.info("db update of hash of source repositories")
         session.execute(sa.delete(database.CatalogueUpdate))
         new_update_info = database.CatalogueUpdate(
             catalogue_repo_commit=catalogue_hash,
@@ -269,6 +276,7 @@ def update_catalogue(
                 cim_hash,
             )
         )
+        logger.info("end of update of the catalogue")
 
 
 def main() -> None:
