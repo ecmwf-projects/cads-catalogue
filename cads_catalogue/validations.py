@@ -239,6 +239,7 @@ def validate_metadata_json(dataset_folder):
         "keywords",
         "licences",
         "lineage",
+        "portal",
         "publication_date",
         "related_resources_keywords",
         "representative_fraction",
@@ -253,10 +254,16 @@ def validate_metadata_json(dataset_folder):
     ]
     for optional_field in optional_fields:
         if optional_field not in data or data.get(optional_field) is None:
-            logger.info(
-                f"optional field not found or empty: '{optional_field}', "
-                f"consider to include a value"
-            )
+            if optional_field in ("publication_date", "resource_update"):
+                logger.warning(
+                    f"optional field not found or empty: '{optional_field}', "
+                    f"strongly suggested to include a value"
+                )
+            else:
+                logger.info(
+                    f"optional field not found or empty: '{optional_field}', "
+                    f"consider to include a value"
+                )
 
     extra_fields = sorted(
         set(data.keys()) - set(required_fields).union(set(optional_fields))
@@ -359,7 +366,7 @@ def validate_datasets(datasets_folder: str) -> None:
     exclude_folders = (".git",)
     logger.info(f"----starting validations of root folder {datasets_folder}----")
     # load metadata of each resource from files and sync each resource in the db
-    for dataset_folder in glob.glob(os.path.join(datasets_folder, "*/")):
+    for dataset_folder in sorted(glob.glob(os.path.join(datasets_folder, "*/"))):
         resource_uid = os.path.basename(dataset_folder.rstrip(os.sep))
         if resource_uid in exclude_folders:
             logger.debug(f"excluding folder {resource_uid}")
