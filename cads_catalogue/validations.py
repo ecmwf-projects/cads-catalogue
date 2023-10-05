@@ -239,6 +239,7 @@ def validate_metadata_json(dataset_folder):
         "keywords",
         "licences",
         "lineage",
+        "portal",
         "publication_date",
         "related_resources_keywords",
         "representative_fraction",
