@@ -383,10 +383,9 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         "responsible_organisation_website"
     )
     metadata["resource_update"] = data.get("update_date")
-    metadata["resource_update"] = data.get("update_date")
     if not metadata["resource_update"]:
         logger.warning(
-            f"update_date not provided: setting like publication_date '{metadata['publication_date']}'"
+            f"update_date not provided: setting as publication_date '{metadata['publication_date']}'"
         )
         metadata["resource_update"] = metadata["publication_date"]
     metadata["portal"] = data.get("portal", "c3s")
