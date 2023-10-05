@@ -364,7 +364,13 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["licence_uids"] = data.get("licences", [])
 
     metadata["lineage"] = data.get("lineage")
+    default_public_date = "2017-01-01"
     metadata["publication_date"] = data.get("publication_date")
+    if not metadata["publication_date"]:
+        logger.warning(
+            f"publication_date not provided: setting default '{default_public_date}'"
+        )
+        metadata["publication_date"] = default_public_date
     metadata["qos_tags"] = data.get("qos_tags", [])
     metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
 
@@ -379,7 +385,10 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["resource_update"] = data.get("update_date")
     metadata["resource_update"] = data.get("update_date")
     if not metadata["resource_update"]:
-        metadata["resource_update"] = data.get("publication_date")
+        logger.warning(
+            f"update_date not provided: setting like publication_date '{metadata['publication_date']}'"
+        )
+        metadata["resource_update"] = metadata["publication_date"]
     metadata["portal"] = data.get("portal", "c3s")
     metadata["title"] = data.get("title")
     metadata["topic"] = data.get("topic")
