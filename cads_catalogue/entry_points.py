@@ -164,7 +164,7 @@ def update_catalogue(
     cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),
     connection_string: Optional[str] = None,
     force: bool = False,
-    resources: Union[None, str, list] = None,
+    resources: Optional[str] = None,
     delete_orphans: bool = True,
 ) -> None:
     """Update the database with the catalogue data.
