@@ -20,7 +20,7 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 import sqlalchemy as sa
 import structlog
@@ -598,6 +598,7 @@ def update_catalogue_resources(
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
+    resources: Union[None, str, list] = None
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -609,6 +610,7 @@ def update_catalogue_resources(
     storage_settings: object with settings to access the object storage
     cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     force: if True, no skipping of dataset update based on detected changes of sources is made
+    resources: list of resources to update, if not provided then all resources are updated
 
     Returns
     -------
@@ -618,7 +620,14 @@ def update_catalogue_resources(
 
     logger.info("running catalogue db update for resources")
     # load metadata of each resource from files and sync each resource in the db
-    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+    if resources is None:
+        resources = glob.glob(os.path.join(resources_folder_path, "*/"))
+    elif isinstance(resources, str):
+        resources = [os.path.join(resources_folder_path, resource)]
+    elif isinstance(resource, (list, tuple)):
+        resources = [os.path.join(resources_folder_path, resource) for resource in resources]
+
+    for resource_folder_path in resources:
         resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
         logger.debug("parsing folder %s" % resource_folder_path)
         input_resource_uids.append(resource_uid)

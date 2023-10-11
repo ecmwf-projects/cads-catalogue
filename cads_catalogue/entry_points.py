@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os.path
-from typing import Optional
+from typing import Optional, Union
 
 import sqlalchemy as sa
 import structlog
@@ -164,6 +164,7 @@ def update_catalogue(
     cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),
     connection_string: Optional[str] = None,
     force: bool = False,
+    resources: Union[None, str, list] = None,
     delete_orphans: bool = True,
 ) -> None:
     """Update the database with the catalogue data.
@@ -242,6 +243,7 @@ def update_catalogue(
             cim_folder_path,
             storage_settings,
             force=force,
+            resources=resources
         )
         logger.info("start db updating of messages")
         messages.update_catalogue_messages(session, messages_folder_path)
