@@ -598,7 +598,7 @@ def update_catalogue_resources(
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
-    resources: Union[None, str, list] = None
+    resources: Union[None, str, list] = None,
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -623,9 +623,11 @@ def update_catalogue_resources(
     if resources is None:
         resources = glob.glob(os.path.join(resources_folder_path, "*/"))
     elif isinstance(resources, str):
-        resources = [os.path.join(resources_folder_path, resource)]
-    elif isinstance(resource, (list, tuple)):
-        resources = [os.path.join(resources_folder_path, resource) for resource in resources]
+        resources = [os.path.join(resources_folder_path, resources)]
+    elif isinstance(resources, (list, tuple)):
+        resources = [
+            os.path.join(resources_folder_path, resource) for resource in resources
+        ]
 
     for resource_folder_path in resources:
         resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))

@@ -243,7 +243,7 @@ def update_catalogue(
             cim_folder_path,
             storage_settings,
             force=force,
-            resources=resources
+            resources=resources,
         )
         logger.info("start db updating of messages")
         messages.update_catalogue_messages(session, messages_folder_path)
