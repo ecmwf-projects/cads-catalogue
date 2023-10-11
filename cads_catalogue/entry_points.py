@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os.path
-from typing import Optional, Union
+from typing import Optional
 
 import sqlalchemy as sa
 import structlog
