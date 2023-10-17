@@ -294,7 +294,7 @@ def ensure_session_obj(read_only: bool = False) -> sa.orm.sessionmaker:
     settings = config.ensure_settings(config.dbsettings)
     if read_only:
         engine = sa.create_engine(
-            settings.connection_string_ro, pool_recycle=settings.pool_recycle
+            settings.connection_string_read, pool_recycle=settings.pool_recycle
         )
     else:
         engine = sa.create_engine(

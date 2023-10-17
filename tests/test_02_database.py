@@ -29,14 +29,13 @@ def test_init_database(postgresql: Connection[str]) -> None:
 def test_ensure_session_obj(postgresql: Connection[str], temp_environ: Any) -> None:
     temp_environ["catalogue_db_host"] = "cataloguehost"
     temp_environ["catalogue_db_password"] = postgresql.info.password
-    temp_environ["read_db_user"] = "readonlyuser"
-    temp_environ["write_db_user"] = "writeuser"
+    temp_environ["catalogue_db_user"] = "user"
+    temp_environ["catalogue_db_host_read"] = "read_only_host"
     temp_environ["catalogue_db_name"] = "catalogue"
     ret_value = database.ensure_session_obj()
     assert isinstance(ret_value, sessionmaker)
     assert (
-        str(ret_value.kw["bind"].url)
-        == "postgresql://writeuser:***@cataloguehost/catalogue"
+        str(ret_value.kw["bind"].url) == "postgresql://user:***@cataloguehost/catalogue"
     )
 
     config.dbsettings = None
@@ -44,6 +43,6 @@ def test_ensure_session_obj(postgresql: Connection[str], temp_environ: Any) -> N
     assert isinstance(ret_value, sessionmaker)
     assert (
         str(ret_value.kw["bind"].url)
-        == "postgresql://readonlyuser:***@cataloguehost/catalogue"
+        == "postgresql://user:***@read_only_host/catalogue"
     )
     config.dbsettings = None
