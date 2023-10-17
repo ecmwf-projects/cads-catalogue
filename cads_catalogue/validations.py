@@ -28,14 +28,14 @@ logger = logging.getLogger(__name__)
 
 def check_values(input_obj, values_to_exclude=[]):
     """Check recursively if input list/dict has forbidden values."""
-    if type(input_obj) is dict:
+    if isinstance(input_obj, dict):
         for key, value in input_obj.items():
             if values_to_exclude and value in values_to_exclude:
                 value_repr = value is None and "'null'" or repr(value)
                 logger.error(f"found key {key} with a forbidden value: {value_repr}")
                 continue
             check_values(value, values_to_exclude=values_to_exclude)
-    elif type(input_obj) is list:
+    elif isinstance(input_obj, list):
         for item in input_obj:
             if values_to_exclude and item in values_to_exclude:
                 item_repr = item is None and "'null'" or repr(item)
