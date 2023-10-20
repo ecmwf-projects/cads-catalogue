@@ -32,14 +32,16 @@ class SqlalchemySettings:
 
     - ``catalogue_db_user``: postgres username.
     - ``catalogue_db_password``: postgres password.
-    - ``catalogue_db_host``: hostname for the connection.
+    - ``catalogue_db_host``: hostname for r/w connection.
+    - ``catalogue_db_host``: hostname for read-only connection.
     - ``catalogue_db_name``: database name.
     """
 
-    catalogue_db_password: str = dataclasses.field(repr=False)
-    catalogue_db_user: str = "catalogue"
-    catalogue_db_host: str = "catalogue-db"
-    catalogue_db_name: str = "catalogue"
+    catalogue_db_user: str | None = None
+    catalogue_db_password: str | None = None
+    catalogue_db_host: str | None = None
+    catalogue_db_host_read: str | None = None
+    catalogue_db_name: str | None = None
     pool_recycle: int = 60
 
     def __init__(self, **kwargs):
@@ -76,23 +78,23 @@ class SqlalchemySettings:
                     )
 
         # validations
-        # defined fields without a default must have a value
+        # defined fields must have a not None value
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
+            if value in (dataclasses.MISSING, None):
                 raise ValueError(f"{field.name} must be set")
-        # catalogue_db_password must be set
-        if self.catalogue_db_password is None:
-            raise ValueError("catalogue_db_password must be set")
 
     @property
     def connection_string(self) -> str:
         """Create reader psql connection string."""
-        return (
-            f"postgresql://{self.catalogue_db_user}"
-            f":{self.catalogue_db_password}@{self.catalogue_db_host}"
-            f"/{self.catalogue_db_name}"
-        )
+        url = f"postgresql://{self.catalogue_db_user}:{self.catalogue_db_password}@{self.catalogue_db_host}/{self.catalogue_db_name}"
+        return url
+
+    @property
+    def connection_string_read(self) -> str:
+        """Create reader psql connection string in read-only mode."""
+        url = f"postgresql://{self.catalogue_db_user}:{self.catalogue_db_password}@{self.catalogue_db_host_read}/{self.catalogue_db_name}"
+        return url
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -146,14 +148,11 @@ class ObjectStorageSettings:
                     )
 
         # validations
-        # defined fields without a default must have a value
+        # defined fields must have a not None value
         for field in dataclasses.fields(self):
             value = getattr(self, field.name)
-            if field.default == dataclasses.MISSING and value == dataclasses.MISSING:
+            if value in (dataclasses.MISSING, None):
                 raise ValueError(f"{field.name} must be set")
-        # storage_password must be set
-        if self.storage_password is None:
-            raise ValueError("storage_password must be set")
 
     @property
     def storage_kws(self) -> dict[str, str | bool | None]:

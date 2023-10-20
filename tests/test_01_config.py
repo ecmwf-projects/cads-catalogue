@@ -8,40 +8,54 @@ from cads_catalogue import config
 
 def test_sqlalchemysettings(temp_environ: Any) -> None:
     # check settings must have a password set (no default)
+    temp_environ.update(
+        dict(
+            catalogue_db_host="host1",
+            catalogue_db_host_read="host2",
+            catalogue_db_name="dbname",
+            catalogue_db_user="dbuser",
+        )
+    )
     temp_environ.pop("catalogue_db_password", default=None)
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(ValueError):
         config.SqlalchemySettings()
-    assert "catalogue_db_password" in str(excinfo.value)
-    config.dbsettings = None
 
     # also an empty password can be set
-    settings = config.SqlalchemySettings(catalogue_db_password="")
+    settings = config.SqlalchemySettings(
+        catalogue_db_password="",
+        catalogue_db_host="host1",
+        catalogue_db_host_read="host2",
+        catalogue_db_name="dbname1",
+        catalogue_db_user="user1",
+    )
     assert settings.catalogue_db_password == ""
     config.dbsettings = None
 
     # also a not empty password can be set
-    temp_environ["catalogue_db_password"] = "a password"
+    temp_environ.update(
+        dict(
+            catalogue_db_password="apassword",
+            catalogue_db_host="host1",
+            catalogue_db_host_read="host2",
+            catalogue_db_name="dbname",
+            catalogue_db_user="dbuser",
+        )
+    )
     settings = config.SqlalchemySettings()
-    assert settings.catalogue_db_password == "a password"
+    assert settings.catalogue_db_password == "apassword"
     config.dbsettings = None
-
-    # take also other values from the environment
-    temp_environ["catalogue_db_password"] = "1"
-    temp_environ["catalogue_db_user"] = "2"
-    temp_environ["catalogue_db_host"] = "3"
-    temp_environ["catalogue_db_name"] = "4"
-    temp_environ["pool_recycle"] = "5"
-    settings = config.SqlalchemySettings()
-    assert settings.catalogue_db_password == "1"
-    assert settings.catalogue_db_user == "2"
-    assert settings.catalogue_db_host == "3"
-    assert settings.catalogue_db_name == "4"
-    assert settings.pool_recycle == 5
+    assert settings.connection_string == "postgresql://dbuser:apassword@host1/dbname"
+    assert (
+        settings.connection_string_read == "postgresql://dbuser:apassword@host2/dbname"
+    )
 
 
 def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) -> None:
+    temp_environ["catalogue_db_user"] = "auser"
     temp_environ["catalogue_db_password"] = "apassword"
-
+    temp_environ["catalogue_db_host"] = "ahost"
+    temp_environ["catalogue_db_host_read"] = "ahost2"
+    temp_environ["catalogue_db_name"] = "aname"
     # initially global settings is importable, but it is None
     assert config.dbsettings is None
 
@@ -49,7 +63,11 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
     effective_settings = config.ensure_settings()
     assert (
         effective_settings.connection_string
-        == "postgresql://catalogue:apassword@catalogue-db/catalogue"
+        == "postgresql://auser:apassword@ahost/aname"
+    )
+    assert (
+        effective_settings.connection_string_read
+        == "postgresql://auser:apassword@ahost2/aname"
     )
     assert config.dbsettings == effective_settings
     config.dbsettings = None
@@ -59,18 +77,24 @@ def test_ensure_settings(session_obj: sa.orm.sessionmaker, temp_environ: Any) ->
         "catalogue_db_user": "monica",
         "catalogue_db_password": "secret1",
         "catalogue_db_host": "myhost",
-        "catalogue_db_name": "mycatalogue",
+        "catalogue_db_host_read": "myhost2",
+        "catalogue_db_name": "mybroker",
     }
     my_settings_connection_string = (
         "postgresql://%(catalogue_db_user)s:%(catalogue_db_password)s"
         "@%(catalogue_db_host)s/%(catalogue_db_name)s" % my_settings_dict
     )
-    mysettings = config.SqlalchemySettings(**my_settings_dict)  # type: ignore
+    my_settings_connection_string_ro = (
+        "postgresql://%(catalogue_db_user)s:%(catalogue_db_password)s"
+        "@%(catalogue_db_host_read)s/%(catalogue_db_name)s" % my_settings_dict
+    )
+    mysettings = config.SqlalchemySettings(**my_settings_dict)
     effective_settings = config.ensure_settings(mysettings)
 
     assert config.dbsettings == effective_settings
     assert effective_settings == mysettings
     assert effective_settings.connection_string == my_settings_connection_string
+    assert effective_settings.connection_string_read == my_settings_connection_string_ro
     config.dbsettings = None
 
 
