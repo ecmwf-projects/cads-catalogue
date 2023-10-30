@@ -1750,6 +1750,7 @@ def test_resource_sync(
     resource2["form_data"] = "content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
+        manager.update_related_resources(session)
         session.commit()
         all_db_resources = session.scalars(sa.select(database.Resource)).all()
         assert (
@@ -1824,6 +1825,7 @@ def test_resource_sync(
     resource2["form_data"] = "a new content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
+        manager.update_related_resources(session)
         session.commit()
 
     with session_obj() as session:

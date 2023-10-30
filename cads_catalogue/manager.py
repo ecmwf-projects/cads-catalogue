@@ -23,6 +23,7 @@ import pathlib
 from typing import Any, List, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import insert
 import structlog
 
 from cads_catalogue import (
@@ -500,20 +501,11 @@ def resource_sync(
             subpath=subpath,
             **storage_settings.storage_kws,
         )
-    dataset_query_stmt = sa.select(database.Resource).filter_by(
-        resource_uid=resource["resource_uid"]
-    )
-    dataset_query_obj = session.execute(dataset_query_stmt).scalars().all()
-    if not dataset_query_obj:
-        dataset_obj = database.Resource(**dataset)
-        session.add(dataset_obj)
-    else:
-        session.execute(
-            sa.update(database.Resource)
-            .filter_by(resource_uid=resource["resource_uid"])
-            .values(**dataset)
-        )
-        dataset_obj = session.execute(dataset_query_stmt).scalar_one()
+    # implementing upsert returning dataset obj:
+    insert_stmt = insert(database.Resource).values(**dataset)
+    do_update_stmt = insert_stmt.on_conflict_do_update(
+        index_elements=['resource_uid'], set_=dataset).returning(database.Resource)
+    dataset_obj = session.scalars(do_update_stmt, execution_options={"populate_existing": True}).one()
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
@@ -534,18 +526,6 @@ def resource_sync(
         if not keyword_obj:
             keyword_obj = database.Keyword(**kw_md)
         dataset_obj.keywords.append(keyword_obj)
-
-    # clean related_resources
-    dataset_obj.related_resources = []
-    dataset_obj.back_related_resources = []  # type: ignore
-    all_db_resources = session.scalars(sa.select(database.Resource)).all()
-
-    # recompute related resources
-    related_resources = find_related_resources(
-        all_db_resources, only_involving_uid=dataset_obj.resource_uid
-    )
-    for res1, res2 in related_resources:
-        res1.related_resources.append(res2)
 
     return dataset_obj
 
@@ -590,6 +570,27 @@ def find_related_resources(
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found
+
+
+def update_related_resources(session: sa.orm.session.Session):
+    """
+    Reset and reassign again the relationships between resources.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+
+    """
+    all_datasets = session.scalars(sa.select(database.Resource)).all()
+    # clean related_resources
+    for dataset_obj in all_datasets:
+        dataset_obj.related_resources = []
+        dataset_obj.back_related_resources = []
+
+    # recompute related resources
+    related_resources = find_related_resources(all_datasets)
+    for res1, res2 in related_resources:
+        res1.related_resources.append(res2)
 
 
 def update_catalogue_resources(
