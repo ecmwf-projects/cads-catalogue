@@ -588,7 +588,7 @@ def update_related_resources(session: sa.orm.session.Session):
     # clean related_resources
     for dataset_obj in all_datasets:
         dataset_obj.related_resources = []
-        dataset_obj.back_related_resources = []
+        dataset_obj.back_related_resources = []  # type: ignore
 
     # recompute related resources
     related_resources = find_related_resources(all_datasets)
