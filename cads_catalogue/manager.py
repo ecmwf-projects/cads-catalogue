@@ -184,7 +184,8 @@ def is_resource_to_update(session, resource_folder_path):
     resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
     db_resource_hash = session.scalars(
         sa.select(database.Resource.sources_hash)
-        .filter_by(resource_uid=resource_uid).limit(1)
+        .filter_by(resource_uid=resource_uid)
+        .limit(1)
     ).first()
     if not db_resource_hash:
         return True, folder_hash
