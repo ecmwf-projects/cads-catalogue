@@ -23,8 +23,8 @@ import pathlib
 from typing import Any, List, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
-from sqlalchemy.dialects.postgresql import insert
 import structlog
+from sqlalchemy.dialects.postgresql import insert
 
 from cads_catalogue import (
     config,
@@ -182,12 +182,10 @@ def is_resource_to_update(session, resource_folder_path):
     """
     folder_hash = str(utils.folder2hash(resource_folder_path).hexdigest())
     resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
-    resource_obj = session.scalars(
-        sa.select(database.Resource).filter_by(resource_uid=resource_uid).limit(1)
+    db_resource_hash = session.scalars(
+        sa.select(database.Resource.sources_hash)
+        .filter_by(resource_uid=resource_uid).limit(1)
     ).first()
-    if not resource_obj:
-        return True, folder_hash
-    db_resource_hash = resource_obj.sources_hash
     if not db_resource_hash:
         return True, folder_hash
     if folder_hash != db_resource_hash:
@@ -504,8 +502,11 @@ def resource_sync(
     # implementing upsert returning dataset obj:
     insert_stmt = insert(database.Resource).values(**dataset)
     do_update_stmt = insert_stmt.on_conflict_do_update(
-        index_elements=['resource_uid'], set_=dataset).returning(database.Resource)
-    dataset_obj = session.scalars(do_update_stmt, execution_options={"populate_existing": True}).one()
+        index_elements=["resource_uid"], set_=dataset
+    ).returning(database.Resource)
+    dataset_obj = session.scalars(
+        do_update_stmt, execution_options={"populate_existing": True}
+    ).one()
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
@@ -581,6 +582,7 @@ def update_related_resources(session: sa.orm.session.Session):
     session: opened SQLAlchemy session
 
     """
+    # could be quite slow
     all_datasets = session.scalars(sa.select(database.Resource)).all()
     # clean related_resources
     for dataset_obj in all_datasets:
