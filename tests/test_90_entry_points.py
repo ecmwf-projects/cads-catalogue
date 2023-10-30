@@ -148,7 +148,7 @@ def test_update_catalogue(
     spy3 = mocker.spy(licence_manager, "load_licences_from_folder")
     spy4 = mocker.spy(manager, "resource_sync")
 
-    # run the script to create the db, and load initial data
+    # run the script to create the db, and load initial data -----------------------------
     result = runner.invoke(
         entry_points.app,
         [

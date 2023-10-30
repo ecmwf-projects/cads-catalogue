@@ -500,7 +500,15 @@ def resource_sync(
             subpath=subpath,
             **storage_settings.storage_kws,
         )
-    # implementing upsert returning dataset obj:
+    # split one-to-one related attributes for building ResourceData
+    resource_data_attrs = {
+        "adaptor_configuration": dataset.pop("adaptor_configuration"),
+        "constraints_data": dataset.pop("constraints_data"),
+        "form_data": dataset.pop("form_data"),
+        "mapping": dataset.pop("mapping"),
+        "resource_uid": dataset["resource_uid"],
+    }
+    # implementing upsert of resource
     insert_stmt = insert(database.Resource).values(**dataset)
     do_update_stmt = insert_stmt.on_conflict_do_update(
         index_elements=["resource_uid"], set_=dataset
@@ -508,6 +516,12 @@ def resource_sync(
     dataset_obj = session.scalars(
         do_update_stmt, execution_options={"populate_existing": True}
     ).one()
+    # implementing upsert of resource_data
+    insert_stmt = insert(database.ResourceData).values(**resource_data_attrs)
+    do_update_stmt = insert_stmt.on_conflict_do_update(
+        index_elements=["resource_uid"], set_=resource_data_attrs
+    )  # type: ignore
+    session.execute(do_update_stmt, execution_options={"populate_existing": True}).all()
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
@@ -678,5 +692,7 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         dataset_to_delete.licences = []
         dataset_to_delete.messages = []
         dataset_to_delete.related_resources = []
+        if dataset_to_delete.resource_data:
+            session.delete(dataset_to_delete.resource_data)
         session.delete(dataset_to_delete)
         logger.info("removed resource %s" % dataset_to_delete.resource_uid)

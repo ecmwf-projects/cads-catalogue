@@ -141,6 +141,28 @@ class Message(BaseModel):
     )
 
 
+class ResourceData(BaseModel):
+    """Resource Data ORM model."""
+
+    __tablename__ = "resource_data"
+    __table_args__ = (
+        sa.schema.UniqueConstraint("resource_uid", name="resource_uid_uc"),
+    )
+
+    resource_data_id = sa.Column(sa.Integer, primary_key=True)
+    adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
+    constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
+    form_data: Any = sa.Column(dialect_postgresql.JSONB)
+    mapping: Any = sa.Column(dialect_postgresql.JSONB)
+
+    resource_uid = sa.Column(
+        sa.String, sa.ForeignKey("resources.resource_uid"), nullable=False
+    )
+    resource: sa.orm.Mapped["Resource"] = sa.orm.relationship(
+        "Resource", back_populates="resource_data", uselist=False
+    )
+
+
 class Resource(BaseModel):
     """Resource ORM model."""
 
@@ -158,12 +180,8 @@ class Resource(BaseModel):
 
     # internal functionality related
     adaptor = sa.Column(sa.String)
-    adaptor_configuration: Any = sa.Column(dialect_postgresql.JSONB)
     adaptor_properties_hash = sa.Column(sa.String)
-    constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
-    form_data: Any = sa.Column(dialect_postgresql.JSONB)
     sources_hash = sa.Column(sa.String)
-    mapping: Any = sa.Column(dialect_postgresql.JSONB)
     related_resources_keywords: List[str] = sa.Column(
         dialect_postgresql.ARRAY(sa.String)
     )
@@ -220,6 +238,10 @@ class Resource(BaseModel):
     )
 
     # relationship attributes
+    resource_data = sa.orm.relationship(
+        ResourceData, uselist=False, back_populates="resource", lazy="select"
+    )
+
     licences: sa.orm.Mapped[List["Licence"]] = sa.orm.relationship(
         "Licence",
         secondary="resources_licences",
