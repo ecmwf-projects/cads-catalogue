@@ -18,10 +18,6 @@ depends_on = None
 
 
 def upgrade() -> None:
-    alembic.op.drop_column("resources", "adaptor_configuration")
-    alembic.op.drop_column("resources", "constraints_data")
-    alembic.op.drop_column("resources", "form_data")
-    alembic.op.drop_column("resources", "mapping")
     alembic.op.create_table(
         "resource_data",
         sa.Column("resource_data_id", sa.Integer, primary_key=True),
@@ -32,6 +28,15 @@ def upgrade() -> None:
         sa.Column("resource_uid", sa.String, sa.ForeignKey("resources.resource_uid"), nullable=False)
     )
     alembic.op.create_unique_constraint("resource_uid_uc", "resource_data", ["resource_uid"])
+    sql = "INSERT INTO resource_data " \
+          "(adaptor_configuration, constraints_data, form_data, mapping, resource_uid) " \
+          "SELECT adaptor_configuration, constraints_data, form_data, mapping, resource_uid"
+    conn = alembic.op.get_bind()
+    conn.execute(sql)
+    alembic.op.drop_column("resources", "adaptor_configuration")
+    alembic.op.drop_column("resources", "constraints_data")
+    alembic.op.drop_column("resources", "form_data")
+    alembic.op.drop_column("resources", "mapping")
 
 
 def downgrade() -> None:
