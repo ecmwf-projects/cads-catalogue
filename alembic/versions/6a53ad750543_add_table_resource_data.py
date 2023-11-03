@@ -30,9 +30,10 @@ def upgrade() -> None:
     alembic.op.create_unique_constraint("resource_uid_uc", "resource_data", ["resource_uid"])
     sql = "INSERT INTO resource_data " \
           "(adaptor_configuration, constraints_data, form_data, mapping, resource_uid) " \
-          "SELECT adaptor_configuration, constraints_data, form_data, mapping, resource_uid"
+          "SELECT adaptor_configuration, constraints_data, form_data, mapping, resource_uid " \
+          "FROM resources"
     conn = alembic.op.get_bind()
-    conn.execute(sql)
+    conn.execute(sa.text(sql))
     alembic.op.drop_column("resources", "adaptor_configuration")
     alembic.op.drop_column("resources", "constraints_data")
     alembic.op.drop_column("resources", "form_data")
