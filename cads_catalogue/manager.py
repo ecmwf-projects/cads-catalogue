@@ -24,6 +24,7 @@ from typing import Any, List, Optional, Sequence, Tuple
 
 import sqlalchemy as sa
 import structlog
+from sqlalchemy.dialects.postgresql import insert
 
 from cads_catalogue import (
     config,
@@ -181,12 +182,11 @@ def is_resource_to_update(session, resource_folder_path):
     """
     folder_hash = str(utils.folder2hash(resource_folder_path).hexdigest())
     resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
-    resource_obj = session.scalars(
-        sa.select(database.Resource).filter_by(resource_uid=resource_uid).limit(1)
+    db_resource_hash = session.scalars(
+        sa.select(database.Resource.sources_hash)
+        .filter_by(resource_uid=resource_uid)
+        .limit(1)
     ).first()
-    if not resource_obj:
-        return True, folder_hash
-    db_resource_hash = resource_obj.sources_hash
     if not db_resource_hash:
         return True, folder_hash
     if folder_hash != db_resource_hash:
@@ -500,20 +500,28 @@ def resource_sync(
             subpath=subpath,
             **storage_settings.storage_kws,
         )
-    dataset_query_stmt = sa.select(database.Resource).filter_by(
-        resource_uid=resource["resource_uid"]
-    )
-    dataset_query_obj = session.execute(dataset_query_stmt).scalars().all()
-    if not dataset_query_obj:
-        dataset_obj = database.Resource(**dataset)
-        session.add(dataset_obj)
-    else:
-        session.execute(
-            sa.update(database.Resource)
-            .filter_by(resource_uid=resource["resource_uid"])
-            .values(**dataset)
-        )
-        dataset_obj = session.execute(dataset_query_stmt).scalar_one()
+    # split one-to-one related attributes for building ResourceData
+    resource_data_attrs = {
+        "adaptor_configuration": dataset.pop("adaptor_configuration"),
+        "constraints_data": dataset.pop("constraints_data"),
+        "form_data": dataset.pop("form_data"),
+        "mapping": dataset.pop("mapping"),
+        "resource_uid": dataset["resource_uid"],
+    }
+    # implementing upsert of resource
+    insert_stmt = insert(database.Resource).values(**dataset)
+    do_update_stmt = insert_stmt.on_conflict_do_update(
+        index_elements=["resource_uid"], set_=dataset
+    ).returning(database.Resource)
+    dataset_obj = session.scalars(
+        do_update_stmt, execution_options={"populate_existing": True}
+    ).one()
+    # implementing upsert of resource_data
+    insert_stmt = insert(database.ResourceData).values(**resource_data_attrs)
+    do_update_stmt = insert_stmt.on_conflict_do_update(
+        index_elements=["resource_uid"], set_=resource_data_attrs
+    )  # type: ignore
+    session.execute(do_update_stmt, execution_options={"populate_existing": True}).all()
 
     dataset_obj.licences = []  # type: ignore
     for licence_uid in licence_uids:
@@ -534,18 +542,6 @@ def resource_sync(
         if not keyword_obj:
             keyword_obj = database.Keyword(**kw_md)
         dataset_obj.keywords.append(keyword_obj)
-
-    # clean related_resources
-    dataset_obj.related_resources = []
-    dataset_obj.back_related_resources = []  # type: ignore
-    all_db_resources = session.scalars(sa.select(database.Resource)).all()
-
-    # recompute related resources
-    related_resources = find_related_resources(
-        all_db_resources, only_involving_uid=dataset_obj.resource_uid
-    )
-    for res1, res2 in related_resources:
-        res1.related_resources.append(res2)
 
     return dataset_obj
 
@@ -590,6 +586,28 @@ def find_related_resources(
         if res1_rel_res_kws & res2_rel_res_kws:
             relationships_found.append((res1, res2))
     return relationships_found
+
+
+def update_related_resources(session: sa.orm.session.Session):
+    """
+    Reset and reassign again the relationships between resources.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+
+    """
+    # could be quite slow
+    all_datasets = session.scalars(sa.select(database.Resource)).all()
+    # clean related_resources
+    for dataset_obj in all_datasets:
+        dataset_obj.related_resources = []
+        dataset_obj.back_related_resources = []  # type: ignore
+
+    # recompute related resources
+    related_resources = find_related_resources(all_datasets)
+    for res1, res2 in related_resources:
+        res1.related_resources.append(res2)
 
 
 def update_catalogue_resources(
@@ -674,5 +692,7 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         dataset_to_delete.licences = []
         dataset_to_delete.messages = []
         dataset_to_delete.related_resources = []
+        if dataset_to_delete.resource_data:
+            session.delete(dataset_to_delete.resource_data)
         session.delete(dataset_to_delete)
         logger.info("removed resource %s" % dataset_to_delete.resource_uid)

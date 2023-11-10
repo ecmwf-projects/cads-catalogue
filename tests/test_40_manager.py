@@ -1679,7 +1679,7 @@ def test_resource_sync(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
     resource = manager.load_resource_from_folder(resource_folder_path)
-    # start without any licence in the db
+    # start without any licence in the db ----------------------------------------------------
     with session_obj() as session:
         with pytest.raises(ValueError):
             manager.resource_sync(session, resource, storage_settings)
@@ -1706,7 +1706,7 @@ def test_resource_sync(
     resource["form"] = "an url for form.json"
     resource["layout"] = "an url for layout.json"
     resource["form_data"] = "content of form.json"
-    # create first dataset
+    # create first dataset --------------------------------------------------------------------
     with session_obj() as session:
         manager.resource_sync(session, resource, storage_settings)
         session.commit()
@@ -1739,7 +1739,7 @@ def test_resource_sync(
     } in [pm.kwargs for pm in patch.mock_calls]
     patch.reset_mock()
 
-    # create second dataset
+    # create second dataset  --------------------------------------------------------------------
     resource_folder_path2 = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land-monthly-means"
     )
@@ -1750,6 +1750,7 @@ def test_resource_sync(
     resource2["form_data"] = "content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
+        manager.update_related_resources(session)
         session.commit()
         all_db_resources = session.scalars(sa.select(database.Resource)).all()
         assert (
@@ -1803,7 +1804,7 @@ def test_resource_sync(
             (2, 6),
             (2, 7),
         ]
-    # modify second dataset
+    # modify second dataset  --------------------------------------------------------------------
     resource2["keywords"] = [
         #  "Product type: Reanalysis",  # removed
         "Spatial coverage: Global",
@@ -1824,6 +1825,7 @@ def test_resource_sync(
     resource2["form_data"] = "a new content of form.json"
     with session_obj() as session:
         manager.resource_sync(session, resource2, storage_settings)
+        manager.update_related_resources(session)
         session.commit()
 
     with session_obj() as session:
@@ -1859,3 +1861,14 @@ def test_resource_sync(
     # reset globals for tests following
     config.dbsettings = None
     config.storagesettings = None
+
+    assert session.execute(sa.text("select resource_uid from resources")).all() == [
+        ("reanalysis-era5-land",),
+        ("reanalysis-era5-land-monthly-means",),
+    ]
+    manager.remove_datasets(session, keep_resource_uids=["reanalysis-era5-land"])
+    session.commit()
+    with session_obj() as session:
+        assert session.execute(sa.text("select resource_uid from resources")).all() == [
+            ("reanalysis-era5-land",),
+        ]

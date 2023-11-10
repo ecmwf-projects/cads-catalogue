@@ -245,15 +245,15 @@ def update_catalogue(
         )
         logger.info("start db updating of messages")
         messages.update_catalogue_messages(session, messages_folder_path)
-
         if delete_orphans:
             logger.info("start db removing of orphan datasets")
             manager.remove_datasets(session, keep_resource_uids=involved_resource_uids)
+        logger.info("start update of relationships between datasets")
+        manager.update_related_resources(session)
         logger.info("start db removing of orphan licences")
         licence_manager.remove_orphan_licences(
             session, keep_licences=involved_licences, resources=involved_resource_uids
         )
-
         # update hashes from the catalogue_updates table
         logger.info("db update of hash of source repositories")
         session.execute(sa.delete(database.CatalogueUpdate))
