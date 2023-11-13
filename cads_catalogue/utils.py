@@ -18,14 +18,11 @@ import datetime
 import hashlib
 import html.parser
 import json
-import logging
 import mimetypes
 import pathlib
 import subprocess
-import sys
 from typing import Any
 
-import structlog
 from sqlalchemy import inspect
 
 
@@ -133,33 +130,6 @@ def normalize_abstract(text: str) -> str:
 def object_as_dict(obj: Any) -> dict[str, Any]:
     """Convert a sqlalchemy object in a python dictionary."""
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
-
-
-def configure_log(
-    loglevel=logging.INFO, logfmt="%(message)s", timefmt="%Y-%m-%d %H:%M.%S"
-):
-    """Configure the log for the package."""
-    logging.basicConfig(
-        level=loglevel,
-        format=logfmt,
-        stream=sys.stdout,
-    )
-
-    structlog.configure(
-        processors=[
-            structlog.stdlib.filter_by_level,
-            structlog.contextvars.merge_contextvars,
-            structlog.stdlib.add_logger_name,
-            structlog.stdlib.add_log_level,
-            structlog.processors.TimeStamper(fmt=timefmt),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            structlog.processors.JSONRenderer(),
-        ],
-        wrapper_class=structlog.stdlib.BoundLogger,
-        logger_factory=structlog.stdlib.LoggerFactory(),
-        cache_logger_on_first_use=True,
-    )
 
 
 def str2bool(value: str, raise_if_unknown=True, default=False):

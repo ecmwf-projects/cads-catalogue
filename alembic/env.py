@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import cads_common.logging
 import sqlalchemy as sa
 
 import alembic.context
@@ -33,7 +34,8 @@ def run_migrations_offline() -> None:
     Calls to alembic.context.execute() here emit the given string to the
     script output.
     """
-    cads_catalogue.utils.configure_log()
+    cads_common.logging.structlog_configure()
+    cads_common.logging.logging_configure()
     url = config.get_main_option("sqlalchemy.url")
     alembic.context.configure(
         url=url,
@@ -51,7 +53,8 @@ def run_migrations_online() -> None:
     In this scenario we need to create an Engine
     and associate a connection with the alembic.context.
     """
-    cads_catalogue.utils.configure_log()
+    cads_common.logging.structlog_configure()
+    cads_common.logging.logging_configure()
     engine = sa.engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

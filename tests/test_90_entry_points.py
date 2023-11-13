@@ -52,7 +52,7 @@ def test_init_db(postgresql: Connection[str]) -> None:
 
 def get_last_commit_factory(expected_values):
     def dummy_get_last_commit_hash(folder):
-        """Use for testing is_db_to_update."""
+        """Use for testing."""
         for i, repo_name in enumerate(
             [
                 "catalogue",
