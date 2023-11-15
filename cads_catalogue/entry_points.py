@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os.path
-from typing import Optional
+from typing import List, Optional
 
 import cads_common.logging
 import sqlalchemy as sa
@@ -174,34 +174,42 @@ def update_catalogue(
     connection_string: Optional[str] = None,
     force: bool = False,
     delete_orphans: bool = True,
+    include: Optional[List[str]] = None,
+    exclude: Optional[List[str]] = None,
+    exclude_resources: bool = False,
+    exclude_licences: bool = False,
+    exclude_messages: bool = False,
 ) -> None:
     """Update the database with the catalogue data.
 
-    Before to fill the database:
-      - if the database doesn't exist (or some tables are missing), it creates the structure from scratch;
-      - check input folders has changes from the last run (if not, and force=False, no update is run)
-
     Parameters
     ----------
-    resources_folder_path: path to the root folder containing metadata files for resources
-    messages_folder_path: path to the root folder containing metadata files for system messages
-    licences_folder_path: path to the root folder containing metadata files for licences
-    cim_folder_path: str = path to the root folder containing CIM generated Quality Assessment layouts
+    resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
+    messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
+    licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
+    cim_folder_path: str = folder containing CIM Quality Assessment layouts (i.e. cads-forms-cim-json)
     connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     force: if True, run update regardless input folders has no changes from last update (default False)
-    delete_orphans: if True, delete resources not involved in the update process (default True)
+    delete_orphans: if True, delete resources/licences not involved. False if using include/exclude
+    include: if specified, pattern for resource uids to include in the update
+    exclude: if specified, pattern for resource uids to exclude from the update
+    exclude_resources: if True, do not consider input resources (default False)
+    exclude_licences: if True, do not consider input licences (default False)
+    exclude_messages: if True, do not consider input messages (default False)
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
     logger.info("start running update of the catalogue")
 
-    # input validation
-    if not os.path.isdir(resources_folder_path):
+    # input management
+    if not os.path.isdir(resources_folder_path) and not exclude_resources:
         raise ValueError("%r is not a folder" % resources_folder_path)
-    if not os.path.isdir(licences_folder_path):
+    if not os.path.isdir(licences_folder_path) and not exclude_licences:
         raise ValueError("%r is not a folder" % licences_folder_path)
-    if not os.path.isdir(messages_folder_path):
+    if not os.path.isdir(messages_folder_path) and not exclude_messages:
         raise ValueError("%r is not a folder" % messages_folder_path)
+    if include or exclude:
+        delete_orphans = False
 
     # get db session session maker
     if not connection_string:
@@ -210,7 +218,7 @@ def update_catalogue(
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
 
-    logger.info("checking if database structure needs to be updated")
+    logger.info("checking database structure")
     database.init_database(connection_string)
 
     # get storage parameters from environment
@@ -223,6 +231,8 @@ def update_catalogue(
         (messages_folder_path, "message_repo_commit"),
         (cim_folder_path, "cim_repo_commit"),
     ]
+    involved_licences = []
+    involved_resource_uids = []
     with session_obj.begin() as session:  # type: ignore
         logger.info("comparing current git hashes with the ones of the last run")
         current_git_hashes = manager.get_current_git_hashes(
@@ -237,36 +247,75 @@ def update_catalogue(
                 "Use --force to update anyway."
             )
             return
-        if current_git_hashes[0] != last_run_git_hashes[0]:
+        this_package_changed = current_git_hashes[0] != last_run_git_hashes[0]
+        datasets_changed = current_git_hashes[1] != last_run_git_hashes[1]
+        licences_changed = current_git_hashes[2] != last_run_git_hashes[2]
+        messages_changed = current_git_hashes[3] != last_run_git_hashes[3]
+        cim_forms_changed = current_git_hashes[4] != last_run_git_hashes[4]
+
+        if this_package_changed:
             logger.info(
                 "detected update of cads-catalogue repository. Imposing automatic --force mode."
             )
             force = True
-
-        logger.info("db updating of licences")
-        involved_licences = licence_manager.update_catalogue_licences(
-            session, licences_folder_path, storage_settings
-        )
-        logger.info("db updating of datasets")
-        involved_resource_uids = manager.update_catalogue_resources(
-            session,
-            resources_folder_path,
-            cim_folder_path,
-            storage_settings,
-            force=force,
-        )
-        logger.info("db updating of messages")
-        messages.update_catalogue_messages(session, messages_folder_path)
+        # licences
+        if not exclude_licences:
+            if not licences_changed and not force:
+                logger.info(
+                    "catalogue update of licences skipped: source files have not changed. "
+                    "Use --force to update anyway."
+                )
+            else:
+                logger.info("db updating of licences")
+                involved_licences = licence_manager.update_catalogue_licences(
+                    session,
+                    licences_folder_path,
+                    storage_settings,
+                )
+        # resources
+        if not exclude_resources:
+            if not datasets_changed and not force and not cim_forms_changed:
+                logger.info(
+                    "catalogue update of resources skipped: source files have not changed. "
+                    "Use --force to update anyway."
+                )
+            else:
+                logger.info("db updating of datasets")
+                involved_resource_uids = manager.update_catalogue_resources(
+                    session,
+                    resources_folder_path,
+                    cim_folder_path,
+                    storage_settings,
+                    force=force,
+                    include=include,
+                    exclude=exclude,
+                )
+        # messages
+        if not exclude_messages:
+            if not datasets_changed and not messages_changed and not force:
+                logger.info(
+                    "catalogue update of messages skipped: source files have not changed. "
+                    "Use --force to update anyway."
+                )
+            else:
+                logger.info("db updating of messages")
+                messages.update_catalogue_messages(session, messages_folder_path)
+        # various cleanup
         if delete_orphans:
-            logger.info("db removing of orphan datasets")
-            manager.remove_datasets(session, keep_resource_uids=involved_resource_uids)
+            if not exclude_resources:
+                logger.info("db removing of orphan datasets")
+                manager.remove_datasets(
+                    session, keep_resource_uids=involved_resource_uids
+                )
+            if not exclude_licences:
+                logger.info("db removing of orphan licences")
+                licence_manager.remove_orphan_licences(
+                    session,
+                    keep_licences=involved_licences,
+                    resources=involved_resource_uids,
+                )
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
-        logger.info("db removing of orphan licences")
-        licence_manager.remove_orphan_licences(
-            session, keep_licences=involved_licences, resources=involved_resource_uids
-        )
-        # update hashes from the catalogue_updates table
         logger.info("db update of hash of source repositories")
         session.execute(sa.delete(database.CatalogueUpdate))
         new_update_info = database.CatalogueUpdate(

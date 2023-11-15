@@ -571,6 +571,8 @@ def update_catalogue_resources(
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
+    include: List[str] = None,
+    exclude: List[str] = None,
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -582,19 +584,32 @@ def update_catalogue_resources(
     storage_settings: object with settings to access the object storage
     cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     force: if True, no skipping of dataset update based on detected changes of sources is made
+    include: list of include patterns for the resource uids
+    exclude: list of exclude patterns for the resource uids
 
     Returns
     -------
     list: list of resource uids involved
     """
-    input_resource_uids = []
+    involved_resource_uids = []
 
     logger.info("running catalogue db update for resources")
-    # load metadata of each resource from files and sync each resource in the db
-    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+    # filtering resource uids
+    folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
+    if include is not None:
+        folders = set()
+        for pattern in include:
+            matched = set(glob.glob(os.path.join(resources_folder_path, f"{pattern}/")))
+            folders |= matched
+    if exclude is not None:
+        for pattern in exclude:
+            matched = set(glob.glob(os.path.join(resources_folder_path, f"{pattern}/")))
+            folders -= matched
+
+    for resource_folder_path in sorted(folders):
         resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
         logger.debug("parsing folder %s" % resource_folder_path)
-        input_resource_uids.append(resource_uid)
+        involved_resource_uids.append(resource_uid)
         try:
             with session.begin_nested():
                 to_update, sources_hash = is_resource_to_update(
@@ -602,7 +617,7 @@ def update_catalogue_resources(
                 )
                 if not to_update and not force:
                     logger.info(
-                        "resource update %s skipped: no change detected" % resource_uid
+                        "skip updating of '%s': no change detected" % resource_uid
                     )
                     continue
                 resource = load_resource_from_folder(resource_folder_path)
@@ -625,7 +640,7 @@ def update_catalogue_resources(
             logger.exception(
                 "db sync for resource %s failed, error follows" % resource_uid
             )
-    return input_resource_uids
+    return involved_resource_uids
 
 
 def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[str]):
