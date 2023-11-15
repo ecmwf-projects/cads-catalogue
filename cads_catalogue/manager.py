@@ -571,8 +571,8 @@ def update_catalogue_resources(
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
-    include: List[str] = None,
-    exclude: List[str] = None,
+    include: List[str] = [],
+    exclude: List[str] = [],
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -596,12 +596,12 @@ def update_catalogue_resources(
     logger.info("running catalogue db update for resources")
     # filtering resource uids
     folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
-    if include is not None:
+    if include:
         folders = set()
         for pattern in include:
             matched = set(glob.glob(os.path.join(resources_folder_path, f"{pattern}/")))
             folders |= matched
-    if exclude is not None:
+    if exclude:
         for pattern in exclude:
             matched = set(glob.glob(os.path.join(resources_folder_path, f"{pattern}/")))
             folders -= matched

@@ -174,8 +174,8 @@ def update_catalogue(
     connection_string: Optional[str] = None,
     force: bool = False,
     delete_orphans: bool = True,
-    include: Optional[List[str]] = None,
-    exclude: Optional[List[str]] = None,
+    include: List[str] = [],
+    exclude: List[str] = [],
     exclude_resources: bool = False,
     exclude_licences: bool = False,
     exclude_messages: bool = False,
@@ -302,17 +302,17 @@ def update_catalogue(
                 messages.update_catalogue_messages(session, messages_folder_path)
         # various cleanup
         if delete_orphans:
-            if not exclude_resources:
-                logger.info("db removing of orphan datasets")
-                manager.remove_datasets(
-                    session, keep_resource_uids=involved_resource_uids
-                )
             if not exclude_licences:
                 logger.info("db removing of orphan licences")
                 licence_manager.remove_orphan_licences(
                     session,
                     keep_licences=involved_licences,
                     resources=involved_resource_uids,
+                )
+            if not exclude_resources:
+                logger.info("db removing of orphan datasets")
+                manager.remove_datasets(
+                    session, keep_resource_uids=involved_resource_uids
                 )
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)

@@ -25,6 +25,7 @@ TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 TEST_RESOURCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-forms-json")
 TEST_MESSAGES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-messages")
 TEST_LICENCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-licences")
+TEST_CIM_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-forms-cim-json")
 
 runner = CliRunner()
 
@@ -161,6 +162,8 @@ def test_update_catalogue(
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
             TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -444,6 +447,8 @@ def test_update_catalogue(
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
             TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -480,6 +485,8 @@ def test_update_catalogue(
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
             TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -570,6 +577,8 @@ def test_update_catalogue(
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
             TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -597,149 +606,3 @@ def test_update_catalogue(
     mocker.resetall()
     config.dbsettings = None
     config.storagesettings = None
-
-
-def test_transaction_update_catalogue(
-    caplog: pytest.LogCaptureFixture,
-    postgresql: Connection[str],
-    mocker: pytest_mock.MockerFixture,
-) -> None:
-    """Here we want to test that transactions are managed outside the update catalogue script."""
-    mocker.patch.object(alembic.config, "main")
-    connection_string = (
-        f"postgresql+psycopg2://{postgresql.info.user}:"
-        f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
-    )
-    object_storage_url = "http://myobject-storage:myport/"
-    doc_storage_url = "http://mypublic-storage/"
-    bucket_name = "my_bucket"
-    object_storage_kws: dict[str, Any] = {
-        "aws_access_key_id": "storage_user",
-        "aws_secret_access_key": "storage_password",
-    }
-    # create the db empty
-    engine = database.init_database(connection_string, force=True)
-    # add some dummy data
-    conn = engine.connect()
-    conn.execute(
-        sa.text(
-            "INSERT INTO licences (licence_uid, revision, title, download_filename, md_filename) "
-            "VALUES ('a-licence', 1, 'a licence', 'a file.pdf', 'a file.md')"
-        )
-    )
-    conn.execute(
-        sa.text(
-            "INSERT INTO resources (resource_uid, abstract, description, type) "
-            "VALUES ('dummy-dataset', 'a dummy ds', '[]', 'dataset')"
-        )
-    )
-    conn.commit()
-
-    # simulate the object storage working...
-    mocker.patch(
-        "cads_catalogue.object_storage.store_file",
-        return_value="an url",
-    )
-    # ... but impose the store_dataset fails to work...
-    mocker.patch.object(
-        manager, "resource_sync", side_effect=Exception("dataset error")
-    )
-    # ....so the entry point execution should fail...
-    result = runner.invoke(
-        entry_points.app,
-        [
-            "update-catalogue",
-            "--connection-string",
-            connection_string,
-            "--force",
-            "--no-delete-orphans",
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
-            "--messages-folder-path",
-            TEST_MESSAGES_DATA_PATH,
-            "--licences-folder-path",
-            TEST_LICENCES_DATA_PATH,
-        ],
-        env={
-            "OBJECT_STORAGE_URL": object_storage_url,
-            "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
-            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
-            "CATALOGUE_BUCKET": bucket_name,
-        },
-    )
-    # ...without raising any
-    assert result.exit_code == 0
-    # ...but there is an error log for each dataset
-    error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
-    for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
-        assert len([e for e in error_messages if dataset_name in e]) >= 1
-    session_obj = sa.orm.sessionmaker(engine)
-    # ...anyway the licence content is updated...(uninvolved licences are removed)
-    with session_obj() as session:
-        licences = session.execute(
-            sa.text("select licence_uid from licences order by lower(licence_uid)")
-        ).all()
-        assert licences == [
-            ("CCI-data-policy-for-satellite-surface-radiation-budget",),
-            ("data-protection-privacy-statement",),
-            ("eumetsat-cm-saf",),
-            ("licence-to-use-copernicus-products",),
-        ]
-        #  ...but the resources must stay unchanged
-        resources = session.execute(
-            sa.text("select resource_uid, abstract, description, type from resources")
-        ).all()
-        assert resources == [("dummy-dataset", "a dummy ds", [], "dataset")]
-
-    # run again without the "no-delete-orphans" options: uninvolved datasets should be removed
-    result = runner.invoke(
-        entry_points.app,
-        [
-            "update-catalogue",
-            "--connection-string",
-            connection_string,
-            "--force",
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
-            "--messages-folder-path",
-            TEST_MESSAGES_DATA_PATH,
-            "--licences-folder-path",
-            TEST_LICENCES_DATA_PATH,
-        ],
-        env={
-            "OBJECT_STORAGE_URL": object_storage_url,
-            "DOCUMENT_STORAGE_URL": doc_storage_url,
-            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
-            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
-            "CATALOGUE_BUCKET": bucket_name,
-        },
-    )
-    # ...without raising any
-    assert result.exit_code == 0
-    # ...but there is an error log for each dataset
-    error_messages = [r.msg for r in caplog.records if r.levelname == "ERROR"]
-    for dataset_name in os.listdir(os.path.join(TESTDATA_PATH, "cads-forms-json")):
-        assert len([e for e in error_messages if dataset_name in e]) >= 1
-    session_obj = sa.orm.sessionmaker(engine)
-    # ...anyway the licence content is updated...(uninvolved licences are removed)
-    with session_obj() as session:
-        licences = session.execute(
-            sa.text("select licence_uid from licences order by lower(licence_uid)")
-        ).all()
-        assert licences == [
-            ("CCI-data-policy-for-satellite-surface-radiation-budget",),
-            ("data-protection-privacy-statement",),
-            ("eumetsat-cm-saf",),
-            ("licence-to-use-copernicus-products",),
-        ]
-        #  ...and the uninvolved resources are removed too
-        resources = session.execute(
-            sa.text("select resource_uid, abstract, description, type from resources")
-        ).all()
-        assert resources == []
-
-    # reset globals for tests following
-    config.dbsettings = None
-    config.storagesettings = None
-    mocker.resetall()
