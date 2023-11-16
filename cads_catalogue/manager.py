@@ -1,5 +1,5 @@
 """utility module to load and store data in the catalogue database."""
-
+import datetime
 # Copyright 2022, European Union.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,6 +88,7 @@ def get_current_git_hashes(*folders: str | pathlib.Path) -> List[str]:
             logger.exception(
                 "no check on commit hash for folder %r, error follows" % folder
             )
+            current_hashes.append(None)
     return current_hashes
 
 
@@ -666,3 +667,21 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
             session.delete(dataset_to_delete.resource_data)
         session.delete(dataset_to_delete)
         logger.info("removed resource %s" % dataset_to_delete.resource_uid)
+
+
+def update_git_hashes(session, hashes_dict):
+    """a docstring."""
+    last_update_record = session.scalars(
+        sa.select(database.CatalogueUpdate)
+        .order_by(database.CatalogueUpdate.update_time.desc())
+        .limit(1)
+    ).first()
+    if not last_update_record:
+        last_update_record = database.CatalogueUpdate(**hashes_dict)
+        session.add(last_update_record)
+    else:
+        hashes_dict["update_time"] = datetime.datetime.now()
+        session.execute(
+            sa.update(database.CatalogueUpdate)
+            .values(**hashes_dict)
+        )

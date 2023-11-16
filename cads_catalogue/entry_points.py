@@ -245,17 +245,18 @@ def update_catalogue(
         last_run_git_hashes = manager.get_last_git_hashes(
             session, *[f[1] for f in paths_db_hash_map]
         )
-        if current_git_hashes == last_run_git_hashes and not force:
+        if current_git_hashes == last_run_git_hashes and not force and None not in current_git_hashes:
             logger.info(
                 "catalogue update skipped: source files have not changed. "
                 "Use --force to update anyway."
             )
             return
-        this_package_changed = current_git_hashes[0] != last_run_git_hashes[0]
-        datasets_changed = current_git_hashes[1] != last_run_git_hashes[1]
-        licences_changed = current_git_hashes[2] != last_run_git_hashes[2]
-        messages_changed = current_git_hashes[3] != last_run_git_hashes[3]
-        cim_forms_changed = current_git_hashes[4] != last_run_git_hashes[4]
+        # if no git ash, consider repo like it was changed
+        this_package_changed = current_git_hashes[0] != last_run_git_hashes[0] or current_git_hashes[0] is None
+        datasets_changed = current_git_hashes[1] != last_run_git_hashes[1] or current_git_hashes[1] is None
+        licences_changed = current_git_hashes[2] != last_run_git_hashes[2] or current_git_hashes[2] is None
+        messages_changed = current_git_hashes[3] != last_run_git_hashes[3] or current_git_hashes[3] is None
+        cim_forms_changed = current_git_hashes[4] != last_run_git_hashes[4] or current_git_hashes[4] is None
 
         if this_package_changed:
             logger.info(
@@ -263,15 +264,15 @@ def update_catalogue(
             )
             force = True
         # licences
-        licences_git_skipped = False
+        licences_processed = False
         if not exclude_licences:
             if not licences_changed and not force:
-                licences_git_skipped = True
                 logger.info(
                     "catalogue update of licences skipped: source files have not changed. "
                     "Use --force to update anyway."
                 )
             else:
+                licences_processed = True
                 logger.info("db updating of licences")
                 involved_licences = licence_manager.update_catalogue_licences(
                     session,
@@ -279,15 +280,15 @@ def update_catalogue(
                     storage_settings,
                 )
         # resources
-        datasets_git_skipped = False
+        some_resources_processed = False
         if not exclude_resources:
-            if not datasets_changed and not force and not cim_forms_changed and not licences_git_skipped:
-                datasets_git_skipped = True
+            if not datasets_changed and not force and not cim_forms_changed and not licences_processed:
                 logger.info(
                     "catalogue update of resources skipped: source files have not changed. "
                     "Use --force to update anyway."
                 )
             else:
+                some_resources_processed = True
                 logger.info("db updating of datasets")
                 involved_resource_uids = manager.update_catalogue_resources(
                     session,
@@ -299,16 +300,19 @@ def update_catalogue(
                     exclude=exclude,
                 )
         # messages
+        messages_processed = False
         if not exclude_messages:
-            if not datasets_git_skipped and not messages_changed and not force:
+            if not some_resources_processed and not messages_changed and not force:
                 logger.info(
                     "catalogue update of messages skipped: source files have not changed. "
                     "Use --force to update anyway."
                 )
             else:
+                messages_processed = True
                 logger.info("db updating of messages")
                 messages.update_catalogue_messages(session, messages_folder_path)
-        # various cleanup
+
+        # delete orphans
         if delete_orphans:  # -> always false if filtering is active
             if not exclude_licences:
                 logger.info("db removing of orphan licences")
@@ -322,19 +326,27 @@ def update_catalogue(
                 manager.remove_datasets(
                     session, keep_resource_uids=involved_resource_uids
                 )
+        # refresh relationships between dataset
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
-        if filter_is_active:
-            logger.info("fitering is active: no db update of hash of source repositories")
+        # store current git commit hashes
+        hashes_dict = dict()
+        if licences_processed:
+            # (all) licences have been effectively processed
+            hashes_dict["licence_repo_commit"] = current_git_hashes[2]
+        if some_resources_processed and not include and not exclude:
+            # all resources have been effectively processed
+            hashes_dict["metadata_repo_commit"] = current_git_hashes[1]
+            hashes_dict["cim_repo_commit"] = current_git_hashes[4]
+        if messages_processed:
+            # (all) messages  have been effectively processed
+            hashes_dict["message_repo_commit"] = current_git_hashes[3]
+        if not hashes_dict:
+            logger.info("disabled db update of last commit hashes of source repositories")
         else:
-            logger.info("db update of hash of source repositories")
-            session.execute(sa.delete(database.CatalogueUpdate))
-            new_update_info = database.CatalogueUpdate(
-                **dict(
-                    [(f[1], current_git_hashes[i]) for i, f in enumerate(paths_db_hash_map)]
-                )
-            )  # type: ignore
-            session.add(new_update_info)
+            hashes_dict["catalogue_repo_commit"] = current_git_hashes[0]
+            logger.info("db update of last commit hashes of source repositories")
+            manager.update_git_hashes(session, hashes_dict)
         logger.info("end of update of the catalogue")
 
 
