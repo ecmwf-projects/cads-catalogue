@@ -208,8 +208,11 @@ def update_catalogue(
         raise ValueError("%r is not a folder" % licences_folder_path)
     if not os.path.isdir(messages_folder_path) and not exclude_messages:
         raise ValueError("%r is not a folder" % messages_folder_path)
-    if include or exclude:
-        delete_orphans = False
+    filter_is_active = bool(include or exclude or exclude_resources or exclude_licences or exclude_messages)
+    if filter_is_active:
+        if delete_orphans:
+            logger.warning("'delete-orphans' has been disabled: include/exclude feature is active")
+            delete_orphans = False
 
     # get db session session maker
     if not connection_string:
@@ -233,6 +236,7 @@ def update_catalogue(
     ]
     involved_licences = []
     involved_resource_uids = []
+
     with session_obj.begin() as session:  # type: ignore
         logger.info("comparing current git hashes with the ones of the last run")
         current_git_hashes = manager.get_current_git_hashes(
@@ -259,8 +263,10 @@ def update_catalogue(
             )
             force = True
         # licences
+        licences_git_skipped = False
         if not exclude_licences:
             if not licences_changed and not force:
+                licences_git_skipped = True
                 logger.info(
                     "catalogue update of licences skipped: source files have not changed. "
                     "Use --force to update anyway."
@@ -273,8 +279,10 @@ def update_catalogue(
                     storage_settings,
                 )
         # resources
+        datasets_git_skipped = False
         if not exclude_resources:
-            if not datasets_changed and not force and not cim_forms_changed:
+            if not datasets_changed and not force and not cim_forms_changed and not licences_git_skipped:
+                datasets_git_skipped = True
                 logger.info(
                     "catalogue update of resources skipped: source files have not changed. "
                     "Use --force to update anyway."
@@ -292,7 +300,7 @@ def update_catalogue(
                 )
         # messages
         if not exclude_messages:
-            if not datasets_changed and not messages_changed and not force:
+            if not datasets_git_skipped and not messages_changed and not force:
                 logger.info(
                     "catalogue update of messages skipped: source files have not changed. "
                     "Use --force to update anyway."
@@ -301,7 +309,7 @@ def update_catalogue(
                 logger.info("db updating of messages")
                 messages.update_catalogue_messages(session, messages_folder_path)
         # various cleanup
-        if delete_orphans:
+        if delete_orphans:  # -> always false if filtering is active
             if not exclude_licences:
                 logger.info("db removing of orphan licences")
                 licence_manager.remove_orphan_licences(
@@ -316,14 +324,17 @@ def update_catalogue(
                 )
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
-        logger.info("db update of hash of source repositories")
-        session.execute(sa.delete(database.CatalogueUpdate))
-        new_update_info = database.CatalogueUpdate(
-            **dict(
-                [(f[1], current_git_hashes[i]) for i, f in enumerate(paths_db_hash_map)]
-            )
-        )  # type: ignore
-        session.add(new_update_info)
+        if filter_is_active:
+            logger.info("fitering is active: no db update of hash of source repositories")
+        else:
+            logger.info("db update of hash of source repositories")
+            session.execute(sa.delete(database.CatalogueUpdate))
+            new_update_info = database.CatalogueUpdate(
+                **dict(
+                    [(f[1], current_git_hashes[i]) for i, f in enumerate(paths_db_hash_map)]
+                )
+            )  # type: ignore
+            session.add(new_update_info)
         logger.info("end of update of the catalogue")
 
 
