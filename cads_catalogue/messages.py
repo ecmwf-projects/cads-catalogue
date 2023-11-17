@@ -252,7 +252,6 @@ def update_catalogue_messages(
     -------
     list: list of message uids involved
     """
-    logger.info("running catalogue db update for messages")
     # load metadata of messages from files and sync each messages in the db
     msgs = load_messages(messages_folder_path)
     logger.info("loaded %s messages from folder %s" % (len(msgs), messages_folder_path))
@@ -263,9 +262,9 @@ def update_catalogue_messages(
         try:
             with session.begin_nested():
                 message_sync(session, msg)
-            logger.info("message %s db sync successful" % msg_uid)
+            logger.info("message '%s' db sync successful" % msg_uid)
         except Exception:  # noqa
-            logger.exception("db sync for message %s failed, error follows" % msg_uid)
+            logger.exception("db sync for message '%s' failed, error follows" % msg_uid)
 
     if not remove_orphans:
         return involved_msg_ids
@@ -283,6 +282,6 @@ def update_catalogue_messages(
     for msg_to_delete in msgs_to_delete:
         msg_to_delete.resources = []
         session.delete(msg_to_delete)
-        logger.debug("removed old message %s" % msg_to_delete.message_uid)
+        logger.info("removed old message '%s'" % msg_to_delete.message_uid)
 
     return involved_msg_ids

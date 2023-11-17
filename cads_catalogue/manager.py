@@ -594,7 +594,6 @@ def update_catalogue_resources(
     """
     involved_resource_uids = []
 
-    logger.info("running catalogue db update for resources")
     # filtering resource uids
     folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
     if include:
@@ -623,7 +622,7 @@ def update_catalogue_resources(
                     continue
                 resource = load_resource_from_folder(resource_folder_path)
                 resource["sources_hash"] = sources_hash
-                logger.info("resource %s loaded successful" % resource_uid)
+                logger.info("resource '%s' loaded successful" % resource_uid)
                 resource = layout_manager.transform_layout(
                     session,
                     resource_folder_path,
@@ -636,10 +635,10 @@ def update_catalogue_resources(
                 )
                 resource["adaptor_properties_hash"] = compute_config_hash(resource)
                 resource_sync(session, resource, storage_settings)
-            logger.info("resource %s db sync successful" % resource_uid)
+            logger.info("resource '%s' db sync successful" % resource_uid)
         except Exception:  # noqa
             logger.exception(
-                "db sync for resource %s failed, error follows" % resource_uid
+                "db sync for resource '%s' failed, error follows" % resource_uid
             )
     return involved_resource_uids
 
@@ -666,7 +665,7 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         if dataset_to_delete.resource_data:
             session.delete(dataset_to_delete.resource_data)
         session.delete(dataset_to_delete)
-        logger.info("removed resource %s" % dataset_to_delete.resource_uid)
+        logger.info("removed resource '%s'" % dataset_to_delete.resource_uid)
 
 
 def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, Any]):
