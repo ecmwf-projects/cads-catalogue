@@ -1,5 +1,6 @@
 """utility module to load and store data in the catalogue database."""
 import datetime
+
 # Copyright 2022, European Union.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,6 @@ import datetime
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import glob
 import hashlib
 import itertools
@@ -669,8 +669,15 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         logger.info("removed resource %s" % dataset_to_delete.resource_uid)
 
 
-def update_git_hashes(session, hashes_dict):
-    """a docstring."""
+def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, Any]):
+    """
+    Insert (or update) the record in catalogue_updates according to input dictionary.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    hashes_dict: dictionary of record properties
+    """
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
@@ -681,7 +688,4 @@ def update_git_hashes(session, hashes_dict):
         session.add(last_update_record)
     else:
         hashes_dict["update_time"] = datetime.datetime.now()
-        session.execute(
-            sa.update(database.CatalogueUpdate)
-            .values(**hashes_dict)
-        )
+        session.execute(sa.update(database.CatalogueUpdate).values(**hashes_dict))

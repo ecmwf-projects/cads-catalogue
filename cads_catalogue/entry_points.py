@@ -208,10 +208,14 @@ def update_catalogue(
         raise ValueError("%r is not a folder" % licences_folder_path)
     if not os.path.isdir(messages_folder_path) and not exclude_messages:
         raise ValueError("%r is not a folder" % messages_folder_path)
-    filter_is_active = bool(include or exclude or exclude_resources or exclude_licences or exclude_messages)
+    filter_is_active = bool(
+        include or exclude or exclude_resources or exclude_licences or exclude_messages
+    )
     if filter_is_active:
         if delete_orphans:
-            logger.warning("'delete-orphans' has been disabled: include/exclude feature is active")
+            logger.warning(
+                "'delete-orphans' has been disabled: include/exclude feature is active"
+            )
             delete_orphans = False
 
     # get db session session maker
@@ -245,18 +249,37 @@ def update_catalogue(
         last_run_git_hashes = manager.get_last_git_hashes(
             session, *[f[1] for f in paths_db_hash_map]
         )
-        if current_git_hashes == last_run_git_hashes and not force and None not in current_git_hashes:
+        if (
+            current_git_hashes == last_run_git_hashes
+            and not force
+            and None not in current_git_hashes
+        ):
             logger.info(
                 "catalogue update skipped: source files have not changed. "
                 "Use --force to update anyway."
             )
             return
         # if no git ash, consider repo like it was changed
-        this_package_changed = current_git_hashes[0] != last_run_git_hashes[0] or current_git_hashes[0] is None
-        datasets_changed = current_git_hashes[1] != last_run_git_hashes[1] or current_git_hashes[1] is None
-        licences_changed = current_git_hashes[2] != last_run_git_hashes[2] or current_git_hashes[2] is None
-        messages_changed = current_git_hashes[3] != last_run_git_hashes[3] or current_git_hashes[3] is None
-        cim_forms_changed = current_git_hashes[4] != last_run_git_hashes[4] or current_git_hashes[4] is None
+        this_package_changed = (
+            current_git_hashes[0] != last_run_git_hashes[0]
+            or current_git_hashes[0] is None
+        )
+        datasets_changed = (
+            current_git_hashes[1] != last_run_git_hashes[1]
+            or current_git_hashes[1] is None
+        )
+        licences_changed = (
+            current_git_hashes[2] != last_run_git_hashes[2]
+            or current_git_hashes[2] is None
+        )
+        messages_changed = (
+            current_git_hashes[3] != last_run_git_hashes[3]
+            or current_git_hashes[3] is None
+        )
+        cim_forms_changed = (
+            current_git_hashes[4] != last_run_git_hashes[4]
+            or current_git_hashes[4] is None
+        )
 
         if this_package_changed:
             logger.info(
@@ -282,7 +305,12 @@ def update_catalogue(
         # resources
         some_resources_processed = False
         if not exclude_resources:
-            if not datasets_changed and not force and not cim_forms_changed and not licences_processed:
+            if (
+                not datasets_changed
+                and not force
+                and not cim_forms_changed
+                and not licences_processed
+            ):
                 logger.info(
                     "catalogue update of resources skipped: source files have not changed. "
                     "Use --force to update anyway."
@@ -342,7 +370,9 @@ def update_catalogue(
             # (all) messages  have been effectively processed
             hashes_dict["message_repo_commit"] = current_git_hashes[3]
         if not hashes_dict:
-            logger.info("disabled db update of last commit hashes of source repositories")
+            logger.info(
+                "disabled db update of last commit hashes of source repositories"
+            )
         else:
             hashes_dict["catalogue_repo_commit"] = current_git_hashes[0]
             logger.info("db update of last commit hashes of source repositories")

@@ -12,7 +12,6 @@ from typer.testing import CliRunner
 
 import alembic.config
 from cads_catalogue import (
-    config,
     database,
     entry_points,
     licence_manager,
@@ -147,7 +146,9 @@ def test_update_catalogue(
     mocker.patch.object(alembic.config, "main")
     _create_database = mocker.spy(sqlalchemy_utils, "create_database")
     _init_database = mocker.spy(database, "init_database")
-    _load_licences_from_folder = mocker.spy(licence_manager, "load_licences_from_folder")
+    _load_licences_from_folder = mocker.spy(
+        licence_manager, "load_licences_from_folder"
+    )
     _resource_sync = mocker.spy(manager, "resource_sync")
     _update_catalogue_messages = mocker.spy(messages, "update_catalogue_messages")
 
@@ -199,13 +200,15 @@ def test_update_catalogue(
     assert _store_file.call_count == 8  # num.licences * 2 = 8
 
     # store of pdf of licence
-    assert (licence_path, object_storage_url) in [mp.args for mp in _store_file.mock_calls]
+    assert (licence_path, object_storage_url) in [
+        mp.args for mp in _store_file.mock_calls
+    ]
     assert {
-               "bucket_name": bucket_name,
-               "subpath": "licences/licence-to-use-copernicus-products",
-               "aws_access_key_id": "storage_user",
-               "aws_secret_access_key": "storage_password",
-           } in [mp.kwargs for mp in _store_file.mock_calls]
+        "bucket_name": bucket_name,
+        "subpath": "licences/licence-to-use-copernicus-products",
+        "aws_access_key_id": "storage_user",
+        "aws_secret_access_key": "storage_password",
+    } in [mp.kwargs for mp in _store_file.mock_calls]
     # check object storage calls
     expected_calls = [  # these are only some
         unittest.mock.call(
@@ -226,20 +229,30 @@ def test_update_catalogue(
     with session_obj() as session:
         # licences are not removed: remove orphans is automatic disabled
         assert (
-                session.execute(sa.text("select count(*) from licences")).scalars().one() == 4
+            session.execute(sa.text("select count(*) from licences")).scalars().one()
+            == 4
         )
 
         assert (
-                session.execute(sa.text("select count(*) from messages")).scalars().one() == 0
+            session.execute(sa.text("select count(*) from messages")).scalars().one()
+            == 0
         )
         assert (
-                session.execute(sa.text("select count(*) from resources")).scalars().one() == 0
+            session.execute(sa.text("select count(*) from resources")).scalars().one()
+            == 0
         )
-        sql = "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, " \
-              "message_repo_commit, cim_repo_commit from catalogue_updates"
+        sql = (
+            "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
+            "message_repo_commit, cim_repo_commit from catalogue_updates"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            ('e5658fef07333700272e36a43df0628efacb5f04', None,
-             'f0591ec408b59d32a46a5d08b9786641dffe5c7e', None, None)
+            (
+                "e5658fef07333700272e36a43df0628efacb5f04",
+                None,
+                "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+                None,
+                None,
+            )
         ]
         licences = [
             utils.object_as_dict(ll)
@@ -355,20 +368,30 @@ def test_update_catalogue(
     # check db content
     with session_obj() as session:
         assert (
-                session.execute(sa.text("select count(*) from licences")).scalars().one() == 4
+            session.execute(sa.text("select count(*) from licences")).scalars().one()
+            == 4
         )
 
         assert (
-                session.execute(sa.text("select count(*) from messages")).scalars().one() == 9
+            session.execute(sa.text("select count(*) from messages")).scalars().one()
+            == 9
         )
         assert (
-                session.execute(sa.text("select count(*) from resources")).scalars().one() == 0
+            session.execute(sa.text("select count(*) from resources")).scalars().one()
+            == 0
         )
-        sql = "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, " \
-              "message_repo_commit, cim_repo_commit from catalogue_updates"
+        sql = (
+            "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
+            "message_repo_commit, cim_repo_commit from catalogue_updates"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            (folder_commit_hashes[0], None,
-             folder_commit_hashes[2], folder_commit_hashes[3], None)
+            (
+                folder_commit_hashes[0],
+                None,
+                folder_commit_hashes[2],
+                folder_commit_hashes[3],
+                None,
+            )
         ]
         expected_msgs = [
             {
@@ -393,7 +416,10 @@ def test_update_catalogue(
                 "* *summary* is missing, so only this main body message is used\n"
                 "* *status* is missing (indeed actually is not used yet)",
                 "date": datetime.datetime(2023, 1, 11, 11, 27, 13),
-                "entries": ["reanalysis-era5-xxx", "satellite-surface-radiation-budget"],
+                "entries": [
+                    "reanalysis-era5-xxx",
+                    "satellite-surface-radiation-budget",
+                ],
                 "is_global": False,
                 "live": False,
                 "message_uid": "contents/2023/2023-01-archived-warning.md",
@@ -406,7 +432,10 @@ def test_update_catalogue(
                 " \n"
                 "Wider **markdown syntax** allowed here.",
                 "date": datetime.datetime(2023, 1, 12, 11, 27, 13),
-                "entries": ["reanalysis-era5-land", "satellite-surface-radiation-budget"],
+                "entries": [
+                    "reanalysis-era5-land",
+                    "satellite-surface-radiation-budget",
+                ],
                 "is_global": False,
                 "live": True,
                 "message_uid": "contents/2023/2023-01-era5-issue-456.md",
@@ -590,11 +619,18 @@ def test_update_catalogue(
                 "sources_hash",
             ),
         )
-        sql = "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, " \
-              "message_repo_commit, cim_repo_commit from catalogue_updates"
+        sql = (
+            "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
+            "message_repo_commit, cim_repo_commit from catalogue_updates"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            (folder_commit_hashes[0], None,
-             folder_commit_hashes[2], folder_commit_hashes[3], None)
+            (
+                folder_commit_hashes[0],
+                None,
+                folder_commit_hashes[2],
+                folder_commit_hashes[3],
+                None,
+            )
         ]
 
     # 3.bis repeat last run -------------------------------------------------------------
@@ -646,26 +682,45 @@ def test_update_catalogue(
     # check db content
     with session_obj() as session:
         assert (
-                session.execute(sa.text("select count(*) from licences")).scalars().one() == 4
+            session.execute(sa.text("select count(*) from licences")).scalars().one()
+            == 4
         )
 
         assert (
-                session.execute(sa.text("select count(*) from messages")).scalars().one() == 9
+            session.execute(sa.text("select count(*) from messages")).scalars().one()
+            == 9
         )
         assert (
-                session.execute(sa.text("select count(*) from resources")).scalars().one() == 1
+            session.execute(sa.text("select count(*) from resources")).scalars().one()
+            == 1
         )
-        sql = "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, " \
-              "message_repo_commit, cim_repo_commit from catalogue_updates"
+        sql = (
+            "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
+            "message_repo_commit, cim_repo_commit from catalogue_updates"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            (folder_commit_hashes[0], None,
-             folder_commit_hashes[2], folder_commit_hashes[3], None)
+            (
+                folder_commit_hashes[0],
+                None,
+                folder_commit_hashes[2],
+                folder_commit_hashes[3],
+                None,
+            )
         ]
 
     # 4. change a licence and a message and repeat last run with force = True -----------
     with session_obj() as session:
-        session.execute(sa.text("update licences set title='a new title' where licence_uid='eumetsat-cm-saf'"))
-        session.execute(sa.text("update messages set live=false where message_uid='portals/c3s/2023/Jan/2021-01-example-of-info-active.md'"))
+        session.execute(
+            sa.text(
+                "update licences set title='a new title' where licence_uid='eumetsat-cm-saf'"
+            )
+        )
+        session.execute(
+            sa.text(
+                "update messages set live=false "
+                "where message_uid='portals/c3s/2023/Jan/2021-01-example-of-info-active.md'"
+            )
+        )
         session.commit()
     result = runner.invoke(
         entry_points.app,
@@ -683,7 +738,7 @@ def test_update_catalogue(
             TEST_CIM_DATA_PATH,
             "--include",
             "reanalysis-era5-land",
-            "--force"
+            "--force",
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -716,8 +771,15 @@ def test_update_catalogue(
 
     # check db changes are reset
     with session_obj() as session:
-        assert session.execute(sa.text("select title from licences where licence_uid='eumetsat-cm-saf'")).all() == [("EUMETSAT CM SAF products licence",)]
-        assert session.execute(sa.text("select live from messages where message_uid='portals/c3s/2023/Jan/2021-01-example-of-info-active.md'")).all() == [(True,)]
+        assert session.execute(
+            sa.text("select title from licences where licence_uid='eumetsat-cm-saf'")
+        ).all() == [("EUMETSAT CM SAF products licence",)]
+        assert session.execute(
+            sa.text(
+                "select live from messages "
+                "where message_uid='portals/c3s/2023/Jan/2021-01-example-of-info-active.md'"
+            )
+        ).all() == [(True,)]
 
     # 5. use 'include' with a pattern that doesn't match anything) ----------------------
     result = runner.invoke(
@@ -833,21 +895,30 @@ def test_update_catalogue(
                 "sources_hash",
             ),
         )
-        sql = "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, " \
-              "message_repo_commit, cim_repo_commit from catalogue_updates"
+        sql = (
+            "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
+            "message_repo_commit, cim_repo_commit from catalogue_updates"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            (folder_commit_hashes[0], None,
-             folder_commit_hashes[2], folder_commit_hashes[3], None)
+            (
+                folder_commit_hashes[0],
+                None,
+                folder_commit_hashes[2],
+                folder_commit_hashes[3],
+                None,
+            )
         ]
-        sql = "select r1.resource_uid, r2.resource_uid from related_resources " \
-              "left join resources as r1 on (parent_resource_id=r1.resource_id) " \
-              "left join resources as r2 on (child_resource_id=r2.resource_id) " \
-              "order by r1.resource_uid, r2.resource_uid"
+        sql = (
+            "select r1.resource_uid, r2.resource_uid from related_resources "
+            "left join resources as r1 on (parent_resource_id=r1.resource_id) "
+            "left join resources as r2 on (child_resource_id=r2.resource_id) "
+            "order by r1.resource_uid, r2.resource_uid"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            ('cams-global-reanalysis-eac4', 'cams-global-reanalysis-eac4-monthly'),
-            ('cams-global-reanalysis-eac4-monthly', 'cams-global-reanalysis-eac4'),
-            ('reanalysis-era5-land', 'reanalysis-era5-land-monthly-means'),
-            ('reanalysis-era5-land-monthly-means', 'reanalysis-era5-land')
+            ("cams-global-reanalysis-eac4", "cams-global-reanalysis-eac4-monthly"),
+            ("cams-global-reanalysis-eac4-monthly", "cams-global-reanalysis-eac4"),
+            ("reanalysis-era5-land", "reanalysis-era5-land-monthly-means"),
+            ("reanalysis-era5-land-monthly-means", "reanalysis-era5-land"),
         ]
 
     # 7. run without excluding anything -------------------------------------------------
@@ -915,20 +986,24 @@ def test_update_catalogue(
                 "sources_hash",
             ),
         )
-        sql = "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, " \
-              "message_repo_commit, cim_repo_commit from catalogue_updates"
+        sql = (
+            "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
+            "message_repo_commit, cim_repo_commit from catalogue_updates"
+        )
         assert session.execute(sa.text(sql)).all() == [folder_commit_hashes]
-        sql = "select r1.resource_uid, r2.resource_uid from related_resources " \
-              "left join resources as r1 on (parent_resource_id=r1.resource_id) " \
-              "left join resources as r2 on (child_resource_id=r2.resource_id) " \
-              "order by r1.resource_uid, r2.resource_uid"
+        sql = (
+            "select r1.resource_uid, r2.resource_uid from related_resources "
+            "left join resources as r1 on (parent_resource_id=r1.resource_id) "
+            "left join resources as r2 on (child_resource_id=r2.resource_id) "
+            "order by r1.resource_uid, r2.resource_uid"
+        )
         assert session.execute(sa.text(sql)).all() == [
-            ('cams-global-reanalysis-eac4', 'cams-global-reanalysis-eac4-monthly'),
-            ('cams-global-reanalysis-eac4-monthly', 'cams-global-reanalysis-eac4'),
-            ('reanalysis-era5-land', 'reanalysis-era5-land-monthly-means'),
-            ('reanalysis-era5-land-monthly-means', 'reanalysis-era5-land'),
-            ('reanalysis-era5-pressure-levels', 'reanalysis-era5-single-levels'),
-            ('reanalysis-era5-single-levels', 'reanalysis-era5-pressure-levels')
+            ("cams-global-reanalysis-eac4", "cams-global-reanalysis-eac4-monthly"),
+            ("cams-global-reanalysis-eac4-monthly", "cams-global-reanalysis-eac4"),
+            ("reanalysis-era5-land", "reanalysis-era5-land-monthly-means"),
+            ("reanalysis-era5-land-monthly-means", "reanalysis-era5-land"),
+            ("reanalysis-era5-pressure-levels", "reanalysis-era5-single-levels"),
+            ("reanalysis-era5-single-levels", "reanalysis-era5-pressure-levels"),
         ]
 
     # 8. run again -----------------------------------------------------------------------
@@ -979,7 +1054,11 @@ def test_update_catalogue(
 
     # 9. change a dataset and run again with force ---------------------------------------
     with session_obj() as session:
-        session.execute(sa.text("update resources set title='a new title' where resource_uid='reanalysis-era5-land'"))
+        session.execute(
+            sa.text(
+                "update resources set title='a new title' where resource_uid='reanalysis-era5-land'"
+            )
+        )
         session.commit()
     # (all should be skipped)
     result = runner.invoke(
@@ -996,7 +1075,7 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
-            "--force"
+            "--force",
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
