@@ -1678,7 +1678,7 @@ def test_resource_sync(
 
         utils.compare_resources_with_dumped_file(
             all_db_resources,
-            os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
+            os.path.join(TESTDATA_PATH, "dumped_resources1.txt"),
             exclude_fields=("record_update", "resource_id", "search_field"),
         )
         assert session.execute(
@@ -1748,7 +1748,7 @@ def test_resource_sync(
         all_db_resources = session.scalars(sa.select(database.Resource)).all()
         utils.compare_resources_with_dumped_file(
             all_db_resources,
-            os.path.join(TESTDATA_PATH, "dumped_resources3.txt"),
+            os.path.join(TESTDATA_PATH, "dumped_resources2.txt"),
             exclude_fields=("record_update", "resource_id", "search_field"),
         )
         assert set(

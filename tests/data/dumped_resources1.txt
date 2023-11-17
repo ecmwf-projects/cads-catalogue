@@ -1641,8 +1641,8 @@
         "resource_id": 2,
         "resource_uid": "reanalysis-era5-land-monthly-means",
         "constraints": "an url",
-        "form": "a new url for form.json",
-        "layout": "a new url for layout.json",
+        "form": "an url for form.json",
+        "layout": "an url for layout.json",
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_configuration": {
@@ -2120,7 +2120,7 @@
                 ]
             }
         ],
-        "form_data": "a new content of form.json",
+        "form_data": "content of form.json",
         "sources_hash": null,
         "mapping": {
             "force": {
@@ -2251,7 +2251,7 @@
         "description": [],
         "documentation": [],
         "doi": "10.24381/cds.68d2bb30",
-        "ds_contactemail": "a_new_test@email",
+        "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
         "ds_responsible_organisation_role": "publisher",
         "file_format": "grib",
