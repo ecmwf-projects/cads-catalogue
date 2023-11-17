@@ -1,4 +1,5 @@
 """utility module to load and store data in the catalogue database."""
+import datetime
 
 # Copyright 2022, European Union.
 #
@@ -13,14 +14,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import glob
 import hashlib
 import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, List, Sequence
 
 import sqlalchemy as sa
 import structlog
@@ -68,58 +68,46 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
     return ret_value.hexdigest()  # type: ignore
 
 
-def is_db_to_update(
-    session: sa.orm.session.Session,
-    resources_folder_path: str | pathlib.Path,
-    licences_folder_path: str | pathlib.Path,
-    messages_folder_path: str | pathlib.Path,
-    cim_folder_path: str | pathlib.Path,
-) -> Tuple[
-    bool,
-    bool,
-    Optional[str],
-    Optional[str],
-    Optional[str],
-    Optional[str],
-    Optional[str],
-]:
+def get_current_git_hashes(*folders: str | pathlib.Path) -> List[str]:
     """
-    Compare current and last run's status of repo folders and return information if the database is to update.
+    Return the list of last commit hashes of input folders.
+
+    Parameters
+    ----------
+    folders: list of folders
+
+    Returns
+    -------
+    List of last commit hashes
+    """
+    current_hashes = []
+    for folder in folders:
+        try:
+            current_hashes.append(utils.get_last_commit_hash(folder))
+        except Exception:  # noqa
+            logger.exception(
+                "no check on commit hash for folder %r, error follows" % folder
+            )
+            current_hashes.append(None)
+    return current_hashes
+
+
+def get_last_git_hashes(
+    session: sa.orm.session.Session, *column_names: str | None
+) -> List[str | None]:
+    """
+    Return last stored git hashes of table catalogue_updates.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    resources_folder_path: the folder path where to look for metadata files of all the resources
-    licences_folder_path: the folder path where to look for metadata files of all the licences
-    messages_folder_path: the folder path where to look for metadata files of all the messages
-    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
+    column_names: list of columns of table catalogue_updates to return the values
 
     Returns
     -------
-    (did_input_folders_change, did_catalogue_source_change, *last_commit_hashes)
+    The values of input column names for the table catalogue_updates
     """
-    current_hashes = [None, None, None, None, None]
-
-    # load effective commit hashes from the folders
-    catalogue_folder_path = os.path.dirname(os.path.abspath(__file__))
-    for i, folder_path in enumerate(
-        [
-            catalogue_folder_path,
-            resources_folder_path,
-            licences_folder_path,
-            messages_folder_path,
-            cim_folder_path,
-        ]
-    ):
-        try:
-            current_hashes[i] = utils.get_last_commit_hash(folder_path)
-        except Exception:  # noqa
-            logger.exception(
-                "no check on commit hash for folder %r, error follows" % folder_path
-            )
-
-    # get last stored commit hashes from the db
-    last_hashes = [None, None, None, None, None]
+    last_hashes: List[str | None] = [None] * len(column_names)
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
@@ -127,42 +115,10 @@ def is_db_to_update(
     ).first()
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
-        is_to_update = True
-        return is_to_update, True, *current_hashes  # type: ignore
-    for i, last_hash_attr in enumerate(
-        [
-            "catalogue_repo_commit",
-            "metadata_repo_commit",
-            "licence_repo_commit",
-            "message_repo_commit",
-            "cim_repo_commit",
-        ]
-    ):
-        last_hashes[i] = getattr(last_update_record, last_hash_attr)
-
-    # logs what's happening
-    for i, repo_name in enumerate(
-        [
-            "catalogue manager",  # cads-catalogue
-            "dataset metadata",  # cads-forms-json
-            "licence",  # cads-licences
-            "message",  # cads-messages
-            "cim layouts",  # cads-forms-cim-json
-        ]
-    ):
-        last_hash = last_hashes[i]
-        current_hash = current_hashes[i]
-        if not last_hash:
-            logger.warning("no information of last %s repository commit" % repo_name)
-        elif last_hash != current_hash:
-            logger.info("detected update of %s repository" % repo_name)
-
-    # set the bool value
-    is_to_update = (
-        last_hashes == [None, None, None, None, None] or last_hashes != current_hashes
-    )
-    did_catalogue_source_change = last_hashes[0] != current_hashes[0]
-    return is_to_update, did_catalogue_source_change, *current_hashes  # type: ignore
+        return last_hashes
+    for i, last_hash_attr in enumerate(column_names):
+        last_hashes[i] = getattr(last_update_record, last_hash_attr)  # type: ignore
+    return last_hashes
 
 
 def is_resource_to_update(session, resource_folder_path):
@@ -616,6 +572,8 @@ def update_catalogue_resources(
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
+    include: List[str] = [],
+    exclude: List[str] = [],
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -627,19 +585,31 @@ def update_catalogue_resources(
     storage_settings: object with settings to access the object storage
     cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     force: if True, no skipping of dataset update based on detected changes of sources is made
+    include: list of include patterns for the resource uids
+    exclude: list of exclude patterns for the resource uids
 
     Returns
     -------
     list: list of resource uids involved
     """
-    input_resource_uids = []
+    involved_resource_uids = []
 
-    logger.info("running catalogue db update for resources")
-    # load metadata of each resource from files and sync each resource in the db
-    for resource_folder_path in glob.glob(os.path.join(resources_folder_path, "*/")):
+    # filtering resource uids
+    folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
+    if include:
+        folders = set()
+        for pattern in include:
+            matched = set(glob.glob(os.path.join(resources_folder_path, f"{pattern}/")))
+            folders |= matched
+    if exclude:
+        for pattern in exclude:
+            matched = set(glob.glob(os.path.join(resources_folder_path, f"{pattern}/")))
+            folders -= matched
+
+    for resource_folder_path in sorted(folders):
         resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
         logger.debug("parsing folder %s" % resource_folder_path)
-        input_resource_uids.append(resource_uid)
+        involved_resource_uids.append(resource_uid)
         try:
             with session.begin_nested():
                 to_update, sources_hash = is_resource_to_update(
@@ -647,12 +617,12 @@ def update_catalogue_resources(
                 )
                 if not to_update and not force:
                     logger.info(
-                        "resource update %s skipped: no change detected" % resource_uid
+                        "skip updating of '%s': no change detected" % resource_uid
                     )
                     continue
                 resource = load_resource_from_folder(resource_folder_path)
                 resource["sources_hash"] = sources_hash
-                logger.info("resource %s loaded successful" % resource_uid)
+                logger.info("resource '%s' loaded successful" % resource_uid)
                 resource = layout_manager.transform_layout(
                     session,
                     resource_folder_path,
@@ -665,12 +635,12 @@ def update_catalogue_resources(
                 )
                 resource["adaptor_properties_hash"] = compute_config_hash(resource)
                 resource_sync(session, resource, storage_settings)
-            logger.info("resource %s db sync successful" % resource_uid)
+            logger.info("resource '%s' db sync successful" % resource_uid)
         except Exception:  # noqa
             logger.exception(
-                "db sync for resource %s failed, error follows" % resource_uid
+                "db sync for resource '%s' failed, error follows" % resource_uid
             )
-    return input_resource_uids
+    return involved_resource_uids
 
 
 def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[str]):
@@ -695,4 +665,26 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         if dataset_to_delete.resource_data:
             session.delete(dataset_to_delete.resource_data)
         session.delete(dataset_to_delete)
-        logger.info("removed resource %s" % dataset_to_delete.resource_uid)
+        logger.info("removed resource '%s'" % dataset_to_delete.resource_uid)
+
+
+def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, Any]):
+    """
+    Insert (or update) the record in catalogue_updates according to input dictionary.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    hashes_dict: dictionary of record properties
+    """
+    last_update_record = session.scalars(
+        sa.select(database.CatalogueUpdate)
+        .order_by(database.CatalogueUpdate.update_time.desc())
+        .limit(1)
+    ).first()
+    if not last_update_record:
+        last_update_record = database.CatalogueUpdate(**hashes_dict)
+        session.add(last_update_record)
+    else:
+        hashes_dict["update_time"] = datetime.datetime.now()
+        session.execute(sa.update(database.CatalogueUpdate).values(**hashes_dict))

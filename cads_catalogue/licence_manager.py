@@ -255,8 +255,6 @@ def update_catalogue_licences(
     -------
     list: list of licence uids involved
     """
-    logger.info("running catalogue db update for licences")
-
     involved_licence_uids = []
     licences = load_licences_from_folder(licences_folder_path)
     logger.info("loaded %s licences from %s" % (len(licences), licences_folder_path))
@@ -266,10 +264,10 @@ def update_catalogue_licences(
         try:
             with session.begin_nested():
                 licence_sync(session, licence_uid, licences, storage_settings)
-            logger.info("licence %s db sync successful" % licence_uid)
+            logger.info("licence '%s' db sync successful" % licence_uid)
         except Exception:  # noqa
             logger.exception(
-                "db sync for licence %s failed, error follows" % licence_uid
+                "db sync for licence '%s' failed, error follows" % licence_uid
             )
     return involved_licence_uids
 
@@ -297,7 +295,7 @@ def remove_orphan_licences(
             continue
         licence_to_delete.resources = []  # type: ignore
         session.delete(licence_to_delete)
-        logger.info("removed licence %s" % licence_to_delete.licence_uid)
+        logger.info("removed licence '%s'" % licence_to_delete.licence_uid)
 
 
 def migrate_from_cds_licences(
