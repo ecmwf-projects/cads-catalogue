@@ -314,6 +314,28 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     return new_data
 
 
+def has_section_id(layout_data: dict[str, Any], section_id: str):
+    """
+    Return True if layout has section id `section_id`.
+
+    Parameters
+    ----------
+    layout_data: data of the layout.json to check
+    section_id: id of the section inside body-> main -> sections
+
+    Returns
+    -------
+    True if id of the section is found, False otherwise.
+    """
+    body = layout_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
+    for section in sections:
+        if section.get("id") == section_id:
+            return True
+    return False
+
+
 def store_layout_by_data(
     layout_data: dict[str, Any],
     resource: dict[str, Any],
@@ -389,6 +411,7 @@ def transform_layout(
     )
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
     logger.debug(f"output layout_data: {layout_data}")
+    resource["qa_flag"] = has_section_id(layout_data, "quality_assurance_tab")
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
     logger.debug(f"layout url: {resource['layout']}")
     return resource
