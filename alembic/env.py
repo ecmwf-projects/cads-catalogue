@@ -36,7 +36,14 @@ def run_migrations_offline() -> None:
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    url = config.get_main_option("sqlalchemy.url")
+    url = sa.engine.URL.create(
+        drivername=config.get_main_option("drivername"),  # type: ignore
+        username=config.get_main_option("username"),
+        password=config.get_main_option("password"),
+        host=config.get_main_option("host"),
+        port=config.get_main_option("port"),  # type: ignore
+        database=config.get_main_option("database"),
+    )
     alembic.context.configure(
         url=url,
         target_metadata=cads_catalogue.database.BaseModel.metadata,
@@ -55,12 +62,15 @@ def run_migrations_online() -> None:
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    engine = sa.engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=sa.pool.NullPool,
+    url = sa.engine.URL.create(
+        drivername=config.get_main_option("drivername"),  # type: ignore
+        username=config.get_main_option("username"),
+        password=config.get_main_option("password"),
+        host=config.get_main_option("host"),
+        port=config.get_main_option("port"),  # type: ignore
+        database=config.get_main_option("database"),
     )
-
+    engine = sa.create_engine(url, poolclass=sa.pool.NullPool)
     with engine.connect() as connection:
         alembic.context.configure(
             connection=connection, target_metadata=cads_catalogue.database.metadata
