@@ -27,7 +27,7 @@ def test_init_database(postgresql: Connection[str]) -> None:
 
 
 def test_init_database_with_password(postgresql2) -> None:
-    connection_string = sa.engine.URL.create(
+    connection_url = sa.engine.URL.create(
         drivername="postgresql+psycopg2",
         username=postgresql2.info.user,
         password=postgresql2.info.password,
@@ -35,6 +35,7 @@ def test_init_database_with_password(postgresql2) -> None:
         port=postgresql2.info.port,
         database=postgresql2.info.dbname,
     )
+    connection_string = connection_url.render_as_string(False)
     engine = sa.create_engine(connection_string)
     conn = engine.connect()
     query = sa.text(
