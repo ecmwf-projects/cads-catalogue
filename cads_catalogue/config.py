@@ -16,6 +16,8 @@
 import dataclasses
 import os
 
+import sqlalchemy as sa
+
 dbsettings = None
 storagesettings = None
 
@@ -87,14 +89,28 @@ class SqlalchemySettings:
     @property
     def connection_string(self) -> str:
         """Create reader psql connection string."""
-        url = f"postgresql://{self.catalogue_db_user}:{self.catalogue_db_password}@{self.catalogue_db_host}/{self.catalogue_db_name}"
-        return url
+        url = sa.engine.URL.create(
+            drivername="postgresql",
+            username=self.catalogue_db_user,
+            password=self.catalogue_db_password,
+            host=self.catalogue_db_host,
+            database=self.catalogue_db_name,
+        )
+        ret_value = url.render_as_string(False)
+        return ret_value
 
     @property
     def connection_string_read(self) -> str:
         """Create reader psql connection string in read-only mode."""
-        url = f"postgresql://{self.catalogue_db_user}:{self.catalogue_db_password}@{self.catalogue_db_host_read}/{self.catalogue_db_name}"
-        return url
+        url = sa.engine.URL.create(
+            drivername="postgresql",
+            username=self.catalogue_db_user,
+            password=self.catalogue_db_password,
+            host=self.catalogue_db_host_read,
+            database=self.catalogue_db_name,
+        )
+        ret_value = url.render_as_string(False)
+        return ret_value
 
 
 @dataclasses.dataclass(kw_only=True)
