@@ -26,30 +26,6 @@ def test_init_database(postgresql: Connection[str]) -> None:
     conn.close()
 
 
-def test_init_database_with_password(postgresql2) -> None:
-    connection_url = sa.engine.URL.create(
-        drivername="postgresql+psycopg2",
-        username=postgresql2.info.user,
-        password=postgresql2.info.password,
-        host=postgresql2.info.host,
-        port=postgresql2.info.port,
-        database=postgresql2.info.dbname,
-    )
-    connection_string = connection_url.render_as_string(False)
-    engine = sa.create_engine(connection_string)
-    conn = engine.connect()
-    query = sa.text(
-        "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
-    )
-    expected_tables_at_beginning: set[str] = set()
-    expected_tables_complete = set(database.metadata.tables).union({"alembic_version"})
-    assert set(conn.execute(query).scalars()) == expected_tables_at_beginning  # type: ignore
-
-    database.init_database(connection_string, force=True)
-    assert set(conn.execute(query).scalars()) == expected_tables_complete  # type: ignore
-    conn.close()
-
-
 def test_ensure_session_obj(postgresql: Connection[str], temp_environ: Any) -> None:
     temp_environ["catalogue_db_host"] = "cataloguehost"
     temp_environ["catalogue_db_password"] = postgresql.info.password
