@@ -803,3 +803,31 @@ def test_transform_cim_blocks(tmpdir):
             },
         },
     }
+
+
+def test_has_section_id(tmpdir):
+    layout_path = os.path.join(str(tmpdir), "layout.json")
+    test_sections_1 = [
+        {
+            "id": "overview",
+            "blocks": [
+                {"id": "abstract1", "type": "a type", "content": "a content"},
+            ],
+        },
+        {
+            "id": "overview2",
+            "blocks": [
+                {"id": "abstract2", "type": "a type", "content": "a content"},
+            ],
+        },
+        {
+            "id": "overview3",
+            "blocks": [
+                {"id": "abstract3", "type": "a type", "content": "a content"},
+            ],
+        },
+    ]
+    # test case 1: not existing cim layout, not existing layout sections
+    layout_data = create_layout_for_test(layout_path, sections=test_sections_1)
+    assert layout_manager.has_section_id(layout_data, "overview2") is True
+    assert layout_manager.has_section_id(layout_data, "overview4") is False
