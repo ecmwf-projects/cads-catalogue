@@ -342,14 +342,14 @@ def update_catalogue(
 
         # delete orphans
         if delete_orphans:  # -> always false if filtering is active
-            if not exclude_licences:
+            if not exclude_licences and licences_processed:
                 logger.info("db removing of orphan licences")
                 licence_manager.remove_orphan_licences(
                     session,
                     keep_licences=involved_licences,
                     resources=involved_resource_uids,
                 )
-            if not exclude_resources:
+            if not exclude_resources and some_resources_processed:
                 logger.info("db removing of orphan datasets")
                 manager.remove_datasets(
                     session, keep_resource_uids=involved_resource_uids
@@ -362,11 +362,16 @@ def update_catalogue(
         if licences_processed:
             # (all) licences have been effectively processed
             hashes_dict["licence_repo_commit"] = current_git_hashes[2]
-        if some_resources_processed and not include and not exclude:
+        if (
+            some_resources_processed
+            and not include
+            and not exclude
+            and not exclude_resources
+        ):
             # all resources have been effectively processed
             hashes_dict["metadata_repo_commit"] = current_git_hashes[1]
             hashes_dict["cim_repo_commit"] = current_git_hashes[4]
-        if messages_processed:
+        if messages_processed and not exclude_messages:
             # (all) messages  have been effectively processed
             hashes_dict["message_repo_commit"] = current_git_hashes[3]
         if not hashes_dict:
