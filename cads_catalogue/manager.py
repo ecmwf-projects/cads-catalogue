@@ -327,6 +327,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
             f"publication_date not provided: setting default '{default_public_date}'"
         )
         metadata["publication_date"] = default_public_date
+    metadata["qa_flag"] = data.get("qa_flag", True)
     metadata["qos_tags"] = data.get("qos_tags", [])
     metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
 

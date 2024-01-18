@@ -39,7 +39,7 @@
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
         "portal": "c3s",
-        "qa_flag": null,
+        "qa_flag": true,
         "qos_tags": [
             "tag1",
             "tag2",
@@ -94,7 +94,7 @@
         "responsible_organisation_role": "pointOfContact",
         "responsible_organisation_website": "https://www.ecmwf.int/",
         "portal": "c3s",
-        "qa_flag": null,
+        "qa_flag": true,
         "qos_tags": [],
         "title": "ERA5-Land monthly averaged data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
