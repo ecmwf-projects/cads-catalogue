@@ -714,7 +714,9 @@ def test_transform_cim_blocks(tmpdir):
     with open(cim_layout_path) as fp:
         cim_layout_data = json.load(fp)
         quality_assurance_tab = cim_layout_data["quality_assurance_tab"]
+        quality_assurance_tab["id"] = "quality_assurance_tab"
         quality_assurance_aside = cim_layout_data["quality_assurance_aside"]
+        quality_assurance_aside["id"] = "quality_assurance_aside"
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
