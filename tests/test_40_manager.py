@@ -1564,6 +1564,7 @@ def test_load_resource_from_folder() -> None:
         "responsible_organisation_website": "https://www.ecmwf.int/",
         "resource_update": "2023-02-17",
         "portal": "c3s",
+        "qa_flag": True,
         "qos_tags": ["tag1", "tag2", "tag3"],
         "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",

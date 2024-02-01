@@ -405,13 +405,15 @@ def transform_layout(
     cim_layout_path = os.path.join(
         cim_folder_path, resource["resource_uid"], "quality_assurance.layout.json"
     )
-    layout_data = transform_cim_blocks(layout_data, cim_layout_path)
+    if resource["qa_flag"]:
+        layout_data = transform_cim_blocks(layout_data, cim_layout_path)
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
     logger.debug(f"output layout_data: {layout_data}")
-    resource["qa_flag"] = has_section_id(layout_data, "quality_assurance_tab")
+    if resource["qa_flag"]:
+        resource["qa_flag"] = has_section_id(layout_data, "quality_assurance_tab")
     resource["layout"] = store_layout_by_data(layout_data, resource, storage_settings)
     logger.debug(f"layout url: {resource['layout']}")
     return resource
