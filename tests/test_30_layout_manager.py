@@ -611,6 +611,7 @@ def test_transform_cim_blocks(tmpdir):
     test_sections_1 = [
         {
             "id": "overview",
+            "title": "an overview",
             "blocks": [
                 {"id": "abstract1", "type": "a type", "content": "a content"},
                 {"id": "abstract2", "type": "a type", "content": "a content"},
@@ -618,6 +619,7 @@ def test_transform_cim_blocks(tmpdir):
         },
         {
             "id": "overview2",
+            "title": "an overview 2",
             "blocks": [
                 {"id": "abstract3", "type": "a type", "content": "a content"},
                 {
@@ -634,6 +636,9 @@ def test_transform_cim_blocks(tmpdir):
         },
     ]
     test_aside_1 = {
+        "id": "an id",
+        "title": "a title",
+        "type": "a type",
         "blocks": [
             {"id": "abstract1", "type": "a type", "content": "a content"},
             {"id": "abstract2", "type": "a type", "content": "a content"},
@@ -647,9 +652,9 @@ def test_transform_cim_blocks(tmpdir):
                 },
             },
             {"id": "abstract4", "type": "a type", "content": "a content"},
-        ]
+        ],
     }
-    # test case 1: not existing cim layout, not existing layout sections
+    # test case 1: not existing cim layout, not existing QA sections -> no change of input layout_data
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_1, aside=test_aside_1
     )
@@ -658,13 +663,14 @@ def test_transform_cim_blocks(tmpdir):
     )
     assert new_layout_data == layout_data
 
-    # test case 2: not existing cim layout, existing only layout section
-    new_section = {
+    # test case 2: not existing cim layout, existing only QA_tab section -> no change of input layout_data
+    qa_tab_section = {
         "title": "Quality assurance, or whatever",
         "id": "quality_assurance_tab",
+        "type": "a_section_type",
         "blocks": [],
     }
-    test_sections_2 = [test_sections_1[0], new_section, test_sections_1[1]]
+    test_sections_2 = [test_sections_1[0], qa_tab_section, test_sections_1[1]]
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_2, aside=test_aside_1
     )
@@ -673,7 +679,7 @@ def test_transform_cim_blocks(tmpdir):
     )
     assert new_layout_data == layout_data
 
-    # test case 3: not existing cim layout, existing only aside block
+    # test case 3: not existing cim layout, existing only QA_aside block -> no change of input layout_data
     new_aside_block = {
         "title": "QA or whatever",
         "id": "quality_assurance_aside",
@@ -682,7 +688,9 @@ def test_transform_cim_blocks(tmpdir):
     test_aside_2 = {
         "blocks": test_aside_1["blocks"][:2]
         + [new_aside_block]
-        + test_aside_1["blocks"][2:]
+        + test_aside_1["blocks"][2:],
+        "title": "a new title",
+        "type": "a new type",
     }
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_1, aside=test_aside_2
@@ -692,7 +700,8 @@ def test_transform_cim_blocks(tmpdir):
     )
     assert new_layout_data == layout_data
 
-    # test case 4: existing cim layout, not existing section/aside on layout
+    # test case 4: existing cim layout, not existing QA section/aside on layout
+    # -> no change of input layout_data
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_1, aside=test_aside_1
     )
@@ -704,18 +713,15 @@ def test_transform_cim_blocks(tmpdir):
     )
     with open(cim_layout_path) as fp:
         cim_layout_data = json.load(fp)
-        quality_assurance_tab_blocks = cim_layout_data["quality_assurance_tab"][
-            "blocks"
-        ]
-        quality_assurance_aside_blocks = cim_layout_data["quality_assurance_aside"][
-            "blocks"
-        ]
+        quality_assurance_tab = cim_layout_data["quality_assurance_tab"]
+        quality_assurance_aside = cim_layout_data["quality_assurance_aside"]
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
     assert new_layout_data == layout_data
 
-    # test case 5: existing cim layout, existing only layout section
+    # test case 5: existing cim layout, existing only QA section on layout
+    # -> layout_data with QA section replaced
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_2, aside=test_aside_1
     )
@@ -728,11 +734,7 @@ def test_transform_cim_blocks(tmpdir):
             "main": {
                 "sections": [
                     test_sections_1[0],
-                    {
-                        "title": "Quality assurance, or whatever",
-                        "id": "quality_assurance_tab",
-                        "blocks": quality_assurance_tab_blocks,
-                    },
+                    quality_assurance_tab,
                     test_sections_1[1],
                 ]
             },
@@ -740,13 +742,14 @@ def test_transform_cim_blocks(tmpdir):
         },
     }
 
-    # test case 6: existing cim layout, existing only aside block
+    # test case 6: existing cim layout, existing only QA aside block -> layout_data with QA aside replaced
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_1, aside=test_aside_2
     )
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
+
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
         "body": {
@@ -755,15 +758,10 @@ def test_transform_cim_blocks(tmpdir):
             },
             "aside": {
                 "blocks": test_aside_1["blocks"][:2]
-                + [
-                    {
-                        "title": "QA or whatever",
-                        "id": "quality_assurance_aside",
-                        "type": "section",
-                        "blocks": quality_assurance_aside_blocks,
-                    }
-                ]
-                + test_aside_1["blocks"][2:]
+                + [quality_assurance_aside]
+                + test_aside_1["blocks"][2:],
+                "title": "a new title",
+                "type": "a new type",
             },
         },
     }
@@ -781,25 +779,16 @@ def test_transform_cim_blocks(tmpdir):
             "main": {
                 "sections": [
                     test_sections_1[0],
-                    {
-                        "title": "Quality assurance, or whatever",
-                        "id": "quality_assurance_tab",
-                        "blocks": quality_assurance_tab_blocks,
-                    },
+                    quality_assurance_tab,
                     test_sections_1[1],
                 ]
             },
             "aside": {
                 "blocks": test_aside_1["blocks"][:2]
-                + [
-                    {
-                        "title": "QA or whatever",
-                        "id": "quality_assurance_aside",
-                        "type": "section",
-                        "blocks": quality_assurance_aside_blocks,
-                    }
-                ]
-                + test_aside_1["blocks"][2:]
+                + [quality_assurance_aside]
+                + test_aside_1["blocks"][2:],
+                "title": "a new title",
+                "type": "a new type",
             },
         },
     }
