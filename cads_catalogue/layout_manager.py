@@ -301,7 +301,7 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
             if remove_tab:
                 del sections[i]
             else:
-                sections[i]["blocks"] = qa_tab_blocks
+                sections[i] = qa_tab
             break
 
     for i, aside_block in enumerate(copy.deepcopy(aside_blocks)):
@@ -309,7 +309,7 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
             if remove_aside:
                 del aside_blocks[i]
             else:
-                aside_blocks[i]["blocks"] = qa_aside_blocks
+                aside_blocks[i] = qa_aside
             break
     return new_data
 

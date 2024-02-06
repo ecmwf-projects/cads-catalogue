@@ -1,5 +1,6 @@
 {
   "quality_assurance_tab": {
+    "id": "quality_assurance_tab",
     "blocks": [ {
       "id": "fitness-for-purpose",
       "type": "thumb-markdown",
@@ -18,6 +19,7 @@
     } ]
   },
   "quality_assurance_aside": {
+    "id": "quality_assurance_aside",
     "blocks": [ {
       "collapsed": true,
       "blocks": [ {
