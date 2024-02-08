@@ -121,7 +121,7 @@ def get_last_git_hashes(
     return last_hashes
 
 
-def is_resource_to_update(session, resource_folder_path):
+def is_resource_to_update(session, resource_folder_paths):
     """Return a tuple (is_to_update, source_hash) to understand if the resource is to update.
 
     is_to_update is True if input folder has been changed since last update of the datataset, False otherwise;
@@ -130,24 +130,25 @@ def is_resource_to_update(session, resource_folder_path):
     Parameters
     ----------
     session:
-    resource_folder_path: input folder of the dataset
+    resource_folder_paths: input folders of the dataset
 
     Returns
     -------
     True if input folder has changed, False otherwise.
     """
-    folder_hash = str(utils.folder2hash(resource_folder_path).hexdigest())
-    resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+    folders_hash = str(utils.folders2hash(resource_folder_paths).hexdigest())
+    # assume resource_uid is the folder name of  resource_folder_paths[0]
+    resource_uid = os.path.basename(resource_folder_paths[0].rstrip(os.sep))
     db_resource_hash = session.scalars(
         sa.select(database.Resource.sources_hash)
         .filter_by(resource_uid=resource_uid)
         .limit(1)
     ).first()
     if not db_resource_hash:
-        return True, folder_hash
-    if folder_hash != db_resource_hash:
-        return True, folder_hash
-    return False, folder_hash
+        return True, folders_hash
+    if folders_hash != db_resource_hash:
+        return True, folders_hash
+    return False, folders_hash
 
 
 def load_resource_for_object_storage(folder_path: str | pathlib.Path) -> dict[str, Any]:
@@ -609,12 +610,16 @@ def update_catalogue_resources(
 
     for resource_folder_path in sorted(folders):
         resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+        cim_resource_folder_path = os.path.join(cim_folder_path, resource_uid)
+        folders_to_consider_for_hash = [resource_folder_path]
+        if os.path.exists(cim_resource_folder_path):
+            folders_to_consider_for_hash.append(cim_resource_folder_path)
         logger.debug("parsing folder %s" % resource_folder_path)
         involved_resource_uids.append(resource_uid)
         try:
             with session.begin_nested():
                 to_update, sources_hash = is_resource_to_update(
-                    session, resource_folder_path
+                    session, folders_to_consider_for_hash
                 )
                 if not to_update and not force:
                     logger.info(
