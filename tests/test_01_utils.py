@@ -10,6 +10,9 @@ THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TEST_RESOURCES_DATA_PATH = os.path.abspath(
     os.path.join(THIS_PATH, "..", "tests", "data", "cads-forms-json")
 )
+TEST_CIM_RESOURCES_DATA_PATH = os.path.abspath(
+    os.path.join(THIS_PATH, "..", "tests", "data", "cads-forms-cim-json")
+)
 
 
 def test_file2hash() -> None:
@@ -29,6 +32,21 @@ def test_folder2hash() -> None:
     assert (
         utils.folder2hash(test_file_path).hexdigest()
         == "48a771d06e98670e3aa8fff982c05d8a"
+    )
+
+
+def test_folders2hash() -> None:
+    test_file_path_1 = os.path.join(TEST_RESOURCES_DATA_PATH, "reanalysis-era5-land")
+    test_file_path_2 = os.path.join(
+        TEST_CIM_RESOURCES_DATA_PATH, "reanalysis-era5-land"
+    )
+    assert (
+        utils.folders2hash([test_file_path_1]).hexdigest()
+        == "e88f2c04649d3f7e312cdaaa1fef4d7b"
+    )
+    assert (
+        utils.folders2hash([test_file_path_1, test_file_path_2]).hexdigest()
+        == "156a35e589e4178db143e5d52e6eb398"
     )
 
 

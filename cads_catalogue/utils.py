@@ -117,6 +117,16 @@ def folder2hash(folder_path, the_hash=None, ignore_names=(".git",)):
     return the_hash
 
 
+def folders2hash(folder_paths, the_hash=None, ignore_names=(".git",)):
+    """Return a MD5 hash object of a list of folders."""
+    ret_value = the_hash
+    for folder_path in folder_paths:
+        ret_value = folder2hash(
+            folder_path, the_hash=ret_value, ignore_names=ignore_names
+        )
+    return ret_value
+
+
 def normalize_abstract(text: str) -> str:
     """Normalize a string containing html codes."""
     if not text:
