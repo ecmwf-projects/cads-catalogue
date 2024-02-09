@@ -181,6 +181,7 @@ class Resource(BaseModel):
     # internal functionality related
     adaptor = sa.Column(sa.String)
     adaptor_properties_hash = sa.Column(sa.String)
+    disabled_reason = sa.Column(sa.String)
     sources_hash = sa.Column(sa.String)
     related_resources_keywords: List[str] = sa.Column(
         dialect_postgresql.ARRAY(sa.String)

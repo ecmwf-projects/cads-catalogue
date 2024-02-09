@@ -25,6 +25,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.e2161bac",
         "ds_contactemail": "https://support.ecmwf.int",

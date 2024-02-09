@@ -71,6 +71,7 @@
                 "value": "Only one version"
             }
         ],
+        "disabled_reason": null,
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/x/OIX4B",
@@ -965,6 +966,7 @@
                 "value": "Only one version"
             }
         ],
+        "disabled_reason": null,
         "documentation": [
             {
                 "url": "https://confluence.ecmwf.int/x/OIX4B",
@@ -1443,6 +1445,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.20d54e34",
         "ds_contactemail": "https://support.ecmwf.int",
@@ -1494,6 +1497,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.e2161bac",
         "ds_contactemail": "https://support.ecmwf.int",
@@ -1549,6 +1553,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.68d2bb30",
         "ds_contactemail": "https://support.ecmwf.int",
@@ -1600,6 +1605,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.bd0915c6",
         "ds_contactemail": "https://support.ecmwf.int",
@@ -1651,6 +1657,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.adbb2d47",
         "ds_contactemail": "https://support.ecmwf.int",
@@ -1702,6 +1709,7 @@
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.cea58b5a",
         "ds_contactemail": "https://support.ecmwf.int/",
