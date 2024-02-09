@@ -287,6 +287,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
             "value": value,
         }
         metadata["description"].append(item)  # type: ignore
+    metadata["disabled_reason"] = data.get("disabled_reason")
     metadata["doi"] = data.get("doi")
     metadata["ds_contactemail"] = data.get("ds_contactemail")
     metadata["ds_responsible_organisation"] = data.get("ds_responsible_organisation")

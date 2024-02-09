@@ -1535,6 +1535,7 @@ def test_load_resource_from_folder() -> None:
         "citation": None,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
+        "disabled_reason": None,
         "doi": "10.24381/cds.e2161bac",
         "ds_contactemail": "https://support.ecmwf.int",
         "ds_responsible_organisation": "ECMWF",
