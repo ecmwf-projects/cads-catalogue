@@ -18,6 +18,7 @@ dependencies:
 - postgresql
 - psycopg
 - pytest-mock
+- pyyaml
 - pip:
   - boto3-stubs
   - pytest-postgresql

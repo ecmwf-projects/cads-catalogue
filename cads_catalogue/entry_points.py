@@ -167,6 +167,7 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 
 @app.command()
 def update_catalogue(
+    override_path: Optional[str] = None,
     resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
@@ -184,6 +185,7 @@ def update_catalogue(
 
     Parameters
     ----------
+    override_path: path of the file override.yaml
     resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
     messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
     licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
@@ -240,19 +242,24 @@ def update_catalogue(
     ]
     involved_licences = []
     involved_resource_uids = []
-
+    current_override_md = manager.parse_override_md(override_path)
     with session_obj.begin() as session:  # type: ignore
-        logger.info("comparing current git hashes with the ones of the last run")
+        logger.info("comparing current input files with the ones of the last run")
         current_git_hashes = manager.get_current_git_hashes(
             *[f[0] for f in paths_db_hash_map]
         )
-        last_run_git_hashes = manager.get_last_git_hashes(
-            session, *[f[1] for f in paths_db_hash_map]
+        last_run_status = manager.get_status_of_last_update(
+            session,
+            *[f[1] for f in paths_db_hash_map],
+            "override_md",
         )
+        last_run_git_hashes = last_run_status[:-1]
+        last_run_override_md = last_run_status[-1]
         if (
             current_git_hashes == last_run_git_hashes
             and not force
             and None not in current_git_hashes
+            and current_override_md == last_run_override_md
         ):
             logger.info(
                 "catalogue update skipped: source files have not changed. "
@@ -260,6 +267,7 @@ def update_catalogue(
             )
             return
         # if no git ash, consider repo like it was changed
+        override_changed = current_override_md != last_run_override_md
         this_package_changed = (
             current_git_hashes[0] != last_run_git_hashes[0]
             or current_git_hashes[0] is None
@@ -284,6 +292,11 @@ def update_catalogue(
         if this_package_changed:
             logger.info(
                 "detected update of cads-catalogue repository. Imposing automatic --force mode."
+            )
+            force = True
+        if override_changed:
+            logger.info(
+                "detected update of override information. Imposing automatic --force mode."
             )
             force = True
         # licences
@@ -326,6 +339,7 @@ def update_catalogue(
                     force=force,
                     include=include,
                     exclude=exclude,
+                    override_md=current_override_md,
                 )
         # messages
         messages_processed = False

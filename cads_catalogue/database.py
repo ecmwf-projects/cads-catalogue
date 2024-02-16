@@ -44,6 +44,7 @@ class CatalogueUpdate(BaseModel):
     licence_repo_commit = sa.Column(sa.String)
     message_repo_commit = sa.Column(sa.String)
     cim_repo_commit = sa.Column(sa.String)
+    override_md = sa.Column(dialect_postgresql.JSONB, default={})
 
 
 class ResourceLicence(BaseModel):
