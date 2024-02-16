@@ -368,7 +368,10 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     dict: dictionary of metadata extracted
     """
     ret_value: dict[str, Any] = dict()
-    if not override_path or not os.path.exists(override_path):
+    if not override_path:
+        return ret_value
+    if not os.path.exists(override_path):
+        logger.error(f"override file {override_path} not found!")
         return ret_value
     logger.warning(f"detected override file {override_path}")
     with open(override_path) as fp:
@@ -380,6 +383,8 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     for dataset_uid in data:
         ret_value[dataset_uid] = dict()
         dataset_md = data[dataset_uid]
+        if not dataset_md:
+            continue
         for key, value in dataset_md.items():
             if key in ("qa_flag", "disabled_reason", "portal"):
                 ret_value[dataset_uid][key] = value

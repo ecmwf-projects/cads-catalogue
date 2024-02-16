@@ -1,0 +1,9 @@
+# This is a full line comment
+reanalysis-era5-pressure-levels:
+  qa_flag: No
+  hidden: True
+  disabled_reason: A reason
+  portal: c3s
+reanalysis-era5-land:
+reanalysis-era5-single-levels:
+  hidden: False

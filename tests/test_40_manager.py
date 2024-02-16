@@ -27,6 +27,30 @@ def test_load_resource_for_object_storage() -> None:
     }
 
 
+def test_parse_override_md() -> None:
+    # override file is not set
+    assert manager.parse_override_md(None) == dict()
+    # override file not exist
+    override_path = os.path.join(TESTDATA_PATH, "notexist.yaml")
+    assert manager.parse_override_md(override_path) == dict()
+    # override file not valid
+    override_path = os.path.join(TESTDATA_PATH, "override1.yaml")
+    assert manager.parse_override_md(override_path) == dict()
+    # consistent override info
+    override_path = os.path.join(TESTDATA_PATH, "override2.yaml")
+    expected = {
+        "reanalysis-era5-land": {},
+        "reanalysis-era5-pressure-levels": {
+            "disabled_reason": "A reason",
+            "hidden": True,
+            "portal": "c3s",
+            "qa_flag": False,
+        },
+        "reanalysis-era5-single-levels": {"hidden": False},
+    }
+    assert manager.parse_override_md(override_path) == expected
+
+
 def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
