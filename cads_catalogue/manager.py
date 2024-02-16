@@ -730,7 +730,11 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         logger.info("removed resource '%s'" % dataset_to_delete.resource_uid)
 
 
-def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, Any]):
+def update_last_input_status(
+    session: sa.orm.session.Session,
+    hashes_dict: dict[str, Any],
+    override_md: dict[str, Any],
+):
     """
     Insert (or update) the record in catalogue_updates according to input dictionary.
 
@@ -738,6 +742,7 @@ def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, An
     ----------
     session: opened SQLAlchemy session
     hashes_dict: dictionary of record properties
+    override_md: dictionary coming from input override file
     """
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
@@ -745,8 +750,14 @@ def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, An
         .limit(1)
     ).first()
     if not last_update_record:
-        last_update_record = database.CatalogueUpdate(**hashes_dict)
+        last_update_record = database.CatalogueUpdate(
+            **hashes_dict, override_md=override_md
+        )
         session.add(last_update_record)
     else:
         hashes_dict["update_time"] = datetime.datetime.now()
-        session.execute(sa.update(database.CatalogueUpdate).values(**hashes_dict))
+        session.execute(
+            sa.update(database.CatalogueUpdate).values(
+                **hashes_dict, override_md=override_md
+            )
+        )
