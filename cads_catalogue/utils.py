@@ -21,9 +21,18 @@ import json
 import mimetypes
 import pathlib
 import subprocess
+import urllib.parse
 from typing import Any
 
 from sqlalchemy import inspect
+
+
+def is_url(astring):
+    """Return True if `astring is parsable as a URL, False otherwise."""
+    result = urllib.parse.urlparse(astring)
+    if result.scheme and result.netloc:
+        return True
+    return False
 
 
 class TagReplacer(html.parser.HTMLParser):
