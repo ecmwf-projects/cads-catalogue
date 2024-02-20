@@ -26,7 +26,7 @@ from typing import Any, List, Sequence
 import sqlalchemy as sa
 import structlog
 
-from cads_catalogue import config, database, object_storage
+from cads_catalogue import config, database, object_storage, utils
 
 logger = structlog.get_logger(__name__)
 
@@ -57,6 +57,9 @@ def manage_image_section(
         image_dict = block.get("image", {})
         image_rel_path = image_dict.get("url")
         if block.get("type") == "thumb-markdown" and image_rel_path:
+            if utils.is_url(image_rel_path):
+                # nothing to do, the url is already uploaded somewhere
+                continue
             image_abs_path = os.path.join(folder_path, block["image"]["url"])
             if os.path.isfile(image_abs_path):
                 if image_abs_path not in images_stored and not disable_upload:

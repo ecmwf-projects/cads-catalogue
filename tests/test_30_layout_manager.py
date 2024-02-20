@@ -219,6 +219,21 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
         layout_manager.manage_image_section(
             str(tmpdir), section, images_stored, resource, oss
         )
+    # url is already a link: no change
+    image_block_already_url = {
+        "id": "abstract",
+        "type": "thumb-markdown",
+        "content": "a content",
+        "image": {
+            "url": "http://anurl.com/overview/overview.png",
+            "alt": "alternative text",
+        },
+    }
+    section = {"id": "overview", "blocks": [no_image_block, image_block_already_url]}
+    new_section = layout_manager.manage_image_section(
+        str(tmpdir), section, images_stored, resource, oss
+    )
+    assert new_section == section
 
     # create image overview/overview.png and repeat the test
     overview_path = os.path.join(str(tmpdir), "overview")
