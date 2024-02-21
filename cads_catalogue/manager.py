@@ -380,6 +380,9 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
         except Exception:  # noqa
             logger.exception(f"override file {override_path} is not a valid YAML")
             return ret_value
+    if data is None:
+        logger.warning(f"override file {override_path} is empty")
+        return ret_value
     for dataset_uid in data:
         ret_value[dataset_uid] = dict()
         dataset_md = data[dataset_uid]
