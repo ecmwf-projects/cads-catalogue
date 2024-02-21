@@ -388,7 +388,6 @@ def update_catalogue(
             # all resources have been effectively processed
             status_info["metadata_repo_commit"] = current_git_hashes[1]
             status_info["cim_repo_commit"] = current_git_hashes[4]
-            status_info["override_md"] = current_override_md
         if messages_processed and not exclude_messages:
             # (all) messages  have been effectively processed
             status_info["message_repo_commit"] = current_git_hashes[3]
@@ -398,6 +397,7 @@ def update_catalogue(
             )
         else:
             status_info["catalogue_repo_commit"] = current_git_hashes[0]
+            status_info["override_md"] = current_override_md
             logger.info(
                 "db update of inputs' status (git commit hashes and override metadata)"
             )
