@@ -731,9 +731,7 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
 
 
 def update_last_input_status(
-    session: sa.orm.session.Session,
-    hashes_dict: dict[str, Any],
-    override_md: dict[str, Any],
+    session: sa.orm.session.Session, status_info: dict[str, Any]
 ):
     """
     Insert (or update) the record in catalogue_updates according to input dictionary.
@@ -741,8 +739,7 @@ def update_last_input_status(
     Parameters
     ----------
     session: opened SQLAlchemy session
-    hashes_dict: dictionary of record properties
-    override_md: dictionary coming from input override file
+    status_info: dictionary of record properties
     """
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
@@ -750,14 +747,8 @@ def update_last_input_status(
         .limit(1)
     ).first()
     if not last_update_record:
-        last_update_record = database.CatalogueUpdate(
-            **hashes_dict, override_md=override_md
-        )
+        last_update_record = database.CatalogueUpdate(**status_info)
         session.add(last_update_record)
     else:
-        hashes_dict["update_time"] = datetime.datetime.now()
-        session.execute(
-            sa.update(database.CatalogueUpdate).values(
-                **hashes_dict, override_md=override_md
-            )
-        )
+        status_info["update_time"] = datetime.datetime.now()
+        session.execute(sa.update(database.CatalogueUpdate).values(**status_info))

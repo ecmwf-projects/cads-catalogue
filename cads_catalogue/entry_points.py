@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os.path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import cads_common.logging
 import sqlalchemy as sa
@@ -375,10 +375,10 @@ def update_catalogue(
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
         # store current git commit hashes
-        hashes_dict = dict()
+        status_info: dict[str, Any] = dict()
         if licences_processed:
             # (all) licences have been effectively processed
-            hashes_dict["licence_repo_commit"] = current_git_hashes[2]
+            status_info["licence_repo_commit"] = current_git_hashes[2]
         if (
             some_resources_processed
             and not include
@@ -386,21 +386,22 @@ def update_catalogue(
             and not exclude_resources
         ):
             # all resources have been effectively processed
-            hashes_dict["metadata_repo_commit"] = current_git_hashes[1]
-            hashes_dict["cim_repo_commit"] = current_git_hashes[4]
+            status_info["metadata_repo_commit"] = current_git_hashes[1]
+            status_info["cim_repo_commit"] = current_git_hashes[4]
+            status_info["override_md"] = current_override_md
         if messages_processed and not exclude_messages:
             # (all) messages  have been effectively processed
-            hashes_dict["message_repo_commit"] = current_git_hashes[3]
-        if not hashes_dict:
+            status_info["message_repo_commit"] = current_git_hashes[3]
+        if not status_info:
             logger.info(
                 "disabled db update of last commit hashes of source repositories"
             )
         else:
-            hashes_dict["catalogue_repo_commit"] = current_git_hashes[0]
+            status_info["catalogue_repo_commit"] = current_git_hashes[0]
             logger.info(
                 "db update of inputs' status (git commit hashes and override metadata)"
             )
-            manager.update_last_input_status(session, hashes_dict, current_override_md)
+            manager.update_last_input_status(session, status_info)
         logger.info("end of update of the catalogue")
 
 
