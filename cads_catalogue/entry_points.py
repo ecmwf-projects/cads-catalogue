@@ -167,7 +167,7 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 
 @app.command()
 def update_catalogue(
-    override_path: Optional[str] = None,
+    overrides_path: Optional[str] = None,
     resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
@@ -185,7 +185,7 @@ def update_catalogue(
 
     Parameters
     ----------
-    override_path: path of the file override.yaml
+    overrides_path: path of the file yaml containing overriding metadata
     resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
     messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
     licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
@@ -243,9 +243,9 @@ def update_catalogue(
     involved_licences = []
     involved_resource_uids = []
     try:
-        current_override_md = manager.parse_override_md(override_path)
+        current_override_md = manager.parse_override_md(overrides_path)
     except Exception:
-        logger.exception(f"not parsable {override_path}")
+        logger.exception(f"not parsable {overrides_path}")
         current_override_md = dict()
     with session_obj.begin() as session:  # type: ignore
         logger.info("comparing current input files with the ones of the last run")

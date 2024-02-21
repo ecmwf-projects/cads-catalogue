@@ -31,13 +31,13 @@ def test_parse_override_md() -> None:
     # override file is not set
     assert manager.parse_override_md(None) == dict()
     # override file not exist
-    override_path = os.path.join(TESTDATA_PATH, "notexist.yaml")
-    assert manager.parse_override_md(override_path) == dict()
+    overrides_path = os.path.join(TESTDATA_PATH, "notexist.yaml")
+    assert manager.parse_override_md(overrides_path) == dict()
     # override file not valid
-    override_path = os.path.join(TESTDATA_PATH, "override1.yaml")
-    assert manager.parse_override_md(override_path) == dict()
+    overrides_path = os.path.join(TESTDATA_PATH, "override1.yaml")
+    assert manager.parse_override_md(overrides_path) == dict()
     # consistent override info
-    override_path = os.path.join(TESTDATA_PATH, "override2.yaml")
+    overrides_path = os.path.join(TESTDATA_PATH, "override2.yaml")
     expected = {
         "reanalysis-era5-pressure-levels": {},
         "reanalysis-era5-land": {
@@ -52,7 +52,7 @@ def test_parse_override_md() -> None:
             "qa_flag": True,
         },
     }
-    assert manager.parse_override_md(override_path) == expected
+    assert manager.parse_override_md(overrides_path) == expected
 
 
 def test_load_resource_from_folder() -> None:
@@ -1603,8 +1603,8 @@ def test_load_resource_from_folder() -> None:
     }
     assert resource == expected_resource
 
-    override_path = os.path.join(TESTDATA_PATH, "override2.yaml")
-    override_md = manager.parse_override_md(override_path)["reanalysis-era5-land"]
+    overrides_path = os.path.join(TESTDATA_PATH, "override2.yaml")
+    override_md = manager.parse_override_md(overrides_path)["reanalysis-era5-land"]
     expected_resource2 = expected_resource.copy()
     expected_resource2.update(override_md)
     resource = manager.load_resource_from_folder(resource_folder_path, override_md)

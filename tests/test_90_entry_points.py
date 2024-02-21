@@ -1189,7 +1189,7 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
-            "--override-path",
+            "--overrides-path",
             os.path.join(TESTDATA_PATH, "override2.yaml"),
         ],
         env={
@@ -1259,7 +1259,7 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
-            "--override-path",
+            "--overrides-path",
             os.path.join(TESTDATA_PATH, "override2.yaml"),
         ],
         env={
