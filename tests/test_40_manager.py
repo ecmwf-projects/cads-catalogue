@@ -27,12 +27,38 @@ def test_load_resource_for_object_storage() -> None:
     }
 
 
+def test_parse_override_md() -> None:
+    # override file is not set
+    assert manager.parse_override_md(None) == dict()
+    # override file not exist
+    override_path = os.path.join(TESTDATA_PATH, "notexist.yaml")
+    assert manager.parse_override_md(override_path) == dict()
+    # override file not valid
+    override_path = os.path.join(TESTDATA_PATH, "override1.yaml")
+    assert manager.parse_override_md(override_path) == dict()
+    # consistent override info
+    override_path = os.path.join(TESTDATA_PATH, "override2.yaml")
+    expected = {
+        "reanalysis-era5-pressure-levels": {},
+        "reanalysis-era5-land": {
+            "disabled_reason": "A reason",
+            "hidden": True,
+            "portal": "c3s2",
+            "qa_flag": False,
+        },
+        "reanalysis-era5-single-levels": {
+            "hidden": False,
+            "portal": "ads",
+            "qa_flag": True,
+        },
+    }
+    assert manager.parse_override_md(override_path) == expected
+
+
 def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
     )
-    constraints_fp = open(os.path.join(resource_folder_path, "constraints.json"))
-    form_fp = open(os.path.join(resource_folder_path, "form.json"))
     resource = manager.load_resource_from_folder(resource_folder_path)
     expected_resource: dict[str, Any] = {
         "resource_uid": "reanalysis-era5-land",
@@ -1577,8 +1603,12 @@ def test_load_resource_from_folder() -> None:
     }
     assert resource == expected_resource
 
-    constraints_fp.close()
-    form_fp.close()
+    override_path = os.path.join(TESTDATA_PATH, "override2.yaml")
+    override_md = manager.parse_override_md(override_path)["reanalysis-era5-land"]
+    expected_resource2 = expected_resource.copy()
+    expected_resource2.update(override_md)
+    resource = manager.load_resource_from_folder(resource_folder_path, override_md)
+    assert resource == expected_resource2
 
 
 def test_resource_sync(

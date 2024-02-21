@@ -24,6 +24,7 @@ from typing import Any, List, Sequence
 
 import sqlalchemy as sa
 import structlog
+import yaml
 from sqlalchemy.dialects.postgresql import insert
 
 from cads_catalogue import (
@@ -92,11 +93,11 @@ def get_current_git_hashes(*folders: str | pathlib.Path) -> List[str]:
     return current_hashes
 
 
-def get_last_git_hashes(
+def get_status_of_last_update(
     session: sa.orm.session.Session, *column_names: str | None
 ) -> List[str | None]:
     """
-    Return last stored git hashes of table catalogue_updates.
+    Return last stored git hashes and other information from table catalogue_updates.
 
     Parameters
     ----------
@@ -236,7 +237,6 @@ def load_fulltext(folder_path: str | pathlib.Path) -> dict[str, Any]:
     -------
     dict: dictionary of metadata collected
     """
-    # TODO: just a draft
     metadata: dict[str, Any] = dict()
     fulltext_path = os.path.join(folder_path, "fulltext.txt")
     metadata["fulltext"] = None
@@ -356,6 +356,53 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     return metadata
 
 
+def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any]:
+    """Parse the input override file and return metadata extracted.
+
+    Metadata returned is meant to override output of load_resource_from_folder for each dataset.
+
+    :param override_path: path to the override.yaml file
+
+    Returns
+    -------
+    dict: dictionary of metadata extracted
+    """
+    ret_value: dict[str, Any] = dict()
+    if not override_path:
+        return ret_value
+    if not os.path.exists(override_path):
+        logger.error(f"override file {override_path} not found!")
+        return ret_value
+    logger.warning(f"detected override file {override_path}")
+    with open(override_path) as fp:
+        try:
+            data = yaml.safe_load(fp)
+        except Exception:  # noqa
+            logger.exception(f"override file {override_path} is not a valid YAML")
+            return ret_value
+    if data is None:
+        logger.warning(f"override file {override_path} is empty")
+        return ret_value
+    for dataset_uid in data:
+        ret_value[dataset_uid] = dict()
+        dataset_md = data[dataset_uid]
+        if not dataset_md:
+            continue
+        for key, value in dataset_md.items():
+            if key in ("qa_flag", "disabled_reason", "portal"):
+                ret_value[dataset_uid][key] = value
+            elif key == "hidden":
+                if isinstance(value, bool):
+                    ret_value[dataset_uid][key] = value  # type: ignore
+                else:
+                    ret_value[dataset_uid][key]: bool = utils.str2bool(value)  # type: ignore
+            else:
+                logger.warning(
+                    f"unknown key '{key}' found in override file for {dataset_uid}. It will be ignored"
+                )
+    return ret_value
+
+
 def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
     """Load a resource's variables metadata.
 
@@ -386,17 +433,22 @@ def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
     return metadata
 
 
-def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]:
+def load_resource_from_folder(
+    folder_path: str | pathlib.Path, override_md: dict[str, Any] | None = None
+) -> dict[str, Any]:
     """Load metadata of a resource from an input folder.
 
     Parameters
     ----------
     folder_path: folder path where to collect metadata of a resource
+    override_md: dictionary of resource metadata to override
 
     Returns
     -------
     dict: dictionary of metadata collected
     """
+    if override_md is None:
+        override_md = dict()
     metadata: dict[str, Any] = dict()
     folder_path = str(folder_path).rstrip(os.sep)
     metadata["resource_uid"] = os.path.basename(folder_path)
@@ -410,6 +462,7 @@ def load_resource_from_folder(folder_path: str | pathlib.Path) -> dict[str, Any]
     ]
     for loader_function in loader_functions:
         metadata.update(loader_function(folder_path))
+    metadata.update(override_md)
     return metadata
 
 
@@ -577,6 +630,7 @@ def update_catalogue_resources(
     force: bool = False,
     include: List[str] = [],
     exclude: List[str] = [],
+    override_md: dict[str, Any] = {},
 ) -> List[str]:
     """
     Load metadata of resources from files and sync each resource in the db.
@@ -590,6 +644,7 @@ def update_catalogue_resources(
     force: if True, no skipping of dataset update based on detected changes of sources is made
     include: list of include patterns for the resource uids
     exclude: list of exclude patterns for the resource uids
+    override_md: dictionary of override metadata for resources
 
     Returns
     -------
@@ -611,6 +666,7 @@ def update_catalogue_resources(
 
     for resource_folder_path in sorted(folders):
         resource_uid = os.path.basename(resource_folder_path.rstrip(os.sep))
+        dataset_override_md = override_md.get(resource_uid, dict())
         cim_resource_folder_path = os.path.join(cim_folder_path, resource_uid)
         folders_to_consider_for_hash = [resource_folder_path]
         if os.path.exists(cim_resource_folder_path):
@@ -627,7 +683,9 @@ def update_catalogue_resources(
                         "skip updating of '%s': no change detected" % resource_uid
                     )
                     continue
-                resource = load_resource_from_folder(resource_folder_path)
+                resource = load_resource_from_folder(
+                    resource_folder_path, dataset_override_md
+                )
                 resource["sources_hash"] = sources_hash
                 logger.info("resource '%s' loaded successful" % resource_uid)
                 resource = layout_manager.transform_layout(
@@ -675,14 +733,16 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         logger.info("removed resource '%s'" % dataset_to_delete.resource_uid)
 
 
-def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, Any]):
+def update_last_input_status(
+    session: sa.orm.session.Session, status_info: dict[str, Any]
+):
     """
     Insert (or update) the record in catalogue_updates according to input dictionary.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    hashes_dict: dictionary of record properties
+    status_info: dictionary of record properties
     """
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
@@ -690,8 +750,8 @@ def update_git_hashes(session: sa.orm.session.Session, hashes_dict: dict[str, An
         .limit(1)
     ).first()
     if not last_update_record:
-        last_update_record = database.CatalogueUpdate(**hashes_dict)
+        last_update_record = database.CatalogueUpdate(**status_info)
         session.add(last_update_record)
     else:
-        hashes_dict["update_time"] = datetime.datetime.now()
-        session.execute(sa.update(database.CatalogueUpdate).values(**hashes_dict))
+        status_info["update_time"] = datetime.datetime.now()
+        session.execute(sa.update(database.CatalogueUpdate).values(**status_info))

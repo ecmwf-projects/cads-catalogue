@@ -781,7 +781,7 @@ def test_update_catalogue(
             )
         ).all() == [(True,)]
 
-    # 5. use 'include' with a pattern that doesn't match anything) ----------------------
+    # 5. use 'include' with a pattern that doesn't match anything ----------------------
     result = runner.invoke(
         entry_points.app,
         [
@@ -1060,7 +1060,6 @@ def test_update_catalogue(
             )
         )
         session.commit()
-    # (all should be skipped)
     result = runner.invoke(
         entry_points.app,
         [
@@ -1127,3 +1126,167 @@ def test_update_catalogue(
                 "sources_hash",
             ),
         )
+
+    # 10. run again without force------------------------------------------------------------------
+    # (all should be skipped)
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    # check no errors
+    assert result.exit_code == 0
+    # check db is not created
+    _create_database.assert_not_called()
+    _create_database.reset_mock()
+    # check db structure initialized
+    _init_database.assert_called_once()
+    _init_database.reset_mock()
+    # check load of licences is not run (git hash stable)
+    _load_licences_from_folder.assert_not_called()
+    _load_licences_from_folder.reset_mock()
+    # check load of resources is not run (git hash stable)
+    _resource_sync.assert_not_called()
+    _resource_sync.reset_mock()
+    # check load of messages is not run (git hash stable)
+    _update_catalogue_messages.assert_not_called()
+    _update_catalogue_messages.reset_mock()
+    # check object storage not called
+    _store_file.assert_not_called()
+    _store_file.reset_mock()
+
+    # 11. run again with a new override file ------------------------------------------------------------
+    # (force mode automatically activated)
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
+            "--override-path",
+            os.path.join(TESTDATA_PATH, "override2.yaml"),
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    # check no errors
+    assert result.exit_code == 0
+    # check db is not created
+    _create_database.assert_not_called()
+    _create_database.reset_mock()
+    # check db structure initialized
+    _init_database.assert_called_once()
+    _init_database.reset_mock()
+    # check load of licences is run (force)
+    _load_licences_from_folder.assert_called_once()
+    _load_licences_from_folder.reset_mock()
+    # check load of resources is run (force)
+    assert _resource_sync.call_count == 8
+    _resource_sync.reset_mock()
+    # check load of messages is run (force)
+    _update_catalogue_messages.assert_called_once()
+    _update_catalogue_messages.reset_mock()
+    # check object storage called
+    assert _store_file.call_count == 48
+    #     # num.licences * 2 = 8
+    #     # num.datasets overview.png * 2 = 16
+    #     # num.datasets layout.json = 8
+    #     # num.datasets form.json = 8
+    #     # num.datasets constraints.json = 8
+    _store_file.reset_mock()
+
+    # check db content
+    with session_obj() as session:
+        resources = session.execute(
+            sa.select(database.Resource).order_by(database.Resource.resource_uid)
+        ).scalars()
+        utils.compare_resources_with_dumped_file(
+            resources,
+            os.path.join(TESTDATA_PATH, "dumped_resources7.txt"),
+            # note: expected sources_hash can be different on some platforms
+            exclude_fields=(
+                "record_update",
+                "resource_id",
+                "search_field",
+                "sources_hash",
+            ),
+        )
+
+    # 12. run again with the same override file ------------------------------------------------------------
+    # (all should be skipped)
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
+            "--override-path",
+            os.path.join(TESTDATA_PATH, "override2.yaml"),
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    # check no errors
+    assert result.exit_code == 0
+    # check db is not created
+    _create_database.assert_not_called()
+    _create_database.reset_mock()
+    # check db structure initialized
+    _init_database.assert_called_once()
+    _init_database.reset_mock()
+    # check load of licences is not run (git hash stable)
+    _load_licences_from_folder.assert_not_called()
+    _load_licences_from_folder.reset_mock()
+    # check load of resources is not run (git hash stable)
+    _resource_sync.assert_not_called()
+    _resource_sync.reset_mock()
+    # check load of messages is not run (git hash stable)
+    _update_catalogue_messages.assert_not_called()
+    _update_catalogue_messages.reset_mock()
+    # check object storage not called
+    _store_file.assert_not_called()
+    _store_file.reset_mock()

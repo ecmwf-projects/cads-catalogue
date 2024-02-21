@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os.path
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import cads_common.logging
 import sqlalchemy as sa
@@ -167,6 +167,7 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 
 @app.command()
 def update_catalogue(
+    override_path: Optional[str] = None,
     resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
@@ -184,6 +185,7 @@ def update_catalogue(
 
     Parameters
     ----------
+    override_path: path of the file override.yaml
     resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
     messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
     licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
@@ -240,19 +242,29 @@ def update_catalogue(
     ]
     involved_licences = []
     involved_resource_uids = []
-
+    try:
+        current_override_md = manager.parse_override_md(override_path)
+    except Exception:
+        logger.exception(f"not parsable {override_path}")
+        current_override_md = dict()
     with session_obj.begin() as session:  # type: ignore
-        logger.info("comparing current git hashes with the ones of the last run")
+        logger.info("comparing current input files with the ones of the last run")
         current_git_hashes = manager.get_current_git_hashes(
             *[f[0] for f in paths_db_hash_map]
         )
-        last_run_git_hashes = manager.get_last_git_hashes(
-            session, *[f[1] for f in paths_db_hash_map]
+        last_run_status = manager.get_status_of_last_update(
+            session,
+            *[f[1] for f in paths_db_hash_map],
+            "override_md",
         )
+        last_run_git_hashes = last_run_status[:-1]
+        last_run_override_md = last_run_status[-1]
+        override_changed = current_override_md != last_run_override_md
         if (
             current_git_hashes == last_run_git_hashes
             and not force
             and None not in current_git_hashes
+            and not override_changed
         ):
             logger.info(
                 "catalogue update skipped: source files have not changed. "
@@ -280,10 +292,14 @@ def update_catalogue(
             current_git_hashes[4] != last_run_git_hashes[4]
             or current_git_hashes[4] is None
         )
-
         if this_package_changed:
             logger.info(
                 "detected update of cads-catalogue repository. Imposing automatic --force mode."
+            )
+            force = True
+        if override_changed:
+            logger.info(
+                "detected update of override information. Imposing automatic --force mode."
             )
             force = True
         # licences
@@ -326,6 +342,7 @@ def update_catalogue(
                     force=force,
                     include=include,
                     exclude=exclude,
+                    override_md=current_override_md,
                 )
         # messages
         messages_processed = False
@@ -357,11 +374,15 @@ def update_catalogue(
         # refresh relationships between dataset
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
-        # store current git commit hashes
-        hashes_dict = dict()
+        # store information of current input status
+        for override_resource_uid in current_override_md.copy():
+            if override_resource_uid not in involved_resource_uids:
+                # do not store not used override information
+                del current_override_md[override_resource_uid]
+        status_info: dict[str, Any] = dict()
         if licences_processed:
             # (all) licences have been effectively processed
-            hashes_dict["licence_repo_commit"] = current_git_hashes[2]
+            status_info["licence_repo_commit"] = current_git_hashes[2]
         if (
             some_resources_processed
             and not include
@@ -369,19 +390,22 @@ def update_catalogue(
             and not exclude_resources
         ):
             # all resources have been effectively processed
-            hashes_dict["metadata_repo_commit"] = current_git_hashes[1]
-            hashes_dict["cim_repo_commit"] = current_git_hashes[4]
+            status_info["metadata_repo_commit"] = current_git_hashes[1]
+            status_info["cim_repo_commit"] = current_git_hashes[4]
         if messages_processed and not exclude_messages:
             # (all) messages  have been effectively processed
-            hashes_dict["message_repo_commit"] = current_git_hashes[3]
-        if not hashes_dict:
+            status_info["message_repo_commit"] = current_git_hashes[3]
+        if not status_info:
             logger.info(
                 "disabled db update of last commit hashes of source repositories"
             )
         else:
-            hashes_dict["catalogue_repo_commit"] = current_git_hashes[0]
-            logger.info("db update of last commit hashes of source repositories")
-            manager.update_git_hashes(session, hashes_dict)
+            status_info["catalogue_repo_commit"] = current_git_hashes[0]
+            status_info["override_md"] = current_override_md
+            logger.info(
+                "db update of inputs' status (git commit hashes and override metadata)"
+            )
+            manager.update_last_input_status(session, status_info)
         logger.info("end of update of the catalogue")
 
 
