@@ -374,7 +374,11 @@ def update_catalogue(
         # refresh relationships between dataset
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
-        # store current git commit hashes
+        # store information of current input status
+        for override_resource_uid in current_override_md:
+            if override_resource_uid not in involved_resource_uids:
+                # do not store not used override information
+                del current_override_md[override_resource_uid]
         status_info: dict[str, Any] = dict()
         if licences_processed:
             # (all) licences have been effectively processed
