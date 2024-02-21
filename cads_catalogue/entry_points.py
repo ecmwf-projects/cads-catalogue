@@ -375,7 +375,7 @@ def update_catalogue(
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
         # store information of current input status
-        for override_resource_uid in current_override_md:
+        for override_resource_uid in current_override_md.copy():
             if override_resource_uid not in involved_resource_uids:
                 # do not store not used override information
                 del current_override_md[override_resource_uid]
