@@ -230,12 +230,14 @@ class Resource(BaseModel):
 
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
+    high_priority_terms = sa.Column(sa.String)
     search_field: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
             "setweight(to_tsvector('english', coalesce(title, '')), 'A')  || ' ' || "
             "setweight(to_tsvector('english', coalesce(abstract, '')), 'B')  || ' ' || "
-            "setweight(to_tsvector('english', coalesce(fulltext, '')), 'C')",
+            "setweight(to_tsvector('english', coalesce(fulltext, '')), 'C')  || ' ' || "
+            "setweight(to_tsvector('english', coalesce(high_priority_terms, '')), 'D')",
             persisted=True,
         ),
     )
