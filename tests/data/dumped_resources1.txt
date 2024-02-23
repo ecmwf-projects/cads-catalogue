@@ -34,6 +34,7 @@
         "file_format": "{grib,netcdf}",
         "format_version": null,
         "hidden": false,
+        "high_priority_terms": "reanalysis ERA5 land",
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -53,7 +54,7 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'1950':7A 'accur':88B 'across':61B 'back':83B 'climat':52B,92B 'combin':55B 'compar':34B 'complet':67B 'compon':47B 'consist':19B,69B 'data':5A,57B,78B 'dataset':16B,70B 'decad':29B,82B 'descript':89B 'ecmwf':50B 'enhanc':32B 'era5':2A,11B,36B,38B,51B 'era5-land':1A,10B,37B 'evolut':23B 'global':66B 'goe':80B 'hour':4A 'land':3A,12B,25B,39B,46B 'law':73B 'model':56B 'observ':59B 'past':95B 'physic':75B 'present':9A 'produc':42B,77B 'provid':17B,86B 'reanalysi':15B,53B,54B,76B 'replay':44B 'resolut':33B 'sever':28B,81B 'time':85B 'use':71B 'variabl':26B 'view':20B 'world':63B"
+        "search_field": "'1950':7A 'accur':88B 'across':61B 'back':83B 'climat':52B,92B 'combin':55B 'compar':34B 'complet':67B 'compon':47B 'consist':19B,69B 'data':5A,57B,78B 'dataset':16B,70B 'decad':29B,82B 'descript':89B 'ecmwf':50B 'enhanc':32B 'era5':2A,11B,36B,38B,51B,97 'era5-land':1A,10B,37B 'evolut':23B 'global':66B 'goe':80B 'hour':4A 'land':3A,12B,25B,39B,46B,98 'law':73B 'model':56B 'observ':59B 'past':95B 'physic':75B 'present':9A 'produc':42B,77B 'provid':17B,86B 'reanalysi':15B,53B,54B,76B,96 'replay':44B 'resolut':33B 'sever':28B,81B 'time':85B 'use':71B 'variabl':26B 'view':20B 'world':63B"
     },
     {
         "resource_id": 2,
@@ -90,6 +91,7 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
+        "high_priority_terms": "",
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
