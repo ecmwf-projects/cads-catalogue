@@ -316,6 +316,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
             metadata["hidden"]: bool = utils.str2bool(data["hidden"])  # type: ignore
     else:
         metadata["hidden"] = False  # type: ignore
+    metadata["high_priority_terms"] = data.get("high_priority_terms", "")
     metadata["keywords"] = data.get("keywords", [])
 
     # NOTE: licence_uids is for relationship, not a db field
