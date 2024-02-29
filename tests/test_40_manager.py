@@ -1571,6 +1571,7 @@ def test_load_resource_from_folder() -> None:
         "format_version": None,
         "geo_extent": {"bboxN": 89, "bboxS": -89, "bboxE": 360, "bboxW": 0},
         "hidden": False,
+        "high_priority_terms": "reanalysis ERA5 land",
         "keywords": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
@@ -1711,7 +1712,7 @@ def test_resource_sync(
         utils.compare_resources_with_dumped_file(
             all_db_resources,
             os.path.join(TESTDATA_PATH, "dumped_resources1.txt"),
-            exclude_fields=("record_update", "resource_id", "search_field"),
+            exclude_fields=("record_update", "resource_id"),
         )
         assert session.execute(
             sa.text(

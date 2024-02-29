@@ -34,6 +34,7 @@
         "file_format": "{grib,netcdf}",
         "format_version": null,
         "hidden": false,
+        "high_priority_terms": "reanalysis ERA5 land",
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",

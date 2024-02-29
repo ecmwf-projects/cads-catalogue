@@ -29,6 +29,7 @@
     "netcdf"
   ],
   "format_version": null,
+  "high_priority_terms": "reanalysis ERA5 land",
   "lineage": "EC Copernicus program",
   "resource_type": "dataset",
   "doi": "10.24381/cds.e2161bac",
