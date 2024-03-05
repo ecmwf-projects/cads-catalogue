@@ -280,6 +280,8 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     """
     if not os.path.exists(cim_layout_path):
         return layout_data
+    with open(cim_layout_path) as fp:
+        cim_layout_data = json.load(fp) 
     
     body = layout_data.get("body", {})
     body_main = body.get("main", {})
@@ -302,15 +304,14 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     if i_qa_tab is None and i_qa_aside is None:
         return layout_data
 
-    with open(cim_layout_path) as fp:
-        cim_layout_data = json.load(fp) 
-
     if i_qa_tab is not None:
         qa_tab = cim_layout_data.get("quality_assurance_tab", None)
         if isinstance(qa_tab, dict) and "blocks" in qa_tab:
             layout_data["body"]["main"]["sections"][i_qa_tab] = qa_tab
+            print(qa_tab)
         else:
             del layout_data["body"]["main"]["sections"][i_qa_tab]
+            print(layout_data["body"]["main"]["sections"])
 
     if i_qa_aside is not None:
         qa_aside = cim_layout_data.get("quality_assurance_aside", None)
