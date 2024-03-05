@@ -280,10 +280,10 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     """
     if os.path.exists(cim_layout_path):
         with open(cim_layout_path) as fp:
-            cim_layout_data = json.load(fp) 
+            cim_layout_data = json.load(fp)
     else:
         cim_layout_data = dict()
-    
+
     body = layout_data.get("body", {})
     body_main = body.get("main", {})
     sections = body_main.get("sections", [])
