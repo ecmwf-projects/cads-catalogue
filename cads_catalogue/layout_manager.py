@@ -280,41 +280,46 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     """
     if not os.path.exists(cim_layout_path):
         return layout_data
-    remove_tab = True
-    remove_aside = True
-    with open(cim_layout_path) as fp:
-        cim_layout_data = json.load(fp)
-    qa_tab = cim_layout_data.get("quality_assurance_tab", {})
-    qa_tab_blocks = qa_tab.get("blocks")
-    if qa_tab_blocks is not None:
-        remove_tab = False
-    qa_aside = cim_layout_data.get("quality_assurance_aside", {})
-    qa_aside_blocks = qa_aside.get("blocks")
-    if qa_aside_blocks is not None:
-        remove_aside = False
-    new_data = copy.deepcopy(layout_data)
-    body = new_data.get("body", {})
+    
+    body = layout_data.get("body", {})
     body_main = body.get("main", {})
     sections = body_main.get("sections", [])
     aside = body.get("aside", {})
     aside_blocks = aside.get("blocks", [])
 
-    for i, section in enumerate(copy.deepcopy(sections)):
+    i_qa_tab: int | None = None
+    for i, section in enumerate(sections):
         if section.get("id") == "quality_assurance_tab":
-            if remove_tab:
-                del sections[i]
-            else:
-                sections[i] = qa_tab
+            i_qa_tab = i
             break
 
-    for i, aside_block in enumerate(copy.deepcopy(aside_blocks)):
+    i_qa_aside: int | None = None
+    for i, aside_block in enumerate(aside_blocks):
         if aside_block.get("id") == "quality_assurance_aside":
-            if remove_aside:
-                del aside_blocks[i]
-            else:
-                aside_blocks[i] = qa_aside
+            i_qa_aside = i
             break
-    return new_data
+
+    if i_qa_tab is None and i_qa_aside is None:
+        return layout_data
+
+    with open(cim_layout_path) as fp:
+        cim_layout_data = json.load(fp) 
+
+    if i_qa_tab is not None:
+        qa_tab = cim_layout_data.get("quality_assurance_tab", None)
+        if qa_tab is not None:
+            sections[i_qa_tab] = qa_tab
+        else:
+            del sections[i_qa_tab]
+
+    if i_qa_aside is not None:
+        qa_aside = cim_layout_data.get("quality_assurance_aside", None)
+        if qa_aside is not None:
+            aside_blocks[i_qa_aside] = qa_aside
+        else:
+            del aside_blocks[i_qa_aside]
+
+    return layout_data
 
 
 def has_section_id(layout_data: dict[str, Any], section_id: str):
