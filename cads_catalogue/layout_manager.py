@@ -278,7 +278,7 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     -------
     dict: dictionary of layout_data modified
     """
-    if not os.path.exists(cim_layout_path):
+    if os.path.exists(cim_layout_path):
         with open(cim_layout_path) as fp:
             cim_layout_data = json.load(fp) 
     else:
