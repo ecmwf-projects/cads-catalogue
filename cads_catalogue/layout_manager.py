@@ -308,16 +308,16 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     if i_qa_tab is not None:
         qa_tab = cim_layout_data.get("quality_assurance_tab", None)
         if qa_tab is not None:
-            sections[i_qa_tab] = qa_tab
+            layout_data["body"]["main"]["sections"][i_qa_tab] = qa_tab
         else:
-            del sections[i_qa_tab]
+            del layout_data["body"]["main"]["sections"][i_qa_tab]
 
     if i_qa_aside is not None:
         qa_aside = cim_layout_data.get("quality_assurance_aside", None)
         if qa_aside is not None:
-            aside_blocks[i_qa_aside] = qa_aside
+            layout_data["body"]["aside"]["blocks"][i_qa_aside] = qa_aside
         else:
-            del aside_blocks[i_qa_aside]
+            del layout_data["body"]["aside"]["blocks"][i_qa_aside]
 
     return layout_data
 
