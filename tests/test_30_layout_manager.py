@@ -678,7 +678,7 @@ def test_transform_cim_blocks(tmpdir):
     )
     assert new_layout_data == layout_data
 
-    # test case 2: not existing cim layout, existing only QA_tab section -> no change of input layout_data
+    # test case 2: not existing cim layout, existing only QA_tab section -> remove placeholder
     qa_tab_section = {
         "title": "Quality assurance, or whatever",
         "id": "quality_assurance_tab",
@@ -692,9 +692,10 @@ def test_transform_cim_blocks(tmpdir):
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
-    assert new_layout_data == layout_data
-
-    # test case 3: not existing cim layout, existing only QA_aside block -> no change of input layout_data
+    assert new_layout_data == create_layout_for_test(
+        layout_path, sections=test_sections_1, aside=test_aside_1
+    )
+    # test case 3: not existing cim layout, existing only QA_aside block -> remove placeholder
     new_aside_block = {
         "title": "QA or whatever",
         "id": "quality_assurance_aside",
@@ -707,13 +708,20 @@ def test_transform_cim_blocks(tmpdir):
         "title": "a new title",
         "type": "a new type",
     }
+    expected_aside_2 = {
+        "blocks": test_aside_1["blocks"],
+        "title": "a new title",
+        "type": "a new type",
+    }
     layout_data = create_layout_for_test(
         layout_path, sections=test_sections_1, aside=test_aside_2
     )
     new_layout_data = layout_manager.transform_cim_blocks(
         layout_data, cim_layout_path=cim_layout_path
     )
-    assert new_layout_data == layout_data
+    assert new_layout_data == create_layout_for_test(
+        layout_path, sections=test_sections_1, aside=expected_aside_2
+    )
 
     # test case 4: existing cim layout, not existing QA section/aside on layout
     # -> no change of input layout_data

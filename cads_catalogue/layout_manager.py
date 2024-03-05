@@ -278,12 +278,12 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
     -------
     dict: dictionary of layout_data modified
     """
-    if not os.path.exists(cim_layout_path):
-        return layout_data
     remove_tab = True
     remove_aside = True
-    with open(cim_layout_path) as fp:
-        cim_layout_data = json.load(fp)
+    cim_layout_data = dict()
+    if os.path.exists(cim_layout_path):
+        with open(cim_layout_path) as fp:
+            cim_layout_data = json.load(fp)
     qa_tab = cim_layout_data.get("quality_assurance_tab", {})
     qa_tab_blocks = qa_tab.get("blocks")
     if qa_tab_blocks is not None:
