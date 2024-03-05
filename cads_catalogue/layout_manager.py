@@ -307,7 +307,7 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
 
     if i_qa_tab is not None:
         qa_tab = cim_layout_data.get("quality_assurance_tab", None)
-        if qa_tab is not None:
+        if isinstance(qa_tab, dict) and "blocks" in qa_tab:
             layout_data["body"]["main"]["sections"][i_qa_tab] = qa_tab
         else:
             del layout_data["body"]["main"]["sections"][i_qa_tab]
