@@ -29,6 +29,7 @@ from cads_catalogue import (
     maintenance,
     manager,
     messages,
+    object_storage,
     validations,
 )
 
@@ -210,6 +211,14 @@ def update_catalogue(
         raise ValueError("%r is not a folder" % licences_folder_path)
     if not os.path.isdir(messages_folder_path) and not exclude_messages:
         raise ValueError("%r is not a folder" % messages_folder_path)
+
+    # test object storage connection, with a timeout (it may raise an error)
+    logger.info("testing connection to object storage")
+    storage_settings = config.ensure_storage_settings(config.storagesettings)
+    object_storage.test_connection_with_timeout(
+        15, storage_settings.object_storage_url, storage_settings.storage_kws
+    )
+
     filter_is_active = bool(
         include or exclude or exclude_resources or exclude_licences or exclude_messages
     )
@@ -229,9 +238,6 @@ def update_catalogue(
 
     logger.info("checking database structure")
     database.init_database(connection_string)
-
-    # get storage parameters from environment
-    storage_settings = config.ensure_storage_settings(config.storagesettings)
 
     paths_db_hash_map = [
         (CATALOGUE_DIR, "catalogue_repo_commit"),

@@ -19,6 +19,7 @@ import hashlib
 import html.parser
 import json
 import mimetypes
+import multiprocessing as mp
 import pathlib
 import subprocess
 import urllib.parse
@@ -33,6 +34,32 @@ def is_url(astring):
     if result.scheme and result.netloc:
         return True
     return False
+
+
+def run_function_with_timeout(timeout, timeout_msg, function, args=(), kwargs=None):
+    """Run a function with a timeout inside a child process.
+
+    Raise an error in case of timeout or child process raises an error.
+
+    Parameters
+    ----------
+    :param timeout: timeout in seconds
+    :param timeout_msg: timeout message
+    :param function: function to run
+    :param args: args of the function
+    :param kwargs: kwargs of the function
+    """
+    if kwargs is None:
+        kwargs = dict()
+    process = mp.Process(target=function, args=args, kwargs=kwargs)
+    process.start()
+    process.join(timeout=timeout)
+    if process.is_alive():
+        process.terminate()
+        raise TimeoutError(timeout_msg)
+    if process.exitcode == 1:
+        # parent process raises as well
+        raise ValueError("error")
 
 
 class TagReplacer(html.parser.HTMLParser):
