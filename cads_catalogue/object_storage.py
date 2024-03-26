@@ -134,6 +134,29 @@ def setup_bucket(client, bucket_name) -> None:
             logger.warning(f"unable to set CORS policy on bucket {bucket_name}")
 
 
+def test_connection(object_storage_url, storage_kws):
+    try:
+        client = boto3.client("s3", endpoint_url=object_storage_url, **storage_kws)
+        client.list_buckets()
+        logger.debug("connection to object storage is ok.")
+    except Exception:
+        logger.error(
+            "connection to object storage currently doesn't work. "
+            "Check connection parameters or try again later."
+        )
+        raise
+
+
+def test_connection_with_timeout(timeout, object_storage_url, storage_kws):
+    timeout_msg = (
+        "connection to object storage currently doesn't work. "
+        "Check connection parameters or try again later."
+    )
+    utils.run_function_with_timeout(
+        timeout, timeout_msg, test_connection, args=(object_storage_url, storage_kws)
+    )
+
+
 def store_file(
     file_path: str | pathlib.Path,
     object_storage_url: str,  # type: ignore

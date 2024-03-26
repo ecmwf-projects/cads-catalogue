@@ -133,6 +133,7 @@ def test_update_catalogue(
     _store_file = mocker.patch(
         "cads_catalogue.object_storage.store_file", return_value="an url"
     )
+    mocker.patch("cads_catalogue.object_storage.test_connection")
     folder_commit_hashes = (
         "e5658fef07333700272e36a43df0628efacb5f04",
         "5f662d202e4084dd569567bab0957c8a56f79c0f",
