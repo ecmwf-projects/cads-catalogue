@@ -1,5 +1,6 @@
 import os.path
 import subprocess
+import time
 
 import pytest
 import pytest_mock
@@ -92,3 +93,39 @@ def test_str2bool() -> None:
         assert utils.str2bool(value, raise_if_unknown=False, default=default) == default
     for value in strange_values:
         assert utils.str2bool(value, raise_if_unknown=False) is False
+
+
+def sleep_function(secs, ret_value=None, raises=False):
+    # used to test run_function_with_timeout
+    time.sleep(secs)
+    if raises:
+        raise ValueError("this is a value error")
+    return ret_value
+
+
+def test_run_function_with_timeout() -> None:
+    # run without any problem
+    utils.run_function_with_timeout(
+        2,
+        "timeout message",
+        sleep_function,
+        (
+            1,
+            1,
+        ),
+    )
+    # run with timeout error
+    with pytest.raises(TimeoutError):
+        utils.run_function_with_timeout(1, "timeout message", sleep_function, (2, 1))
+    # run with a raise
+    with pytest.raises(ValueError):
+        utils.run_function_with_timeout(
+            2,
+            "timeout message",
+            sleep_function,
+            (
+                1,
+                1,
+            ),
+            {"raises": True},
+        )
