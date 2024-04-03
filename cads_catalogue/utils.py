@@ -59,7 +59,7 @@ def run_function_with_timeout(timeout, timeout_msg, function, args=(), kwargs=No
         raise TimeoutError(timeout_msg)
     if process.exitcode == 1:
         # parent process raises as well
-        raise ValueError("error")
+        raise ValueError(f"error calling {function.__name__}")
 
 
 class TagReplacer(html.parser.HTMLParser):
