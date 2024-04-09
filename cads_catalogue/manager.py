@@ -1,4 +1,5 @@
 """utility module to load and store data in the catalogue database."""
+
 import datetime
 
 # Copyright 2022, European Union.

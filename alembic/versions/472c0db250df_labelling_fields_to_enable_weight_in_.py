@@ -5,6 +5,7 @@ Revises: 504bc78c19a5
 Create Date: 2023-05-26 12:42:39.003076
 
 """
+
 import sqlalchemy as sa
 import sqlalchemy_utils
 
