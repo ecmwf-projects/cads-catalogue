@@ -8,6 +8,7 @@
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_properties_hash": null,
+        "disabled_reason": null,
         "sources_hash": null,
         "related_resources_keywords": [],
         "geo_extent": {
@@ -19,13 +20,12 @@
         "begin_date": "1950-01-01",
         "end_date": "2023-02-11",
         "publication_date": "2019-07-12",
-        "record_update": "2023-12-11 08:48:23.338769+01:00",
+        "record_update": "2024-04-12 10:15:31.425675+02:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.",
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
-        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.e2161bac",
         "ds_contactemail": "https://support.ecmwf.int",
@@ -34,7 +34,6 @@
         "file_format": "{grib,netcdf}",
         "format_version": null,
         "hidden": false,
-        "high_priority_terms": "reanalysis ERA5 land",
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -54,7 +53,8 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": null,
-        "search_field": "'1950':7A 'accur':88B 'across':61B 'back':83B 'climat':52B,92B 'combin':55B 'compar':34B 'complet':67B 'compon':47B 'consist':19B,69B 'data':5A,57B,78B 'dataset':16B,70B 'decad':29B,82B 'descript':89B 'ecmwf':50B 'enhanc':32B 'era5':2A,11B,36B,38B,51B 'era5-land':1A,10B,37B 'evolut':23B 'global':66B 'goe':80B 'hour':4A 'land':3A,12B,25B,39B,46B 'law':73B 'model':56B 'observ':59B 'past':95B 'physic':75B 'present':9A 'produc':42B,77B 'provid':17B,86B 'reanalysi':15B,53B,54B,76B 'replay':44B 'resolut':33B 'sever':28B,81B 'time':85B 'use':71B 'variabl':26B 'view':20B 'world':63B"
+        "high_priority_terms": "reanalysis ERA5 land",
+        "search_field": "'1950':11A 'accur':92B 'across':65B 'back':87B 'climat':56B,96B 'combin':59B 'compar':38B 'complet':71B 'compon':51B 'consist':23B,73B 'data':9A,61B,82B 'dataset':20B,74B 'decad':33B,86B 'descript':93B 'ecmwf':54B 'enhanc':36B 'era5':3A,6A,15B,40B,42B,55B,101 'era5-land':5A,14B,41B 'evolut':27B 'global':70B 'goe':84B 'hour':8A 'land':4A,7A,16B,29B,43B,50B,102 'law':77B 'model':60B 'observ':63B 'past':99B 'physic':79B 'present':13A 'produc':46B,81B 'provid':21B,90B 'reanalysi':2A,19B,57B,58B,80B,100 'reanalysis-era5-land':1A 'replay':48B 'resolut':37B 'sever':32B,85B 'time':89B 'use':75B 'variabl':30B 'view':24B 'world':67B"
     },
     {
         "resource_id": 2,
@@ -65,6 +65,7 @@
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_properties_hash": null,
+        "disabled_reason": null,
         "sources_hash": null,
         "related_resources_keywords": [],
         "geo_extent": {
@@ -76,13 +77,12 @@
         "begin_date": "1950-01-01",
         "end_date": "2022-12-01",
         "publication_date": "2019-06-23",
-        "record_update": "2023-12-11 08:48:23.365425+01:00",
+        "record_update": "2024-04-12 10:15:31.463810+02:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.",
         "citation": null,
         "contactemail": "https://support.ecmwf.int",
         "description": [],
-        "disabled_reason": null,
         "documentation": [],
         "doi": "10.24381/cds.68d2bb30",
         "ds_contactemail": "a_new_test@email",
@@ -91,7 +91,6 @@
         "file_format": "grib",
         "format_version": null,
         "hidden": false,
-        "high_priority_terms": "",
         "lineage": "EC Copernicus program",
         "representative_fraction": 0.25,
         "responsible_organisation": "ECMWF",
@@ -107,6 +106,7 @@
         "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
         "variables": [],
         "fulltext": "climate reanalysis past land era5 hydrology physics biosphere copernicus c3s conditions variables monthly means",
-        "search_field": "'1950':8A 'accur':89B 'across':62B 'averag':5A 'back':84B 'biospher':104C 'c3s':106C 'climat':53B,93B,97C 'combin':56B 'compar':35B 'complet':68B 'compon':48B 'condit':107C 'consist':20B,70B 'copernicus':105C 'data':6A,58B,79B 'dataset':17B,71B 'decad':30B,83B 'descript':90B 'ecmwf':51B 'enhanc':33B 'era5':2A,12B,37B,39B,52B,101C 'era5-land':1A,11B,38B 'evolut':24B 'global':67B 'goe':81B 'hydrolog':102C 'land':3A,13B,26B,40B,47B,100C 'law':74B 'mean':110C 'model':57B 'month':4A,109C 'observ':60B 'past':96B,99C 'physic':76B,103C 'present':10A 'produc':43B,78B 'provid':18B,87B 'reanalysi':16B,54B,55B,77B,98C 'replay':45B 'resolut':34B 'sever':29B,82B 'time':86B 'use':72B 'variabl':27B,108C 'view':21B 'world':64B"
+        "high_priority_terms": "",
+        "search_field": "'1950':14A 'accur':95B 'across':68B 'averag':11A 'back':90B 'biospher':110C 'c3s':112C 'climat':59B,99B,103C 'combin':62B 'compar':41B 'complet':74B 'compon':54B 'condit':113C 'consist':26B,76B 'copernicus':111C 'data':12A,64B,85B 'dataset':23B,77B 'decad':36B,89B 'descript':96B 'ecmwf':57B 'enhanc':39B 'era5':3A,8A,18B,43B,45B,58B,107C 'era5-land':7A,17B,44B 'evolut':30B 'global':73B 'goe':87B 'hydrolog':108C 'land':4A,9A,19B,32B,46B,53B,106C 'law':80B 'mean':6A,116C 'model':63B 'month':5A,10A,115C 'observ':66B 'past':102B,105C 'physic':82B,109C 'present':16A 'produc':49B,84B 'provid':24B,93B 'reanalysi':2A,22B,60B,61B,83B,104C 'reanalysis-era5-land-monthly-means':1A 'replay':51B 'resolut':40B 'sever':35B,88B 'time':92B 'use':78B 'variabl':33B,114C 'view':27B 'world':70B"
     }
 ]
