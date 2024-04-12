@@ -5,13 +5,15 @@ Revises: 81993949dc59
 Create Date: 2024-04-11 14:11:50.174472
 
 """
-from alembic import op
+
 import sqlalchemy as sa
 import sqlalchemy_utils
 
+from alembic import op
+
 # revision identifiers, used by Alembic.
-revision = '7366df17e57c'
-down_revision = '81993949dc59'
+revision = "7366df17e57c"
+down_revision = "81993949dc59"
 branch_labels = None
 depends_on = None
 
@@ -24,7 +26,8 @@ def upgrade() -> None:
             "search_field",
             sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
             sa.Computed(
-                "setweight(to_tsvector('english', resource_uid || ' ' || coalesce(title, '')), 'A')  || ' ' || "
+                "setweight(to_tsvector('english', resource_uid || ' ' || coalesce(title, '')), 'A') "
+                " || ' ' || "
                 "setweight(to_tsvector('english', coalesce(abstract, '')), 'B')  || ' ' || "
                 "setweight(to_tsvector('english', coalesce(fulltext, '')), 'C')  || ' ' || "
                 "setweight(to_tsvector('english', coalesce(high_priority_terms, '')), 'D')",
