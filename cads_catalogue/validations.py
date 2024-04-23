@@ -312,11 +312,16 @@ def validate_metadata_json(dataset_folder):
                 logger.exception("field 'hidden' not compliant")
 
     keywords = data.get("keywords")
+    kw_args = []
     if keywords:
         for keyword in keywords:
             if len(keyword.split(":")) != 2:
                 logger.error(f"keyword {keyword} not compliant")
-
+            else:
+                kw_args.append(keyword.split(":")[0])
+    # at least 1 "Product type" must be present in keywords
+    if "Product type" not in kw_args:
+        logger.warning("'Product type' not present among the keywords")
     return metadata
 
 
