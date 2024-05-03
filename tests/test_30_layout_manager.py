@@ -818,6 +818,31 @@ def test_transform_cim_blocks(tmpdir):
         },
     }
 
+    # test case 8: existing cim layout, existing both section and aside blocks, but qa_flag is False
+    # -> layout_data with placeholders removed
+    layout_data = create_layout_for_test(
+        layout_path, sections=test_sections_2, aside=test_aside_2
+    )
+    new_layout_data = layout_manager.transform_cim_blocks(
+        layout_data, cim_layout_path=cim_layout_path, qa_flag=False
+    )
+    assert new_layout_data == {
+        "uid": "cams-global-reanalysis-eac4",
+        "body": {
+            "main": {
+                "sections": [
+                    test_sections_1[0],
+                    test_sections_1[1],
+                ]
+            },
+            "aside": {
+                "blocks": test_aside_1["blocks"][:2] + test_aside_1["blocks"][2:],
+                "title": "a new title",
+                "type": "a new type",
+            },
+        },
+    }
+
 
 def test_has_section_id(tmpdir):
     layout_path = os.path.join(str(tmpdir), "layout.json")

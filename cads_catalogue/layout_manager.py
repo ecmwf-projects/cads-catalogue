@@ -266,13 +266,16 @@ def transform_licences_blocks(
     return new_data
 
 
-def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
+def transform_cim_blocks(
+    layout_data: dict[str, Any], cim_layout_path: str, qa_flag: bool = True
+):
     """Transform layout.json data according to CIM Quality Assessment layout.
 
     Parameters
     ----------
     layout_data: data of the layout.json to transform
     cim_layout_path: path to the file containing CIM Quality Assessment
+    qa_flag: if False, remove QA placeholders from layout_data regardless the cim layout
 
     Returns
     -------
@@ -286,11 +289,11 @@ def transform_cim_blocks(layout_data: dict[str, Any], cim_layout_path: str):
             cim_layout_data = json.load(fp)
     qa_tab = cim_layout_data.get("quality_assurance_tab", {})
     qa_tab_blocks = qa_tab.get("blocks")
-    if qa_tab_blocks is not None:
+    if qa_tab_blocks is not None and qa_flag:
         remove_tab = False
     qa_aside = cim_layout_data.get("quality_assurance_aside", {})
     qa_aside_blocks = qa_aside.get("blocks")
-    if qa_aside_blocks is not None:
+    if qa_aside_blocks is not None and qa_flag:
         remove_aside = False
     new_data = copy.deepcopy(layout_data)
     body = new_data.get("body", {})
@@ -408,8 +411,9 @@ def transform_layout(
     cim_layout_path = os.path.join(
         cim_folder_path, resource["resource_uid"], "quality_assurance.layout.json"
     )
-    if resource["qa_flag"]:
-        layout_data = transform_cim_blocks(layout_data, cim_layout_path)
+    layout_data = transform_cim_blocks(
+        layout_data, cim_layout_path, resource["qa_flag"]
+    )
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
