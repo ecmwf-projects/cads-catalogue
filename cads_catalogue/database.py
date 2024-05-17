@@ -182,6 +182,7 @@ class Resource(BaseModel):
     # internal functionality related
     adaptor = sa.Column(sa.String)
     adaptor_properties_hash = sa.Column(sa.String)
+    api_enforce_constraints = sa.Column(sa.Boolean, default=False)
     disabled_reason = sa.Column(sa.String)
     sources_hash = sa.Column(sa.String)
     related_resources_keywords: List[str] = sa.Column(

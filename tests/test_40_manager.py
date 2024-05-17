@@ -1557,6 +1557,7 @@ def test_load_resource_from_folder() -> None:
         " the world into a globally complete and consistent dataset using the laws of "
         "physics. Reanalysis produces data that goes several decades back in time, "
         "providing an accurate description of the climate of the past.",
+        "api_enforce_constraints": True,
         "begin_date": "1950-01-01",
         "citation": None,
         "contactemail": "https://support.ecmwf.int",
