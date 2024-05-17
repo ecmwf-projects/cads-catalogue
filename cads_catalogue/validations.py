@@ -218,6 +218,7 @@ def validate_metadata_json(dataset_folder):
         if required_field not in data or not data.get(required_field):
             logger.error(f"required field not found or empty: '{required_field}'")
     optional_fields = [
+        "api_enforce_constraints",
         "bboxE",
         "bboxN",
         "bboxS",
@@ -234,6 +235,8 @@ def validate_metadata_json(dataset_folder):
         "ds_responsible_organisation_role",
         "end_date",
         "file_format",
+        "format_version",
+        "high_priority_terms",
         "hidden",
         "inspire_theme",
         "keywords",
@@ -241,6 +244,7 @@ def validate_metadata_json(dataset_folder):
         "lineage",
         "portal",
         "publication_date",
+        "qos_tags",
         "related_resources_keywords",
         "representative_fraction",
         "responsible_individual",
