@@ -23,6 +23,7 @@
   "bboxW": 0,
   "bboxS": -89,
   "bboxE": 360,
+  "api_enforce_constraints": false,
   "begin_date": "1959-01-01",
   "end_date": "2023-02-11",
   "file_format": "grib",

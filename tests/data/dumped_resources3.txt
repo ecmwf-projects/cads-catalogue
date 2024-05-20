@@ -2,6 +2,7 @@
     {
         "resource_id": 1,
         "resource_uid": "reanalysis-era5-land",
+        "api_enforce_constraints": true,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",

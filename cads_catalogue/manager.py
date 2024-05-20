@@ -277,6 +277,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         data = json.load(fp)
 
     metadata["abstract"] = utils.normalize_abstract(data["abstract"])  # required
+    metadata["api_enforce_constraints"] = data.get("api_enforce_constraints", False)
     metadata["begin_date"] = data.get("begin_date")
     metadata["citation"] = data.get("citation")
     metadata["contactemail"] = data.get("contactemail")

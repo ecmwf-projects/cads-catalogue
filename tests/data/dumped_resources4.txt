@@ -2,6 +2,7 @@
     {
         "resource_id": 4,
         "resource_uid": "cams-global-reanalysis-eac4",
+        "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -898,6 +899,7 @@
     {
         "resource_id": 3,
         "resource_uid": "cams-global-reanalysis-eac4-monthly",
+        "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -1424,6 +1426,7 @@
     {
         "resource_id": 5,
         "resource_uid": "derived-near-surface-meteorological-variables",
+        "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -1477,6 +1480,7 @@
     {
         "resource_id": 1,
         "resource_uid": "reanalysis-era5-land",
+        "api_enforce_constraints": true,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -1534,6 +1538,7 @@
     {
         "resource_id": 6,
         "resource_uid": "reanalysis-era5-land-monthly-means",
+        "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -1587,6 +1592,7 @@
     {
         "resource_id": 7,
         "resource_uid": "reanalysis-era5-pressure-levels",
+        "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
@@ -1640,6 +1646,7 @@
     {
         "resource_id": 8,
         "resource_uid": "satellite-surface-radiation-budget",
+        "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
         "layout": "an url",
