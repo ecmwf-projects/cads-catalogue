@@ -170,6 +170,7 @@ def normalize_abstract(text: str) -> str:
     replacer_map = {"sup": superscript_text, "sub": subscript_text}
     parser = TagReplacer(replacer_map)
     parser.feed(text)
+    parser.close()
     return parser.output_text
 
 
