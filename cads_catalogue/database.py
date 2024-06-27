@@ -232,6 +232,7 @@ class Resource(BaseModel):
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
     high_priority_terms = sa.Column(sa.String)
+    popularity = sa.Column(sa.Integer, default=1)
     search_field: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
@@ -242,7 +243,13 @@ class Resource(BaseModel):
             persisted=True,
         ),
     )
-
+    fts: str = sa.Column(
+        sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
+        sa.Computed(
+            "setweight(to_tsvector('english', coalesce(high_priority_terms, '')), 'D')",
+            persisted=True,
+        ),
+    )
     # relationship attributes
     resource_data = sa.orm.relationship(
         ResourceData, uselist=False, back_populates="resource", lazy="select"
@@ -274,6 +281,7 @@ class Resource(BaseModel):
 
     __table_args__ = (
         sa.Index("idx_resources_search_field", search_field, postgresql_using="gin"),
+        sa.Index("idx_resources_fts", fts, postgresql_using="gin"),
     )
 
 
