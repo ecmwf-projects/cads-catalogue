@@ -325,6 +325,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["licence_uids"] = data.get("licences", [])
 
     metadata["lineage"] = data.get("lineage")
+    metadata["popularity"] = data.get("popularity", 1)
     default_public_date = "2017-01-01"
     metadata["publication_date"] = data.get("publication_date")
     if not metadata["publication_date"]:
