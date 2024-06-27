@@ -43,11 +43,11 @@ def test_folders2hash() -> None:
     )
     assert (
         utils.folders2hash([test_file_path_1]).hexdigest()
-        == "e8fa178d247cf902502dfeca284bdd49"
+        == "b918f99ca582f9d2f04cb47f3b73cb51"
     )
     assert (
         utils.folders2hash([test_file_path_1, test_file_path_2]).hexdigest()
-        == "afd7020282c5977b199dcc569fbb9370"
+        == "b7875c9c1af9e7e8d8a03046b7d7f867"
     )
 
 

@@ -1585,6 +1585,7 @@ def test_load_resource_from_folder() -> None:
         "licence_uids": ["licence-to-use-copernicus-products"],
         "lineage": "EC Copernicus program",
         "mapping": None,
+        "popularity": 500,
         "publication_date": "2019-07-12",
         "related_resources_keywords": [],
         "representative_fraction": 0.25,
