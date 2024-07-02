@@ -30,6 +30,27 @@ metadata = sa.MetaData()
 BaseModel = sa.orm.declarative_base(metadata=metadata)
 
 
+add_rank_function_sql = """
+CREATE OR REPLACE FUNCTION ts_rank2(w real[], v1 tsvector, v2 tsvector, q tsquery, n integer) RETURNS real
+LANGUAGE plpgsql
+IMMUTABLE PARALLEL SAFE STRICT
+AS $function$
+DECLARE
+    original_rank REAL;
+    htp_rank REAL;
+BEGIN
+    SELECT INTO original_rank ts_rank(w,v1,q);
+    SELECT INTO htp_rank ts_rank(v2,q);
+    RETURN htp_rank*n*10 + original_rank;
+END;
+$function$;
+"""
+
+drop_rank_function_sql = """
+DROP FUNCTION ts_rank2(w real[], v1 tsvector, v2 tsvector, q tsquery, n integer);
+"""
+
+
 class CatalogueUpdate(BaseModel):
     """Catalogue manager update information ORM model."""
 
@@ -232,6 +253,7 @@ class Resource(BaseModel):
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
     high_priority_terms = sa.Column(sa.String)
+    popularity = sa.Column(sa.Integer, default=1)
     search_field: str = sa.Column(
         sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
         sa.Computed(
@@ -242,7 +264,13 @@ class Resource(BaseModel):
             persisted=True,
         ),
     )
-
+    fts: str = sa.Column(
+        sqlalchemy_utils.types.ts_vector.TSVectorType(regconfig="english"),
+        sa.Computed(
+            "to_tsvector('english', coalesce(high_priority_terms, ''))",
+            persisted=True,
+        ),
+    )
     # relationship attributes
     resource_data = sa.orm.relationship(
         ResourceData, uselist=False, back_populates="resource", lazy="select"
@@ -274,6 +302,7 @@ class Resource(BaseModel):
 
     __table_args__ = (
         sa.Index("idx_resources_search_field", search_field, postgresql_using="gin"),
+        sa.Index("idx_resources_fts", fts, postgresql_using="gin"),
     )
 
 
@@ -332,6 +361,13 @@ def ensure_session_obj(read_only: bool = False) -> sa.orm.sessionmaker:
     return session_obj
 
 
+def create_catalogue_functions(engine):
+    """Add customized functions in the catalogue database."""
+    with engine.connect() as conn:
+        conn.execute(sa.text(add_rank_function_sql))
+        conn.commit()
+
+
 def init_database(connection_string: str, force: bool = False) -> sa.engine.Engine:
     """Make sure the db located at URI `connection_string` exists updated and return the engine object.
 
@@ -358,6 +394,7 @@ def init_database(connection_string: str, force: bool = False) -> sa.engine.Engi
         # cleanup and create the schema
         BaseModel.metadata.drop_all(engine)
         BaseModel.metadata.create_all(engine)
+        create_catalogue_functions(engine)
         alembic.command.stamp(alembic_cfg, "head")
     else:
         # check the structure is empty or incomplete
@@ -372,6 +409,7 @@ def init_database(connection_string: str, force: bool = False) -> sa.engine.Engi
         # NOTE: tables no more in metadata are not removed with drop_all
         BaseModel.metadata.drop_all(engine)
         BaseModel.metadata.create_all(engine)
+        create_catalogue_functions(engine)
         alembic.command.stamp(alembic_cfg, "head")
     else:
         # update db structure
