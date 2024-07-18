@@ -573,6 +573,7 @@ def find_related_resources(
     Links from a resource A to resource B created this way:
      - B has a (not empty) list of "keywords" metadata completely included in A's keywords
      - B has at least one common element in the "related_resources_keywords"
+    Also: B should not be hidden.
 
     Parameters
     ----------
@@ -594,12 +595,21 @@ def find_related_resources(
             continue
         res1_keywords = set([r.keyword_name for r in res1.keywords])
         res2_keywords = set([r.keyword_name for r in res2.keywords])
-        if res1_keywords.issubset(res2_keywords) and len(res1_keywords) > 0:
+        if (
+            res1_keywords.issubset(res2_keywords)
+            and len(res1_keywords) > 0
+            # Never create references to hidden resources
+            and not res2.hidden
+        ):
             relationships_found.append((res1, res2))
             continue
         res1_rel_res_kws = set(res1.related_resources_keywords)
         res2_rel_res_kws = set(res2.related_resources_keywords)
-        if res1_rel_res_kws & res2_rel_res_kws:
+        if (
+            res1_rel_res_kws & res2_rel_res_kws
+            # Never create references to hidden resources
+            and not res2.hidden
+        ):
             relationships_found.append((res1, res2))
     return relationships_found
 
