@@ -1823,3 +1823,80 @@ def test_resource_sync(
         assert session.execute(sa.text("select resource_uid from resources")).all() == [
             ("reanalysis-era5-land",),
         ]
+
+
+def test_find_related_resources():
+    def _to_testable_structure(raw_related):
+        return [[r.resource_uid for r in t] for t in raw_related]
+
+    res1 = database.Resource(
+        resource_id=1, resource_uid="res1", related_resources_keywords=["aaa"]
+    )
+    res2 = database.Resource(
+        resource_id=2, resource_uid="res2", related_resources_keywords=["aaa", "bbb"]
+    )
+    res3 = database.Resource(
+        resource_id=3, resource_uid="res3", related_resources_keywords=["ccc"]
+    )
+    res4 = database.Resource(
+        resource_id=4,
+        resource_uid="res4",
+        related_resources_keywords=["aaa"],
+        hidden=True,
+    )
+    related = manager.find_related_resources([res1, res2, res3, res4])
+
+    assert _to_testable_structure(related) == [
+        ["res1", "res2"],
+        ["res2", "res1"],
+        ["res4", "res1"],
+        ["res4", "res2"],
+    ]
+
+    res2.hidden = True
+    related = manager.find_related_resources([res1, res2, res3, res4])
+
+    assert _to_testable_structure(related) == [
+        ["res2", "res1"],
+        ["res4", "res1"],
+    ]
+
+    res1 = database.Resource(
+        resource_id=1,
+        resource_uid="res1",
+        related_resources_keywords=[],
+        keywords=[
+            database.Keyword(keyword_id=1, keyword_name="aaa"),
+            database.Keyword(keyword_id=2, keyword_name="bbb"),
+        ],
+    )
+    res2 = database.Resource(
+        resource_id=2,
+        resource_uid="res2",
+        related_resources_keywords=[],
+        keywords=[
+            database.Keyword(keyword_id=1, keyword_name="aaa"),
+            database.Keyword(keyword_id=2, keyword_name="bbb"),
+            database.Keyword(keyword_id=2, keyword_name="ccc"),
+        ],
+    )
+    res3 = database.Resource(
+        resource_id=1,
+        resource_uid="res3",
+        related_resources_keywords=[],
+        keywords=[
+            database.Keyword(keyword_id=1, keyword_name="aaa"),
+            database.Keyword(keyword_id=2, keyword_name="bbb"),
+            database.Keyword(keyword_id=2, keyword_name="ddd"),
+        ],
+    )
+    related = manager.find_related_resources([res1, res2])
+
+    assert _to_testable_structure(related) == [
+        ["res1", "res2"],
+    ]
+
+    res2.hidden = True
+    related = manager.find_related_resources([res1, res2])
+
+    assert _to_testable_structure(related) == []
