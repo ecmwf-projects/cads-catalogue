@@ -1853,6 +1853,16 @@ def test_find_related_resources():
         ["res4", "res2"],
     ]
 
+    related = manager.find_related_resources(
+        [res1, res2, res3, res4], only_involving_uid="res2"
+    )
+
+    assert _to_testable_structure(related) == [
+        ["res1", "res2"],
+        ["res2", "res1"],
+        ["res4", "res2"],
+    ]
+
     res2.hidden = True
     related = manager.find_related_resources([res1, res2, res3, res4])
 
