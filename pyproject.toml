@@ -33,6 +33,9 @@ cads-catalogue = "cads_catalogue.entry_points:main"
 
 [tool.coverage.run]
 branch = true
+omit = [
+  "alembic/*"
+]
 
 [tool.mypy]
 exclude = "tests/data"
