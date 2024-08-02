@@ -14,6 +14,8 @@ dependencies:
 - sphinx
 - sphinx-autoapi
 # DO NOT EDIT ABOVE THIS LINE, ADD DEPENDENCIES BELOW
+- mypy != 1.11.0
+- mypy != 1.11.1
 - pip
 - postgresql
 - psycopg
