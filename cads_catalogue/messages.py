@@ -181,7 +181,7 @@ def load_portal_messages(
     List of found messages parsed.
     """
     loaded_messages: List[dict[str, Any]] = []
-    portal = os.path.basename(portal_folder)
+    site = os.path.basename(portal_folder)
     for current_root, dirs, files in os.walk(portal_folder):
         for current_file in files:
             file_path = os.path.join(current_root, current_file)
@@ -189,7 +189,7 @@ def load_portal_messages(
                 msg_uid = os.path.relpath(file_path, root_msg_folder)
                 try:
                     msg_record = md2message_record(
-                        file_path, msg_uid, is_global=True, portal=portal
+                        file_path, msg_uid, is_global=True, site=site
                     )
                 except:  # noqa
                     logger.exception("error loading message %r" % file_path)
