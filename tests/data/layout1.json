@@ -1,0 +1,283 @@
+{
+  "uid": "cams-solar-radiation-timeseries",
+  "title": "CAMS solar radiation time-series",
+  "description": "",
+  "body": {
+    "main": {
+      "sections": [
+        {
+          "title": "Overview",
+          "id": "overview",
+          "blocks": [
+            {
+              "id": "abstract",
+              "type": "thumb-markdown",
+              "content": "The CAMS solar radiation services provide historical values (2004 to present) of global (GHI), direct (BHI) and diffuse (DHI) solar irradiation, as well as direct normal irradiation (BNI). The aim is to fulfil the needs of European and national policy development and the requirements of both commercial and public downstream services, e.g. for planning, monitoring, efficiency improvements and the integration of solar energy systems into energy supply grids.\n \nFor clear-sky conditions, an irradiation time series is provided for any location in the world using information on aerosol, ozone and water vapour from the CAMS global forecasting system. Other properties, such as ground albedo and ground elevation, are also taken into account. Similar time series are available for cloudy (or \u201call sky\u201d) conditions but, since the high-resolution cloud information is directly inferred from satellite observations, these are currently only available inside the field-of-view of the Meteosat Second Generation (MSG) and the Himawari satellites, which is roughly Europe, Africa, part of South America, the Atlantic Ocean, the Middle East, part of Asia, and Australia.\n \nData is offered in both ASCII and netCDF format. Additionally, an ASCII \"expert mode\" format can be selected which contains in addition to the irradiation, all the input data used in their calculation (aerosol optical properties, water vapour concentration, etc). This additional information is only meaningful in the time frame at which the calculation is performed and so is only available at 1-minute time steps in universal time (UT).\n",
+              "image": {
+                "type": "image",
+                "url": "overview.png"
+              }
+            },
+            {
+              "type": "table",
+              "id": "data_description",
+              "structure": {
+                "headings": [
+                  {
+                    "id": "data_type",
+                    "label": "Data type"
+                  },
+                  {
+                    "id": "horizontal_coverage",
+                    "label": "Horizontal coverage"
+                  },
+                  {
+                    "id": "horizontal_resolution",
+                    "label": "Horizontal resolution"
+                  },
+                  {
+                    "id": "temporal_coverage",
+                    "label": "Temporal coverage"
+                  },
+                  {
+                    "id": "temporal_resolution",
+                    "label": "Temporal resolution"
+                  },
+                  {
+                    "id": "file_format",
+                    "label": "File format"
+                  }
+                ],
+                "orientation": "horizontal"
+              },
+              "content": [
+                {
+                  "file_format": "CSV, netCDF",
+                  "data_type": "Time series at specified point",
+                  "horizontal_coverage": "Global for cloud-free parameters; satellite field-of-view for all-sky parameters",
+                  "horizontal_resolution": "Interpolated to the point of interest from various input data spatial resolutions",
+                  "temporal_coverage": "February 2004 to present for Meteosat and January 2016 to present for Himawari field of view",
+                  "temporal_resolution": "1-minute, 15-minute, 1-hourly, daily, monthly"
+                }
+              ],
+              "caption": "Data description"
+            },
+            {
+              "type": "table",
+              "id": "variables",
+              "structure": {
+                "orientation": "vertical",
+                "headings": [
+                  {
+                    "id": "name",
+                    "label": "Name"
+                  },
+                  {
+                    "id": "units",
+                    "label": "Units"
+                  },
+                  {
+                    "id": "description",
+                    "label": "Description"
+                  }
+                ]
+              },
+              "content": [
+                {
+                  "name": "BHI",
+                  "description": "Direct horizontal all sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "BHIc",
+                  "description": "Direct horizontal clear sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "BNI",
+                  "description": "Direct normal all sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "BNIc",
+                  "description": "Direct normal clear sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "DHI",
+                  "description": "Diffuse horizontal all sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "DHIc",
+                  "description": "Diffuse horizontal clear sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "GHI",
+                  "description": "Global horizontal all sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                },
+                {
+                  "name": "GHIc",
+                  "description": "Global horizontal clear sky irradiation",
+                  "units": "Wh m<sup>-2</sup>"
+                }
+              ],
+              "caption": "Variables"
+            },
+            {
+              "type": "licences",
+              "id": "licences_section",
+              "title": "Licences",
+              "details": {
+                "licences": [
+                  {
+                    "licence-id": "licence-to-use-copernicus-products"
+                  },
+                  {
+                    "licence-id": "eumetsat-cm-saf"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "title": "Download",
+          "id": "download",
+          "blocks": []
+        },
+        {
+          "title": "Download 2",
+          "id": "d_download",
+          "blocks": [
+            {
+              "title": "Licence",
+              "id": "licence",
+              "type": "licence",
+              "details": {
+                "licences": [
+                  {
+                    "id": "licence-to-use-copernicus-products",
+                    "revision": 12,
+                    "label": "Licence to use Copernicus Products",
+                    "contents_url": "https://s3.cds.ecmwf.int/swift/v1/AUTH_3e237111c3a144df8e0e0980577062b4/bopen-cds2-dev-catalogue/licences/licence-to-use-copernicus-products/licence-to-use-copernicus-productsv12_c742a3ce47ae53486a6bc9012f0496e655cd94f19fb2d01b4f6e32af69276ed1.md",
+                    "attachment_url": "https://s3.cds.ecmwf.int/swift/v1/AUTH_3e237111c3a144df8e0e0980577062b4/bopen-cds2-dev-catalogue/licences/licence-to-use-copernicus-products/licence-to-use-copernicus-products_b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18.pdf"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "download1",
+              "type": "markdown",
+              "content": "The access to this dataset  can be **slow**  and is intended for **expert** users to access the **complete** set of data produced by the  ERA5 atmospheric reanalysis on its native grid.\nIt includes data that is  **not** provided through the other, more convenient [ERA5 catalogue entries for regridded data][ERA5-entries]:\n\n* native grid rather than regridded into regular lat-lon,\n\n* model and potential temperature/vorticity levels, in addition to  pressure levels and  surface fields,\n\n* full two-dimensional ocean-wave spectra in addition to integrated wave parameters,\n\n* explicit distinction between analysis, short-forecast and other, more technical, products.\n\nAn overview of the range of products is provided [here] [era5-doc]. <br/>\nA full list of available variables can be found [here] [era5-parameters]. <br/>\n\n\n**Install the API**<br/>\nAccess to  ERA5 atmospheric reanalysis  is provided through the Climate Data Store Application Program Interface (CDS API).\nThis requires the installation  of  the CDS API application in the users' computer. More information on  how to install can be found [here][cds-api-how-to].<br/>\nYou also need to provide your user identity and public key, which can be found when you are logged in the Catalogue and click on your username at the top left.\n\n\n**Example of a request**<br/>\nRequests for these data using the CDS API have to use the MARS request syntax. <br/>\nYou can discover the ERA5-complete structure (1940-present) and learn how to build a CDS API request by following these steps:\n\n1. Open the [MARS ERA5 catalogue][era5-mars-catalogue].\n\n2. Browse for discovery, and browse your way to the parameter level to build a request.\n\n3. Use the \" View MARS request \" feature - this will help you build your own CDS API Python script to retrieve the data through the CDS API.\n\n4. Tailor your request to \n    1. re-grid to the desired regular lat-lon resolution\n    2. convert to NetCDF (works for regular grids only, so you need to use the 'grid' keyword as well)\n    3. select sub areas\n\nHere is an example to download model level ERA5 analysis data (temperature) for a given area at a regular lat/lon grid in NetCDF format.\n\n       #!/usr/bin/env python\n       import cdsapi\n       c = cdsapi.Client()\n       c.retrieve('reanalysis-era5-complete', { # Requests follow MARS syntax\n                                                # Keywords 'expver' and 'class' can be dropped. They are obsolete\n                                                # since their values are imposed by 'reanalysis-era5-complete'\n           'date'    : '2013-01-01',            # The hyphens can be omitted\n           'levelist': '1/10/100/137',          # 1 is top level, 137 the lowest model level in ERA5. Use '/' to separate values.\n           'levtype' : 'ml',\n           'param'   : '130',                   # Full information at https://apps.ecmwf.int/codes/grib/param-db/\n                                                # The native representation for temperature is spherical harmonics\n           'stream'  : 'oper',                  # Denotes ERA5. Ensemble members are selected by 'enda'\n           'time'    : '00/to/23/by/6',         # You can drop :00:00 and use MARS short-hand notation, instead of '00/06/12/18'\n           'type'    : 'an',\n           'area'    : '80/-50/-25/0',          # North, West, South, East. Default: global\n           'grid'    : '1.0/1.0',               # Latitude/longitude. Default: spherical harmonics or reduced Gaussian grid\n           'format'  : 'netcdf',                # Output needs to be regular lat-lon, so only works in combination with 'grid'!\n       }, 'ERA5-ml-temperature-subarea.nc')     # Output file. Adapt as you wish.\n\n**How to access ERA5.1**<br/>\nFor ERA5.1 the same method can be used as above, however,\n\n* there is no dedicated online cacalogue, so for disovery of products and API request the [MARS ERA5 catalogue][era5-mars-catalogue] needs to be used as well,\n\n* data is only available from January 2000 to December 2006 inclusive,\n\n* use 'reanalysis-era5.1-complete' rather than 'reanalysis-era5-complete'.\n\n**Terms of use**<br/>\nUsers need to accept the Terms of use of this datase by clicking **Accept Terms** in the box below before being able to download the data.\nPlease note that this box is only visible after login.\nThis needs to be accepted only once and the CDS will remember that you have accepted the licence.\n\n [ERA5-entries]: https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels \n [era5-doc]: https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation\n [cds-api-how-to]: https://cds.climate.copernicus.eu/api-how-to\n [era5-parameters]: https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation#ERA5:datadocumentation-Parameterlistings\n [era5-mars-catalogue]: https://apps.ecmwf.int/data-catalogues/era5/?class=ea\n\n"
+            }
+          ]
+        },
+        {
+          "title": "Documentation",
+          "id": "documentation",
+          "blocks": [
+            {
+              "id": "all_docs-0",
+              "type": "link",
+              "href": "https://confluence.ecmwf.int/x/jOLjDw",
+              "title": "CAMS Solar Radiation Documentation",
+              "description": "Documentation on the CAMS solar radiation products",
+              "new-window": true
+            },
+            {
+              "id": "all_docs-1",
+              "type": "link",
+              "href": "https://atmosphere.copernicus.eu/supplementary-services#fa6856b7-a306-4cc4-9137-f3e0cb703093",
+              "title": "Evaluation and quality assurance (EQA) reports",
+              "description": "Evaluation and Quality Assurance (EQA) reports for the CAMS solar irradiance products are provided on a quarterly basis. They lag by about eight months in order to acquire sufficient validation observations.",
+              "new-window": true
+            }
+          ]
+        }
+      ]
+    },
+    "aside": {
+      "blocks": [
+        {
+          "id": "contact",
+          "type": "section",
+          "title": "Support",
+          "blocks": [
+            {
+              "id": "portal",
+              "type": "link",
+              "href": "https://jira.ecmwf.int/plugins/servlet/desk/portal/1/create/202",
+              "title": "Get help",
+              "new-window": true
+            }
+          ]
+        },
+        {
+          "id": "quality_assurance_aside"
+        },
+        {
+          "title": "Licence",
+          "id": "licence",
+          "type": "section",
+          "blocks": [
+            {
+              "type": "licence",
+              "licence-id": "licence-to-use-copernicus-products",
+              "id": "licence-to-use-copernicus-products"
+            }
+          ]
+        },
+        {
+          "id": "publication_date",
+          "type": "section",
+          "title": "Publication date",
+          "blocks": [
+            {
+              "id": "publication_date-markdown",
+              "type": "markdown",
+              "content": "2020-02-06"
+            }
+          ]
+        },
+        {
+          "id": "api_access",
+          "type": "section",
+          "title": "Standard metadata",
+          "blocks": [
+            {
+              "id": "stac",
+              "type": "link",
+              "href": "../stac-browser/collections/cams-solar-radiation-timeseries",
+              "title": "STAC",
+              "new-window": true
+            },
+            {
+              "id": "schema_org",
+              "type": "link",
+              "href": "../api/catalogue/v1/collections/cams-solar-radiation-timeseries/schema.org",
+              "title": "Schema.org",
+              "new-window": true
+            },
+            {
+              "id": "csw",
+              "type": "link",
+              "href": "../api/csw/v1/?service=CSW&version=3.0.0&request=GetRecordById&outputSchema=http://www.isotc211.org/2005/gmd&id=cams-solar-radiation-timeseries",
+              "title": "CSW",
+              "new-window": true
+            }
+          ]
+        },
+        {
+          "id": "related_dataset",
+          "type": "related_entries",
+          "content": "datasets",
+          "title": "Related datasets",
+          "rel": "related"
+        }
+      ]
+    }
+  }
+}

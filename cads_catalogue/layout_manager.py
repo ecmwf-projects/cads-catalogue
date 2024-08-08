@@ -266,6 +266,124 @@ def transform_licences_blocks(
     return new_data
 
 
+def build_licence_block2(
+    licence_objs: List[database.Licence], doc_storage_url: str
+) -> dict[str, Any]:
+    """
+    Build a list of new licence blocks to be inserted inside the layout data.
+
+    Parameters
+    ----------
+    licence_objs: list of related licence objects
+    doc_storage_url: public base url of the document storage
+
+    Returns
+    -------
+    new licence block for the layout data
+    """
+    licence_blocks = []
+    for licence_obj in licence_objs:
+        licence_block = {
+            "id": f"{licence_obj.licence_uid}",
+            "revision": licence_obj.revision,
+            "label": f"{licence_obj.title}",
+            "contents_url": urllib.parse.urljoin(
+                doc_storage_url, licence_obj.md_filename
+            ),
+            "attachment_url": urllib.parse.urljoin(
+                doc_storage_url, licence_obj.download_filename
+            ),
+        }
+        licence_blocks.append(licence_block)
+    new_block = {
+        "type": "licences",
+        "id": "licences_section",
+        "title": "Licence",
+        "details": {"licences": licence_blocks},
+    }
+    return new_block
+
+
+def manage_licence_section2(
+    all_licences: Sequence[database.Licence],
+    section: dict[str, Any],
+    doc_storage_url: str,
+):
+    """
+    Look for licence blocks and modify accordingly with urls of object storage files.
+
+    Parameters
+    ----------
+    all_licences: list of licence objects in the database
+    section: section of layout.json data
+    doc_storage_url: public url of the object storage
+    """
+    new_section = copy.deepcopy(section)
+    blocks = new_section.get("blocks", [])
+    for i, block in enumerate(copy.deepcopy(blocks)):
+        if (
+            block.get("type") == "licences"
+            and block.get("id") == "licences_section"
+            and "details" in block
+        ):
+            licence_objs = []
+            for licence_block in block["details"]["licences"]:
+                licence_uid = licence_block["licence-id"]
+                try:
+                    licence_obj = [
+                        r
+                        for r in all_licences
+                        if r.licence_uid == licence_block["licence-id"]
+                    ][0]
+                except IndexError:
+                    raise ValueError(f"not found licence {licence_uid}")
+                licence_objs.append(licence_obj)
+            new_block = build_licence_block2(licence_objs, doc_storage_url)
+            del blocks[i]
+            blocks.insert(i, new_block)
+        elif block.get("type") in ("section", "accordion"):
+            blocks[i] = manage_licence_section2(all_licences, block, doc_storage_url)
+    return new_section
+
+
+def transform_licences_blocks2(
+    session: sa.orm.session.Session,
+    layout_data: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings,
+):
+    """Transform layout.json data processing uploads of referenced licences (block_id = "licences_section").
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    layout_data: data of the layout.json to store
+    storage_settings: object with settings to access the object storage
+
+    Returns
+    -------
+    dict: dictionary of layout_data modified
+    """
+    new_data = copy.deepcopy(layout_data)
+    doc_storage_url = storage_settings.document_storage_url
+    all_licences = session.scalars(sa.select(database.Licence)).all()
+
+    # search all licence blocks inside body/main/sections:
+    body = new_data.get("body", {})
+    body_main = body.get("main", {})
+    sections = body_main.get("sections", [])
+    for i, section in enumerate(copy.deepcopy(sections)):
+        sections[i] = manage_licence_section2(all_licences, section, doc_storage_url)
+    # search all the images inside body/aside:
+    aside_section = body.get("aside", {})
+    if aside_section:
+        new_data["body"]["aside"] = manage_licence_section2(
+            all_licences,
+            aside_section,
+            doc_storage_url,
+        )
+    return new_data
+
+
 def transform_cim_blocks(
     layout_data: dict[str, Any], cim_layout_path: str, qa_flag: bool = True
 ):
@@ -418,6 +536,7 @@ def transform_layout(
         layout_data, resource_folder_path, resource, storage_settings
     )
     layout_data = transform_licences_blocks(session, layout_data, storage_settings)
+    layout_data = transform_licences_blocks2(session, layout_data, storage_settings)
     logger.debug(f"output layout_data: {layout_data}")
     if resource["qa_flag"]:
         resource["qa_flag"] = has_section_id(layout_data, "quality_assurance_tab")
