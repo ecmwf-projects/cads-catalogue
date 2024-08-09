@@ -872,35 +872,47 @@ def test_has_section_id(tmpdir):
     assert layout_manager.has_section_id(layout_data, "overview4") is False
 
 
-# def test_transform_licences_blocks2(session_obj: sa.orm.sessionmaker):
-#     my_settings_dict = {
-#         "object_storage_url": "object/storage/url",
-#         "storage_admin": "admin1",
-#         "storage_password": "secret1",
-#         "catalogue_bucket": "mycatalogue_bucket",
-#         "document_storage_url": "my/url",
-#     }
-#     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
-#     # add some licences to work on
-#     licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
-#     licences = licence_manager.load_licences_from_folder(licences_folder_path)
-#     with session_obj() as session:
-#         for licence in licences:
-#             session.add(database.Licence(**licence))
-#         session.commit()
-#         # all_licences = session.scalars(sa.select(database.Licence)).all()
-#
-#     input_layout_path = os.path.join(TESTDATA_PATH, "layout1.json")
-#     with open(input_layout_path) as fp:
-#         input_layout_data = json.load(fp)
-#     out_layout_data = layout_manager.transform_licences_blocks2(
-#         session, input_layout_data, storage_settings
-#     )
-#     expected_layout_path = os.path.join(TESTDATA_PATH, "layout2.json")
-#     # with open(expected_layout_path, "w") as fp:
-#     #     json.dump(out_layout_data, fp, indent=2)
-#     #  TODO: test with effective document_storage_url
-#     # with open(expected_layout_path) as fp:
-#     #     expected_layout_data = json.load(fp)
-#     # assert out_layout_data == expected_layout_data
-#     session.close()
+def test_transform_licences_blocks2(session_obj: sa.orm.sessionmaker):
+    my_settings_dict = {
+        "object_storage_url": "https://object/storage/url/",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "https://document/storage/url/",
+    }
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
+    # add some licences to work on
+    licences_folder_path = os.path.join(TESTDATA_PATH, "cads-licences")
+    licences = licence_manager.load_licences_from_folder(licences_folder_path)
+    with session_obj() as session:
+        for licence in licences:
+            # simulate upload to storage
+            licence["download_filename"] = os.path.join(
+                storage_settings.catalogue_bucket,
+                "licences",
+                licence["licence_uid"],
+                "test_storage_path.pdf",
+            )
+            licence["md_filename"] = os.path.join(
+                storage_settings.catalogue_bucket,
+                "licences",
+                licence["licence_uid"],
+                "test_storage_path.md",
+            )
+            session.add(database.Licence(**licence))
+        session.commit()
+        # all_licences = session.scalars(sa.select(database.Licence)).all()
+
+    input_layout_path = os.path.join(TESTDATA_PATH, "layout1.json")
+    with open(input_layout_path) as fp:
+        input_layout_data = json.load(fp)
+    out_layout_data = layout_manager.transform_licences_blocks2(
+        session, input_layout_data, storage_settings
+    )
+    expected_layout_path = os.path.join(TESTDATA_PATH, "layout2.json")
+    # with open(expected_layout_path, "w") as fp:
+    #     json.dump(out_layout_data, fp, indent=2)
+    with open(expected_layout_path) as fp:
+        expected_layout_data = json.load(fp)
+    assert out_layout_data == expected_layout_data
+    session.close()
