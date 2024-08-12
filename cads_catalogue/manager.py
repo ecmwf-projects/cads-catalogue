@@ -689,6 +689,8 @@ def update_catalogue_resources(
         involved_resource_uids.append(resource_uid)
         try:
             with session.begin_nested():
+                # NOTE: here the change of dataset's override is not considered because
+                # any change of override file however imposes force mode
                 to_update, sources_hash = is_resource_to_update(
                     session, folders_to_consider_for_hash
                 )
