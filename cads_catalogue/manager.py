@@ -372,6 +372,8 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     dict: dictionary of metadata extracted
     """
     ret_value: dict[str, Any] = dict()
+
+    # base extraction and validation
     if not override_path:
         return ret_value
     if not os.path.exists(override_path):
@@ -387,23 +389,45 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     if data is None:
         logger.warning(f"override file {override_path} is empty")
         return ret_value
+    if not isinstance(data, dict):
+        logger.error(f"override file {override_path} has a wrong format and cannot be parsed")
+        return ret_value
+
+    # normalization
+    supported_keys_str = (
+        "abstract", "begin_date", "contactemail", "disabled_reason", "doi", "ds_contactemail",
+        "ds_responsible_organisation", "ds_responsible_organisation_role", "file_format",
+        "format_version", "high_priority_terms", "lineage", "portal", "publication_date",
+        "responsible_organisation", "responsible_organisation_role", "responsible_organisation_website",
+        "title", "topic", "unit_measure", "use_limitation",
+
+    )
+    supported_keys_bool = (
+        "api_enforce_constraints", "qa_flag", "hidden",
+    )
+    # integers = ("popularity",)
+    # floats = ("representative_fraction",)
+    # jsons = ("description", "geo_extent",) DO NOT WANT
+    #  arrays = ("qos_tags", "related_resources_keywords",) DO NOT WANT
+    # to_be_managed_apart = ("end_date", "keywords", "licence_uids", "update_date", "type")
     for dataset_uid in data:
         ret_value[dataset_uid] = dict()
         dataset_md = data[dataset_uid]
         if not dataset_md:
             continue
         for key, value in dataset_md.items():
-            if key in ("qa_flag", "disabled_reason", "portal"):
-                ret_value[dataset_uid][key] = value
-            elif key == "hidden":
+            if key in supported_keys_bool:
                 if isinstance(value, bool):
                     ret_value[dataset_uid][key] = value  # type: ignore
                 else:
                     ret_value[dataset_uid][key]: bool = utils.str2bool(value)  # type: ignore
+            elif key in supported_keys_str:
+                ret_value[dataset_uid][key] = value
             else:
                 logger.warning(
                     f"unknown key '{key}' found in override file for {dataset_uid}. It will be ignored"
                 )
+                continue
     return ret_value
 
 
