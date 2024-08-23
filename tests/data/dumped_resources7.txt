@@ -1486,7 +1486,7 @@
     {
         "resource_id": 1,
         "resource_uid": "reanalysis-era5-land",
-        "popularity": 500,
+        "popularity": 200,
         "api_enforce_constraints": false,
         "constraints": "an url",
         "form": "an url",
@@ -1523,7 +1523,7 @@
         "high_priority_terms": "ERA5 reanalysis temperature",
         "fts": "'era5':1 'reanalysi':2 'temperatur':3",
         "lineage": "Copernicus Atmospheric Monitoring Service",
-        "representative_fraction": 0.25,
+        "representative_fraction": 0.5,
         "responsible_organisation": "Org2",
         "responsible_organisation_role": "pointOfContact2",
         "responsible_organisation_website": "http://a/website.com",

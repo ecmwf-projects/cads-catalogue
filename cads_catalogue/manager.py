@@ -268,7 +268,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     -------
     dict: dictionary of metadata collected
     """
-    metadata = dict()
+    metadata: dict[str, Any] = dict()
     metadata_file_path = os.path.join(folder_path, "metadata.json")
     if not os.path.isfile(metadata_file_path):
         # some fields are required
@@ -297,7 +297,9 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         "ds_responsible_organisation_role"
     )
     end_date = data.get("end_date")
-    if end_date != "now":
+    if end_date == "now":
+        metadata["end_date"] = None
+    else:
         metadata["end_date"] = end_date
     metadata["file_format"] = data.get("file_format")
     metadata["format_version"] = data.get("format_version")
@@ -423,26 +425,28 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
         "qa_flag",
         "hidden",
     )
-    # integers = ("popularity",)
-    # floats = ("representative_fraction",)
-    # jsons = ("description", "geo_extent",) DO NOT WANT
-    #  arrays = ("qos_tags", "related_resources_keywords",) DO NOT WANT
-    # to_be_managed_apart = ("end_date", "keywords", "licence_uids", "update_date", "type", "file_format",)
+    supported_keys_int = ("popularity",)
+    supported_keys_floats = ("representative_fraction",)
     for dataset_uid in data:
         ret_value[dataset_uid] = dict()
         dataset_md = data[dataset_uid]
         if not dataset_md:
             continue
         for key, value in dataset_md.items():
+            if value == "null":
+                ret_value[dataset_uid][key] = None
+                continue
             if key in supported_keys_bool:
                 if isinstance(value, bool):
                     ret_value[dataset_uid][key] = value  # type: ignore
                 else:
                     ret_value[dataset_uid][key]: bool = utils.str2bool(value)  # type: ignore
             elif key in supported_keys_str:
-                if value == "null":
-                    value = None
                 ret_value[dataset_uid][key] = value
+            elif key in supported_keys_int:
+                ret_value[dataset_uid][key] = int(value)
+            elif key in supported_keys_floats:
+                ret_value[dataset_uid][key] = float(value)
             else:
                 logger.warning(
                     f"unknown key '{key}' found in override file for {dataset_uid}. It will be ignored"
