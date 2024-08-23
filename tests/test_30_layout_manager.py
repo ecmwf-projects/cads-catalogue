@@ -52,14 +52,14 @@ def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
         all_licences = session.scalars(sa.select(database.Licence)).all()
     # create a test layout.json
     layout_path = os.path.join(str(tmpdir), "layout.json")
-    block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence"}
+    block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence_widget"}
     block2 = {
         "type": "link",
         "id": "test-link-id",
         "title": "a link",
         "href": "http://a-link.html",
     }
-    block3 = {"licence-id": all_licences[1].licence_uid, "type": "licence"}
+    block3 = {"licence-id": all_licences[1].licence_uid, "type": "licence_widget"}
     sections = [
         {"id": "overview", "blocks": [block1, block2, block3]},
         {"id": "overview2", "blocks": [block2, block3]},
@@ -105,14 +105,14 @@ def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
     }
 
     # build a nested version
-    block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence"}
+    block1 = {"licence-id": all_licences[0].licence_uid, "type": "licence_widget"}
     block2 = {
         "type": "link",
         "id": "test-link-id",
         "title": "a link",
         "href": "http://a-link.html",
     }
-    block3 = {"licence-id": all_licences[1].licence_uid, "type": "licence"}
+    block3 = {"licence-id": all_licences[1].licence_uid, "type": "licence_widget"}
     section1 = {"id": "overview", "blocks": [block1, block2, block3]}
     section2 = {"id": "overview2", "blocks": [block2, block3]}
     section3 = {"id": "section1", "type": "section", "blocks": [block1, block3]}
