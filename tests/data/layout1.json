@@ -127,7 +127,7 @@
               "caption": "Variables"
             },
             {
-              "type": "licence_block",
+              "type": "licence_widget",
               "id": "licences_section",
               "title": "a title",
               "details": {
@@ -155,7 +155,7 @@
             {
               "title": "A title to not override",
               "id": "licence",
-              "type": "licence_block",
+              "type": "licence_widget",
               "details": {
                 "licences": [
                   {
@@ -224,7 +224,7 @@
           "type": "section",
           "blocks": [
             {
-              "type": "licence_widget",
+              "type": "licence_block",
               "licence-id": "licence-to-use-copernicus-products",
               "id": "licence-to-use-copernicus-products"
             }
