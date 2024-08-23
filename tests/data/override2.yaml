@@ -4,6 +4,25 @@ reanalysis-era5-land:
   hidden: True
   disabled_reason: A reason
   portal: c3s2
+  abstract: an abstract
+  begin_date: 1960-11-02
+  contactemail: an@email
+  doi: 20.24381/cds.22161bac
+  ds_contactemail: https://support.ecmwf.com
+  ds_responsible_organisation: ORG1
+  ds_responsible_organisation_role: null
+  format_version: null
+  high_priority_terms: ERA5 reanalysis temperature
+  lineage: Copernicus Atmospheric Monitoring Service
+  publication_date: 2022-06-01
+  responsible_organisation: Org2
+  responsible_organisation_role: pointOfContact2
+  responsible_organisation_website: http://a/website.com
+  title: a title
+  topic: a topic
+  unit_measure: degree
+  use_limitation: Content accessible through the CDS
+  api_enforce_constraints: False
 reanalysis-era5-pressure-levels:
 reanalysis-era5-single-levels:
   hidden: False

@@ -382,7 +382,7 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     logger.warning(f"detected override file {override_path}")
     with open(override_path) as fp:
         try:
-            data = yaml.safe_load(fp)
+            data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
         except Exception:  # noqa
             logger.exception(f"override file {override_path} is not a valid YAML")
             return ret_value
@@ -390,26 +390,44 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
         logger.warning(f"override file {override_path} is empty")
         return ret_value
     if not isinstance(data, dict):
-        logger.error(f"override file {override_path} has a wrong format and cannot be parsed")
+        logger.error(
+            f"override file {override_path} has a wrong format and cannot be parsed"
+        )
         return ret_value
 
     # normalization
     supported_keys_str = (
-        "abstract", "begin_date", "contactemail", "disabled_reason", "doi", "ds_contactemail",
-        "ds_responsible_organisation", "ds_responsible_organisation_role", "file_format",
-        "format_version", "high_priority_terms", "lineage", "portal", "publication_date",
-        "responsible_organisation", "responsible_organisation_role", "responsible_organisation_website",
-        "title", "topic", "unit_measure", "use_limitation",
-
+        "abstract",
+        "begin_date",
+        "contactemail",
+        "disabled_reason",
+        "doi",
+        "ds_contactemail",
+        "ds_responsible_organisation",
+        "ds_responsible_organisation_role",
+        "format_version",
+        "high_priority_terms",
+        "lineage",
+        "portal",
+        "publication_date",
+        "responsible_organisation",
+        "responsible_organisation_role",
+        "responsible_organisation_website",
+        "title",
+        "topic",
+        "unit_measure",
+        "use_limitation",
     )
     supported_keys_bool = (
-        "api_enforce_constraints", "qa_flag", "hidden",
+        "api_enforce_constraints",
+        "qa_flag",
+        "hidden",
     )
     # integers = ("popularity",)
     # floats = ("representative_fraction",)
     # jsons = ("description", "geo_extent",) DO NOT WANT
     #  arrays = ("qos_tags", "related_resources_keywords",) DO NOT WANT
-    # to_be_managed_apart = ("end_date", "keywords", "licence_uids", "update_date", "type")
+    # to_be_managed_apart = ("end_date", "keywords", "licence_uids", "update_date", "type", "file_format",)
     for dataset_uid in data:
         ret_value[dataset_uid] = dict()
         dataset_md = data[dataset_uid]
@@ -422,6 +440,8 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
                 else:
                     ret_value[dataset_uid][key]: bool = utils.str2bool(value)  # type: ignore
             elif key in supported_keys_str:
+                if value == "null":
+                    value = None
                 ret_value[dataset_uid][key] = value
             else:
                 logger.warning(
