@@ -142,7 +142,7 @@ class Message(BaseModel):
     message_id = sa.Column(sa.Integer, primary_key=True)
     message_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     date = sa.Column(sa.DateTime, nullable=False)
-    portal = sa.Column(sa.String, index=True)
+    site = sa.Column(sa.String, index=True)
     summary = sa.Column(sa.String, nullable=True)
     url = sa.Column(sa.String)
     severity = sa.Column(

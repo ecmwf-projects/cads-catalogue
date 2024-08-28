@@ -24,8 +24,8 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": True,
-            "message_uid": "portals/c3s/2023/Jan/2021-01-example-of-info-active.md",
-            "portal": "c3s",
+            "message_uid": "sites/cds/2023/Jan/2021-01-example-of-info-active.md",
+            "site": "cds",
             "severity": "info",
             "summary": "a summary of the message",
         },
@@ -78,8 +78,8 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": False,
-            "message_uid": "portals/c3s/2023/Jan/2023-01-example-of-archived-critical.md",
-            "portal": "c3s",
+            "message_uid": "sites/cds/2023/Jan/2023-01-example-of-archived-critical.md",
+            "site": "cds",
             "severity": "critical",
             "summary": "A **brief description** of the message",
         },
@@ -91,8 +91,8 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": True,
-            "message_uid": "portals/c3s/2023/Jan/2023-01-example-warning-active.md",
-            "portal": "c3s",
+            "message_uid": "sites/cds/2023/Jan/2023-01-example-warning-active.md",
+            "site": "cds",
             "severity": "warning",
             "summary": "A **brief description** of the message",
         },
@@ -105,8 +105,8 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": True,
-            "message_uid": "portals/ads/2023/02/2021-02-example-of-info-active.md",
-            "portal": "ads",
+            "message_uid": "sites/ads/2023/02/2021-02-example-of-info-active.md",
+            "site": "ads",
             "severity": "info",
             "summary": "a summary of the message",
         },
@@ -118,8 +118,8 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": False,
-            "message_uid": "portals/ads/2023/02/2023-02-example-of-archived-critical.md",
-            "portal": "ads",
+            "message_uid": "sites/ads/2023/02/2023-02-example-of-archived-critical.md",
+            "site": "ads",
             "severity": "critical",
             "summary": "A **brief description** of the message",
         },
@@ -131,8 +131,8 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": True,
-            "message_uid": "portals/ads/2023/02/2023-02-example-warning-active.md",
-            "portal": "ads",
+            "message_uid": "sites/ads/2023/02/2023-02-example-warning-active.md",
+            "site": "ads",
             "severity": "warning",
             "summary": "A **brief description** of the message",
         },
@@ -163,8 +163,8 @@ def test_message_sync(session_obj: sa.orm.sessionmaker) -> None:
         "entries": [],
         "is_global": True,
         "live": False,
-        "message_uid": "portals/c3s/2023/Jan/2023-01-example-of-archived-critical.md",
-        "portal": "portal2",
+        "message_uid": "sites/cds/2023/Jan/2023-01-example-of-archived-critical.md",
+        "site": "site2",
         "severity": "success",
         "summary": "A **brief description** of the message",
     }
@@ -228,7 +228,7 @@ def test_message_sync(session_obj: sa.orm.sessionmaker) -> None:
             assert getattr(db_message2, key) == value
         assert sorted([r.resource_id for r in db_message2.resources]) == [2, 3, 4]  # type: ignore
 
-        # adding portal message
+        # adding site message
         db_message3 = messages.message_sync(session, prt_message)
         session.commit()
         for key, value in prt_message.items():

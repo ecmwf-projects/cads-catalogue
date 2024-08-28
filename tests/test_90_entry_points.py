@@ -404,8 +404,8 @@ def test_update_catalogue(
                 "entries": [],
                 "is_global": True,
                 "live": True,
-                "message_uid": "portals/c3s/2023/Jan/2021-01-example-of-info-active.md",
-                "portal": "c3s",
+                "message_uid": "sites/cds/2023/Jan/2021-01-example-of-info-active.md",
+                "site": "cds",
                 "severity": "info",
                 "summary": "a summary of the message",
             },
@@ -464,8 +464,8 @@ def test_update_catalogue(
                 "entries": [],
                 "is_global": True,
                 "live": False,
-                "message_uid": "portals/c3s/2023/Jan/2023-01-example-of-archived-critical.md",
-                "portal": "c3s",
+                "message_uid": "sites/cds/2023/Jan/2023-01-example-of-archived-critical.md",
+                "site": "cds",
                 "severity": "critical",
                 "summary": "A **brief description** of the message",
             },
@@ -477,8 +477,8 @@ def test_update_catalogue(
                 "entries": [],
                 "is_global": True,
                 "live": True,
-                "message_uid": "portals/c3s/2023/Jan/2023-01-example-warning-active.md",
-                "portal": "c3s",
+                "message_uid": "sites/cds/2023/Jan/2023-01-example-warning-active.md",
+                "site": "cds",
                 "severity": "warning",
                 "summary": "A **brief description** of the message",
             },
@@ -491,8 +491,8 @@ def test_update_catalogue(
                 "entries": [],
                 "is_global": True,
                 "live": True,
-                "message_uid": "portals/ads/2023/02/2021-02-example-of-info-active.md",
-                "portal": "ads",
+                "message_uid": "sites/ads/2023/02/2021-02-example-of-info-active.md",
+                "site": "ads",
                 "severity": "info",
                 "summary": "a summary of the message",
             },
@@ -504,8 +504,8 @@ def test_update_catalogue(
                 "entries": [],
                 "is_global": True,
                 "live": False,
-                "message_uid": "portals/ads/2023/02/2023-02-example-of-archived-critical.md",
-                "portal": "ads",
+                "message_uid": "sites/ads/2023/02/2023-02-example-of-archived-critical.md",
+                "site": "ads",
                 "severity": "critical",
                 "summary": "A **brief description** of the message",
             },
@@ -517,8 +517,8 @@ def test_update_catalogue(
                 "entries": [],
                 "is_global": True,
                 "live": True,
-                "message_uid": "portals/ads/2023/02/2023-02-example-warning-active.md",
-                "portal": "ads",
+                "message_uid": "sites/ads/2023/02/2023-02-example-warning-active.md",
+                "site": "ads",
                 "severity": "warning",
                 "summary": "A **brief description** of the message",
             },
@@ -719,7 +719,7 @@ def test_update_catalogue(
         session.execute(
             sa.text(
                 "update messages set live=false "
-                "where message_uid='portals/c3s/2023/Jan/2021-01-example-of-info-active.md'"
+                "where message_uid='sites/c3s/2023/Jan/2021-01-example-of-info-active.md'"
             )
         )
         session.commit()
@@ -778,7 +778,7 @@ def test_update_catalogue(
         assert session.execute(
             sa.text(
                 "select live from messages "
-                "where message_uid='portals/c3s/2023/Jan/2021-01-example-of-info-active.md'"
+                "where message_uid='sites/cds/2023/Jan/2021-01-example-of-info-active.md'"
             )
         ).all() == [(True,)]
 

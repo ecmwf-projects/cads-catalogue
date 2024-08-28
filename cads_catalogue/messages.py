@@ -46,7 +46,7 @@ def message_sync(
     """
     message = msg.copy()
     message_uid = message["message_uid"]
-    # NOTE: portal messages have always entries = []
+    # NOTE: site messages have always entries = []
     entries = message.pop("entries", [])
 
     # translate entries in resource_objs
@@ -165,31 +165,31 @@ def load_contents_messages(
     return loaded_messages
 
 
-def load_portal_messages(
-    root_msg_folder: str | pathlib.Path, portal_folder: str | pathlib.Path
+def load_site_messages(
+    root_msg_folder: str | pathlib.Path, site_folder: str | pathlib.Path
 ) -> List[dict[str, Any]]:
     """
-    Look for messages specific for a portal (i.e. 'global' messages).
+    Look for messages specific for a site (i.e. 'global' messages).
 
     Parameters
     ----------
     root_msg_folder: base root path (i.e. cads-messages root folder) (used to generate msg uids)
-    portal_folder: root path where to look for portal messages
+    site_folder: root path where to look for site messages
 
     Returns
     -------
     List of found messages parsed.
     """
     loaded_messages: List[dict[str, Any]] = []
-    portal = os.path.basename(portal_folder)
-    for current_root, dirs, files in os.walk(portal_folder):
+    site = os.path.basename(site_folder)
+    for current_root, dirs, files in os.walk(site_folder):
         for current_file in files:
             file_path = os.path.join(current_root, current_file)
             if os.path.splitext(current_file)[1].lower() == ".md":
                 msg_uid = os.path.relpath(file_path, root_msg_folder)
                 try:
                     msg_record = md2message_record(
-                        file_path, msg_uid, is_global=True, portal=portal
+                        file_path, msg_uid, is_global=True, site=site
                     )
                 except:  # noqa
                     logger.exception("error loading message %r" % file_path)
@@ -220,16 +220,16 @@ def load_messages(root_msg_folder: str | pathlib.Path) -> List[dict[str, Any]]:
     else:
         logger.warning("not found folder %r" % contents_folder)
 
-    # load 'portals' folder
-    portals_folder = os.path.join(root_msg_folder, "portals")
-    if os.path.isdir(portals_folder):
-        for portal in os.listdir(portals_folder):
-            portal_folder = os.path.join(portals_folder, portal)
-            if not os.path.isdir(portal_folder):
+    # load 'sites' folder
+    sites_folder = os.path.join(root_msg_folder, "sites")
+    if os.path.isdir(sites_folder):
+        for site in os.listdir(sites_folder):
+            site_folder = os.path.join(sites_folder, site)
+            if not os.path.isdir(site_folder):
                 continue
-            loaded_messages += load_portal_messages(root_msg_folder, portal_folder)
+            loaded_messages += load_site_messages(root_msg_folder, site_folder)
     else:
-        logger.warning("not found folder %r" % portals_folder)
+        logger.warning("not found folder %r" % sites_folder)
 
     return loaded_messages
 
