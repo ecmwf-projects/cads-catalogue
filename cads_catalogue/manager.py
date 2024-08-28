@@ -268,7 +268,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     -------
     dict: dictionary of metadata collected
     """
-    metadata = dict()
+    metadata: dict[str, Any] = dict()
     metadata_file_path = os.path.join(folder_path, "metadata.json")
     if not os.path.isfile(metadata_file_path):
         # some fields are required
@@ -297,7 +297,9 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         "ds_responsible_organisation_role"
     )
     end_date = data.get("end_date")
-    if end_date != "now":
+    if end_date == "now":
+        metadata["end_date"] = None
+    else:
         metadata["end_date"] = end_date
     metadata["file_format"] = data.get("file_format")
     metadata["format_version"] = data.get("format_version")
@@ -372,6 +374,8 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     dict: dictionary of metadata extracted
     """
     ret_value: dict[str, Any] = dict()
+
+    # base extraction and validation
     if not override_path:
         return ret_value
     if not os.path.exists(override_path):
@@ -380,30 +384,74 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
     logger.warning(f"detected override file {override_path}")
     with open(override_path) as fp:
         try:
-            data = yaml.safe_load(fp)
+            data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
         except Exception:  # noqa
             logger.exception(f"override file {override_path} is not a valid YAML")
             return ret_value
     if data is None:
         logger.warning(f"override file {override_path} is empty")
         return ret_value
+    if not isinstance(data, dict):
+        logger.error(
+            f"override file {override_path} has a wrong format and cannot be parsed"
+        )
+        return ret_value
+
+    # normalization
+    supported_keys_str = (
+        "abstract",
+        "begin_date",
+        "contactemail",
+        "disabled_reason",
+        "doi",
+        "ds_contactemail",
+        "ds_responsible_organisation",
+        "ds_responsible_organisation_role",
+        "format_version",
+        "high_priority_terms",
+        "lineage",
+        "portal",
+        "publication_date",
+        "responsible_organisation",
+        "responsible_organisation_role",
+        "responsible_organisation_website",
+        "title",
+        "topic",
+        "unit_measure",
+        "use_limitation",
+    )
+    supported_keys_bool = (
+        "api_enforce_constraints",
+        "qa_flag",
+        "hidden",
+    )
+    supported_keys_int = ("popularity",)
+    supported_keys_floats = ("representative_fraction",)
     for dataset_uid in data:
         ret_value[dataset_uid] = dict()
         dataset_md = data[dataset_uid]
         if not dataset_md:
             continue
         for key, value in dataset_md.items():
-            if key in ("qa_flag", "disabled_reason", "portal"):
-                ret_value[dataset_uid][key] = value
-            elif key == "hidden":
+            if value == "null":
+                ret_value[dataset_uid][key] = None
+                continue
+            if key in supported_keys_bool:
                 if isinstance(value, bool):
                     ret_value[dataset_uid][key] = value  # type: ignore
                 else:
                     ret_value[dataset_uid][key]: bool = utils.str2bool(value)  # type: ignore
+            elif key in supported_keys_str:
+                ret_value[dataset_uid][key] = value
+            elif key in supported_keys_int:
+                ret_value[dataset_uid][key] = int(value)
+            elif key in supported_keys_floats:
+                ret_value[dataset_uid][key] = float(value)
             else:
                 logger.warning(
                     f"unknown key '{key}' found in override file for {dataset_uid}. It will be ignored"
                 )
+                continue
     return ret_value
 
 
