@@ -207,7 +207,7 @@ def manage_licence_section(
     blocks = new_section.get("blocks", [])
     replacements = 0
     for i, block in enumerate(copy.deepcopy(blocks)):
-        if block.get("type") == "licence_block":
+        if block.get("type") == "licence":
             licence_uid = block["licence-id"]
             try:
                 licence = [
@@ -296,7 +296,7 @@ def build_licence_block2(
         }
         licence_blocks.append(licence_block)
     new_block = {
-        "type": "licence_widget",
+        "type": "licences_acceptance",
         "id": "licences_section",
         "title": "Licence",
         "details": {"licences": licence_blocks},
@@ -322,7 +322,7 @@ def manage_licence_section2(
     blocks = new_section.get("blocks", [])
     for i, block in enumerate(copy.deepcopy(blocks)):
         if (
-            block.get("type") == "licence_widget"
+            block.get("type") == "licences_acceptance"
             and block.get("id") == "licences_section"
             and "details" in block
         ):
