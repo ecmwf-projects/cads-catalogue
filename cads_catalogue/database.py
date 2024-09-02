@@ -74,6 +74,7 @@ class Content(BaseModel):
     __tablename__ = "contents"
 
     content_id = sa.Column(sa.Integer, primary_key=True)
+    content_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
     creation_date = sa.Column(sa.Date, nullable=False)
     data = sa.Column(dialect_postgresql.JSONB)
     description = sa.Column(sa.String, nullable=False)
@@ -85,7 +86,7 @@ class Content(BaseModel):
     title = sa.Column(sa.String, nullable=False)
     type = sa.Column(sa.String, nullable=False)
 
-    keywords: sa.orm.Mapped[List["Keyword"]] = sa.orm.relationship(
+    keywords: sa.orm.Mapped[List["ContentKeyword"]] = sa.orm.relationship(
         "ContentKeyword", secondary="contents_keywords_m2m", back_populates="contents"
     )
 

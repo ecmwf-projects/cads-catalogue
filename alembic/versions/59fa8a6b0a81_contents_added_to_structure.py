@@ -22,6 +22,7 @@ def upgrade() -> None:
     alembic.op.create_table(
         "contents",
         sa.Column("content_id", sa.Integer, primary_key=True),
+        sa.Column("content_uid", sa.String, index=True, unique=True, nullable=False),
         sa.Column("creation_date", sa.Date, nullable=False),
         sa.Column("data", dialect_postgresql.JSONB),
         sa.Column("description", sa.String, nullable=False),
