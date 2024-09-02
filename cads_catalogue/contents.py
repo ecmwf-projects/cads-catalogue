@@ -68,9 +68,7 @@ def content_sync(
 
     # upsert of the message
     db_content = session.scalars(
-        sa.select(database.Content)
-        .filter_by(content_uid=content_uid)
-        .limit(1)
+        sa.select(database.Content).filter_by(content_uid=content_uid).limit(1)
     ).first()
     if not db_content:
         db_content = database.Content(**content)
@@ -171,9 +169,13 @@ def load_contents(root_contents_folder: str | pathlib.Path) -> List[dict[str, An
                 logger.warning("unknown file %r found" % content_type_folder)
                 continue
             try:
-                content_md = load_content_folder(content_type_folder, site, content_type)
-            except:
-                logger.exception("failed parsing content in %s, error follows" % content_type_folder)
+                content_md = load_content_folder(
+                    content_type_folder, site, content_type
+                )
+            except:  # noqa
+                logger.exception(
+                    "failed parsing content in %s, error follows" % content_type_folder
+                )
                 continue
             loaded_contents.append(content_md)
 
@@ -201,7 +203,9 @@ def update_catalogue_contents(
     list: list of content uids involved
     """
     contents = load_contents(contents_folder_path)
-    logger.info("loaded %s contents from folder %s" % (len(contents), contents_folder_path))
+    logger.info(
+        "loaded %s contents from folder %s" % (len(contents), contents_folder_path)
+    )
     involved_content_ids = []
     for content in contents:
         content_uid = content["content_uid"]
@@ -211,7 +215,9 @@ def update_catalogue_contents(
                 content_sync(session, content, storage_settings)
             logger.info("content '%s' db sync successful" % content_uid)
         except Exception:  # noqa
-            logger.exception("db sync for content '%s' failed, error follows" % content_uid)
+            logger.exception(
+                "db sync for content '%s' failed, error follows" % content_uid
+            )
 
     if not remove_orphans:
         return involved_content_ids
