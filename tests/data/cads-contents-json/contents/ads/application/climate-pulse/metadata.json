@@ -1,7 +1,8 @@
 {
   "link": "https://pulse.climate.copernicus.eu/",
-  "creation_date": "2023-03-18",
-  "last_update": "2024-07-19",
+  "published": "2023-03-18T11:03:31Z",
+  "image": "./overview.png",
+  "updated": "2024-07-19T10:02:31Z",
   "keywords": [
     "Product type: Application",
     "Spatial coverage: Global",

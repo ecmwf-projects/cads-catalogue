@@ -1,7 +1,7 @@
 {
   "link": "https://pulse.climate.copernicus.eu/",
-  "creation_date": "2023-03-18",
-  "last_update": "2024-07-19",
+  "published": "2023-03-18T11:02:31Z",
+  "updated": "2024-07-19T11:01:31Z",
   "keywords": [
     "Product type: Application",
     "Spatial coverage: Global",
@@ -11,6 +11,8 @@
     "Variable domain: Land (biosphere)",
     "Provider: Copernicus C3S"
   ],
+  "image": "./overview.png",
+  "layout": "layout.json",
   "title": "Climate Pulse",
   "description": "Climate Pulse visualises near-real-time updates of global average air- and sea-surface temperatures from ECMWF's flagship ERA5 reanalysis"
 }

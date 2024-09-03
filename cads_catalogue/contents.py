@@ -26,10 +26,7 @@ from cads_catalogue import config, database, object_storage
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
 
-OBJECT_STORAGE_UPLOAD_FILES = {
-    "overview.png": "image",
-    # "layout.json": "layout",
-}
+OBJECT_STORAGE_UPLOAD_FIELDS = ["layout", "image"]
 
 
 def content_sync(
@@ -54,11 +51,11 @@ def content_sync(
     keywords = content.pop("keywords", [])
 
     subpath = os.path.join("contents", content["content_uid"])
-    for _, db_field in OBJECT_STORAGE_UPLOAD_FILES.items():
-        file_path = content.get(db_field)
+    for field in OBJECT_STORAGE_UPLOAD_FIELDS:
+        file_path = content.get(field)
         if not file_path:
             continue
-        content[db_field] = object_storage.store_file(
+        content[field] = object_storage.store_file(
             file_path,
             storage_settings.object_storage_url,
             bucket_name=storage_settings.catalogue_bucket,
@@ -117,12 +114,6 @@ def load_content_folder(
     dictionary of information parsed.
     """
     folder_name = os.path.basename(content_folder)
-    # base validation
-    all_files = [f for f in os.listdir(content_type) if os.path.isfile(f)]
-    required_files = ["metadata.json", "overview.png"]  # TODO: layout.json
-    for required_file in required_files:
-        if required_file not in all_files:
-            raise ValueError(f"file '{required_file}' missing in {content_folder}")
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
         data = json.load(fp)
@@ -130,61 +121,74 @@ def load_content_folder(
         "site": site,
         "type": content_type,
         "content_uid": f"{site}-{content_type}-{folder_name}",
-        "link": data["link"],
+        "link": data.get("link"),
         "title": data["title"],
         "description": data["description"],
-        "creation_date": data["creation_date"],
-        "last_update": data["last_update"],
+        "creation_date": data["published"],
+        "last_update": data["updated"],
         "keywords": data.get("keywords", []),
     }
-    for filename in all_files:
-        file_path = os.path.join(content_folder, filename)
-        if filename in OBJECT_STORAGE_UPLOAD_FILES and os.path.isfile(file_path):
-            db_field_name = OBJECT_STORAGE_UPLOAD_FILES[filename]
-            metadata[db_field_name] = os.path.abspath(file_path)
+    for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:
+        metadata[ancillar_file_field] = None
+        rel_path = data.get(ancillar_file_field)
+        if rel_path:
+            ancillar_file_path = os.path.abspath(os.path.join(content_folder, rel_path))
+            if os.path.isfile(ancillar_file_path):
+                metadata[ancillar_file_field] = os.path.abspath(
+                    os.path.join(content_folder, rel_path)
+                )
+            else:
+                raise ValueError(f"file {ancillar_file_path} not found!")
     return metadata
 
 
-def load_contents(root_contents_folder: str | pathlib.Path) -> List[dict[str, Any]]:
+def load_contents(contents_package_path: str | pathlib.Path) -> List[dict[str, Any]]:
     """
     Load all contents from a well-known filesystem root.
 
     Parameters
     ----------
-    root_contents_folder: root path where to look for contents (i.e. cads-contents-json root folder)
+    contents_package_path: root path where to look for contents (i.e. cads-contents-json root folder)
 
     Returns
     -------
     List of found contents parsed.
     """
     loaded_contents = []
-    for site in os.listdir(root_contents_folder):
-        site_folder = os.path.join(root_contents_folder, site)
+    contents_root_folder = os.path.join(contents_package_path, "contents")
+    if not os.path.isdir(contents_root_folder):
+        logger.warning("not found folder {contents_root_folder}!")
+        return []
+    for site in sorted(os.listdir(contents_root_folder)):
+        site_folder = os.path.join(contents_root_folder, site)
         if not os.path.isdir(site_folder):
             logger.warning("unknown file %r found" % site_folder)
             continue
-        for content_type in os.listdir(site_folder):
+        for content_type in sorted(os.listdir(site_folder)):
             content_type_folder = os.path.join(site_folder, content_type)
             if not os.path.isdir(content_type_folder):
                 logger.warning("unknown file %r found" % content_type_folder)
                 continue
-            try:
-                content_md = load_content_folder(
-                    content_type_folder, site, content_type
-                )
-            except:  # noqa
-                logger.exception(
-                    "failed parsing content in %s, error follows" % content_type_folder
-                )
-                continue
-            loaded_contents.append(content_md)
-
+            for content_folder_name in sorted(os.listdir(content_type_folder)):
+                content_folder = os.path.join(content_type_folder, content_folder_name)
+                if not os.path.isdir(content_folder):
+                    logger.warning("unknown file %r found" % content_folder)
+                    continue
+                try:
+                    content_md = load_content_folder(content_folder, site, content_type)
+                except:  # noqa
+                    logger.exception(
+                        "failed parsing content in %s, error follows"
+                        % content_type_folder
+                    )
+                    continue
+                loaded_contents.append(content_md)
     return loaded_contents
 
 
 def update_catalogue_contents(
     session: sa.orm.session.Session,
-    contents_folder_path: str | pathlib.Path,
+    contents_package_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     remove_orphans: bool = True,
 ):
@@ -194,7 +198,7 @@ def update_catalogue_contents(
     Parameters
     ----------
     session: opened SQLAlchemy session
-    contents_folder_path: path to the root folder containing metadata files for system contents
+    contents_package_path: root folder path of the contents package (i.e. cads-contents-json root folder)
     storage_settings: object with settings to access the object storage
     remove_orphans: if True, remove from the database other contents not involved (default True)
 
@@ -202,9 +206,9 @@ def update_catalogue_contents(
     -------
     list: list of content uids involved
     """
-    contents = load_contents(contents_folder_path)
+    contents = load_contents(contents_package_path)
     logger.info(
-        "loaded %s contents from folder %s" % (len(contents), contents_folder_path)
+        "loaded %s contents from folder %s" % (len(contents), contents_package_path)
     )
     involved_content_ids = []
     for content in contents:

@@ -1,7 +1,7 @@
 {
   "link": "https://atlas.climate.copernicus.eu/atlas",
-  "creation_date": "2023-02-17",
-  "last_update": "2024-08-17",
+  "published": "2023-02-17T11:02:31Z",
+  "updated": "2024-08-17T11:02:31Z",
   "keywords": [
     "Product type: Application",
     "Spatial coverage: Global",
@@ -10,6 +10,7 @@
     "Variable domain: Ocean (biology)",
     "Provider: Copernicus C3S"
   ],
+  "image": "./image.png",
   "title": "Copernicus Interactive Climate Atlas",
   "description": "The Copernicus Interactive Climate Atlas provides graphical information about recent past trends and future changes (for different scenarios and global warming levels)"
 }
