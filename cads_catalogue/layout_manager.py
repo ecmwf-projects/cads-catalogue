@@ -296,7 +296,7 @@ def build_licence_block2(
         }
         licence_blocks.append(licence_block)
     new_block = {
-        "type": "licences",
+        "type": "licences_acceptance",
         "id": "licences_section",
         "title": "Licence",
         "details": {"licences": licence_blocks},
@@ -322,7 +322,7 @@ def manage_licence_section2(
     blocks = new_section.get("blocks", [])
     for i, block in enumerate(copy.deepcopy(blocks)):
         if (
-            block.get("type") == "licences"
+            block.get("type") == "licences_acceptance"
             and block.get("id") == "licences_section"
             and "details" in block
         ):
@@ -339,6 +339,7 @@ def manage_licence_section2(
                     raise ValueError(f"not found licence {licence_uid}")
                 licence_objs.append(licence_obj)
             new_block = build_licence_block2(licence_objs, doc_storage_url)
+            new_block["title"] = blocks[i].get("title", new_block["title"])
             del blocks[i]
             blocks.insert(i, new_block)
         elif block.get("type") in ("section", "accordion"):

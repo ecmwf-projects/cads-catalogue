@@ -127,9 +127,9 @@
               "caption": "Variables"
             },
             {
-              "type": "licences",
+              "type": "licences_acceptance",
               "id": "licences_section",
-              "title": "Licence",
+              "title": "a title",
               "details": {
                 "licences": [
                   {
@@ -161,9 +161,9 @@
           "id": "d_download",
           "blocks": [
             {
-              "title": "Licence",
+              "title": "A title to not override",
               "id": "licence",
-              "type": "licence",
+              "type": "licences_acceptance",
               "details": {
                 "licences": [
                   {
