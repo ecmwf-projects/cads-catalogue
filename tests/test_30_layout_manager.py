@@ -33,7 +33,7 @@ def create_layout_for_test(path, sections=[], aside={}):
     return base_data
 
 
-def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
+def test_transform_licence_required_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
     my_settings_dict = {
         "object_storage_url": "object/storage/url",
         "storage_admin": "admin1",
@@ -68,7 +68,7 @@ def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
 
     layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
 
-    new_layout_data = layout_manager.transform_licences_blocks(
+    new_layout_data = layout_manager.transform_licence_required_blocks(
         session, layout_data, storage_settings
     )
     assert new_layout_data == {
@@ -78,25 +78,25 @@ def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
                 "sections": [
                     {
                         "id": "overview",
-                        "blocks": layout_manager.build_licence_blocks(
+                        "blocks": layout_manager.build_required_licence_blocks(
                             all_licences[0], storage_settings.document_storage_url
                         )
                         + [block2]
-                        + layout_manager.build_licence_blocks(
+                        + layout_manager.build_required_licence_blocks(
                             all_licences[1], storage_settings.document_storage_url
                         ),
                     },
                     {
                         "id": "overview2",
                         "blocks": [block2]
-                        + layout_manager.build_licence_blocks(
+                        + layout_manager.build_required_licence_blocks(
                             all_licences[1], storage_settings.document_storage_url
                         ),
                     },
                 ]
             },
             "aside": {
-                "blocks": layout_manager.build_licence_blocks(
+                "blocks": layout_manager.build_required_licence_blocks(
                     all_licences[0], storage_settings.document_storage_url
                 )
                 + [block2]
@@ -123,15 +123,15 @@ def test_transform_licences_blocks(tmpdir, session_obj: sa.orm.sessionmaker):
     }
     sections = [section1, section4, section2]
     aside = {"blocks": [block1, block2, section4, block3]}
-    new_block1 = layout_manager.build_licence_blocks(
+    new_block1 = layout_manager.build_required_licence_blocks(
         all_licences[0], storage_settings.document_storage_url
     )
-    new_block3 = layout_manager.build_licence_blocks(
+    new_block3 = layout_manager.build_required_licence_blocks(
         all_licences[1], storage_settings.document_storage_url
     )
     layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
 
-    new_layout_data = layout_manager.transform_licences_blocks(
+    new_layout_data = layout_manager.transform_licence_required_blocks(
         session, layout_data, storage_settings
     )
     expected = {
@@ -872,7 +872,7 @@ def test_has_section_id(tmpdir):
     assert layout_manager.has_section_id(layout_data, "overview4") is False
 
 
-def test_transform_licences_blocks2(session_obj: sa.orm.sessionmaker):
+def test_transform_licence_acceptance_blocks(session_obj: sa.orm.sessionmaker):
     my_settings_dict = {
         "object_storage_url": "https://object/storage/url/",
         "storage_admin": "admin1",
@@ -906,7 +906,7 @@ def test_transform_licences_blocks2(session_obj: sa.orm.sessionmaker):
     input_layout_path = os.path.join(TESTDATA_PATH, "layout1.json")
     with open(input_layout_path) as fp:
         input_layout_data = json.load(fp)
-    out_layout_data = layout_manager.transform_licences_blocks2(
+    out_layout_data = layout_manager.transform_licence_acceptance_blocks(
         session, input_layout_data, storage_settings
     )
     expected_layout_path = os.path.join(TESTDATA_PATH, "layout2.json")

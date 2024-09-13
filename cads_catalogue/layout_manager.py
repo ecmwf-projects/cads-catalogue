@@ -145,11 +145,11 @@ def transform_image_blocks(
     return new_data
 
 
-def build_licence_blocks(
+def build_required_licence_blocks(
     licence: database.Licence, doc_storage_url: str
 ) -> List[dict[str, str]]:
     """
-    Build a list of new licence blocks to be inserted inside the layout data.
+    Build a list of blocks related to required licences to be inserted inside the layout data.
 
     Parameters
     ----------
@@ -189,13 +189,13 @@ def build_licence_blocks(
     return new_blocks
 
 
-def manage_licence_section(
+def manage_required_licence_section(
     all_licences: Sequence[database.Licence],
     section: dict[str, Any],
     doc_storage_url: str,
 ):
     """
-    Look for licence blocks and modify accordingly with urls of object storage files.
+    Look for required licence blocks and modify accordingly with urls of object storage files.
 
     Parameters
     ----------
@@ -215,25 +215,25 @@ def manage_licence_section(
                 ][0]
             except IndexError:
                 raise ValueError(f"not found licence {licence_uid}")
-            new_blocks = build_licence_blocks(licence, doc_storage_url)
+            new_blocks = build_required_licence_blocks(licence, doc_storage_url)
             del blocks[i + 2 * replacements]
             blocks.insert(i + 2 * replacements, new_blocks[0])
             blocks.insert(i + 1 + 2 * replacements, new_blocks[1])
             blocks.insert(i + 2 + 2 * replacements, new_blocks[2])
             replacements += 1
         elif block.get("type") in ("section", "accordion"):
-            blocks[i + 2 * replacements] = manage_licence_section(
+            blocks[i + 2 * replacements] = manage_required_licence_section(
                 all_licences, block, doc_storage_url
             )
     return new_section
 
 
-def transform_licences_blocks(
+def transform_licence_required_blocks(
     session: sa.orm.session.Session,
     layout_data: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ):
-    """Transform layout.json data processing uploads of referenced licences.
+    """Transform layout.json replacing blocks related to required licences.
 
     Parameters
     ----------
@@ -254,11 +254,13 @@ def transform_licences_blocks(
     body_main = body.get("main", {})
     sections = body_main.get("sections", [])
     for i, section in enumerate(copy.deepcopy(sections)):
-        sections[i] = manage_licence_section(all_licences, section, doc_storage_url)
+        sections[i] = manage_required_licence_section(
+            all_licences, section, doc_storage_url
+        )
     # search all the images inside body/aside:
     aside_section = body.get("aside", {})
     if aside_section:
-        new_data["body"]["aside"] = manage_licence_section(
+        new_data["body"]["aside"] = manage_required_licence_section(
             all_licences,
             aside_section,
             doc_storage_url,
@@ -266,11 +268,11 @@ def transform_licences_blocks(
     return new_data
 
 
-def build_licence_block2(
+def build_licence_acceptance_block(
     licence_objs: List[database.Licence], doc_storage_url: str
 ) -> dict[str, Any]:
     """
-    Build a list of new licence blocks to be inserted inside the layout data.
+    Build a new licence acceptance block to be inserted inside the layout data.
 
     Parameters
     ----------
@@ -297,20 +299,18 @@ def build_licence_block2(
         licence_blocks.append(licence_block)
     new_block = {
         "type": "licences_acceptance",
-        "id": "licences_section",
-        "title": "Licence",
         "details": {"licences": licence_blocks},
     }
     return new_block
 
 
-def manage_licence_section2(
+def manage_licence_acceptance_section(
     all_licences: Sequence[database.Licence],
     section: dict[str, Any],
     doc_storage_url: str,
 ):
     """
-    Look for licence blocks and modify accordingly with urls of object storage files.
+    Look for licence acceptance blocks and modify accordingly with urls of object storage files.
 
     Parameters
     ----------
@@ -321,11 +321,7 @@ def manage_licence_section2(
     new_section = copy.deepcopy(section)
     blocks = new_section.get("blocks", [])
     for i, block in enumerate(copy.deepcopy(blocks)):
-        if (
-            block.get("type") == "licences_acceptance"
-            and block.get("id") == "licences_section"
-            and "details" in block
-        ):
+        if block.get("type") == "licences_acceptance" and "details" in block:
             licence_objs = []
             for licence_block in block["details"]["licences"]:
                 licence_uid = licence_block["licence-id"]
@@ -338,21 +334,26 @@ def manage_licence_section2(
                 except IndexError:
                     raise ValueError(f"not found licence {licence_uid}")
                 licence_objs.append(licence_obj)
-            new_block = build_licence_block2(licence_objs, doc_storage_url)
-            new_block["title"] = blocks[i].get("title", new_block["title"])
+            new_block = build_licence_acceptance_block(licence_objs, doc_storage_url)
+            for attr in ("id", "title"):
+                attr_value = block.get(attr)
+                if attr_value:
+                    new_block[attr] = attr_value
             del blocks[i]
             blocks.insert(i, new_block)
         elif block.get("type") in ("section", "accordion"):
-            blocks[i] = manage_licence_section2(all_licences, block, doc_storage_url)
+            blocks[i] = manage_licence_acceptance_section(
+                all_licences, block, doc_storage_url
+            )
     return new_section
 
 
-def transform_licences_blocks2(
+def transform_licence_acceptance_blocks(
     session: sa.orm.session.Session,
     layout_data: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
 ):
-    """Transform layout.json data processing uploads of referenced licences (block_id = "licences_section").
+    """Transform layout.json replacing blocks related to licence acceptance.
 
     Parameters
     ----------
@@ -373,11 +374,13 @@ def transform_licences_blocks2(
     body_main = body.get("main", {})
     sections = body_main.get("sections", [])
     for i, section in enumerate(copy.deepcopy(sections)):
-        sections[i] = manage_licence_section2(all_licences, section, doc_storage_url)
+        sections[i] = manage_licence_acceptance_section(
+            all_licences, section, doc_storage_url
+        )
     # search all the images inside body/aside:
     aside_section = body.get("aside", {})
     if aside_section:
-        new_data["body"]["aside"] = manage_licence_section2(
+        new_data["body"]["aside"] = manage_licence_acceptance_section(
             all_licences,
             aside_section,
             doc_storage_url,
@@ -536,8 +539,12 @@ def transform_layout(
     layout_data = transform_image_blocks(
         layout_data, resource_folder_path, resource, storage_settings
     )
-    layout_data = transform_licences_blocks(session, layout_data, storage_settings)
-    layout_data = transform_licences_blocks2(session, layout_data, storage_settings)
+    layout_data = transform_licence_required_blocks(
+        session, layout_data, storage_settings
+    )
+    layout_data = transform_licence_acceptance_blocks(
+        session, layout_data, storage_settings
+    )
     logger.debug(f"output layout_data: {layout_data}")
     if resource["qa_flag"]:
         resource["qa_flag"] = has_section_id(layout_data, "quality_assurance_tab")
