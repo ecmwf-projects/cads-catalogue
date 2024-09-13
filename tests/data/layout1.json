@@ -128,8 +128,8 @@
             },
             {
               "type": "licences_acceptance",
-              "id": "licences_section",
-              "title": "a title",
+              "id": "arandomid",
+              "title": "arandom title",
               "details": {
                 "licences": [
                   {
@@ -152,22 +152,6 @@
           "title": "Download 2",
           "id": "d_download",
           "blocks": [
-            {
-              "title": "A title to not override",
-              "id": "licence",
-              "type": "licences_acceptance",
-              "details": {
-                "licences": [
-                  {
-                    "id": "licence-to-use-copernicus-products",
-                    "revision": 12,
-                    "label": "Licence to use Copernicus Products",
-                    "contents_url": "https://s3.cds.ecmwf.int/swift/v1/AUTH_3e237111c3a144df8e0e0980577062b4/bopen-cds2-dev-catalogue/licences/licence-to-use-copernicus-products/licence-to-use-copernicus-productsv12_c742a3ce47ae53486a6bc9012f0496e655cd94f19fb2d01b4f6e32af69276ed1.md",
-                    "attachment_url": "https://s3.cds.ecmwf.int/swift/v1/AUTH_3e237111c3a144df8e0e0980577062b4/bopen-cds2-dev-catalogue/licences/licence-to-use-copernicus-products/licence-to-use-copernicus-products_b4b9451f54cffa16ecef5c912c9cebd6979925a956e3fa677976e0cf198c2c18.pdf"
-                  }
-                ]
-              }
-            },
             {
               "id": "download1",
               "type": "markdown",
