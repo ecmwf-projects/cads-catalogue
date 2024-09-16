@@ -189,21 +189,21 @@ def update_catalogue(
 
     Parameters
     ----------
-    overrides_path: path of the file yaml containing overriding metadata
-    resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
-    messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
-    licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
-    cim_folder_path: str = folder containing CIM Quality Assessment layouts (i.e. cads-forms-cim-json)
-    contents_folder_path = folder containing metadata files for contents (i.e. cads-contents-json)
-    connection_string: something like 'postgresql://user:password@netloc:port/dbname'
-    force: if True, run update regardless input folders has no changes from last update (default False)
-    delete_orphans: if True, delete resources/licences not involved. False if using include/exclude
-    include: if specified, pattern for resource uids to include in the update
-    exclude: if specified, pattern for resource uids to exclude from the update
-    exclude_resources: if True, do not consider input resources (default False)
-    exclude_licences: if True, do not consider input licences (default False)
-    exclude_messages: if True, do not consider input messages (default False)
-    exclude_contents: if True, do not consider input contents (default False)
+    :param overrides_path: path of the file yaml containing overriding metadata
+    :param resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
+    :param messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
+    :param licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
+    :param cim_folder_path: str = folder containing CIM Quality Assessment layouts (i.e. cads-forms-cim-json)
+    :param contents_folder_path = folder containing metadata files for contents (i.e. cads-contents-json)
+    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param force: if True, run update regardless input folders has no changes from last update (default False)
+    :param delete_orphans: if True, delete resources/licences not involved. False if using include/exclude
+    :param include: if specified, pattern for resource uids to include in the update
+    :param exclude: if specified, pattern for resource uids to exclude from the update
+    :param exclude_resources: if True, do not consider input resources (default False)
+    :param exclude_licences: if True, do not consider input licences (default False)
+    :param exclude_messages: if True, do not consider input messages (default False)
+    :param exclude_contents: if True, do not consider input contents (default False)
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
