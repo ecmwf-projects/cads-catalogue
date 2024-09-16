@@ -12,18 +12,16 @@ TEST_CONTENT_ROOT_PATH = os.path.join(TESTDATA_PATH, "cads-contents-json")
 
 
 def test_load_content_folder() -> None:
-    site = "cds"
-    content_type = "application"
     content_folder = os.path.join(
-        TEST_CONTENT_ROOT_PATH, "contents", site, content_type, "climate-pulse"
+        TEST_CONTENT_ROOT_PATH, "copernicus-interactive-climates-atlas"
     )
     expected_content = {
-        "content_uid": "cds-application-climate-pulse",
-        "creation_date": "2023-03-18T11:02:31Z",
-        "description": "Climate Pulse visualises near-real-time updates of global "
-        "average air- and sea-surface temperatures from ECMWF's "
-        "flagship ERA5 reanalysis",
-        "image": os.path.join(content_folder, "overview.png"),
+        "content_uid": "copernicus-interactive-climates-atlas",
+        "publication_date": "2024-09-13T00:00:00Z",
+        "description": "The Copernicus Interactive Climate Atlas provides graphical "
+        "information about recent past trends and future changes "
+        "(for different scenarios and global warming levels)",
+        "image": os.path.join(content_folder, "cica-overview.png"),
         "keywords": [
             "Product type: Application",
             "Spatial coverage: Global",
@@ -33,30 +31,36 @@ def test_load_content_folder() -> None:
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S",
         ],
-        "layout": os.path.join(content_folder, "layout.json"),
-        "last_update": "2024-07-19T11:01:31Z",
-        "link": "https://pulse.climate.copernicus.eu/",
+        "layout": None,
+        "link": "https://atlas.climate.copernicus.eu/atlas",
+        "content_update": "2024-09-16T00:00:00Z",
         "site": "cds",
-        "title": "Climate Pulse",
+        "title": "Copernicus Interactive Climate Atlas",
         "type": "application",
+        "data": {
+            "file-format": "GRIB (optional conversion to netCDF)",
+            "data-type": "Gridded",
+            "horizontal-coverage": "Global",
+        },
     }
 
-    effective_content = contents.load_content_folder(content_folder, site, content_type)
+    effective_content = contents.load_content_folder(content_folder)
     assert effective_content == expected_content
 
 
 def test_load_contents() -> None:
     expected_contents = [
         {
-            "site": "ads",
-            "type": "application",
-            "content_uid": "ads-application-climate-pulse",
-            "link": "https://pulse.climate.copernicus.eu/",
-            "title": "Climate Pulse",
-            "description": "Climate Pulse visualises near-real-time updates of global average "
-            "air- and sea-surface temperatures from ECMWF's flagship ERA5 reanalysis",
-            "creation_date": "2023-03-18T11:03:31Z",
-            "last_update": "2024-07-19T10:02:31Z",
+            "content_uid": "copernicus-interactive-climates-atlas",
+            "publication_date": "2024-09-13T00:00:00Z",
+            "description": "The Copernicus Interactive Climate Atlas provides graphical "
+            "information about recent past trends and future changes "
+            "(for different scenarios and global warming levels)",
+            "image": os.path.join(
+                TEST_CONTENT_ROOT_PATH,
+                "copernicus-interactive-climates-atlas",
+                "cica-overview.png",
+            ),
             "keywords": [
                 "Product type: Application",
                 "Spatial coverage: Global",
@@ -67,99 +71,30 @@ def test_load_contents() -> None:
                 "Provider: Copernicus C3S",
             ],
             "layout": None,
-            "image": os.path.join(
-                TEST_CONTENT_ROOT_PATH,
-                "contents",
-                "ads",
-                "application",
-                "climate-pulse",
-                "overview.png",
-            ),
-        },
-        {
-            "site": "ads",
-            "type": "page",
-            "content_uid": "ads-page-how-to-api",
-            "link": None,
-            "title": "How to API page",
-            "description": "This is the test description of the How to API page",
-            "creation_date": "2024-02-08T11:02:31Z",
-            "last_update": "2024-09-02T13:02:31Z",
-            "keywords": [],
-            "layout": os.path.join(
-                TEST_CONTENT_ROOT_PATH,
-                "contents",
-                "ads",
-                "page",
-                "how-to-api",
-                "layout.json",
-            ),
-            "image": None,
-        },
-        {
-            "site": "cds",
-            "type": "application",
-            "content_uid": "cds-application-climate-pulse",
-            "link": "https://pulse.climate.copernicus.eu/",
-            "title": "Climate Pulse",
-            "description": "Climate Pulse visualises near-real-time updates of global average "
-            "air- and sea-surface temperatures from ECMWF's flagship ERA5 reanalysis",
-            "creation_date": "2023-03-18T11:02:31Z",
-            "last_update": "2024-07-19T11:01:31Z",
-            "keywords": [
-                "Product type: Application",
-                "Spatial coverage: Global",
-                "Temporal coverage: Past",
-                "Variable domain: Land (hydrology)",
-                "Variable domain: Land (physics)",
-                "Variable domain: Land (biosphere)",
-                "Provider: Copernicus C3S",
-            ],
-            "layout": os.path.join(
-                TEST_CONTENT_ROOT_PATH,
-                "contents",
-                "cds",
-                "application",
-                "climate-pulse",
-                "layout.json",
-            ),
-            "image": os.path.join(
-                TEST_CONTENT_ROOT_PATH,
-                "contents",
-                "cds",
-                "application",
-                "climate-pulse",
-                "overview.png",
-            ),
-        },
-        {
-            "site": "cds",
-            "type": "application",
-            "content_uid": "cds-application-copernicus-interactive-climate-atlas",
             "link": "https://atlas.climate.copernicus.eu/atlas",
+            "content_update": "2024-09-16T00:00:00Z",
+            "site": "cds",
             "title": "Copernicus Interactive Climate Atlas",
-            "description": "The Copernicus Interactive Climate Atlas provides graphical information about "
-            "recent past trends and future changes (for different scenarios and "
-            "global warming levels)",
-            "creation_date": "2023-02-17T11:02:31Z",
-            "last_update": "2024-08-17T11:02:31Z",
-            "keywords": [
-                "Product type: Application",
-                "Spatial coverage: Global",
-                "Temporal coverage: Present",
-                "Variable domain: Atmosphere (surface)",
-                "Variable domain: Ocean (biology)",
-                "Provider: Copernicus C3S",
-            ],
-            "layout": None,
-            "image": os.path.join(
-                TEST_CONTENT_ROOT_PATH,
-                "contents",
-                "cds",
-                "application",
-                "copernicus-interactive-climate-atlas",
-                "image.png",
-            ),
+            "type": "application",
+            "data": {
+                "file-format": "GRIB (optional conversion to netCDF)",
+                "data-type": "Gridded",
+                "horizontal-coverage": "Global",
+            },
+        },
+        {
+            "content_uid": "how-to-api",
+            "publication_date": "2024-09-13T10:01:50Z",
+            "description": "Access the full data store catalogue, with search and availability features",
+            "image": None,
+            "keywords": [],
+            "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
+            "content_update": "2024-09-16T02:10:22Z",
+            "link": None,
+            "site": "cds,ads",
+            "title": "CDSAPI setup",
+            "type": "page",
+            "data": None,
         },
     ]
     effective_contents = contents.load_contents(TEST_CONTENT_ROOT_PATH)
@@ -170,7 +105,7 @@ def test_content_sync(
     session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
 ) -> None:
     content_folder = os.path.join(
-        TEST_CONTENT_ROOT_PATH, "cds", "application", "climate-pulse"
+        TEST_CONTENT_ROOT_PATH, "copernicus-interactive-climates-atlas"
     )
     # patching object storage upload
     my_settings_dict = {
@@ -184,12 +119,12 @@ def test_content_sync(
     mocker.patch.object(object_storage, "store_file", return_value="an url")
     # load testing content
     content1 = {
-        "content_uid": "cds-application-climate-pulse",
-        "creation_date": "2023-03-18T11:02:31Z",
-        "description": "Climate Pulse visualises near-real-time updates of global "
-        "average air- and sea-surface temperatures from ECMWF's "
-        "flagship ERA5 reanalysis",
-        "image": os.path.join(content_folder, "overview.png"),
+        "content_uid": "copernicus-interactive-climates-atlas",
+        "publication_date": "2024-09-13T00:00:00Z",
+        "description": "The Copernicus Interactive Climate Atlas provides graphical "
+        "information about recent past trends and future changes "
+        "(for different scenarios and global warming levels)",
+        "image": os.path.join(content_folder, "cica-overview.png"),
         "keywords": [
             "Product type: Application",
             "Spatial coverage: Global",
@@ -199,11 +134,11 @@ def test_content_sync(
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S",
         ],
-        "layout": os.path.join(content_folder, "layout.json"),
-        "last_update": "2024-07-19T11:01:31Z",
+        "layout": None,
+        "content_update": "2024-09-16T00:00:00Z",
         "link": "https://pulse.climate.copernicus.eu/",
-        "site": "cds",
-        "title": "Climate Pulse",
+        "site": "cds,ads",
+        "title": "Copernicus Interactive Climate Atlas",
         "type": "application",
     }
 
@@ -242,13 +177,13 @@ def test_content_sync(
         )
         # check db fields
         for key, value in content1.items():
-            if key in ("creation_date", "last_update"):
+            if key in ("publication_date", "content_update"):
                 value = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")  # type: ignore
-            elif key in ("image", "layout"):
+            elif key in ("image",):
                 value = "an url"
             elif key == "keywords":
                 continue
-            assert getattr(db_content1, key) == value
+            assert getattr(db_content1, key) == value, key
 
     # changing content1, so do an update
     content1["image"] = None  # type: ignore
@@ -260,8 +195,9 @@ def test_content_sync(
         "Variable domain: Land (biosphere)",
         "Provider: Copernicus C3S",
     ]
-    content1["creation_date"] = "2021-03-18T11:02:31Z"
+    content1["publication_date"] = "2021-03-18T11:02:31Z"
     content1["title"] = "new title"
+    content1["layout"] = os.path.join(content_folder, "cica-overview.png")
     with session_obj() as session:
         # db is not empty: update a content
         db_content2 = contents.content_sync(session, content1, storage_settings)
@@ -296,7 +232,7 @@ def test_content_sync(
         )
         # check db fields
         for key, value in content1.items():
-            if key in ("creation_date", "last_update"):
+            if key in ("publication_date", "content_update"):
                 value = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")  # type: ignore
             elif key in ("layout",):
                 value = "an url"

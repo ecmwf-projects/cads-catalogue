@@ -1,4 +1,4 @@
-"""configuration utilities."""
+"""utility module to load and store contents in the catalogue database."""
 # Copyright 2022, European Union.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,12 +35,13 @@ def content_sync(
     storage_settings: config.ObjectStorageSettings,
 ) -> database.Content:
     """
-    Compare db record and folder of a content and make them the same.
+    Update db record with a content's metadata dictionary.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
     content: metadata of loaded content
+    storage_settings: object with settings to access the object storage
 
     Returns
     -------
@@ -97,38 +98,37 @@ def content_sync(
     return db_content
 
 
-def load_content_folder(
-    content_folder: str | pathlib.Path, site: str, content_type: str
-) -> dict[str, Any]:
+def load_content_folder(content_folder: str | pathlib.Path) -> dict[str, Any]:
     """
-    Parse a content folder and returns its metadata ready for the database.
+    Parse a content folder and returns its metadata dictionary.
 
     Parameters
     ----------
     content_folder: folder path containing content files
-    site: site id of the content
-    content_type: type of the content
 
     Returns
     -------
     dictionary of information parsed.
     """
-    folder_name = os.path.basename(content_folder)
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
         data = json.load(fp)
     metadata = {
-        "site": site,
-        "type": content_type,
-        "content_uid": f"{site}-{content_type}-{folder_name}",
-        "link": data.get("link"),
+        "site": ",".join(data["site"]),
+        "type": data["resource_type"],
+        "content_uid": data["id"],
         "title": data["title"],
-        "description": data["description"],
-        "creation_date": data["published"],
-        "last_update": data["updated"],
+        "description": data["abstract"],
+        "publication_date": data["publication_date"],
+        "content_update": data["update_date"],
+        "link": data.get("link"),
         "keywords": data.get("keywords", []),
+        "data": data.get("data"),
+        # managed below:
+        # "image": None,
+        # "layout": None,
     }
-    for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:
+    for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:  # image, layout
         metadata[ancillar_file_field] = None
         rel_path = data.get(ancillar_file_field)
         if rel_path:
@@ -138,51 +138,41 @@ def load_content_folder(
                     os.path.join(content_folder, rel_path)
                 )
             else:
-                raise ValueError(f"file {ancillar_file_path} not found!")
+                raise ValueError(
+                    f"{metadata_file_path} contains reference to {ancillar_file_field} file not found!"
+                )
     return metadata
 
 
-def load_contents(contents_package_path: str | pathlib.Path) -> List[dict[str, Any]]:
+def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, Any]]:
     """
-    Load all contents from a well-known filesystem root.
+    Load all contents from a folder and return a dictionary of metadata extracted.
 
     Parameters
     ----------
-    contents_package_path: root path where to look for contents (i.e. cads-contents-json root folder)
+    contents_root_folder: root path where to look for contents (i.e. cads-contents-json root folder)
 
     Returns
     -------
     List of found contents parsed.
     """
     loaded_contents = []
-    contents_root_folder = os.path.join(contents_package_path, "contents")
     if not os.path.isdir(contents_root_folder):
         logger.warning("not found folder {contents_root_folder}!")
         return []
-    for site in sorted(os.listdir(contents_root_folder)):
-        site_folder = os.path.join(contents_root_folder, site)
-        if not os.path.isdir(site_folder):
-            logger.warning("unknown file %r found" % site_folder)
+    for content_folder_name in sorted(os.listdir(contents_root_folder)):
+        content_folder = os.path.join(contents_root_folder, content_folder_name)
+        if not os.path.isdir(content_folder):
+            logger.warning("unknown file %r found" % content_folder)
             continue
-        for content_type in sorted(os.listdir(site_folder)):
-            content_type_folder = os.path.join(site_folder, content_type)
-            if not os.path.isdir(content_type_folder):
-                logger.warning("unknown file %r found" % content_type_folder)
-                continue
-            for content_folder_name in sorted(os.listdir(content_type_folder)):
-                content_folder = os.path.join(content_type_folder, content_folder_name)
-                if not os.path.isdir(content_folder):
-                    logger.warning("unknown file %r found" % content_folder)
-                    continue
-                try:
-                    content_md = load_content_folder(content_folder, site, content_type)
-                except:  # noqa
-                    logger.exception(
-                        "failed parsing content in %s, error follows"
-                        % content_type_folder
-                    )
-                    continue
-                loaded_contents.append(content_md)
+        try:
+            content_md = load_content_folder(content_folder)
+        except:  # noqa
+            logger.exception(
+                "failed parsing content in %s, error follows" % content_folder
+            )
+            continue
+        loaded_contents.append(content_md)
     return loaded_contents
 
 

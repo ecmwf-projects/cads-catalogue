@@ -3,8 +3,25 @@
   "resource_type": "application",
   "title": "Copernicus Interactive Climate Atlas",
   "abstract": "The Copernicus Interactive Climate Atlas provides graphical information about recent past trends and future changes (for different scenarios and global warming levels)",
-  "site": ["cds"],
+  "site": [
+    "cds"
+  ],
   "publication_date": "2024-09-13T00:00:00Z",
-  "update_date": "2024-09-13T00:00:00Z",
-  "image": "./cica-overview.png"
+  "link": "https://atlas.climate.copernicus.eu/atlas",
+  "keywords": [
+    "Product type: Application",
+    "Spatial coverage: Global",
+    "Temporal coverage: Past",
+    "Variable domain: Land (hydrology)",
+    "Variable domain: Land (physics)",
+    "Variable domain: Land (biosphere)",
+    "Provider: Copernicus C3S"
+  ],
+  "update_date": "2024-09-16T00:00:00Z",
+  "image": "./cica-overview.png",
+  "data": {
+    "file-format": "GRIB (optional conversion to netCDF)",
+    "data-type": "Gridded",
+    "horizontal-coverage": "Global"
+  }
 }
