@@ -1,0 +1,10 @@
+{
+  "id": "copernicus-interactive-climates-atlas",
+  "resource_type": "application",
+  "title": "Copernicus Interactive Climate Atlas",
+  "abstract": "The Copernicus Interactive Climate Atlas provides graphical information about recent past trends and future changes (for different scenarios and global warming levels)",
+  "site": ["cds"],
+  "publication_date": "2024-09-13T00:00:00Z",
+  "update_date": "2024-09-13T00:00:00Z",
+  "image": "./cica-overview.png"
+}

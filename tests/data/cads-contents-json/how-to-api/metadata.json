@@ -1,0 +1,10 @@
+{
+  "id": "how-to-api",
+  "resource_type": "page",
+  "title": "CDSAPI setup",
+  "abstract": "Access the full data store catalogue, with search and availability features",
+  "site": ["cds", "ads"],
+  "publication_date": "2024-09-13T00:00:00Z",
+  "update_date": "2024-09-13T00:00:00Z",
+  "layout": "./layout.json"
+}
