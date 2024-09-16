@@ -56,9 +56,13 @@ def upgrade() -> None:
             primary_key=True,
         ),
     )
+    alembic.op.add_column(
+        "catalogue_updates", sa.Column("content_repo_commit", sa.String)
+    )
 
 
 def downgrade() -> None:
     alembic.op.drop_table("contents_keywords_m2m")
     alembic.op.drop_table("content_keywords")
     alembic.op.drop_table("contents")
+    alembic.op.drop_column("catalogue_updates", "contents_repo_commit")
