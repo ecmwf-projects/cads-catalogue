@@ -23,13 +23,13 @@ def upgrade() -> None:
         "contents",
         sa.Column("content_id", sa.Integer, primary_key=True),
         sa.Column("content_uid", sa.String, index=True, unique=True, nullable=False),
-        sa.Column("creation_date", sa.TIMESTAMP, nullable=False),
+        sa.Column("content_update", sa.TIMESTAMP, nullable=False),
         sa.Column("data", dialect_postgresql.JSONB),
         sa.Column("description", sa.String, nullable=False),
         sa.Column("image", sa.String),
         sa.Column("layout", sa.String),
-        sa.Column("last_update", sa.TIMESTAMP, nullable=False),
         sa.Column("link", sa.String),
+        sa.Column("publication_date", sa.TIMESTAMP, nullable=False),
         sa.Column("site", sa.String, index=True, nullable=False),
         sa.Column("title", sa.String, nullable=False),
         sa.Column("type", sa.String, nullable=False),
@@ -37,9 +37,9 @@ def upgrade() -> None:
     alembic.op.create_table(
         "content_keywords",
         sa.Column("keyword_id", sa.Integer, primary_key=True),
-        sa.Column("category_name", sa.Date, nullable=False),
-        sa.Column("category_value", dialect_postgresql.JSONB),
-        sa.Column("keyword_name", sa.String, nullable=False),
+        sa.Column("category_name", sa.String),
+        sa.Column("category_value", sa.String),
+        sa.Column("keyword_name", sa.String),
     )
     alembic.op.create_table(
         "contents_keywords_m2m",
@@ -48,14 +48,12 @@ def upgrade() -> None:
             sa.Integer,
             sa.ForeignKey("contents.content_id"),
             primary_key=True,
-            nullable=False,
         ),
         sa.Column(
             "keyword_id",
             sa.Integer,
             sa.ForeignKey("content_keywords.keyword_id"),
             primary_key=True,
-            nullable=False,
         ),
     )
 
