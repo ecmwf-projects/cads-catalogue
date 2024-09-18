@@ -12,6 +12,7 @@ from typer.testing import CliRunner
 
 import alembic.config
 from cads_catalogue import (
+    contents,
     database,
     entry_points,
     licence_manager,
@@ -26,6 +27,7 @@ TEST_RESOURCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-forms-json")
 TEST_MESSAGES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-messages")
 TEST_LICENCES_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-licences")
 TEST_CIM_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-forms-cim-json")
+TEST_CONTENTS_DATA_PATH = os.path.join(TESTDATA_PATH, "cads-contents-json")
 
 runner = CliRunner()
 
@@ -61,6 +63,7 @@ def get_last_commit_factory(expected_values):
                 "cads-licences",
                 "cads-messages",
                 "cads-forms-cim-json",
+                "cads-contents-json",
             ]
         ):
             if repo_name in folder.split(os.path.sep)[-1]:
@@ -140,6 +143,7 @@ def test_update_catalogue(
         "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
         "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69",
         "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b",
+        "a0ae2002dec8b4b8b0ba8f2b5223722a71d84b8d",
     )
     mocker.patch.object(
         utils, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
@@ -150,6 +154,7 @@ def test_update_catalogue(
     _load_licences_from_folder = mocker.spy(
         licence_manager, "load_licences_from_folder"
     )
+    _update_catalogue_contents = mocker.spy(contents, "update_catalogue_contents")
     _resource_sync = mocker.spy(manager, "resource_sync")
     _update_catalogue_messages = mocker.spy(messages, "update_catalogue_messages")
 
@@ -168,8 +173,11 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            # "--contents-folder-path",
+            # TEST_CONTENTS_DATA_PATH,
             "--exclude-resources",
             "--exclude-messages",
+            # "--exclude-contents",
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -197,6 +205,9 @@ def test_update_catalogue(
     # check load of messages is not run
     _update_catalogue_messages.assert_not_called()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage calls
     assert _store_file.call_count == 8  # num.licences * 2 = 8
 
@@ -239,18 +250,23 @@ def test_update_catalogue(
             == 0
         )
         assert (
+            session.execute(sa.text("select count(*) from contents")).scalars().one()
+            == 0
+        )
+        assert (
             session.execute(sa.text("select count(*) from resources")).scalars().one()
             == 0
         )
         sql = (
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
-            "message_repo_commit, cim_repo_commit from catalogue_updates"
+            "message_repo_commit, cim_repo_commit, content_repo_commit from catalogue_updates"
         )
         assert session.execute(sa.text(sql)).all() == [
             (
                 "e5658fef07333700272e36a43df0628efacb5f04",
                 None,
                 "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+                None,
                 None,
                 None,
             )
@@ -286,8 +302,11 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            # "--contents-folder-path",
+            # TEST_CONTENTS_DATA_PATH,
             "--exclude-resources",
             "--exclude-messages",
+            # "--exclude-contents",
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -314,6 +333,9 @@ def test_update_catalogue(
     # check load of messages is not run
     _update_catalogue_messages.assert_not_called()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage calls
     _store_file.assert_not_called()
     _store_file.reset_mock()
@@ -333,8 +355,11 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            # "--contents-folder-path",
+            # TEST_CONTENTS_DATA_PATH,
             "--exclude-resources",
             "--exclude-licences",
+            # "--exclude-contents",
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -362,6 +387,9 @@ def test_update_catalogue(
     # check load of messages is run
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage calls
     _store_file.assert_not_called()
     _store_file.reset_mock()
@@ -379,6 +407,10 @@ def test_update_catalogue(
         )
         assert (
             session.execute(sa.text("select count(*) from resources")).scalars().one()
+            == 0
+        )
+        assert (
+            session.execute(sa.text("select count(*) from contents")).scalars().one()
             == 0
         )
         sql = (
@@ -536,7 +568,7 @@ def test_update_catalogue(
                     continue
                 assert msg_dict[k] == expected_msg[k]
 
-    # 3. load only a dataset (including licences and messages) --------------------------
+    # 3. load only a dataset (including licences, messages, contents) --------------------------
     result = runner.invoke(
         entry_points.app,
         [
@@ -551,6 +583,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--include",
             "reanalysis-era5-land",
         ],
@@ -576,13 +610,16 @@ def test_update_catalogue(
     # check load of resources is run only 1 time
     _resource_sync.assert_called_once()
     _resource_sync.reset_mock()
+    # check load of contents is run only 1 time
+    _update_catalogue_contents.assert_called_once()
+    _update_catalogue_contents.reset_mock()
     # check load of messages is run (because of loading of resources)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
     # check object storage calls
-    assert _store_file.call_count == 5
-    #     # overview.png * 2 = 2
-    #     # layout.json = 1
+    assert _store_file.call_count == 7
+    #     # overview.png * 3 = 3 (one from contents)
+    #     # layout.json * 2 = 2 (one from contents)
     #     # form.json = 1
     #     # constraints.json = 1
     #     # check object storage calls
@@ -597,6 +634,18 @@ def test_update_catalogue(
             object_storage_url,
             bucket_name=bucket_name,
             subpath="resources/reanalysis-era5-land",
+            **object_storage_kws,
+        ),
+        unittest.mock.call(
+            os.path.join(
+                TESTDATA_PATH,
+                "cads-contents-json",
+                "how-to-api",
+                "layout.json",
+            ),
+            object_storage_url,
+            bucket_name=bucket_name,
+            subpath="contents/how-to-api",
             **object_storage_kws,
         ),
     ]
@@ -633,6 +682,18 @@ def test_update_catalogue(
                 None,
             )
         ]
+        sql2 = (
+            "select content_uid, title, site, type from contents order by content_uid"
+        )
+        assert session.execute(sa.text(sql2)).all() == [
+            (
+                "copernicus-interactive-climates-atlas",
+                "Copernicus Interactive Climate Atlas",
+                "cds",
+                "application",
+            ),
+            ("how-to-api", "CDSAPI setup", "cds,ads", "page"),
+        ]
 
     # 3.bis repeat last run -------------------------------------------------------------
     result = runner.invoke(
@@ -649,6 +710,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--include",
             "reanalysis-era5-land",
         ],
@@ -677,6 +740,9 @@ def test_update_catalogue(
     # check load of messages is run (git hash not changed but a resource is processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (folder hash not changed)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage not called
     _store_file.assert_not_called()
 
@@ -695,9 +761,13 @@ def test_update_catalogue(
             session.execute(sa.text("select count(*) from resources")).scalars().one()
             == 1
         )
+        assert (
+            session.execute(sa.text("select count(*) from contents")).scalars().one()
+            == 2
+        )
         sql = (
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
-            "message_repo_commit, cim_repo_commit from catalogue_updates"
+            "message_repo_commit, cim_repo_commit, content_repo_commit from catalogue_updates"
         )
         assert session.execute(sa.text(sql)).all() == [
             (
@@ -706,10 +776,11 @@ def test_update_catalogue(
                 folder_commit_hashes[2],
                 folder_commit_hashes[3],
                 None,
+                folder_commit_hashes[5],
             )
         ]
 
-    # 4. change a licence and a message and repeat last run with force = True -----------
+    # 4. change a licence, a message and a content and repeat last run with force = True -----------
     with session_obj() as session:
         session.execute(
             sa.text(
@@ -720,6 +791,12 @@ def test_update_catalogue(
             sa.text(
                 "update messages set live=false "
                 "where message_uid='sites/c3s/2023/Jan/2021-01-example-of-info-active.md'"
+            )
+        )
+        session.execute(
+            sa.text(
+                "update contents set title='a new title' "
+                "where content_uid='how-to-api'"
             )
         )
         session.commit()
@@ -737,6 +814,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--include",
             "reanalysis-era5-land",
             "--force",
@@ -766,8 +845,11 @@ def test_update_catalogue(
     # check load of messages is run (it's forced)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
-    # check object storage called for 1 dataset and 4 licences (5 + 4*2)
-    assert _store_file.call_count == 13
+    # check load of contents is run (it's forced)
+    _update_catalogue_contents.assert_called_once()
+    _update_catalogue_contents.reset_mock()
+    # check object storage called for 1 dataset, 4 licences and 2 contents (5 + 4*2 + 2)
+    assert _store_file.call_count == 15
     _store_file.reset_mock()
 
     # check db changes are reset
@@ -781,6 +863,9 @@ def test_update_catalogue(
                 "where message_uid='sites/cds/2023/Jan/2021-01-example-of-info-active.md'"
             )
         ).all() == [(True,)]
+        assert session.execute(
+            sa.text("select title from contents where content_uid='how-to-api'")
+        ).all() == [("CDSAPI setup",)]
 
     # 5. use 'include' with a pattern that doesn't match anything ----------------------
     result = runner.invoke(
@@ -797,6 +882,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--include",
             "not-existing-*-dataset",
         ],
@@ -825,6 +912,9 @@ def test_update_catalogue(
     # check load of messages is run (resources are processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (git hash stable)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage not called
     _store_file.assert_not_called()
     _store_file.reset_mock()
@@ -844,6 +934,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--exclude",
             "reanalysis-era5-single-*",
         ],
@@ -872,6 +964,9 @@ def test_update_catalogue(
     # check load of messages is run (resources are processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (git hash stable)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage called
     assert _store_file.call_count == 30
     #     # num.datasets overview.png * 2 = 12
@@ -898,7 +993,7 @@ def test_update_catalogue(
         )
         sql = (
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
-            "message_repo_commit, cim_repo_commit from catalogue_updates"
+            "message_repo_commit, cim_repo_commit, content_repo_commit from catalogue_updates"
         )
         assert session.execute(sa.text(sql)).all() == [
             (
@@ -907,6 +1002,7 @@ def test_update_catalogue(
                 folder_commit_hashes[2],
                 folder_commit_hashes[3],
                 None,
+                folder_commit_hashes[5],
             )
         ]
         sql = (
@@ -937,6 +1033,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -963,6 +1061,9 @@ def test_update_catalogue(
     # check load of messages is run (resources are processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (git hash stable)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage called
     assert _store_file.call_count == 5
     #     # num.datasets overview.png * 2 = 2
@@ -989,7 +1090,7 @@ def test_update_catalogue(
         )
         sql = (
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
-            "message_repo_commit, cim_repo_commit from catalogue_updates"
+            "message_repo_commit, cim_repo_commit, content_repo_commit from catalogue_updates"
         )
         assert session.execute(sa.text(sql)).all() == [folder_commit_hashes]
         sql = (
@@ -1023,6 +1124,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1049,6 +1152,9 @@ def test_update_catalogue(
     # check load of messages is not run (git hash stable)
     _update_catalogue_messages.assert_not_called()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (git hash stable)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage not called
     _store_file.assert_not_called()
     _store_file.reset_mock()
@@ -1075,6 +1181,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--force",
         ],
         env={
@@ -1102,13 +1210,17 @@ def test_update_catalogue(
     # check load of messages is run (force)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is run (force)
+    _update_catalogue_contents.assert_called_once()
+    _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 48
+    assert _store_file.call_count == 50
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
     #     # num.datasets form.json = 8
     #     # num.datasets constraints.json = 8
+    #     # num.contents = 2
     _store_file.reset_mock()
 
     # check db content
@@ -1144,6 +1256,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1170,6 +1284,9 @@ def test_update_catalogue(
     # check load of messages is not run (git hash stable)
     _update_catalogue_messages.assert_not_called()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (git hash stable)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage not called
     _store_file.assert_not_called()
     _store_file.reset_mock()
@@ -1190,6 +1307,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--overrides-path",
             os.path.join(TESTDATA_PATH, "override2.yaml"),
         ],
@@ -1218,13 +1337,17 @@ def test_update_catalogue(
     # check load of messages is run (force)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is run (force)
+    _update_catalogue_contents.assert_called_once()
+    _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 48
+    assert _store_file.call_count == 50
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
     #     # num.datasets form.json = 8
     #     # num.datasets constraints.json = 8
+    #     # num.contents = 2
     _store_file.reset_mock()
 
     # check db content
@@ -1260,6 +1383,8 @@ def test_update_catalogue(
             TEST_LICENCES_DATA_PATH,
             "--cim-folder-path",
             TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
             "--overrides-path",
             os.path.join(TESTDATA_PATH, "override2.yaml"),
         ],
@@ -1288,6 +1413,9 @@ def test_update_catalogue(
     # check load of messages is not run (git hash stable)
     _update_catalogue_messages.assert_not_called()
     _update_catalogue_messages.reset_mock()
+    # check load of contents is not run (git hash stable)
+    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.reset_mock()
     # check object storage not called
     _store_file.assert_not_called()
     _store_file.reset_mock()

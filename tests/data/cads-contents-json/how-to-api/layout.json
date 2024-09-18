@@ -1,0 +1,20 @@
+{
+  "title": "CDSAPI setup",
+  "description": "Access the full data store catalogue, with search and availability features",
+  "body": {
+    "main": {
+      "sections": [
+        {
+          "id": "main",
+          "blocks": [
+            {
+              "id": "page-content",
+              "type": "html",
+              "content": "<div>TODO</div>"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

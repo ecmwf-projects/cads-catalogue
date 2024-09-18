@@ -65,7 +65,62 @@ class CatalogueUpdate(BaseModel):
     licence_repo_commit = sa.Column(sa.String)
     message_repo_commit = sa.Column(sa.String)
     cim_repo_commit = sa.Column(sa.String)
+    content_repo_commit = sa.Column(sa.String)
     override_md = sa.Column(dialect_postgresql.JSONB, default={})
+
+
+class Content(BaseModel):
+    """Content ORM model."""
+
+    __tablename__ = "contents"
+
+    content_id = sa.Column(sa.Integer, primary_key=True)
+    content_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
+    content_update = sa.Column(sa.TIMESTAMP, nullable=False)
+    data = sa.Column(dialect_postgresql.JSONB)
+    description = sa.Column(sa.String, nullable=False)
+    image = sa.Column(sa.String)
+    layout = sa.Column(sa.String)
+    link = sa.Column(sa.String)
+    publication_date = sa.Column(sa.TIMESTAMP, nullable=False)
+    site = sa.Column(sa.String, index=True, nullable=False)
+    title = sa.Column(sa.String, nullable=False)
+    type = sa.Column(sa.String, nullable=False)
+
+    keywords: sa.orm.Mapped[List["ContentKeyword"]] = sa.orm.relationship(
+        "ContentKeyword", secondary="contents_keywords_m2m", back_populates="contents"
+    )
+
+
+class ContentKeyword(BaseModel):
+    """ContentKeyword ORM model."""
+
+    __tablename__ = "content_keywords"
+
+    keyword_id = sa.Column(sa.Integer, primary_key=True)
+    category_name = sa.Column(sa.String)
+    category_value = sa.Column(sa.String)
+    keyword_name = sa.Column(sa.String)
+
+    contents: sa.orm.Mapped[List["Content"]] = sa.orm.relationship(
+        "Content",
+        secondary="contents_keywords_m2m",
+        back_populates="keywords",
+        uselist=True,
+    )
+
+
+class ContentsKeywordM2M(BaseModel):
+    """many-to-may ORM model for contents-keywords."""
+
+    __tablename__ = "contents_keywords_m2m"
+
+    content_id = sa.Column(
+        sa.Integer, sa.ForeignKey("contents.content_id"), primary_key=True
+    )
+    keyword_id = sa.Column(
+        sa.Integer, sa.ForeignKey("content_keywords.keyword_id"), primary_key=True
+    )
 
 
 class ResourceLicence(BaseModel):
