@@ -65,4 +65,4 @@ def downgrade() -> None:
     alembic.op.drop_table("contents_keywords_m2m")
     alembic.op.drop_table("content_keywords")
     alembic.op.drop_table("contents")
-    alembic.op.drop_column("catalogue_updates", "contents_repo_commit")
+    alembic.op.drop_column("catalogue_updates", "content_repo_commit")
