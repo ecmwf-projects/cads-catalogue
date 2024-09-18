@@ -617,9 +617,9 @@ def test_update_catalogue(
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
     # check object storage calls
-    assert _store_file.call_count == 7
+    assert _store_file.call_count == 8
     #     # overview.png * 3 = 3 (one from contents)
-    #     # layout.json * 2 = 2 (one from contents)
+    #     # layout.json * 3 = 3 (2 from contents)
     #     # form.json = 1
     #     # constraints.json = 1
     #     # check object storage calls
@@ -645,7 +645,7 @@ def test_update_catalogue(
             ),
             object_storage_url,
             bucket_name=bucket_name,
-            subpath="contents/how-to-api",
+            subpath="contents/ads-page-how-to-api",
             **object_storage_kws,
         ),
     ]
@@ -686,13 +686,14 @@ def test_update_catalogue(
             "select content_uid, title, site, type from contents order by content_uid"
         )
         assert session.execute(sa.text(sql2)).all() == [
+            ("ads-page-how-to-api", "CDSAPI setup", "ads", "page"),
             (
-                "copernicus-interactive-climates-atlas",
+                "cds-application-copernicus-interactive-climates-atlas",
                 "Copernicus Interactive Climate Atlas",
                 "cds",
                 "application",
             ),
-            ("how-to-api", "CDSAPI setup", "cds,ads", "page"),
+            ("cds-page-how-to-api", "CDSAPI setup", "cds", "page"),
         ]
 
     # 3.bis repeat last run -------------------------------------------------------------
@@ -763,7 +764,7 @@ def test_update_catalogue(
         )
         assert (
             session.execute(sa.text("select count(*) from contents")).scalars().one()
-            == 2
+            == 3
         )
         sql = (
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
@@ -796,7 +797,7 @@ def test_update_catalogue(
         session.execute(
             sa.text(
                 "update contents set title='a new title' "
-                "where content_uid='how-to-api'"
+                "where content_uid='ads-page-how-to-api'"
             )
         )
         session.commit()
@@ -848,8 +849,8 @@ def test_update_catalogue(
     # check load of contents is run (it's forced)
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
-    # check object storage called for 1 dataset, 4 licences and 2 contents (5 + 4*2 + 2)
-    assert _store_file.call_count == 15
+    # check object storage called for 1 dataset, 4 licences and 3 contents (5 + 4*2 + 3)
+    assert _store_file.call_count == 16
     _store_file.reset_mock()
 
     # check db changes are reset
@@ -864,7 +865,7 @@ def test_update_catalogue(
             )
         ).all() == [(True,)]
         assert session.execute(
-            sa.text("select title from contents where content_uid='how-to-api'")
+            sa.text("select title from contents where content_uid='ads-page-how-to-api'")
         ).all() == [("CDSAPI setup",)]
 
     # 5. use 'include' with a pattern that doesn't match anything ----------------------
@@ -1214,13 +1215,13 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 50
+    assert _store_file.call_count == 51
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
     #     # num.datasets form.json = 8
     #     # num.datasets constraints.json = 8
-    #     # num.contents = 2
+    #     # num.contents = 3
     _store_file.reset_mock()
 
     # check db content
@@ -1341,13 +1342,13 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 50
+    assert _store_file.call_count == 51
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
     #     # num.datasets form.json = 8
     #     # num.datasets constraints.json = 8
-    #     # num.contents = 2
+    #     # num.contents = 3
     _store_file.reset_mock()
 
     # check db content

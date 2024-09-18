@@ -98,9 +98,9 @@ def content_sync(
     return db_content
 
 
-def load_content_folder(content_folder: str | pathlib.Path) -> dict[str, Any]:
+def load_content_folder(content_folder: str | pathlib.Path) -> List[dict[str, Any]]:
     """
-    Parse a content folder and returns its metadata dictionary.
+    Parse folder and returns a list of metadata dictionaries, each one for a content.
 
     Parameters
     ----------
@@ -108,40 +108,45 @@ def load_content_folder(content_folder: str | pathlib.Path) -> dict[str, Any]:
 
     Returns
     -------
-    dictionary of information parsed.
+    list of dictionaries of information parsed.
     """
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
         data = json.load(fp)
-    metadata = {
-        "site": ",".join(data["site"]),
-        "type": data["resource_type"],
-        "content_uid": data["id"],
-        "title": data["title"],
-        "description": data["abstract"],
-        "publication_date": data["publication_date"],
-        "content_update": data["update_date"],
-        "link": data.get("link"),
-        "keywords": data.get("keywords", []),
-        "data": data.get("data"),
-        # managed below:
-        # "image": None,
-        # "layout": None,
-    }
-    for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:  # image, layout
-        metadata[ancillar_file_field] = None
-        rel_path = data.get(ancillar_file_field)
-        if rel_path:
-            ancillar_file_path = os.path.abspath(os.path.join(content_folder, rel_path))
-            if os.path.isfile(ancillar_file_path):
-                metadata[ancillar_file_field] = os.path.abspath(
+    ret_value = []
+    for site in data["site"]:
+        metadata = {
+            "site": site,
+            "type": data["resource_type"],
+            "content_uid": f"{site}-{data['resource_type']}-{data['id']}",
+            "title": data["title"],
+            "description": data["abstract"],
+            "publication_date": data["publication_date"],
+            "content_update": data["update_date"],
+            "link": data.get("link"),
+            "keywords": data.get("keywords", []),
+            "data": data.get("data"),
+            # managed below:
+            # "image": None,
+            # "layout": None,
+        }
+        for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:  # image, layout
+            metadata[ancillar_file_field] = None
+            rel_path = data.get(ancillar_file_field)
+            if rel_path:
+                ancillar_file_path = os.path.abspath(
                     os.path.join(content_folder, rel_path)
                 )
-            else:
-                raise ValueError(
-                    f"{metadata_file_path} contains reference to {ancillar_file_field} file not found!"
-                )
-    return metadata
+                if os.path.isfile(ancillar_file_path):
+                    metadata[ancillar_file_field] = os.path.abspath(
+                        os.path.join(content_folder, rel_path)
+                    )
+                else:
+                    raise ValueError(
+                        f"{metadata_file_path} contains reference to {ancillar_file_field} file not found!"
+                    )
+        ret_value.append(metadata)
+    return ret_value
 
 
 def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, Any]]:
@@ -169,13 +174,13 @@ def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, An
             logger.warning("unknown file %r found" % content_folder)
             continue
         try:
-            content_md = load_content_folder(content_folder)
+            contents_md = load_content_folder(content_folder)
         except:  # noqa
             logger.exception(
                 "failed parsing content in %s, error follows" % content_folder
             )
             continue
-        loaded_contents.append(content_md)
+        loaded_contents += contents_md
     return loaded_contents
 
 
