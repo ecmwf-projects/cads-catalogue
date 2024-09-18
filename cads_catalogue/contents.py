@@ -160,7 +160,7 @@ def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, An
     if not os.path.isdir(contents_root_folder):
         logger.warning("not found folder {contents_root_folder}!")
         return []
-    exclude_folder_names = ['.git']
+    exclude_folder_names = [".git"]
     for content_folder_name in sorted(os.listdir(contents_root_folder)):
         if content_folder_name in exclude_folder_names:
             continue
