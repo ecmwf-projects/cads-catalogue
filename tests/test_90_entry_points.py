@@ -645,7 +645,7 @@ def test_update_catalogue(
             ),
             object_storage_url,
             bucket_name=bucket_name,
-            subpath="contents/ads-page-how-to-api",
+            subpath="contents/ads/page/how-to-api",
             **object_storage_kws,
         ),
     ]
@@ -682,18 +682,16 @@ def test_update_catalogue(
                 None,
             )
         ]
-        sql2 = (
-            "select content_uid, title, site, type from contents order by content_uid"
-        )
+        sql2 = "select slug, title, site, type from contents order by site, type, slug"
         assert session.execute(sa.text(sql2)).all() == [
-            ("ads-page-how-to-api", "CDSAPI setup", "ads", "page"),
+            ("how-to-api", "CDSAPI setup", "ads", "page"),
             (
-                "cds-application-copernicus-interactive-climates-atlas",
+                "copernicus-interactive-climates-atlas",
                 "Copernicus Interactive Climate Atlas",
                 "cds",
                 "application",
             ),
-            ("cds-page-how-to-api", "CDSAPI setup", "cds", "page"),
+            ("how-to-api", "CDSAPI setup", "cds", "page"),
         ]
 
     # 3.bis repeat last run -------------------------------------------------------------
@@ -797,7 +795,7 @@ def test_update_catalogue(
         session.execute(
             sa.text(
                 "update contents set title='a new title' "
-                "where content_uid='ads-page-how-to-api'"
+                "where slug='how-to-api' and site='ads' and type='page'"
             )
         )
         session.commit()
@@ -866,7 +864,7 @@ def test_update_catalogue(
         ).all() == [(True,)]
         assert session.execute(
             sa.text(
-                "select title from contents where content_uid='ads-page-how-to-api'"
+                "select title from contents where slug='how-to-api' and site='ads' and type='page'"
             )
         ).all() == [("CDSAPI setup",)]
 

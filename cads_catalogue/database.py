@@ -73,9 +73,10 @@ class Content(BaseModel):
     """Content ORM model."""
 
     __tablename__ = "contents"
+    __table_args__ = (sa.UniqueConstraint("site", "slug", "type"),)
 
     content_id = sa.Column(sa.Integer, primary_key=True)
-    content_uid = sa.Column(sa.String, index=True, unique=True, nullable=False)
+    slug = sa.Column(sa.String, index=True, nullable=False)
     content_update = sa.Column(sa.TIMESTAMP, nullable=False)
     data = sa.Column(dialect_postgresql.JSONB)
     description = sa.Column(sa.String, nullable=False)
@@ -85,7 +86,7 @@ class Content(BaseModel):
     publication_date = sa.Column(sa.TIMESTAMP, nullable=False)
     site = sa.Column(sa.String, index=True, nullable=False)
     title = sa.Column(sa.String, nullable=False)
-    type = sa.Column(sa.String, nullable=False)
+    type = sa.Column(sa.String, index=True, nullable=False)
 
     keywords: sa.orm.Mapped[List["ContentKeyword"]] = sa.orm.relationship(
         "ContentKeyword", secondary="contents_keywords_m2m", back_populates="contents"

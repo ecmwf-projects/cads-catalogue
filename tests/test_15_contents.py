@@ -18,7 +18,7 @@ def test_load_content_folder() -> None:
     )
     expected_contents = [
         {
-            "content_uid": "cds-application-copernicus-interactive-climates-atlas",
+            "slug": "copernicus-interactive-climates-atlas",
             "publication_date": "2024-09-13T00:00:00Z",
             "description": "The Copernicus Interactive Climate Atlas provides graphical "
             "information about recent past trends and future changes "
@@ -54,21 +54,7 @@ def test_load_content_folder() -> None:
 def test_load_contents() -> None:
     expected_contents = [
         {
-            "content_uid": "ads-page-how-to-api",
-            "publication_date": "2024-09-13T10:01:50Z",
-            "description": "Access the full data store catalogue, with search and availability features",
-            "image": None,
-            "keywords": [],
-            "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
-            "content_update": "2024-09-16T02:10:22Z",
-            "link": None,
-            "site": "ads",
-            "title": "CDSAPI setup",
-            "type": "page",
-            "data": None,
-        },
-        {
-            "content_uid": "cds-application-copernicus-interactive-climates-atlas",
+            "slug": "copernicus-interactive-climates-atlas",
             "publication_date": "2024-09-13T00:00:00Z",
             "description": "The Copernicus Interactive Climate Atlas provides graphical "
             "information about recent past trends and future changes "
@@ -100,7 +86,21 @@ def test_load_contents() -> None:
             },
         },
         {
-            "content_uid": "cds-page-how-to-api",
+            "slug": "how-to-api",
+            "publication_date": "2024-09-13T10:01:50Z",
+            "description": "Access the full data store catalogue, with search and availability features",
+            "image": None,
+            "keywords": [],
+            "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
+            "content_update": "2024-09-16T02:10:22Z",
+            "link": None,
+            "site": "ads",
+            "title": "CDSAPI setup",
+            "type": "page",
+            "data": None,
+        },
+        {
+            "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
             "description": "Access the full data store catalogue, with search and availability features",
             "image": None,
@@ -115,7 +115,7 @@ def test_load_contents() -> None:
         },
     ]
     effective_contents = sorted(
-        contents.load_contents(TEST_CONTENT_ROOT_PATH), key=itemgetter("content_uid")
+        contents.load_contents(TEST_CONTENT_ROOT_PATH), key=itemgetter("slug", "site")
     )
     assert effective_contents == expected_contents
 
@@ -138,7 +138,7 @@ def test_content_sync(
     mocker.patch.object(object_storage, "store_file", return_value="an url")
     # load testing content
     content1 = {
-        "content_uid": "copernicus-interactive-climates-atlas",
+        "slug": "copernicus-interactive-climates-atlas",
         "publication_date": "2024-09-13T00:00:00Z",
         "description": "The Copernicus Interactive Climate Atlas provides graphical "
         "information about recent past trends and future changes "
