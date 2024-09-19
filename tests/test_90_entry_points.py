@@ -865,7 +865,9 @@ def test_update_catalogue(
             )
         ).all() == [(True,)]
         assert session.execute(
-            sa.text("select title from contents where content_uid='ads-page-how-to-api'")
+            sa.text(
+                "select title from contents where content_uid='ads-page-how-to-api'"
+            )
         ).all() == [("CDSAPI setup",)]
 
     # 5. use 'include' with a pattern that doesn't match anything ----------------------
