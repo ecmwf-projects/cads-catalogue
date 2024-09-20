@@ -18,7 +18,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.create_index("idx_contents_type", "contents", ["type"])
+    op.create_index("ix_contents_type", "contents", ["type"])
     op.drop_column("contents", "content_uid")
     op.add_column("contents", sa.Column("slug", sa.String, index=True, nullable=False))
     op.create_unique_constraint("contents_site_slug_type_key", "contents", ["site", "slug", "type"])
@@ -28,4 +28,4 @@ def downgrade() -> None:
     op.drop_constraint("contents_site_slug_type_key", "contents")
     op.drop_column("contents", "slug")
     op.add_column("contents", sa.Column("content_uid", sa.String, index=True, unique=True, nullable=False))
-    op.drop_index("idx_contents_type", "contents")
+    op.drop_index("ix_contents_type", "contents")
