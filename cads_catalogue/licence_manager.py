@@ -271,7 +271,8 @@ def update_catalogue_licences(
             )
         except Exception:  # noqa
             logger.exception(
-                "db sync for licence '%s' failed, error follows" % licence_uid
+                "db sync for licence '%s' (revision %s) failed, error follows"
+                % (licence_uid, revision)
             )
     return involved_licences
 
@@ -297,7 +298,10 @@ def remove_orphan_licences(
             continue
         licence.resources = []
         session.delete(licence)
-        logger.info("removed licence '%s'" % licence.licence_uid)
+        logger.info(
+            "removed licence '%s' (revision %s)"
+            % (licence.licence_uid, licence.revision)
+        )
 
 
 def migrate_from_cds_licences(
