@@ -230,12 +230,12 @@ def update_catalogue_contents(
         return involved_content_props
 
     # remove not loaded contents from the db
-    all_contents = session.scalars(sa.select(database.Content))
-    for content in all_contents:
-        content_props = (content.site, content.type, content.slug)
+    all_db_contents = session.scalars(sa.select(database.Content))
+    for db_content in all_db_contents:
+        content_props = (db_content.site, db_content.type, db_content.slug)
         if content_props not in involved_content_props:
-            content.keywords = []
-            session.delete(content)
+            db_content.keywords = []
+            session.delete(db_content)
             logger.info(
                 f"removed old content {content_props[1]} '{content_props[2]}' "
                 f"for site {content_props[0]}"
