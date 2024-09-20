@@ -241,7 +241,7 @@ def update_catalogue_licences(
     session: sa.orm.session.Session,
     licences_folder_path: str,
     storage_settings: config.ObjectStorageSettings,
-) -> List[str]:
+) -> List[tuple]:
     """
     Load metadata of licences from files and sync each licence in the db.
 
@@ -253,27 +253,31 @@ def update_catalogue_licences(
 
     Returns
     -------
-    list: list of licence uids involved
+    list: list of tuple (licence uid, revision) of licences involved
     """
-    involved_licence_uids = []
+    involved_licences = []
     licences = load_licences_from_folder(licences_folder_path)
     logger.info("loaded %s licences from %s" % (len(licences), licences_folder_path))
     for licence in licences:
         licence_uid = licence["licence_uid"]
-        involved_licence_uids.append(licence_uid)
+        revision = int(licence["revision"])
+        involved_licences.append((licence_uid, revision))
         try:
             with session.begin_nested():
                 licence_sync(session, licence_uid, licences, storage_settings)
-            logger.info("licence '%s' db sync successful" % licence_uid)
+            logger.info(
+                "licence '%s' (revision %s): db sync successful"
+                % (licence_uid, revision)
+            )
         except Exception:  # noqa
             logger.exception(
                 "db sync for licence '%s' failed, error follows" % licence_uid
             )
-    return involved_licence_uids
+    return involved_licences
 
 
 def remove_orphan_licences(
-    session: sa.orm.session.Session, keep_licences: List[str], resources: List[str]
+    session: sa.orm.session.Session, keep_licences: List[tuple], resources: List[str]
 ):
     """
     Remove all licences that not are in the list of `keep_licences` and unrelated to any resource.
@@ -284,18 +288,16 @@ def remove_orphan_licences(
     keep_licences: list of licence uids to keep
     resources: list of resource_uid
     """
-    licences_to_delete = session.scalars(
-        sa.select(database.Licence).filter(
-            database.Licence.licence_uid.notin_(keep_licences)
-        )
-    )
-    for licence_to_delete in licences_to_delete:
-        related_dataset_uids = [r.resource_uid for r in licence_to_delete.resources]  # type: ignore
+    all_licences = session.scalars(sa.select(database.Licence))
+    for licence in all_licences:
+        if (licence.licence_uid, licence.revision) in keep_licences:
+            continue
+        related_dataset_uids = [r.resource_uid for r in licence.resources]
         if set(related_dataset_uids).intersection(set(resources)):
             continue
-        licence_to_delete.resources = []  # type: ignore
-        session.delete(licence_to_delete)
-        logger.info("removed licence '%s'" % licence_to_delete.licence_uid)
+        licence.resources = []
+        session.delete(licence)
+        logger.info("removed licence '%s'" % licence.licence_uid)
 
 
 def migrate_from_cds_licences(
