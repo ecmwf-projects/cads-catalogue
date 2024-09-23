@@ -48,10 +48,9 @@ def content_sync(
     The created/updated db message
     """
     content = content.copy()
-    content_uid = content["content_uid"]
     keywords = content.pop("keywords", [])
-
-    subpath = os.path.join("contents", content["content_uid"])
+    site, ctype, slug = content["site"], content["type"], content["slug"]
+    subpath = os.path.join("contents", site, ctype, slug)
     for field in OBJECT_STORAGE_UPLOAD_FIELDS:
         file_path = content.get(field)
         if not file_path:
@@ -66,19 +65,25 @@ def content_sync(
 
     # upsert of the message
     db_content = session.scalars(
-        sa.select(database.Content).filter_by(content_uid=content_uid).limit(1)
+        sa.select(database.Content)
+        .filter_by(
+            site=site,
+            type=ctype,
+            slug=slug,
+        )
+        .limit(1)
     ).first()
     if not db_content:
         db_content = database.Content(**content)
         session.add(db_content)
-        logger.debug("added db content %r" % content_uid)
+        logger.debug(f"added content {ctype} '{slug}' for site {site}")
     else:
         session.execute(
             sa.update(database.Content)
             .filter_by(content_id=db_content.content_id)
             .values(**content)
         )
-        logger.debug("updated db content %r" % content_uid)
+        logger.debug("updated content {ctype} '{slug}' for site {site}")
 
     # build related keywords
     db_content.keywords = []  # type: ignore
@@ -98,9 +103,9 @@ def content_sync(
     return db_content
 
 
-def load_content_folder(content_folder: str | pathlib.Path) -> dict[str, Any]:
+def load_content_folder(content_folder: str | pathlib.Path) -> List[dict[str, Any]]:
     """
-    Parse a content folder and returns its metadata dictionary.
+    Parse folder and returns a list of metadata dictionaries, each one for a content.
 
     Parameters
     ----------
@@ -108,40 +113,45 @@ def load_content_folder(content_folder: str | pathlib.Path) -> dict[str, Any]:
 
     Returns
     -------
-    dictionary of information parsed.
+    list of dictionaries of information parsed.
     """
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
         data = json.load(fp)
-    metadata = {
-        "site": ",".join(data["site"]),
-        "type": data["resource_type"],
-        "content_uid": data["id"],
-        "title": data["title"],
-        "description": data["abstract"],
-        "publication_date": data["publication_date"],
-        "content_update": data["update_date"],
-        "link": data.get("link"),
-        "keywords": data.get("keywords", []),
-        "data": data.get("data"),
-        # managed below:
-        # "image": None,
-        # "layout": None,
-    }
-    for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:  # image, layout
-        metadata[ancillar_file_field] = None
-        rel_path = data.get(ancillar_file_field)
-        if rel_path:
-            ancillar_file_path = os.path.abspath(os.path.join(content_folder, rel_path))
-            if os.path.isfile(ancillar_file_path):
-                metadata[ancillar_file_field] = os.path.abspath(
+    ret_value = []
+    for site in data["site"]:
+        metadata = {
+            "site": site,
+            "type": data["resource_type"],
+            "slug": data["id"],
+            "title": data["title"],
+            "description": data["abstract"],
+            "publication_date": data["publication_date"],
+            "content_update": data["update_date"],
+            "link": data.get("link"),
+            "keywords": data.get("keywords", []),
+            "data": data.get("data"),
+            # managed below:
+            # "image": None,
+            # "layout": None,
+        }
+        for ancillar_file_field in OBJECT_STORAGE_UPLOAD_FIELDS:  # image, layout
+            metadata[ancillar_file_field] = None
+            rel_path = data.get(ancillar_file_field)
+            if rel_path:
+                ancillar_file_path = os.path.abspath(
                     os.path.join(content_folder, rel_path)
                 )
-            else:
-                raise ValueError(
-                    f"{metadata_file_path} contains reference to {ancillar_file_field} file not found!"
-                )
-    return metadata
+                if os.path.isfile(ancillar_file_path):
+                    metadata[ancillar_file_field] = os.path.abspath(
+                        os.path.join(content_folder, rel_path)
+                    )
+                else:
+                    raise ValueError(
+                        f"{metadata_file_path} contains reference to {ancillar_file_field} file not found!"
+                    )
+        ret_value.append(metadata)
+    return ret_value
 
 
 def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, Any]]:
@@ -169,13 +179,13 @@ def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, An
             logger.warning("unknown file %r found" % content_folder)
             continue
         try:
-            content_md = load_content_folder(content_folder)
+            contents_md = load_content_folder(content_folder)
         except:  # noqa
             logger.exception(
                 "failed parsing content in %s, error follows" % content_folder
             )
             continue
-        loaded_contents.append(content_md)
+        loaded_contents += contents_md
     return loaded_contents
 
 
@@ -197,41 +207,38 @@ def update_catalogue_contents(
 
     Returns
     -------
-    list: list of content uids involved
+    list: list of (site, type, slug) of contents involved
     """
     contents = load_contents(contents_package_path)
     logger.info(
         "loaded %s contents from folder %s" % (len(contents), contents_package_path)
     )
-    involved_content_ids = []
+    involved_content_props = []
     for content in contents:
-        content_uid = content["content_uid"]
-        involved_content_ids.append(content_uid)
+        site, ctype, slug = content["site"], content["type"], content["slug"]
+        involved_content_props.append((site, ctype, slug))
         try:
             with session.begin_nested():
                 content_sync(session, content, storage_settings)
-            logger.info("content '%s' db sync successful" % content_uid)
+            logger.info(f"content {ctype} '{slug}' for site {site}: db sync successful")
         except Exception:  # noqa
             logger.exception(
-                "db sync for content '%s' failed, error follows" % content_uid
+                f"db sync for content {ctype} '{slug}' for site {site} failed, error follows"
             )
 
     if not remove_orphans:
-        return involved_content_ids
+        return involved_content_props
 
     # remove not loaded contents from the db
-    contents_to_delete = (
-        session.scalars(
-            sa.select(database.Content).filter(
-                database.Content.content_uid.notin_(involved_content_ids)
+    all_db_contents = session.scalars(sa.select(database.Content))
+    for db_content in all_db_contents:
+        content_props = (db_content.site, db_content.type, db_content.slug)
+        if content_props not in involved_content_props:
+            db_content.keywords = []
+            session.delete(db_content)
+            logger.info(
+                f"removed old content {content_props[1]} '{content_props[2]}' "
+                f"for site {content_props[0]}"
             )
-        )
-        .unique()
-        .all()
-    )
-    for content_to_delete in contents_to_delete:
-        content_to_delete.keywords = []
-        session.delete(content_to_delete)
-        logger.info("removed old content '%s'" % content_to_delete.content_uid)
 
-    return involved_content_ids
+    return involved_content_props

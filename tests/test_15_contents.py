@@ -1,5 +1,6 @@
 import datetime
 import os.path
+from operator import itemgetter
 
 import pytest_mock
 import sqlalchemy as sa
@@ -15,43 +16,45 @@ def test_load_content_folder() -> None:
     content_folder = os.path.join(
         TEST_CONTENT_ROOT_PATH, "copernicus-interactive-climates-atlas"
     )
-    expected_content = {
-        "content_uid": "copernicus-interactive-climates-atlas",
-        "publication_date": "2024-09-13T00:00:00Z",
-        "description": "The Copernicus Interactive Climate Atlas provides graphical "
-        "information about recent past trends and future changes "
-        "(for different scenarios and global warming levels)",
-        "image": os.path.join(content_folder, "cica-overview.png"),
-        "keywords": [
-            "Product type: Application",
-            "Spatial coverage: Global",
-            "Temporal coverage: Past",
-            "Variable domain: Land (hydrology)",
-            "Variable domain: Land (physics)",
-            "Variable domain: Land (biosphere)",
-            "Provider: Copernicus C3S",
-        ],
-        "layout": None,
-        "link": "https://atlas.climate.copernicus.eu/atlas",
-        "content_update": "2024-09-16T00:00:00Z",
-        "site": "cds",
-        "title": "Copernicus Interactive Climate Atlas",
-        "type": "application",
-        "data": {
-            "file-format": "GRIB (optional conversion to netCDF)",
-            "data-type": "Gridded",
-            "horizontal-coverage": "Global",
-        },
-    }
+    expected_contents = [
+        {
+            "slug": "copernicus-interactive-climates-atlas",
+            "publication_date": "2024-09-13T00:00:00Z",
+            "description": "The Copernicus Interactive Climate Atlas provides graphical "
+            "information about recent past trends and future changes "
+            "(for different scenarios and global warming levels)",
+            "image": os.path.join(content_folder, "cica-overview.png"),
+            "keywords": [
+                "Product type: Application",
+                "Spatial coverage: Global",
+                "Temporal coverage: Past",
+                "Variable domain: Land (hydrology)",
+                "Variable domain: Land (physics)",
+                "Variable domain: Land (biosphere)",
+                "Provider: Copernicus C3S",
+            ],
+            "layout": None,
+            "link": "https://atlas.climate.copernicus.eu/atlas",
+            "content_update": "2024-09-16T00:00:00Z",
+            "site": "cds",
+            "title": "Copernicus Interactive Climate Atlas",
+            "type": "application",
+            "data": {
+                "file-format": "GRIB (optional conversion to netCDF)",
+                "data-type": "Gridded",
+                "horizontal-coverage": "Global",
+            },
+        }
+    ]
 
-    effective_content = contents.load_content_folder(content_folder)
-    assert effective_content == expected_content
+    effective_contents = contents.load_content_folder(content_folder)
+    assert effective_contents == expected_contents
 
 
 def test_load_contents() -> None:
     expected_contents = [
         {
-            "content_uid": "copernicus-interactive-climates-atlas",
+            "slug": "copernicus-interactive-climates-atlas",
             "publication_date": "2024-09-13T00:00:00Z",
             "description": "The Copernicus Interactive Climate Atlas provides graphical "
             "information about recent past trends and future changes "
@@ -83,7 +86,7 @@ def test_load_contents() -> None:
             },
         },
         {
-            "content_uid": "how-to-api",
+            "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
             "description": "Access the full data store catalogue, with search and availability features",
             "image": None,
@@ -91,13 +94,29 @@ def test_load_contents() -> None:
             "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
             "content_update": "2024-09-16T02:10:22Z",
             "link": None,
-            "site": "cds,ads",
+            "site": "ads",
+            "title": "CDSAPI setup",
+            "type": "page",
+            "data": None,
+        },
+        {
+            "slug": "how-to-api",
+            "publication_date": "2024-09-13T10:01:50Z",
+            "description": "Access the full data store catalogue, with search and availability features",
+            "image": None,
+            "keywords": [],
+            "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
+            "content_update": "2024-09-16T02:10:22Z",
+            "link": None,
+            "site": "cds",
             "title": "CDSAPI setup",
             "type": "page",
             "data": None,
         },
     ]
-    effective_contents = contents.load_contents(TEST_CONTENT_ROOT_PATH)
+    effective_contents = sorted(
+        contents.load_contents(TEST_CONTENT_ROOT_PATH), key=itemgetter("slug", "site")
+    )
     assert effective_contents == expected_contents
 
 
@@ -119,7 +138,7 @@ def test_content_sync(
     mocker.patch.object(object_storage, "store_file", return_value="an url")
     # load testing content
     content1 = {
-        "content_uid": "copernicus-interactive-climates-atlas",
+        "slug": "copernicus-interactive-climates-atlas",
         "publication_date": "2024-09-13T00:00:00Z",
         "description": "The Copernicus Interactive Climate Atlas provides graphical "
         "information about recent past trends and future changes "
