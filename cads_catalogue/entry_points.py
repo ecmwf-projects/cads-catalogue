@@ -369,7 +369,7 @@ def update_catalogue(
                     resources_folder_path,
                     cim_folder_path,
                     storage_settings,
-                    force=force,
+                    force=force or licences_processed,
                     include=include,
                     exclude=exclude,
                     override_md=current_override_md,
