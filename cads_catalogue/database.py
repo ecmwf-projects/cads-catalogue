@@ -392,7 +392,7 @@ class Licence(BaseModel):
     )
 
 
-def ensure_engine(connection_string, **kwargs):
+def ensure_engine(connection_string, **kwargs) -> sa.engine.Engine:
     """Return a sqlalchemy engine."""
     settings = config.ensure_settings(config.dbsettings)
     engine_kwargs = {
