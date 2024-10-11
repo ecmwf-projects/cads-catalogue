@@ -392,7 +392,26 @@ class Licence(BaseModel):
     )
 
 
-def ensure_session_obj(read_only: bool = False) -> sa.orm.sessionmaker:
+def ensure_engine(connection_string, **kwargs):
+    """Return a sqlalchemy engine."""
+    settings = config.ensure_settings(config.dbsettings)
+    engine_kwargs = {
+        "pool_recycle": settings.pool_recycle,
+        "pool_size": settings.pool_size,
+        "pool_timeout": settings.pool_timeout,
+        "max_overflow": settings.max_overflow,
+    }
+    engine_kwargs.update(kwargs)
+    if engine_kwargs["pool_size"] == -1:
+        engine = sa.create_engine(
+            connection_string, poolclass=sa.pool.NullPool, **engine_kwargs
+        )
+    else:
+        engine = sa.create_engine(connection_string, **engine_kwargs)
+    return engine
+
+
+def ensure_session_obj(read_only: bool = False, **kwargs) -> sa.orm.sessionmaker:
     """Create a new session object bound to the catalogue database.
 
     Parameters
@@ -409,16 +428,7 @@ def ensure_session_obj(read_only: bool = False) -> sa.orm.sessionmaker:
         connection_string = settings.connection_string_read
     else:
         connection_string = settings.connection_string
-    if settings.pool_size == -1:
-        engine = sa.create_engine(connection_string, poolclass=sa.pool.NullPool)
-    else:
-        engine = sa.create_engine(
-            connection_string,
-            pool_recycle=settings.pool_recycle,
-            pool_size=settings.pool_size,
-            pool_timeout=settings.pool_timeout,
-            max_overflow=settings.max_overflow,
-        )
+    engine = ensure_engine(connection_string, **kwargs)
     session_obj = sa.orm.sessionmaker(engine)
     return session_obj
 
