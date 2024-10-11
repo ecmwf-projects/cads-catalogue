@@ -45,6 +45,9 @@ class SqlalchemySettings:
     catalogue_db_host_read: str | None = None
     catalogue_db_name: str | None = None
     pool_recycle: int = 60
+    pool_size: int = 5
+    pool_timeout: float = 1.0
+    max_overflow: int = 15
 
     def __init__(self, **kwargs):
         self.match_args = kwargs

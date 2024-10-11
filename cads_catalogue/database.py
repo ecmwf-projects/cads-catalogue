@@ -406,12 +406,18 @@ def ensure_session_obj(read_only: bool = False) -> sa.orm.sessionmaker:
     """
     settings = config.ensure_settings(config.dbsettings)
     if read_only:
-        engine = sa.create_engine(
-            settings.connection_string_read, pool_recycle=settings.pool_recycle
-        )
+        connection_string = settings.connection_string_read
+    else:
+        connection_string = settings.connection_string
+    if settings.pool_size == -1:
+        engine = sa.create_engine(connection_string, poolclass=sa.pool.NullPool)
     else:
         engine = sa.create_engine(
-            settings.connection_string, pool_recycle=settings.pool_recycle
+            connection_string,
+            pool_recycle=settings.pool_recycle,
+            pool_size=settings.pool_size,
+            pool_timeout=settings.pool_timeout,
+            max_overflow=settings.max_overflow,
         )
     session_obj = sa.orm.sessionmaker(engine)
     return session_obj
