@@ -403,9 +403,7 @@ def ensure_engine(connection_string, **kwargs) -> sa.engine.Engine:
     }
     engine_kwargs.update(kwargs)
     if engine_kwargs["pool_size"] == -1:
-        engine = sa.create_engine(
-            connection_string, poolclass=sa.pool.NullPool, **engine_kwargs
-        )
+        engine = sa.create_engine(connection_string, poolclass=sa.pool.NullPool)
     else:
         engine = sa.create_engine(connection_string, **engine_kwargs)
     return engine
