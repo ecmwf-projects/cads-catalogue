@@ -18,6 +18,9 @@ depends_on = None
 
 
 def upgrade() -> None:
+    sql = "DELETE * FROM contents"
+    conn = op.get_bind()
+    conn.execute(sa.text(sql))
     op.create_index("ix_contents_type", "contents", ["type"])
     op.drop_column("contents", "content_uid")
     op.add_column("contents", sa.Column("slug", sa.String, index=True, nullable=False))
