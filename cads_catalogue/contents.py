@@ -21,7 +21,7 @@ from typing import Any, List
 import sqlalchemy as sa
 import structlog
 
-from cads_catalogue import config, database, object_storage
+from cads_catalogue import config, database, layout_manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
@@ -52,6 +52,9 @@ def content_sync(
     site, ctype, slug = content["site"], content["type"], content["slug"]
     subpath = os.path.join("contents", site, ctype, slug)
     for field in OBJECT_STORAGE_UPLOAD_FIELDS:
+        if field == "layout":
+            # already done by layout manager
+            continue
         file_path = content.get(field)
         if not file_path:
             continue
@@ -143,15 +146,51 @@ def load_content_folder(content_folder: str | pathlib.Path) -> List[dict[str, An
                     os.path.join(content_folder, rel_path)
                 )
                 if os.path.isfile(ancillar_file_path):
-                    metadata[ancillar_file_field] = os.path.abspath(
-                        os.path.join(content_folder, rel_path)
-                    )
+                    metadata[ancillar_file_field] = ancillar_file_path
                 else:
                     raise ValueError(
                         f"{metadata_file_path} contains reference to {ancillar_file_field} file not found!"
                     )
         ret_value.append(metadata)
     return ret_value
+
+
+def transform_layout(
+    content: dict[str, Any],
+    storage_settings: config.ObjectStorageSettings,
+):
+    """
+    Modify layout.json information inside content metadata, with related uploads to the object storage.
+
+    Parameters
+    ----------
+    content: metadata of a loaded content from files
+    storage_settings: object with settings to access the object storage
+
+    Returns
+    -------
+    modified version of input resource metadata
+    """
+    if not content.get("layout"):
+        return content
+    layout_file_path = content["layout"]
+    if not os.path.isfile(layout_file_path):
+        return content
+    layout_folder_path = os.path.dirname(layout_file_path)
+    with open(layout_file_path) as fp:
+        layout_data = json.load(fp)
+        logger.debug(f"input layout_data: {layout_data}")
+
+    layout_data = layout_manager.transform_html_blocks(layout_data, layout_folder_path)
+
+    logger.debug(f"output layout_data: {layout_data}")
+    site, ctype, slug = content["site"], content["type"], content["slug"]
+    subpath = os.path.join("contents", site, ctype, slug)
+    content["layout"] = layout_manager.store_layout_by_data(
+        layout_data, content, storage_settings, subpath=subpath
+    )
+    logger.debug(f"layout url: {content['layout']}")
+    return content
 
 
 def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, Any]]:
@@ -214,9 +253,10 @@ def update_catalogue_contents(
         "loaded %s contents from folder %s" % (len(contents), contents_package_path)
     )
     involved_content_props = []
-    for content in contents:
+    for content in contents[:]:
         site, ctype, slug = content["site"], content["type"], content["slug"]
         involved_content_props.append((site, ctype, slug))
+        content = transform_layout(content, storage_settings)
         try:
             with session.begin_nested():
                 content_sync(session, content, storage_settings)

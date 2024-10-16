@@ -640,12 +640,12 @@ def test_update_catalogue(
             os.path.join(
                 TESTDATA_PATH,
                 "cads-contents-json",
-                "how-to-api",
-                "layout.json",
+                "copernicus-interactive-climates-atlas",
+                "cica-overview.png",
             ),
             object_storage_url,
             bucket_name=bucket_name,
-            subpath="contents/ads/page/how-to-api",
+            subpath="contents/cds/application/copernicus-interactive-climates-atlas",
             **object_storage_kws,
         ),
     ]

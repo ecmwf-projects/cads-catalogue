@@ -216,7 +216,6 @@ def test_content_sync(
     ]
     content1["publication_date"] = "2021-03-18T11:02:31Z"
     content1["title"] = "new title"
-    content1["layout"] = os.path.join(content_folder, "cica-overview.png")
     with session_obj() as session:
         # db is not empty: update a content
         db_content2 = contents.content_sync(session, content1, storage_settings)
@@ -253,8 +252,6 @@ def test_content_sync(
         for key, value in content1.items():
             if key in ("publication_date", "content_update"):
                 value = datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")  # type: ignore
-            elif key in ("layout",):
-                value = "an url"
             elif key == "keywords":
                 continue
             assert getattr(db_content2, key) == value
