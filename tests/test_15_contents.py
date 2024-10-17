@@ -1,11 +1,13 @@
 import datetime
 import os.path
+import unittest.mock
 from operator import itemgetter
+from typing import Any
 
 import pytest_mock
 import sqlalchemy as sa
 
-from cads_catalogue import config, contents, object_storage
+from cads_catalogue import config, contents, layout_manager, object_storage
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -255,3 +257,67 @@ def test_content_sync(
             elif key == "keywords":
                 continue
             assert getattr(db_content2, key) == value
+
+
+def test_transform_layout(mocker: pytest_mock.MockerFixture):
+    mocker.patch.object(object_storage, "store_file", return_value="an url")
+    _store_layout_by_data = mocker.spy(layout_manager, "store_layout_by_data")
+    my_settings_dict = {
+        "object_storage_url": "https://object/storage/url/",
+        "storage_admin": "admin1",
+        "storage_password": "secret1",
+        "catalogue_bucket": "mycatalogue_bucket",
+        "document_storage_url": "https://document/storage/url/",
+    }
+    storage_settings = config.ObjectStorageSettings(**my_settings_dict)
+    content_folder = os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api")
+    initial_md_content: dict[str, Any] = {
+        "site": "cds",
+        "type": "page",
+        "slug": "how-to-api",
+        "title": "CDSAPI setup",
+        "description": "Access the full data store catalogue, with search and availability features",
+        "publication_date": "2024-09-13T10:01:50Z",
+        "content_update": "2024-09-16T02:10:22Z",
+        "link": None,
+        "keywords": [],
+        "data": None,
+        "layout": os.path.join(content_folder, "layout.json"),
+        "image": None,
+    }
+    expected_layout_data = {
+        "title": "CDSAPI setup",
+        "description": "Access the full data store catalogue, with search and availability features",
+        "body": {
+            "main": {
+                "sections": [
+                    {
+                        "id": "main",
+                        "blocks": [
+                            {
+                                "id": "page-content",
+                                "type": "html",
+                                "content": "<p>this is a content of a html block</p>",
+                            }
+                        ],
+                    }
+                ]
+            }
+        },
+    }
+
+    effective_md_content = contents.transform_layout(
+        initial_md_content, storage_settings
+    )
+    expected_md_content = initial_md_content.copy()
+    expected_md_content["layout"] = "an url"
+
+    assert effective_md_content == expected_md_content
+    assert _store_layout_by_data.mock_calls == [
+        unittest.mock.call(
+            expected_layout_data,
+            expected_md_content,
+            storage_settings,
+            subpath="contents/cds/page/how-to-api",
+        )
+    ]
