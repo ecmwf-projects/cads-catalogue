@@ -10,7 +10,8 @@
             {
               "id": "page-content",
               "type": "html",
-              "content": "<div>TODO</div>"
+              "content": "<div>TODO</div>",
+              "content_source": "../html_block.html"
             }
           ]
         }
