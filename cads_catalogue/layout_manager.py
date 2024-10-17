@@ -513,7 +513,7 @@ def transform_html_blocks(
     sections = body_main.get("sections", [])
     for i, section in enumerate(copy.deepcopy(sections)):
         sections[i] = manage_html_block_in_section(section, layout_folder_path)
-    # search all the html blocks inside body/aside:
+    # search all html blocks inside body/aside:
     aside_section = body.get("aside", {})
     if aside_section:
         new_data["body"]["aside"] = manage_html_block_in_section(
