@@ -65,15 +65,13 @@ def manage_image_section(
                 if utils.is_url(image_rel_path):
                     # nothing to do, the url is already uploaded somewhere
                     continue
-                image_abs_path = os.path.join(folder_path, image_dict["url"])
+                image_abs_path = os.path.abspath(
+                    os.path.join(folder_path, image_dict["url"])
+                )
                 if os.path.isfile(image_abs_path):
                     if image_abs_path not in images_stored and not disable_upload:
                         # process upload to object storage
-                        subpath = os.path.dirname(
-                            os.path.join(
-                                "resources", resource["resource_uid"], image_rel_path
-                            )
-                        )
+                        subpath = f"resources/{resource['resource_uid']}"
                         image_rel_url = object_storage.store_file(
                             image_abs_path,
                             storage_settings.object_storage_url,
