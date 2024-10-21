@@ -202,6 +202,21 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
             "alt": "alternative text",
         },
     }
+    multi_images_block = {
+        "id": "abstract",
+        "type": "thumb-markdown",
+        "content": "a content",
+        "image": [
+            {
+                "url": "overview/overview.png",
+                "alt": "alternative text1",
+            },
+            {
+                "url": "overview/overview2.png",
+                "alt": "alternative text2",
+            },
+        ],
+    }
     modified_image_block = {
         "id": "abstract",
         "type": "thumb-markdown",
@@ -211,6 +226,21 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
             "alt": "alternative text",
         },
     }
+    multi_images_block_uploaded = {
+        "id": "abstract",
+        "type": "thumb-markdown",
+        "content": "a content",
+        "image": [
+            {
+                "url": "http://public-storage/an url",
+                "alt": "alternative text1",
+            },
+            {
+                "url": "http://public-storage/an url",
+                "alt": "alternative text2",
+            },
+        ],
+    }
     section = {"id": "overview", "blocks": [no_image_block, image_block]}
     images_stored: dict[str, str] = dict()
 
@@ -219,7 +249,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
         layout_manager.manage_image_section(
             str(tmpdir), section, images_stored, resource, oss
         )
-    # url is already a link: no change
+    # url is already uploaded: no change
     image_block_already_url = {
         "id": "abstract",
         "type": "thumb-markdown",
@@ -241,7 +271,9 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     overview_file_path = os.path.join(overview_path, "overview.png")
     with open(overview_file_path, "w") as fp:
         fp.write("hello! I am an image")
-
+    overview2_file_path = os.path.join(overview_path, "overview2.png")
+    with open(overview2_file_path, "w") as fp:
+        fp.write("hello! I am an image2")
     # 1 image block
     section = {"id": "overview", "blocks": [no_image_block, image_block]}
     new_section = layout_manager.manage_image_section(
@@ -263,7 +295,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     )
     assert new_section == section
 
-    # case section with more image_blocks
+    # case section with more separeted image blocks
     section = {"id": "overview", "blocks": [image_block, no_image_block, image_block]}
     new_section = layout_manager.manage_image_section(
         str(tmpdir), section, images_stored, resource, oss
@@ -321,6 +353,15 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
             },
             no_image_block,
         ],
+    }
+    # case section with a block with multiple images
+    section = {"id": "overview", "blocks": [no_image_block, multi_images_block]}
+    new_section = layout_manager.manage_image_section(
+        str(tmpdir), section, images_stored, resource, oss
+    )
+    assert new_section == {
+        "id": "overview",
+        "blocks": [no_image_block, multi_images_block_uploaded],
     }
 
 
