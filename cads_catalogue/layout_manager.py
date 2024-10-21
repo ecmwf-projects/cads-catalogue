@@ -54,44 +54,56 @@ def manage_image_section(
     new_section = copy.deepcopy(section)
     blocks = new_section.get("blocks", [])
     for i, block in enumerate(copy.deepcopy(blocks)):
-        image_dict = block.get("image", {})
-        image_rel_path = image_dict.get("url")
-        if block.get("type") == "thumb-markdown" and image_rel_path:
-            if utils.is_url(image_rel_path):
-                # nothing to do, the url is already uploaded somewhere
-                continue
-            image_abs_path = os.path.join(folder_path, block["image"]["url"])
-            if os.path.isfile(image_abs_path):
-                if image_abs_path not in images_stored and not disable_upload:
-                    # process upload to object storage
-                    subpath = os.path.dirname(
-                        os.path.join(
-                            "resources", resource["resource_uid"], image_rel_path
+        if "image" not in block:
+            continue
+        image_dict_list = block["image"]
+        if isinstance(image_dict_list, dict):
+            image_dict_list = [image_dict_list]
+        for j, image_dict in enumerate(image_dict_list):
+            image_rel_path = image_dict.get("url")
+            if block.get("type") == "thumb-markdown" and image_rel_path:
+                if utils.is_url(image_rel_path):
+                    # nothing to do, the url is already uploaded somewhere
+                    continue
+                image_abs_path = os.path.join(folder_path, image_dict["url"])
+                if os.path.isfile(image_abs_path):
+                    if image_abs_path not in images_stored and not disable_upload:
+                        # process upload to object storage
+                        subpath = os.path.dirname(
+                            os.path.join(
+                                "resources", resource["resource_uid"], image_rel_path
+                            )
                         )
-                    )
-                    image_rel_url = object_storage.store_file(
-                        image_abs_path,
-                        storage_settings.object_storage_url,
-                        bucket_name=storage_settings.catalogue_bucket,
-                        subpath=subpath,
-                        **storage_settings.storage_kws,
-                    )
-                    # update cache of the upload urls
-                    images_stored[image_abs_path] = urllib.parse.urljoin(
-                        storage_settings.document_storage_url, image_rel_url
-                    )
-                blocks[i]["image"]["url"] = images_stored.get(image_abs_path, "")
-            else:
-                raise ValueError(f"image {image_rel_path} not found")
-        elif block.get("type") in ("section", "accordion"):
-            blocks[i] = manage_image_section(
-                folder_path,
-                block,
-                images_stored,
-                resource,
-                storage_settings,
-                disable_upload=disable_upload,
-            )
+                        image_rel_url = object_storage.store_file(
+                            image_abs_path,
+                            storage_settings.object_storage_url,
+                            bucket_name=storage_settings.catalogue_bucket,
+                            subpath=subpath,
+                            **storage_settings.storage_kws,
+                        )
+                        # update cache of the upload urls
+                        images_stored[image_abs_path] = urllib.parse.urljoin(
+                            storage_settings.document_storage_url, image_rel_url
+                        )
+                    if isinstance(block["image"], dict):
+                        blocks[i]["image"]["url"] = images_stored.get(
+                            image_abs_path, ""
+                        )
+                    else:
+                        blocks[i]["image"][j]["url"] = images_stored.get(
+                            image_abs_path, ""
+                        )
+                else:
+                    raise ValueError(f"image {image_rel_path} not found")
+            elif block.get("type") in ("section", "accordion"):
+                blocks[i] = manage_image_section(
+                    folder_path,
+                    block,
+                    images_stored,
+                    resource,
+                    storage_settings,
+                    disable_upload=disable_upload,
+                )
     return new_section
 
 
