@@ -60,6 +60,7 @@ def manage_image_section(
         if isinstance(image_dict_list, dict):
             image_dict_list = [image_dict_list]
         for j, image_dict in enumerate(image_dict_list):
+            # TODO: better to not use relative paths, look only inside local folder
             image_rel_path = image_dict.get("url")
             if block.get("type") == "thumb-markdown" and image_rel_path:
                 if utils.is_url(image_rel_path):
