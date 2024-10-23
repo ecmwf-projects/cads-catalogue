@@ -957,3 +957,107 @@ def test_transform_licence_acceptance_blocks(session_obj: sa.orm.sessionmaker):
         expected_layout_data = json.load(fp)
     assert out_layout_data == expected_layout_data
     session.close()
+
+
+def build_layout_data(blocks):
+    """For testing transform_html_blocks."""
+    layout_data = {
+        "title": "CDSAPI setup",
+        "description": "Access the full data store catalogue, with search and availability features",
+        "body": {
+            "main": {
+                "sections": [
+                    {
+                        "id": "main",
+                        "blocks": blocks,
+                    }
+                ]
+            }
+        },
+    }
+    return layout_data
+
+
+def test_transform_html_blocks():
+    # note: layout_folder_path is the reference for relative path of the html content source
+    layout_folder_path = os.path.join(TESTDATA_PATH, "cads-contents-json", "how-to-api")
+    with open(
+        os.path.join(TESTDATA_PATH, "cads-contents-json", "html_block.html")
+    ) as fp:
+        html_block_content = fp.read()
+    thumb_block = {
+        "id": "test_block",
+        "type": "thumb-markdown",
+        "content": "EAC4",
+    }
+    html_block_no_change = {
+        "id": "test_block",
+        "type": "html",
+        "content": "<p>this must be static</p>",
+    }
+    html_block_replace = {
+        "id": "test_block",
+        "type": "html",
+        "content_source": "../html_block.html",
+    }
+    html_block_overwrite = {
+        "id": "test_block",
+        "type": "html",
+        "content_source": "../html_block.html",
+        "content": "<div>to be overriden</div>",
+    }
+    html_block_default = {
+        "id": "test_block",
+        "type": "html",
+        "content_source": "../not_exist.html",
+        "content": "<div>to be overriden</div>",
+    }
+    html_block_broken = {
+        "id": "test_block",
+        "type": "html",
+        "content_source": "../not_exist.html",
+    }
+    exp_html_block_replaced = {
+        "id": "test_block",
+        "type": "html",
+        "content": html_block_content,
+    }
+    exp_html_block_default = {
+        "id": "test_block",
+        "type": "html",
+        "content": "<div>to be overriden</div>",
+    }
+    # no change
+    in_layout_data = build_layout_data([thumb_block, html_block_no_change, thumb_block])
+    out_layout_data = layout_manager.transform_html_blocks(
+        in_layout_data, layout_folder_path
+    )
+    assert out_layout_data == in_layout_data
+    # replace
+    in_layout_data = build_layout_data([thumb_block, html_block_replace, thumb_block])
+    out_layout_data = layout_manager.transform_html_blocks(
+        in_layout_data, layout_folder_path
+    )
+    assert out_layout_data == build_layout_data(
+        [thumb_block, exp_html_block_replaced, thumb_block]
+    )
+    # overwrite
+    in_layout_data = build_layout_data([thumb_block, html_block_overwrite, thumb_block])
+    out_layout_data = layout_manager.transform_html_blocks(
+        in_layout_data, layout_folder_path
+    )
+    assert out_layout_data == build_layout_data(
+        [thumb_block, exp_html_block_replaced, thumb_block]
+    )
+    # default
+    in_layout_data = build_layout_data([thumb_block, html_block_default, thumb_block])
+    out_layout_data = layout_manager.transform_html_blocks(
+        in_layout_data, layout_folder_path
+    )
+    assert out_layout_data == build_layout_data(
+        [thumb_block, exp_html_block_default, thumb_block]
+    )
+    # broken
+    in_layout_data = build_layout_data([thumb_block, html_block_broken, thumb_block])
+    with pytest.raises(ValueError):
+        layout_manager.transform_html_blocks(in_layout_data, layout_folder_path)
