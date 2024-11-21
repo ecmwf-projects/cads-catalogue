@@ -20,8 +20,9 @@ from typing import Any, List
 
 import sqlalchemy as sa
 import structlog
+import yaml
 
-from cads_catalogue import config, database, layout_manager, object_storage
+from cads_catalogue import config, database, layout_manager, object_storage, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
@@ -106,23 +107,31 @@ def content_sync(
     return db_content
 
 
-def load_content_folder(content_folder: str | pathlib.Path) -> List[dict[str, Any]]:
+def load_content_folder(
+    content_folder: str | pathlib.Path, global_context: dict[str, Any] | None = None
+) -> List[dict[str, Any]]:
     """
     Parse folder and returns a list of metadata dictionaries, each one for a content.
 
     Parameters
     ----------
     content_folder: folder path containing content files
+    global_context: dictionary to be used for rendering templates
 
     Returns
     -------
     list of dictionaries of information parsed.
     """
+    if global_context is None:
+        global_context = dict()
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
         data = json.load(fp)
     ret_value = []
     for site in data["site"]:
+        site_context = global_context.get("default", dict())
+        site_context.update(global_context.get("site", dict()))
+        data = utils.dict_render(data, site_context)
         metadata = {
             "site": site,
             "type": data["resource_type"],
@@ -193,18 +202,40 @@ def transform_layout(
     return content
 
 
-def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, Any]]:
+def yaml2context(yaml_path: str | pathlib.Path | None) -> dict[str, Any]:
+    """
+    load yaml used for rendering templates.
+
+    :param yaml_path: yaml path
+    :return: yaml parsed
+    """
+    if not yaml_path:
+        return dict()
+    if not os.path.isfile(yaml_path):
+        logger.warning(f"{yaml_path} not found. No variable substitution in templates.")
+        return dict()
+    with open(yaml_path) as fp:
+        data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+    return data
+
+
+def load_contents(
+    contents_root_folder: str | pathlib.Path,
+    yaml_path: str | pathlib.Path | None = None,
+) -> List[dict[str, Any]]:
     """
     Load all contents from a folder and return a dictionary of metadata extracted.
 
     Parameters
     ----------
     contents_root_folder: root path where to look for contents (i.e. cads-contents-json root folder)
+    yaml_path: path to the yaml file to load variables (i.e. context) for template rendering
 
     Returns
     -------
     List of found contents parsed.
     """
+    global_context = yaml2context(yaml_path)
     loaded_contents = []
     if not os.path.isdir(contents_root_folder):
         logger.warning("not found folder {contents_root_folder}!")
@@ -218,7 +249,7 @@ def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, An
             logger.warning("unknown file %r found" % content_folder)
             continue
         try:
-            contents_md = load_content_folder(content_folder)
+            contents_md = load_content_folder(content_folder, global_context)
         except:  # noqa
             logger.exception(
                 "failed parsing content in %s, error follows" % content_folder
@@ -233,6 +264,7 @@ def update_catalogue_contents(
     contents_package_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     remove_orphans: bool = True,
+    yaml_path: str | pathlib.Path | None = None,
 ):
     """
     Load metadata of contents from files and sync each content in the db.
@@ -243,12 +275,13 @@ def update_catalogue_contents(
     contents_package_path: root folder path of the contents package (i.e. cads-contents-json root folder)
     storage_settings: object with settings to access the object storage
     remove_orphans: if True, remove from the database other contents not involved (default True)
+    yaml_path: path to yaml file containing variables to be rendered in the json files
 
     Returns
     -------
     list: list of (site, type, slug) of contents involved
     """
-    contents = load_contents(contents_package_path)
+    contents = load_contents(contents_package_path, yaml_path)
     logger.info(
         "loaded %s contents from folder %s" % (len(contents), contents_package_path)
     )
