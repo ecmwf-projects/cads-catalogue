@@ -126,12 +126,12 @@ def load_content_folder(
         global_context = dict()
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
-        data = json.load(fp)
+        data_raw = json.load(fp)
     ret_value = []
-    for site in data["site"]:
+    for site in data_raw["site"][:]:
         site_context = global_context.get("default", dict())
-        site_context.update(global_context.get("site", dict()))
-        data = utils.dict_render(data, site_context)
+        site_context.update(global_context.get(site, dict()))
+        data = utils.dict_render(data_raw, site_context)
         metadata = {
             "site": site,
             "type": data["resource_type"],
