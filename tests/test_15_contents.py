@@ -14,9 +14,33 @@ TESTDATA_PATH = os.path.join(THIS_PATH, "data")
 TEST_CONTENT_ROOT_PATH = os.path.join(TESTDATA_PATH, "cads-contents-json")
 
 
+def test_yaml2context() -> None:
+    yaml_path = os.path.join(TEST_CONTENT_ROOT_PATH, "template_config.yaml")
+    effective_context = contents.yaml2context(yaml_path)
+    expected_context = {
+        "default": {
+            "apiSnippet": "import something\nthis_is_a_default_snippet\n",
+            "global_prop": "33",
+        },
+        "cds": {
+            "siteSlug": "CDS",
+            "siteName": "Climate Data Store",
+            "apiSnippet": "import cds_stuff\nthis_is_cds_snippet\n",
+        },
+        "ads": {
+            "siteSlug": "ADS",
+            "siteName": "ADS Data Store",
+            "apiSnippet": "import ads_stuff\nthis_is_ads_snippet",
+        },
+    }
+    assert effective_context == expected_context
+
+
 def test_load_content_folder() -> None:
+    # no templated content
     content_folder = os.path.join(
-        TEST_CONTENT_ROOT_PATH, "copernicus-interactive-climates-atlas"
+        TEST_CONTENT_ROOT_PATH,
+        "copernicus-interactive-climates-atlas",
     )
     expected_contents = [
         {
@@ -52,8 +76,36 @@ def test_load_content_folder() -> None:
     effective_contents = contents.load_content_folder(content_folder)
     assert effective_contents == expected_contents
 
+    # templated content
+    content_folder = os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api-templated")
+    yaml_config = os.path.join(TEST_CONTENT_ROOT_PATH, "template_config.yaml")
+    expected_contents = [
+        {
+            "slug": "how-to-api-templated",
+            "publication_date": "2024-09-13T10:01:50Z",
+            "description": "Access 33 items of ADS Data Store catalogue, "
+            "with search and availability features",
+            "image": None,
+            "keywords": [],
+            "layout": os.path.join(
+                TEST_CONTENT_ROOT_PATH, "how-to-api-templated", "layout.json"
+            ),
+            "content_update": "2024-09-16T02:10:22Z",
+            "link": None,
+            "site": "ads",
+            "title": "ADS API setup",
+            "type": "page",
+            "data": None,
+        },
+    ]
+    global_context = contents.yaml2context(yaml_config)
+    effective_contents = contents.load_content_folder(content_folder, global_context)
+    assert effective_contents == expected_contents
+
 
 def test_load_contents() -> None:
+    yaml_config = os.path.join(TEST_CONTENT_ROOT_PATH, "template_config.yaml")
+    global_context = contents.yaml2context(yaml_config)
     expected_contents = [
         {
             "slug": "copernicus-interactive-climates-atlas",
@@ -90,7 +142,8 @@ def test_load_contents() -> None:
         {
             "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
-            "description": "Access the full data store catalogue, with search and availability features",
+            "description": "Access the full data store catalogue, "
+            "with search and availability features",
             "image": None,
             "keywords": [],
             "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
@@ -104,7 +157,8 @@ def test_load_contents() -> None:
         {
             "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
-            "description": "Access the full data store catalogue, with search and availability features",
+            "description": "Access the full data store catalogue, "
+            "with search and availability features",
             "image": None,
             "keywords": [],
             "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
@@ -115,9 +169,27 @@ def test_load_contents() -> None:
             "type": "page",
             "data": None,
         },
+        {
+            "slug": "how-to-api-templated",
+            "publication_date": "2024-09-13T10:01:50Z",
+            "description": "Access 33 items of ADS Data Store catalogue, "
+            "with search and availability features",
+            "image": None,
+            "keywords": [],
+            "layout": os.path.join(
+                TEST_CONTENT_ROOT_PATH, "how-to-api-templated", "layout.json"
+            ),
+            "content_update": "2024-09-16T02:10:22Z",
+            "link": None,
+            "site": "ads",
+            "title": "ADS API setup",
+            "type": "page",
+            "data": None,
+        },
     ]
     effective_contents = sorted(
-        contents.load_contents(TEST_CONTENT_ROOT_PATH), key=itemgetter("slug", "site")
+        contents.load_contents(TEST_CONTENT_ROOT_PATH, global_context),
+        key=itemgetter("slug", "site"),
     )
     assert effective_contents == expected_contents
 
@@ -297,7 +369,7 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
                             {
                                 "id": "page-content",
                                 "type": "html",
-                                "content": "<p>this is a content of a html block</p>",
+                                "content": "<p>this is a content of a html block</p>\n<p>${apiSnippet}</p>",
                             }
                         ],
                     }
@@ -321,3 +393,21 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
             subpath="contents/cds/page/how-to-api",
         )
     ]
+
+
+# def test_update_catalogue_contents(session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture):
+#     my_settings_dict = {
+#         "object_storage_url": "object/storage/url",
+#         "storage_admin": "admin1",
+#         "storage_password": "secret1",
+#         "catalogue_bucket": "mycatalogue_bucket",
+#         "document_storage_url": "my/url",
+#     }
+#     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
+#     patch = mocker.patch.object(object_storage, "store_file", return_value="an url")
+#     contents_package_path = os.path.join(TESTDATA_PATH, "cads-contents-json")
+#     yaml_config = os.path.join(TEST_CONTENT_ROOT_PATH, 'template_config.yaml')
+#     with session_obj() as session:
+#         contents.update_catalogue_contents(
+#         session, contents_package_path, storage_settings, yaml_path=yaml_config
+#         )

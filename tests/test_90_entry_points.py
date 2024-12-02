@@ -617,9 +617,9 @@ def test_update_catalogue(
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
     # check object storage calls
-    assert _store_file.call_count == 8
+    assert _store_file.call_count == 9
     #     # overview.png * 3 = 3 (one from contents)
-    #     # layout.json * 3 = 3 (2 from contents)
+    #     # layout.json * 4 = 4 (3 from contents)
     #     # form.json = 1
     #     # constraints.json = 1
     #     # check object storage calls
@@ -683,15 +683,16 @@ def test_update_catalogue(
             )
         ]
         sql2 = "select slug, title, site, type from contents order by site, type, slug"
-        assert session.execute(sa.text(sql2)).all() == [
-            ("how-to-api", "CDSAPI setup", "ads", "page"),
+        assert sorted(session.execute(sa.text(sql2)).all()) == [
             (
                 "copernicus-interactive-climates-atlas",
                 "Copernicus Interactive Climate Atlas",
                 "cds",
                 "application",
             ),
+            ("how-to-api", "CDSAPI setup", "ads", "page"),
             ("how-to-api", "CDSAPI setup", "cds", "page"),
+            ("how-to-api-templated", "${siteSlug} API setup", "ads", "page"),
         ]
 
     # 3.bis repeat last run -------------------------------------------------------------
@@ -762,7 +763,7 @@ def test_update_catalogue(
         )
         assert (
             session.execute(sa.text("select count(*) from contents")).scalars().one()
-            == 3
+            == 4
         )
         sql = (
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
@@ -847,8 +848,8 @@ def test_update_catalogue(
     # check load of contents is run (it's forced)
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
-    # check object storage called for 1 dataset, 4 licences and 3 contents (5 + 4*2 + 3)
-    assert _store_file.call_count == 16
+    # check object storage called for 1 dataset, 4 licences and 4 contents (5 + 4*2 + 4)
+    assert _store_file.call_count == 17
     _store_file.reset_mock()
 
     # check db changes are reset
@@ -1215,13 +1216,13 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 51
+    assert _store_file.call_count == 52
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
     #     # num.datasets form.json = 8
     #     # num.datasets constraints.json = 8
-    #     # num.contents = 3
+    #     # num.contents = 4
     _store_file.reset_mock()
 
     # check db content
@@ -1342,13 +1343,13 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 51
+    assert _store_file.call_count == 52
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
     #     # num.datasets form.json = 8
     #     # num.datasets constraints.json = 8
-    #     # num.contents = 3
+    #     # num.contents = 4
     _store_file.reset_mock()
 
     # check db content

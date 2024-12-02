@@ -401,6 +401,7 @@ def update_catalogue(
                     session,
                     contents_folder_path,  # type: ignore
                     storage_settings,
+                    # TODO: add here yaml config for contents templating
                 )
         # delete orphans
         if delete_orphans:  # -> always false if filtering is active
