@@ -1037,6 +1037,8 @@ def test_update_catalogue(
             TEST_CIM_DATA_PATH,
             "--contents-folder-path",
             TEST_CONTENTS_DATA_PATH,
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1063,15 +1065,16 @@ def test_update_catalogue(
     # check load of messages is run (resources are processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
-    # check load of contents is not run (git hash stable)
-    _update_catalogue_contents.assert_not_called()
+    # check load of contents is run (contents config is changed)
+    _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 5
+    assert _store_file.call_count == 9
     #     # num.datasets overview.png * 2 = 2
     #     # num.datasets layout.json = 1
     #     # num.datasets form.json = 1
     #     # num.datasets constraints.json = 1
+    #     # num. contents = 4
     _store_file.reset_mock()
 
     # check db content
@@ -1109,7 +1112,39 @@ def test_update_catalogue(
             ("reanalysis-era5-pressure-levels", "reanalysis-era5-single-levels"),
             ("reanalysis-era5-single-levels", "reanalysis-era5-pressure-levels"),
         ]
-
+        sql = "select site, title, slug, type, description from contents order by title, site"
+        assert session.execute(sa.text(sql)).all() == [
+            (
+                "ads",
+                "ADS API setup",
+                "how-to-api-templated",
+                "page",
+                "Access 33 items of ADS Data Store catalogue, with search and availability features",
+            ),
+            (
+                "ads",
+                "CDSAPI setup",
+                "how-to-api",
+                "page",
+                "Access the full data store catalogue, with search and availability features",
+            ),
+            (
+                "cds",
+                "CDSAPI setup",
+                "how-to-api",
+                "page",
+                "Access the full data store catalogue, with search and availability features",
+            ),
+            (
+                "cds",
+                "Copernicus Interactive Climate Atlas",
+                "copernicus-interactive-climates-atlas",
+                "application",
+                "The Copernicus Interactive Climate Atlas provides graphical "
+                "information about recent past trends and future changes "
+                "(for different scenarios and global warming levels)",
+            ),
+        ]
     # 8. run again -----------------------------------------------------------------------
     # (all should be skipped)
     result = runner.invoke(
@@ -1128,6 +1163,8 @@ def test_update_catalogue(
             TEST_CIM_DATA_PATH,
             "--contents-folder-path",
             TEST_CONTENTS_DATA_PATH,
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,

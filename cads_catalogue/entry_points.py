@@ -272,6 +272,11 @@ def update_catalogue(
     except Exception:
         logger.exception(f"not parsable {overrides_path}")
         current_override_md = dict()
+    try:
+        current_contents_config = contents.yaml2context(contents_config_path)
+    except Exception:
+        logger.exception(f"not parsable {contents_config_path}")
+        current_contents_config = dict()
     with session_obj.begin() as session:  # type: ignore
         logger.info("comparing current input files with the ones of the last run")
         current_git_hashes = manager.get_current_git_hashes(
@@ -281,10 +286,13 @@ def update_catalogue(
             session,
             *[f[1] for f in paths_db_hash_map],
             "override_md",
+            "contents_config",
         )
-        last_run_git_hashes = last_run_status[:-1]
-        last_run_override_md = last_run_status[-1]
+        last_run_git_hashes = last_run_status[:-2]
+        last_run_override_md = last_run_status[-2]
+        last_run_contents_config = last_run_status[-1]
         override_changed = current_override_md != last_run_override_md
+        contents_config_changed = current_contents_config != last_run_contents_config
         if (
             current_git_hashes == last_run_git_hashes
             and not force
@@ -323,6 +331,7 @@ def update_catalogue(
             contents_changed = (
                 current_git_hashes[5] != last_run_git_hashes[5]
                 or current_git_hashes[5] is None
+                or contents_config_changed
             )
         if this_package_changed:
             logger.info(
@@ -450,6 +459,7 @@ def update_catalogue(
         else:
             status_info["catalogue_repo_commit"] = current_git_hashes[0]
             status_info["override_md"] = current_override_md
+            status_info["contents_config"] = current_contents_config
             logger.info(
                 "db update of inputs' status (git commit hashes and override metadata)"
             )
