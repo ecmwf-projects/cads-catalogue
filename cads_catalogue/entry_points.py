@@ -177,6 +177,7 @@ def update_catalogue(
     contents_folder_path: Optional[
         str
     ] = None,  # os.path.join(PACKAGE_DIR, "cads-contents-json"),
+    contents_config_path: Optional[str] = None,
     connection_string: Optional[str] = None,
     force: bool = False,
     delete_orphans: bool = True,
@@ -197,6 +198,7 @@ def update_catalogue(
     :param licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
     :param cim_folder_path: str = folder containing CIM Quality Assessment layouts (i.e. cads-forms-cim-json)
     :param contents_folder_path = folder containing metadata files for contents (i.e. cads-contents-json)
+    :param contents_config_path = path of the file yaml containing template variables for contents
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     :param force: if True, run update regardless input folders has no changes from last update (default False)
     :param delete_orphans: if True, delete resources/licences not involved. False if using include/exclude
@@ -401,7 +403,7 @@ def update_catalogue(
                     session,
                     contents_folder_path,  # type: ignore
                     storage_settings,
-                    # TODO: add here yaml config for contents templating
+                    yaml_path=contents_config_path,
                 )
         # delete orphans
         if delete_orphans:  # -> always false if filtering is active
