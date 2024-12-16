@@ -67,6 +67,7 @@ class CatalogueUpdate(BaseModel):
     cim_repo_commit = sa.Column(sa.String)
     content_repo_commit = sa.Column(sa.String)
     override_md = sa.Column(dialect_postgresql.JSONB, default={})
+    contents_config = sa.Column(dialect_postgresql.JSONB, default={})
 
 
 class Content(BaseModel):

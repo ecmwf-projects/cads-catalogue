@@ -177,6 +177,7 @@ def update_catalogue(
     contents_folder_path: Optional[
         str
     ] = None,  # os.path.join(PACKAGE_DIR, "cads-contents-json"),
+    contents_config_path: Optional[str] = None,
     connection_string: Optional[str] = None,
     force: bool = False,
     delete_orphans: bool = True,
@@ -197,6 +198,7 @@ def update_catalogue(
     :param licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
     :param cim_folder_path: str = folder containing CIM Quality Assessment layouts (i.e. cads-forms-cim-json)
     :param contents_folder_path = folder containing metadata files for contents (i.e. cads-contents-json)
+    :param contents_config_path = path of the file yaml containing template variables for contents
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     :param force: if True, run update regardless input folders has no changes from last update (default False)
     :param delete_orphans: if True, delete resources/licences not involved. False if using include/exclude
@@ -270,6 +272,11 @@ def update_catalogue(
     except Exception:
         logger.exception(f"not parsable {overrides_path}")
         current_override_md = dict()
+    try:
+        current_contents_config = contents.yaml2context(contents_config_path)
+    except Exception:
+        logger.exception(f"not parsable {contents_config_path}")
+        current_contents_config = dict()
     with session_obj.begin() as session:  # type: ignore
         logger.info("comparing current input files with the ones of the last run")
         current_git_hashes = manager.get_current_git_hashes(
@@ -279,10 +286,13 @@ def update_catalogue(
             session,
             *[f[1] for f in paths_db_hash_map],
             "override_md",
+            "contents_config",
         )
-        last_run_git_hashes = last_run_status[:-1]
-        last_run_override_md = last_run_status[-1]
+        last_run_git_hashes = last_run_status[:-2]
+        last_run_override_md = last_run_status[-2]
+        last_run_contents_config = last_run_status[-1]
         override_changed = current_override_md != last_run_override_md
+        contents_config_changed = current_contents_config != last_run_contents_config
         if (
             current_git_hashes == last_run_git_hashes
             and not force
@@ -321,6 +331,7 @@ def update_catalogue(
             contents_changed = (
                 current_git_hashes[5] != last_run_git_hashes[5]
                 or current_git_hashes[5] is None
+                or contents_config_changed
             )
         if this_package_changed:
             logger.info(
@@ -401,6 +412,7 @@ def update_catalogue(
                     session,
                     contents_folder_path,  # type: ignore
                     storage_settings,
+                    yaml_path=contents_config_path,
                 )
         # delete orphans
         if delete_orphans:  # -> always false if filtering is active
@@ -447,6 +459,7 @@ def update_catalogue(
         else:
             status_info["catalogue_repo_commit"] = current_git_hashes[0]
             status_info["override_md"] = current_override_md
+            status_info["contents_config"] = current_contents_config
             logger.info(
                 "db update of inputs' status (git commit hashes and override metadata)"
             )

@@ -1,0 +1,21 @@
+{
+  "title": "${siteSlug}API setup",
+  "description": "Access the full data store catalogue of ${siteName}, with search and availability features. Global prop: ${global_prop}",
+  "body": {
+    "main": {
+      "sections": [
+        {
+          "id": "main",
+          "blocks": [
+            {
+              "id": "page-content",
+              "type": "html",
+              "content": "<div>TODO</div>",
+              "content_source": "../html_block.html"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

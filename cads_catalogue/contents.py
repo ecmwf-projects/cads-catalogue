@@ -20,8 +20,9 @@ from typing import Any, List
 
 import sqlalchemy as sa
 import structlog
+import yaml
 
-from cads_catalogue import config, database, layout_manager, object_storage
+from cads_catalogue import config, database, layout_manager, object_storage, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
@@ -106,23 +107,31 @@ def content_sync(
     return db_content
 
 
-def load_content_folder(content_folder: str | pathlib.Path) -> List[dict[str, Any]]:
+def load_content_folder(
+    content_folder: str | pathlib.Path, global_context: dict[str, Any] | None = None
+) -> List[dict[str, Any]]:
     """
     Parse folder and returns a list of metadata dictionaries, each one for a content.
 
     Parameters
     ----------
     content_folder: folder path containing content files
+    global_context: dictionary to be used for rendering templates
 
     Returns
     -------
     list of dictionaries of information parsed.
     """
+    if global_context is None:
+        global_context = dict()
     metadata_file_path = os.path.join(content_folder, "metadata.json")
     with open(metadata_file_path) as fp:
-        data = json.load(fp)
+        data_raw = json.load(fp)
     ret_value = []
-    for site in data["site"]:
+    for site in data_raw["site"][:]:
+        site_context = global_context.get("default", dict())
+        site_context.update(global_context.get(site, dict()))
+        data = utils.dict_render(data_raw, site_context)
         metadata = {
             "site": site,
             "type": data["resource_type"],
@@ -158,6 +167,7 @@ def load_content_folder(content_folder: str | pathlib.Path) -> List[dict[str, An
 def transform_layout(
     content: dict[str, Any],
     storage_settings: config.ObjectStorageSettings,
+    global_context: dict[str, Any] | None = None,
 ):
     """
     Modify layout.json information inside content metadata, with related uploads to the object storage.
@@ -166,6 +176,7 @@ def transform_layout(
     ----------
     content: metadata of a loaded content from files
     storage_settings: object with settings to access the object storage
+    global_context: dictionary to be used for rendering templates
 
     Returns
     -------
@@ -173,6 +184,9 @@ def transform_layout(
     """
     if not content.get("layout"):
         return content
+    site, ctype, slug = content["site"], content["type"], content["slug"]
+    if global_context is None:
+        global_context = dict()
     layout_file_path = content["layout"]
     if not os.path.isfile(layout_file_path):
         return content
@@ -181,10 +195,14 @@ def transform_layout(
         layout_data = json.load(fp)
         logger.debug(f"input layout_data: {layout_data}")
 
-    layout_data = layout_manager.transform_html_blocks(layout_data, layout_folder_path)
+    layout_raw_data = layout_manager.transform_html_blocks(
+        layout_data, layout_folder_path
+    )
+    site_context = global_context.get("default", dict())
+    site_context.update(global_context.get(site, dict()))
+    layout_data = utils.dict_render(layout_raw_data, site_context)
 
     logger.debug(f"output layout_data: {layout_data}")
-    site, ctype, slug = content["site"], content["type"], content["slug"]
     subpath = os.path.join("contents", site, ctype, slug)
     content["layout"] = layout_manager.store_layout_by_data(
         layout_data, content, storage_settings, subpath=subpath
@@ -193,13 +211,34 @@ def transform_layout(
     return content
 
 
-def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, Any]]:
+def yaml2context(yaml_path: str | pathlib.Path | None) -> dict[str, Any]:
+    """
+    load yaml used for rendering templates.
+
+    :param yaml_path: yaml path
+    :return: yaml parsed
+    """
+    if not yaml_path:
+        return dict()
+    if not os.path.isfile(yaml_path):
+        logger.warning(f"{yaml_path} not found. No variable substitution in templates.")
+        return dict()
+    with open(yaml_path) as fp:
+        data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+    return data
+
+
+def load_contents(
+    contents_root_folder: str | pathlib.Path,
+    global_context: dict[str, Any] | None = None,
+) -> List[dict[str, Any]]:
     """
     Load all contents from a folder and return a dictionary of metadata extracted.
 
     Parameters
     ----------
     contents_root_folder: root path where to look for contents (i.e. cads-contents-json root folder)
+    global_context: dictionary to be used for rendering templates
 
     Returns
     -------
@@ -218,7 +257,7 @@ def load_contents(contents_root_folder: str | pathlib.Path) -> List[dict[str, An
             logger.warning("unknown file %r found" % content_folder)
             continue
         try:
-            contents_md = load_content_folder(content_folder)
+            contents_md = load_content_folder(content_folder, global_context)
         except:  # noqa
             logger.exception(
                 "failed parsing content in %s, error follows" % content_folder
@@ -233,6 +272,7 @@ def update_catalogue_contents(
     contents_package_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     remove_orphans: bool = True,
+    yaml_path: str | pathlib.Path | None = None,
 ):
     """
     Load metadata of contents from files and sync each content in the db.
@@ -243,12 +283,14 @@ def update_catalogue_contents(
     contents_package_path: root folder path of the contents package (i.e. cads-contents-json root folder)
     storage_settings: object with settings to access the object storage
     remove_orphans: if True, remove from the database other contents not involved (default True)
+    yaml_path: path to yaml file containing variables to be rendered in the json files
 
     Returns
     -------
     list: list of (site, type, slug) of contents involved
     """
-    contents = load_contents(contents_package_path)
+    global_context = yaml2context(yaml_path)
+    contents = load_contents(contents_package_path, global_context)
     logger.info(
         "loaded %s contents from folder %s" % (len(contents), contents_package_path)
     )
@@ -256,7 +298,7 @@ def update_catalogue_contents(
     for content in contents[:]:
         site, ctype, slug = content["site"], content["type"], content["slug"]
         involved_content_props.append((site, ctype, slug))
-        content = transform_layout(content, storage_settings)
+        content = transform_layout(content, storage_settings, global_context)
         try:
             with session.begin_nested():
                 content_sync(session, content, storage_settings)

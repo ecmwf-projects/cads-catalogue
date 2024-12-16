@@ -23,9 +23,64 @@ import multiprocessing as mp
 import pathlib
 import subprocess
 import urllib.parse
+from string import Template
 from typing import Any
 
 from sqlalchemy import inspect
+
+
+class CADSTemplate(Template):
+    """template using only brace brackets for variables."""
+
+    idpattern = "nothing^"  # so force to use curly braces
+    braceidpattern = Template.idpattern
+
+
+def list_render(
+    input_list: list[Any], context: dict[str, Any], template_class=CADSTemplate
+) -> list[Any]:
+    """
+    render values of an input list according to values defined in a context dictionary.
+
+    :param input_list: list with values to be rendered
+    :param context: dictionary with values to be used for rendering
+    :param template_class: class to be used for templating
+    :return: input_list with values rendered
+    """
+    output_list = []
+    for item in input_list:
+        output_item = item
+        if isinstance(item, str):
+            output_item = template_class(item).safe_substitute(context)
+        elif isinstance(item, dict):
+            output_item = dict_render(item, context, template_class)
+        elif isinstance(item, list):
+            output_item = list_render(item, context, template_class)
+        output_list.append(output_item)
+    return output_list
+
+
+def dict_render(
+    input_dict, context: dict[str, Any], template_class=CADSTemplate
+) -> dict[str, Any]:
+    """
+    render values of an input dictionary according to values defined in a context dictionary.
+
+    :param input_dict: dictionary with values to be rendered
+    :param context: dictionary with values to be used for rendering
+    :param template_class: class to be used for templating
+    :return: a_dict with values rendered
+    """
+    output_dict = dict()
+    for key, value in input_dict.items():
+        output_dict[key] = value
+        if isinstance(value, str):
+            output_dict[key] = template_class(value).safe_substitute(context)
+        elif isinstance(value, dict):
+            output_dict[key] = dict_render(value, context, template_class)
+        elif isinstance(value, list):
+            output_dict[key] = list_render(value, context, template_class)
+    return output_dict
 
 
 def is_url(astring):
