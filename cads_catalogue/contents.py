@@ -143,6 +143,7 @@ def load_content_folder(
             "link": data.get("link"),
             "keywords": data.get("keywords", []),
             "data": data.get("data"),
+            "hidden": data.get("hidden", False),
             # managed below:
             # "image": None,
             # "layout": None,

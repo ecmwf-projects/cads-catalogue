@@ -6,5 +6,6 @@
   "site": ["cds", "ads"],
   "publication_date": "2024-09-13T10:01:50Z",
   "update_date": "2024-09-16T02:10:22Z",
-  "layout": "./layout.json"
+  "layout": "./layout.json",
+  "hidden": true
 }

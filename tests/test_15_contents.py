@@ -46,6 +46,7 @@ def test_load_content_folder() -> None:
         {
             "slug": "copernicus-interactive-climates-atlas",
             "publication_date": "2024-09-13T00:00:00Z",
+            "hidden": False,
             "description": "The Copernicus Interactive Climate Atlas provides graphical "
             "information about recent past trends and future changes "
             "(for different scenarios and global warming levels)",
@@ -83,6 +84,7 @@ def test_load_content_folder() -> None:
         {
             "slug": "how-to-api-templated",
             "publication_date": "2024-09-13T10:01:50Z",
+            "hidden": False,
             "description": "Access 33 items of ADS Data Store catalogue, "
             "with search and availability features",
             "image": None,
@@ -110,6 +112,7 @@ def test_load_contents() -> None:
         {
             "slug": "copernicus-interactive-climates-atlas",
             "publication_date": "2024-09-13T00:00:00Z",
+            "hidden": False,
             "description": "The Copernicus Interactive Climate Atlas provides graphical "
             "information about recent past trends and future changes "
             "(for different scenarios and global warming levels)",
@@ -142,6 +145,7 @@ def test_load_contents() -> None:
         {
             "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
+            "hidden": True,
             "description": "Access the full data store catalogue, "
             "with search and availability features",
             "image": None,
@@ -157,6 +161,7 @@ def test_load_contents() -> None:
         {
             "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
+            "hidden": True,
             "description": "Access the full data store catalogue, "
             "with search and availability features",
             "image": None,
@@ -172,6 +177,7 @@ def test_load_contents() -> None:
         {
             "slug": "how-to-api-templated",
             "publication_date": "2024-09-13T10:01:50Z",
+            "hidden": False,
             "description": "Access 33 items of ADS Data Store catalogue, "
             "with search and availability features",
             "image": None,
@@ -214,6 +220,7 @@ def test_content_sync(
     content1 = {
         "slug": "copernicus-interactive-climates-atlas",
         "publication_date": "2024-09-13T00:00:00Z",
+        "hidden": True,
         "description": "The Copernicus Interactive Climate Atlas provides graphical "
         "information about recent past trends and future changes "
         "(for different scenarios and global warming levels)",
