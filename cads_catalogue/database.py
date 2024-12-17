@@ -81,6 +81,7 @@ class Content(BaseModel):
     content_update = sa.Column(sa.TIMESTAMP, nullable=False)
     data = sa.Column(dialect_postgresql.JSONB)
     description = sa.Column(sa.String, nullable=False)
+    hidden = sa.Column(sa.Boolean, default=False, nullable=False)
     image = sa.Column(sa.String)
     layout = sa.Column(sa.String)
     link = sa.Column(sa.String)
