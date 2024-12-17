@@ -174,9 +174,7 @@ def update_catalogue(
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
     cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),
-    contents_folder_path: Optional[
-        str
-    ] = None,  # os.path.join(PACKAGE_DIR, "cads-contents-json"),
+    contents_folder_path: str = os.path.join(PACKAGE_DIR, "cads-contents-json"),
     contents_config_path: Optional[str] = None,
     connection_string: Optional[str] = None,
     force: bool = False,
@@ -186,7 +184,7 @@ def update_catalogue(
     exclude_resources: bool = False,
     exclude_licences: bool = False,
     exclude_messages: bool = False,
-    # exclude_contents: bool = False,
+    exclude_contents: bool = False,
 ) -> None:
     """Update the database with the catalogue data.
 
@@ -207,7 +205,7 @@ def update_catalogue(
     :param exclude_resources: if True, do not consider input resources (default False)
     :param exclude_licences: if True, do not consider input licences (default False)
     :param exclude_messages: if True, do not consider input messages (default False)
-    # :param exclude_contents: if True, do not consider input contents (default False)
+    :param exclude_contents: if True, do not consider input contents (default False)
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
@@ -220,11 +218,7 @@ def update_catalogue(
         raise ValueError("%r is not a folder" % licences_folder_path)
     if not os.path.isdir(messages_folder_path) and not exclude_messages:
         raise ValueError("%r is not a folder" % messages_folder_path)
-    # temporary backward compatibility:
-    exclude_contents = False
-    if contents_folder_path is None:
-        exclude_contents = True
-    elif not os.path.isdir(contents_folder_path) and not exclude_contents:
+    if not os.path.isdir(contents_folder_path) and not exclude_contents:
         raise ValueError("%r is not a folder" % contents_folder_path)
 
     # test object storage connection, with a timeout (it may raise an error)
@@ -235,8 +229,12 @@ def update_catalogue(
     )
 
     filter_is_active = bool(
-        include or exclude or exclude_resources or exclude_licences or exclude_messages
-        # or exclude_contents
+        include
+        or exclude
+        or exclude_resources
+        or exclude_licences
+        or exclude_messages
+        or exclude_contents
     )
     if filter_is_active:
         if delete_orphans:
@@ -261,10 +259,8 @@ def update_catalogue(
         (licences_folder_path, "licence_repo_commit"),
         (messages_folder_path, "message_repo_commit"),
         (cim_folder_path, "cim_repo_commit"),
-        # (contents_folder_path, "content_repo_commit"),
+        (contents_folder_path, "content_repo_commit"),
     ]
-    if contents_folder_path:
-        paths_db_hash_map.append((contents_folder_path, "content_repo_commit"))
     involved_licences = []
     involved_resource_uids = []
     try:
@@ -298,6 +294,7 @@ def update_catalogue(
             and not force
             and None not in current_git_hashes
             and not override_changed
+            and not contents_config_changed
         ):
             logger.info(
                 "catalogue update skipped: source files have not changed. "
@@ -325,14 +322,11 @@ def update_catalogue(
             current_git_hashes[4] != last_run_git_hashes[4]
             or current_git_hashes[4] is None
         )
-        if not contents_folder_path:
-            contents_changed = False
-        else:
-            contents_changed = (
-                current_git_hashes[5] != last_run_git_hashes[5]
-                or current_git_hashes[5] is None
-                or contents_config_changed
-            )
+        contents_changed = (
+            current_git_hashes[5] != last_run_git_hashes[5]
+            or current_git_hashes[5] is None
+            or contents_config_changed
+        )
         if this_package_changed:
             logger.info(
                 "detected update of cads-catalogue repository. Imposing automatic --force mode."
@@ -410,7 +404,7 @@ def update_catalogue(
                 logger.info("db updating of contents")
                 contents.update_catalogue_contents(
                     session,
-                    contents_folder_path,  # type: ignore
+                    contents_folder_path,
                     storage_settings,
                     yaml_path=contents_config_path,
                 )
@@ -448,10 +442,9 @@ def update_catalogue(
         if messages_processed and not exclude_messages:
             # (all) messages have been effectively processed
             status_info["message_repo_commit"] = current_git_hashes[3]
-        if contents_folder_path:
-            if contents_processed and not exclude_contents:
-                # (all) contents have been effectively processed
-                status_info["content_repo_commit"] = current_git_hashes[5]
+        if contents_processed and not exclude_contents:
+            # (all) contents have been effectively processed
+            status_info["content_repo_commit"] = current_git_hashes[5]
         if not status_info:
             logger.info(
                 "disabled db update of last commit hashes of source repositories"
