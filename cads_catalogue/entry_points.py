@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import os.path
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import cads_common.logging
 import sqlalchemy as sa
@@ -30,7 +30,7 @@ from cads_catalogue import (
     maintenance,
     manager,
     messages,
-    object_storage,
+    skipping_utils,
     validations,
 )
 
@@ -211,252 +211,98 @@ def update_catalogue(
     cads_common.logging.logging_configure()
     logger.info("start running update of the catalogue")
 
-    # input management
-    if not os.path.isdir(resources_folder_path) and not exclude_resources:
-        raise ValueError("%r is not a folder" % resources_folder_path)
-    if not os.path.isdir(licences_folder_path) and not exclude_licences:
-        raise ValueError("%r is not a folder" % licences_folder_path)
-    if not os.path.isdir(messages_folder_path) and not exclude_messages:
-        raise ValueError("%r is not a folder" % messages_folder_path)
-    if not os.path.isdir(contents_folder_path) and not exclude_contents:
-        raise ValueError("%r is not a folder" % contents_folder_path)
-
-    # test object storage connection, with a timeout (it may raise an error)
-    logger.info("testing connection to object storage")
-    storage_settings = config.ensure_storage_settings(config.storagesettings)
-    object_storage.test_connection_with_timeout(
-        15, storage_settings.object_storage_url, storage_settings.storage_kws
+    repo_paths = {
+        "metadata_repo": resources_folder_path,
+        "cim_repo": cim_folder_path,
+        "message_repo": messages_folder_path,
+        "licence_repo": licences_folder_path,
+        "content_repo": contents_folder_path,
+    }
+    config_paths = {
+        "contents_config_path": contents_config_path,
+        "overrides_path": overrides_path,
+    }
+    filtering_kwargs: Dict[str, Any] = {
+        "include": include,
+        "exclude": exclude,
+        "exclude_resources": exclude_resources,
+        "exclude_messages": exclude_messages,
+        "exclude_contents": exclude_contents,
+        "exclude_licences": exclude_licences,
+    }
+    # preprocessing
+    manager.prerun_processing(repo_paths, connection_string, filtering_kwargs)
+    # disable delete orphans licences/datasets if filtering is active
+    delete_orphans = manager.normalize_delete_orphans(
+        delete_orphans, **filtering_kwargs
     )
-
-    filter_is_active = bool(
-        include
-        or exclude
-        or exclude_resources
-        or exclude_licences
-        or exclude_messages
-        or exclude_contents
-    )
-    if filter_is_active:
-        if delete_orphans:
-            logger.warning(
-                "'delete-orphans' has been disabled: include/exclude feature is active"
-            )
-            delete_orphans = False
-
     # get db session session maker
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
-
-    logger.info("checking database structure")
-    database.init_database(connection_string)
-
-    paths_db_hash_map = [
-        (CATALOGUE_DIR, "catalogue_repo_commit"),
-        (resources_folder_path, "metadata_repo_commit"),
-        (licences_folder_path, "licence_repo_commit"),
-        (messages_folder_path, "message_repo_commit"),
-        (cim_folder_path, "cim_repo_commit"),
-        (contents_folder_path, "content_repo_commit"),
-    ]
-    involved_licences = []
-    involved_resource_uids = []
-    try:
-        current_override_md = manager.parse_override_md(overrides_path)
-    except Exception:
-        logger.exception(f"not parsable {overrides_path}")
-        current_override_md = dict()
-    try:
-        current_contents_config = contents.yaml2context(contents_config_path)
-    except Exception:
-        logger.exception(f"not parsable {contents_config_path}")
-        current_contents_config = dict()
+    # compute skipping logic
+    to_process, new_catalogue_update_md, force = skipping_utils.skipping_engine(
+        session_obj, config_paths, force, repo_paths, filtering_kwargs
+    )
+    storage_settings = config.ensure_storage_settings(config.storagesettings)
     with session_obj.begin() as session:  # type: ignore
-        logger.info("comparing current input files with the ones of the last run")
-        current_git_hashes = manager.get_current_git_hashes(
-            *[f[0] for f in paths_db_hash_map]
-        )
-        last_run_status = manager.get_status_of_last_update(
-            session,
-            *[f[1] for f in paths_db_hash_map],
-            "override_md",
-            "contents_config",
-        )
-        last_run_git_hashes = last_run_status[:-2]
-        last_run_override_md = last_run_status[-2]
-        last_run_contents_config = last_run_status[-1]
-        override_changed = current_override_md != last_run_override_md
-        contents_config_changed = current_contents_config != last_run_contents_config
-        if (
-            current_git_hashes == last_run_git_hashes
-            and not force
-            and None not in current_git_hashes
-            and not override_changed
-            and not contents_config_changed
-        ):
-            logger.info(
-                "catalogue update skipped: source files have not changed. "
-                "Use --force to update anyway."
+        if "licences" in to_process:
+            logger.info("db updating of licences")
+            involved_licences = licence_manager.update_catalogue_licences(
+                session,
+                licences_folder_path,
+                storage_settings,
             )
-            return
-        # if no git ash, consider repo like it was changed
-        this_package_changed = (
-            current_git_hashes[0] != last_run_git_hashes[0]
-            or current_git_hashes[0] is None
-        )
-        datasets_changed = (
-            current_git_hashes[1] != last_run_git_hashes[1]
-            or current_git_hashes[1] is None
-        )
-        licences_changed = (
-            current_git_hashes[2] != last_run_git_hashes[2]
-            or current_git_hashes[2] is None
-        )
-        messages_changed = (
-            current_git_hashes[3] != last_run_git_hashes[3]
-            or current_git_hashes[3] is None
-        )
-        cim_forms_changed = (
-            current_git_hashes[4] != last_run_git_hashes[4]
-            or current_git_hashes[4] is None
-        )
-        contents_changed = (
-            current_git_hashes[5] != last_run_git_hashes[5]
-            or current_git_hashes[5] is None
-            or contents_config_changed
-        )
-        if this_package_changed:
-            logger.info(
-                "detected update of cads-catalogue repository. Imposing automatic --force mode."
+        if "datasets" in to_process:
+            logger.info("db updating of datasets")
+            force_datasets = force or "licences" in to_process
+            involved_resource_uids = manager.update_catalogue_resources(
+                session,
+                resources_folder_path,
+                cim_folder_path,
+                storage_settings,
+                force=force_datasets,
+                include=include,
+                exclude=exclude,
+                override_md=new_catalogue_update_md["override_md"],
             )
-            force = True
-        if override_changed:
-            logger.info(
-                "detected update of override information. Imposing automatic --force mode."
+        if "messages" in to_process:
+            logger.info("db updating of messages")
+            messages.update_catalogue_messages(session, messages_folder_path)
+        if "contents" in to_process:
+            logger.info("db updating of contents")
+            contents.update_catalogue_contents(
+                session,
+                contents_folder_path,
+                storage_settings,
+                yaml_path=contents_config_path,
             )
-            force = True
-        # licences
-        licences_processed = False
-        if not exclude_licences:
-            if not licences_changed and not force:
-                logger.info(
-                    "catalogue update of licences skipped: source files have not changed. "
-                    "Use --force to update anyway."
-                )
-            else:
-                licences_processed = True
-                logger.info("db updating of licences")
-                involved_licences = licence_manager.update_catalogue_licences(
-                    session,
-                    licences_folder_path,
-                    storage_settings,
-                )
-        # resources
-        some_resources_processed = False
-        if not exclude_resources:
-            if (
-                not datasets_changed
-                and not force
-                and not cim_forms_changed
-                and not licences_processed
-            ):
-                logger.info(
-                    "catalogue update of resources skipped: source files have not changed. "
-                    "Use --force to update anyway."
-                )
-            else:
-                some_resources_processed = True
-                logger.info("db updating of datasets")
-                involved_resource_uids = manager.update_catalogue_resources(
-                    session,
-                    resources_folder_path,
-                    cim_folder_path,
-                    storage_settings,
-                    force=force or licences_processed,
-                    include=include,
-                    exclude=exclude,
-                    override_md=current_override_md,
-                )
-        # messages
-        messages_processed = False
-        if not exclude_messages:
-            if not some_resources_processed and not messages_changed and not force:
-                logger.info(
-                    "catalogue update of messages skipped: source files have not changed. "
-                    "Use --force to update anyway."
-                )
-            else:
-                messages_processed = True
-                logger.info("db updating of messages")
-                messages.update_catalogue_messages(session, messages_folder_path)
-        # contents
-        contents_processed = False
-        if not exclude_contents:
-            if not contents_changed and not force:
-                logger.info(
-                    "catalogue update of contents skipped: source files have not changed. "
-                    "Use --force to update anyway."
-                )
-            else:
-                contents_processed = True
-                logger.info("db updating of contents")
-                contents.update_catalogue_contents(
-                    session,
-                    contents_folder_path,
-                    storage_settings,
-                    yaml_path=contents_config_path,
-                )
         # delete orphans
         if delete_orphans:  # -> always false if filtering is active
-            if not exclude_licences and licences_processed:
+            if "licences" in to_process:
                 logger.info("db removing of orphan licences")
                 licence_manager.remove_orphan_licences(
                     session,
                     keep_licences=involved_licences,
                     resources=involved_resource_uids,
                 )
-            if not exclude_resources and some_resources_processed:
+            if "datasets" in to_process:
                 logger.info("db removing of orphan datasets")
                 manager.remove_datasets(
                     session, keep_resource_uids=involved_resource_uids
                 )
+
         # refresh relationships between dataset
         logger.info("db update of relationships between datasets")
         manager.update_related_resources(session)
+
         # store information of current input status
-        status_info: dict[str, Any] = dict()
-        if licences_processed:
-            # (all) licences have been effectively processed
-            status_info["licence_repo_commit"] = current_git_hashes[2]
-        if (
-            some_resources_processed
-            and not include
-            and not exclude
-            and not exclude_resources
-        ):
-            # all resources have been effectively processed
-            status_info["metadata_repo_commit"] = current_git_hashes[1]
-            status_info["cim_repo_commit"] = current_git_hashes[4]
-        if messages_processed and not exclude_messages:
-            # (all) messages have been effectively processed
-            status_info["message_repo_commit"] = current_git_hashes[3]
-        if contents_processed and not exclude_contents:
-            # (all) contents have been effectively processed
-            status_info["content_repo_commit"] = current_git_hashes[5]
-        if not status_info:
-            logger.info(
-                "disabled db update of last commit hashes of source repositories"
-            )
-        else:
-            status_info["catalogue_repo_commit"] = current_git_hashes[0]
-            status_info["override_md"] = current_override_md
-            status_info["contents_config"] = current_contents_config
-            logger.info(
-                "db update of inputs' status (git commit hashes and override metadata)"
-            )
-            manager.update_last_input_status(session, status_info)
+        logger.info(
+            "db update of inputs' status (git commit hashes and override metadata)"
+        )
+        manager.update_last_input_status(session, new_catalogue_update_md)
         logger.info("end of update of the catalogue")
 
 

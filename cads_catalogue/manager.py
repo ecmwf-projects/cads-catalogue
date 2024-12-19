@@ -21,9 +21,10 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Sequence
+from typing import Any, Dict, List, Sequence
 
 import sqlalchemy as sa
+import sqlalchemy_utils
 import structlog
 import yaml
 from sqlalchemy.dialects.postgresql import insert
@@ -70,46 +71,42 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
     return ret_value.hexdigest()  # type: ignore
 
 
-def get_current_git_hashes(*folders: str | pathlib.Path) -> List[str]:
+def get_git_hashes(folder_map: dict[str, str]) -> Dict[str, str]:
     """
-    Return the list of last commit hashes of input folders.
+    Return last commit hashes of labelled folders.
 
     Parameters
     ----------
-    folders: list of folders
+    folder_map: {'folder_label': 'folder_path'}
 
     Returns
     -------
-    List of last commit hashes
+    {'folder_label': 'git_hash'}
     """
-    current_hashes = []
-    for folder in folders:
+    current_hashes = dict()
+    for folder_label, folder_path in folder_map.items():
         try:
-            current_hashes.append(utils.get_last_commit_hash(folder))
+            current_hashes[folder_label] = utils.get_last_commit_hash(folder_path)
         except Exception:  # noqa
             logger.exception(
-                "no check on commit hash for folder %r, error follows" % folder
+                f"no check on commit hash for folder '{folder_path}, error follows"
             )
-            current_hashes.append(None)
+            current_hashes[folder_label] = None
     return current_hashes
 
 
-def get_status_of_last_update(
-    session: sa.orm.session.Session, *column_names: str | None
-) -> List[str | None]:
+def get_status_of_last_update(session: sa.orm.session.Session) -> Dict[str, Any] | None:
     """
     Return last stored git hashes and other information from table catalogue_updates.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    column_names: list of columns of table catalogue_updates to return the values
 
     Returns
     -------
     The values of input column names for the table catalogue_updates
     """
-    last_hashes: List[str | None] = [None] * len(column_names)
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
@@ -117,10 +114,12 @@ def get_status_of_last_update(
     ).first()
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
-        return last_hashes
-    for i, last_hash_attr in enumerate(column_names):
-        last_hashes[i] = getattr(last_update_record, last_hash_attr)  # type: ignore
-    return last_hashes
+        return dict()
+    ret_value = dict()
+    for column in sqlalchemy_utils.get_columns(last_update_record):
+        c_name = column.name
+        ret_value[c_name] = getattr(last_update_record, c_name)
+    return ret_value
 
 
 def is_resource_to_update(session, resource_folder_paths):
@@ -682,6 +681,60 @@ def update_related_resources(session: sa.orm.session.Session):
     related_resources = find_related_resources(all_datasets)
     for res1, res2 in related_resources:
         res1.related_resources.append(res2)
+
+
+def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
+    """Preliminary processing for the catalogue manager."""
+    logger.info("additional input checks")
+    for repo_key, filter_key in [
+        ("metadata_repo", "exclude_resources"),
+        ("cim_repo", "exclude_resources"),
+        ("licence_repo", "exclude_licences"),
+        ("message_repo", "exclude_messages"),
+        ("content_repo", "exclude_contents"),
+    ]:
+        repo_path = repo_paths[repo_key]
+        exclude = filtering_kwargs[filter_key]
+        if not os.path.isdir(repo_path) and not exclude:
+            raise ValueError(f"'{repo_path}' is not a folder")
+
+    logger.info("updating database structure")
+    database.init_database(connection_string)
+
+    logger.info("testing connection to object storage")
+    storage_conn_timeout = 15  # seconds
+    storage_settings = config.ensure_storage_settings(config.storagesettings)
+    object_storage.test_connection_with_timeout(
+        storage_conn_timeout,
+        storage_settings.object_storage_url,
+        storage_settings.storage_kws,
+    )
+
+
+def normalize_delete_orphans(
+    delete_orphans: bool,
+    include: List[str],
+    exclude: List[str],
+    exclude_resources: bool,
+    exclude_licences: bool,
+    exclude_messages: bool,
+    exclude_contents: bool,
+) -> bool:
+    """Disable delete_orphans if any filtering is active."""
+    filter_is_active = bool(
+        include
+        or exclude
+        or exclude_resources
+        or exclude_licences
+        or exclude_messages
+        or exclude_contents
+    )
+    if filter_is_active and delete_orphans:
+        logger.warning(
+            "'delete-orphans' has been disabled: include/exclude feature is active"
+        )
+        delete_orphans = False
+    return delete_orphans
 
 
 def update_catalogue_resources(

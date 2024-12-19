@@ -225,7 +225,13 @@ def yaml2context(yaml_path: str | pathlib.Path | None) -> dict[str, Any]:
         logger.warning(f"{yaml_path} not found. No variable substitution in templates.")
         return dict()
     with open(yaml_path) as fp:
-        data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+        try:
+            data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+        except Exception:
+            logger.exception(
+                f"{yaml_path} not parsable. No variable substitution in templates."
+            )
+            return dict()
     return data
 
 
