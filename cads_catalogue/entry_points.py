@@ -21,6 +21,7 @@ import cads_common.logging
 import sqlalchemy as sa
 import structlog
 import typer
+from typing_extensions import Annotated
 
 from cads_catalogue import (
     config,
@@ -170,7 +171,9 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 @app.command()
 def update_catalogue(
     overrides_path: Optional[str] = None,
-    resources_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-json"),
+    resources_folder_path: Annotated[List[str], typer.Option()] = [
+        os.path.join(PACKAGE_DIR, "cads-forms-json")
+    ],
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
     cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),

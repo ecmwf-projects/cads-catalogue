@@ -687,7 +687,6 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
     """Preliminary processing for the catalogue manager."""
     logger.info("additional input checks")
     for repo_key, filter_key in [
-        ("metadata_repo", "exclude_resources"),
         ("cim_repo", "exclude_resources"),
         ("licence_repo", "exclude_licences"),
         ("message_repo", "exclude_messages"),
@@ -697,6 +696,14 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
         exclude = filtering_kwargs[filter_key]
         if not os.path.isdir(repo_path) and not exclude:
             raise ValueError(f"'{repo_path}' is not a folder")
+    for repo_key, filter_key in [
+        ("metadata_repo", "exclude_resources"),
+    ]:
+        repo_paths = repo_paths[repo_key]
+        exclude = filtering_kwargs[filter_key]
+        for repo_path in repo_paths:
+            if not os.path.isdir(repo_path) and not exclude:
+                raise ValueError(f"'{repo_path}' is not a folder")
 
     logger.info("updating database structure")
     database.init_database(connection_string)
@@ -739,7 +746,7 @@ def normalize_delete_orphans(
 
 def update_catalogue_resources(
     session: sa.orm.session.Session,
-    resources_folder_path: str | pathlib.Path,
+    resources_folder_paths: List[str] | List[pathlib.Path],
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
@@ -753,7 +760,7 @@ def update_catalogue_resources(
     Parameters
     ----------
     session: opened SQLAlchemy session
-    resources_folder_path: path to the root folder containing metadata files for resources
+    resources_folder_paths: paths to the root folder containing metadata files for resources
     storage_settings: object with settings to access the object storage
     cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     force: if True, no skipping of dataset update based on detected changes of sources is made
@@ -766,7 +773,8 @@ def update_catalogue_resources(
     list: list of resource uids involved
     """
     involved_resource_uids = []
-
+    # FIXME: at the moment supported only 1 resources_folder_path
+    resources_folder_path = resources_folder_paths[0]
     # filtering resource uids
     folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
     if include:

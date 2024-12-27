@@ -18,7 +18,7 @@ import os.path
 
 import structlog
 
-from cads_catalogue import contents, manager
+from cads_catalogue import contents, manager, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 CATALOGUE_DIR = os.path.abspath(os.path.join(THIS_PATH, ".."))
@@ -73,12 +73,15 @@ def can_skip_datasets(
         "metadata_repo_commit"
     ):
         logger.info(
-            "update of datasets not skippable, detected update of datasets repository."
+            "update of datasets not skippable, detected update of some datasets repositories."
         )
         return False
-    if new_git_hashes["metadata_repo_commit"] is None:
+    if (
+        not new_git_hashes["metadata_repo_commit"]
+        or None in new_git_hashes["metadata_repo_commit"].values()
+    ):
         logger.info(
-            "update of datasets not skippable, git hash of datasets repository not recoverable."
+            "update of datasets not skippable, git hash of some datasets repository not recoverable."
         )
         return False
     if new_git_hashes["cim_repo_commit"] != last_run_status.get("cim_repo_commit"):
@@ -180,13 +183,18 @@ def skipping_engine(
     folders_map = {
         # db column: folder path
         "catalogue_repo_commit": CATALOGUE_DIR,
-        "metadata_repo_commit": repo_paths["metadata_repo"],
+        # "metadata_repo_commit": repo_paths["metadata_repo"],
         "cim_repo_commit": repo_paths["cim_repo"],
         "message_repo_commit": repo_paths["message_repo"],
         "licence_repo_commit": repo_paths["licence_repo"],
         "content_repo_commit": repo_paths["content_repo"],
     }
     new_git_hashes = manager.get_git_hashes(folders_map)
+    new_git_hashes["metadata_repo_commit"] = dict()
+    for md_repo_path in repo_paths["metadata_repo"]:
+        new_git_hashes["metadata_repo_commit"][utils.get_repo_url(md_repo_path)] = (
+            utils.get_last_commit_hash(md_repo_path)
+        )
     new_catalogue_update_md = {
         "override_md": new_override_md,
         "contents_config": new_contents_config,
