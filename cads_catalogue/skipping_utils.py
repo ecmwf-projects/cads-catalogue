@@ -15,7 +15,6 @@
 # limitations under the License.
 
 import os.path
-from typing import Any, Dict
 
 import structlog
 
@@ -34,25 +33,33 @@ logger = structlog.get_logger(__name__)
 
 
 def can_skip_licences(new_git_hashes, last_run_status, force, filtering_kwargs):
-    """Return True if licence processing can be skipped."""
+    """Return True if catalogue manager can skip licences' processing."""
     if filtering_kwargs["exclude_licences"]:
         logger.info("update of licences skipped, detected option to exclude licences.")
         return True
     if force:
         logger.info("update of licences not skippable, detected force mode.")
         return False
-    if new_git_hashes["licence_repo_commit"] != last_run_status.get("licence_repo_commit"):
-        logger.info("update of licences not skippable, detected update of licences repository.")
+    if new_git_hashes["licence_repo_commit"] != last_run_status.get(
+        "licence_repo_commit"
+    ):
+        logger.info(
+            "update of licences not skippable, detected update of licences repository."
+        )
         return False
     if new_git_hashes["licence_repo_commit"] is None:
         logger.info("update of licences not skippable, git hash not recoverable.")
         return False
-    logger.info("update of licences skipped: source files have not changed. Use --force to update anyway.")
+    logger.info(
+        "update of licences skipped: source files have not changed. Use --force to update anyway."
+    )
     return True
 
 
-def can_skip_datasets(new_git_hashes, last_run_status, force, filtering_kwargs, to_process):
-    """Return True if datasets processing can be skipped."""
+def can_skip_datasets(
+    new_git_hashes, last_run_status, force, filtering_kwargs, to_process
+):
+    """Return True if catalogue manager can skip datasets' processing."""
     if filtering_kwargs["exclude_resources"]:
         logger.info("update of datasets skipped, detected option to exclude resources.")
         return True
@@ -62,24 +69,38 @@ def can_skip_datasets(new_git_hashes, last_run_status, force, filtering_kwargs, 
     if force:
         logger.info("update of datasets not skippable, detected force mode.")
         return False
-    if new_git_hashes["metadata_repo_commit"] != last_run_status.get("metadata_repo_commit"):
-        logger.info("update of datasets not skippable, detected update of datasets repository.")
+    if new_git_hashes["metadata_repo_commit"] != last_run_status.get(
+        "metadata_repo_commit"
+    ):
+        logger.info(
+            "update of datasets not skippable, detected update of datasets repository."
+        )
         return False
     if new_git_hashes["metadata_repo_commit"] is None:
-        logger.info("update of datasets not skippable, git hash of datasets repository not recoverable.")
+        logger.info(
+            "update of datasets not skippable, git hash of datasets repository not recoverable."
+        )
         return False
     if new_git_hashes["cim_repo_commit"] != last_run_status.get("cim_repo_commit"):
-        logger.info("update of datasets not skippable, detected update of cim datasets repository.")
+        logger.info(
+            "update of datasets not skippable, detected update of cim datasets repository."
+        )
         return False
     if new_git_hashes["cim_repo_commit"] is None:
-        logger.info("update of datasets not skippable, git hash of cim datasets repository not recoverable.")
+        logger.info(
+            "update of datasets not skippable, git hash of cim datasets repository not recoverable."
+        )
         return False
-    logger.info("update of datasets skipped: source files have not changed. Use --force to update anyway.")
+    logger.info(
+        "update of datasets skipped: source files have not changed. Use --force to update anyway."
+    )
     return True
 
 
-def can_skip_messages(new_git_hashes, last_run_status, force, filtering_kwargs, to_process):
-    """Return True if messages processing can be skipped."""
+def can_skip_messages(
+    new_git_hashes, last_run_status, force, filtering_kwargs, to_process
+):
+    """Return True if catalogue manager can skip messages' processing."""
     if filtering_kwargs["exclude_messages"]:
         logger.info("update of messages skipped, detected option to exclude messages.")
         return True
@@ -89,34 +110,50 @@ def can_skip_messages(new_git_hashes, last_run_status, force, filtering_kwargs, 
     if force:
         logger.info("update of messages not skippable, detected force mode.")
         return False
-    if new_git_hashes["message_repo_commit"] != last_run_status.get("message_repo_commit"):
-        logger.info("update of messages not skippable, detected update of messages repository.")
+    if new_git_hashes["message_repo_commit"] != last_run_status.get(
+        "message_repo_commit"
+    ):
+        logger.info(
+            "update of messages not skippable, detected update of messages repository."
+        )
         return False
     if new_git_hashes["message_repo_commit"] is None:
         logger.info("update of messages not skippable, git hash not recoverable.")
         return False
-    logger.info("update of messages skipped: source files have not changed. Use --force to update anyway.")
+    logger.info(
+        "update of messages skipped: source files have not changed. Use --force to update anyway."
+    )
     return True
 
 
-def can_skip_contents(new_git_hashes, last_run_status, force, filtering_kwargs, contents_config):
-    """Return True if contents processing can be skipped."""
+def can_skip_contents(
+    new_git_hashes, last_run_status, force, filtering_kwargs, contents_config
+):
+    """Return True if catalogue manager can skip contents' processing."""
     if filtering_kwargs["exclude_contents"]:
         logger.info("update of contents skipped, detected option to exclude contents.")
         return True
     if contents_config != last_run_status.get("contents_config"):
-        logger.info("update of contents not skippable, detected update of contents configuration.")
+        logger.info(
+            "update of contents not skippable, detected update of contents configuration."
+        )
         return False
     if force:
         logger.info("update of contents not skippable, detected force mode.")
         return False
-    if new_git_hashes["content_repo_commit"] != last_run_status.get("content_repo_commit"):
-        logger.info("update of contents not skippable, detected update of contents repository.")
+    if new_git_hashes["content_repo_commit"] != last_run_status.get(
+        "content_repo_commit"
+    ):
+        logger.info(
+            "update of contents not skippable, detected update of contents repository."
+        )
         return False
     if new_git_hashes["content_repo_commit"] is None:
         logger.info("update of contents not skippable, git hash not recoverable.")
         return False
-    logger.info("update of contents skipped: source files have not changed. Use --force to update anyway.")
+    logger.info(
+        "update of contents skipped: source files have not changed. Use --force to update anyway."
+    )
     return True
 
 
@@ -128,12 +165,13 @@ def skipping_engine(
     filtering_kwargs,
 ):
     """
-    return: to_process, new_catalogue_update_md, force
-    * list of what to process: 'datasets', 'licences', 'messages', 'contents' (can be empty)
-    * new record to be applied to the table catalogue_updates
-    * force to be applied (boolean)
-    """
+    Return useful information for catalogue manager about what to skip processing.
 
+    returns (to_process, new_catalogue_update_md, force), where:
+    to_process: list of what to process (one or more among 'datasets', 'licences', 'messages', 'contents'),
+    new_catalogue_update_md: new record to be applied to the table catalogue_updates:
+    force: force option to be applied
+    """
     to_process = ["licences", "datasets", "messages", "contents"]
     new_override_md = manager.parse_override_md(config_paths["overrides_path"])
     new_contents_config = contents.yaml2context(config_paths["contents_config_path"])
@@ -156,7 +194,11 @@ def skipping_engine(
     }
     with session_obj.begin() as session:  # type: ignore
         last_run_status = manager.get_status_of_last_update(session)
-    if new_git_hashes["catalogue_repo_commit"] != last_run_status.get("catalogue_repo_commit") or new_git_hashes["catalogue_repo_commit"] is None:
+    if (
+        new_git_hashes["catalogue_repo_commit"]
+        != last_run_status.get("catalogue_repo_commit")
+        or new_git_hashes["catalogue_repo_commit"] is None
+    ):
         logger.info(
             "detected update of cads-catalogue repository. Imposing automatic --force mode."
         )
@@ -169,20 +211,40 @@ def skipping_engine(
     if can_skip_licences(new_git_hashes, last_run_status, force, filtering_kwargs):
         to_process.remove("licences")
     else:
-        new_catalogue_update_md["licence_repo_commit"] = new_git_hashes["licence_repo_commit"]
-    if can_skip_datasets(new_git_hashes, last_run_status, force, filtering_kwargs, to_process):
+        new_catalogue_update_md["licence_repo_commit"] = new_git_hashes[
+            "licence_repo_commit"
+        ]
+    if can_skip_datasets(
+        new_git_hashes, last_run_status, force, filtering_kwargs, to_process
+    ):
         to_process.remove("datasets")
     else:
-        is_filter_datasets_enabled = filtering_kwargs["include"] or filtering_kwargs["exclude"] or filtering_kwargs["exclude_resources"]
+        is_filter_datasets_enabled = (
+            filtering_kwargs["include"]
+            or filtering_kwargs["exclude"]
+            or filtering_kwargs["exclude_resources"]
+        )
         if not is_filter_datasets_enabled:
-            new_catalogue_update_md["metadata_repo_commit"] = new_git_hashes["metadata_repo_commit"]
-            new_catalogue_update_md["cim_repo_commit"] = new_git_hashes["cim_repo_commit"]
-    if can_skip_messages(new_git_hashes, last_run_status, force, filtering_kwargs, to_process):
+            new_catalogue_update_md["metadata_repo_commit"] = new_git_hashes[
+                "metadata_repo_commit"
+            ]
+            new_catalogue_update_md["cim_repo_commit"] = new_git_hashes[
+                "cim_repo_commit"
+            ]
+    if can_skip_messages(
+        new_git_hashes, last_run_status, force, filtering_kwargs, to_process
+    ):
         to_process.remove("messages")
     else:
-        new_catalogue_update_md["message_repo_commit"] = new_git_hashes["message_repo_commit"]
-    if can_skip_contents(new_git_hashes, last_run_status, force, filtering_kwargs, new_contents_config):
+        new_catalogue_update_md["message_repo_commit"] = new_git_hashes[
+            "message_repo_commit"
+        ]
+    if can_skip_contents(
+        new_git_hashes, last_run_status, force, filtering_kwargs, new_contents_config
+    ):
         to_process.remove("contents")
     else:
-        new_catalogue_update_md["content_repo_commit"] = new_git_hashes["content_repo_commit"]
+        new_catalogue_update_md["content_repo_commit"] = new_git_hashes[
+            "content_repo_commit"
+        ]
     return to_process, new_catalogue_update_md, force
