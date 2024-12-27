@@ -1,5 +1,6 @@
 """utility module to load and store data in the catalogue database."""
 
+import collections
 import datetime
 
 # Copyright 2022, European Union.
@@ -21,7 +22,7 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Sequence, Tuple
 
 import sqlalchemy as sa
 import sqlalchemy_utils
@@ -699,14 +700,30 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
     for repo_key, filter_key in [
         ("metadata_repo", "exclude_resources"),
     ]:
-        repo_paths = repo_paths[repo_key]
+        repo_paths_list = repo_paths[repo_key]
         exclude = filtering_kwargs[filter_key]
-        for repo_path in repo_paths:
+        for repo_path in repo_paths_list:
             if not os.path.isdir(repo_path) and not exclude:
                 raise ValueError(f"'{repo_path}' is not a folder")
 
     logger.info("updating database structure")
     database.init_database(connection_string)
+
+    if not filtering_kwargs["exclude_resources"]:
+        logger.info("checking input datasets")
+        datasets_info = list_all_repos_datasets(
+            repo_paths["metadata_repo"], filtering_kwargs
+        )
+        slugs_counter = collections.Counter([d[0] for d in datasets_info])
+        found_multiple = False
+        for slug in slugs_counter:
+            if slugs_counter[slug] > 1:
+                found_multiple = True
+                logger.error(f"Found dataset {slug} in multiple repositories")
+        if found_multiple:
+            raise ValueError(
+                "Found same dataset slugs in multiple repositories: catalogue manager cannot proceed."
+            )
 
     logger.info("testing connection to object storage")
     storage_conn_timeout = 15  # seconds
@@ -922,3 +939,44 @@ def update_last_input_status(
     else:
         status_info["update_time"] = datetime.datetime.now()
         session.execute(sa.update(database.CatalogueUpdate).values(**status_info))
+
+
+def list_repo_datasets(repo_path: str, filtering_kwargs=None) -> List[Tuple[str, str, str]]:
+    """Return the list of valid (slugs, dataset_path, config_path) inside a repo_path."""
+    ret_value = []
+    if filtering_kwargs is None:
+        filtering_kwargs = dict()
+    folders = set(glob.glob(os.path.join(repo_path, "*/")))
+    if filtering_kwargs.get("include"):
+        folders = set()
+        for pattern in filtering_kwargs["include"]:
+            matched = set(glob.glob(os.path.join(repo_path, f"{pattern}/")))
+            folders |= matched
+    if filtering_kwargs.get("exclude"):
+        for pattern in filtering_kwargs["exclude"]:
+            matched = set(glob.glob(os.path.join(repo_path, f"{pattern}/")))
+            folders -= matched
+
+    for resource_folder_path in folders:
+        slug = os.path.basename(resource_folder_path.rstrip(os.sep))
+        config_folder = os.path.join(resource_folder_path, "json-config")
+        if os.path.isfile(os.path.join(config_folder, "metadata.json")):
+            ret_value.append((slug, resource_folder_path, config_folder))
+        elif os.path.isfile(os.path.join(resource_folder_path, "metadata.json")):
+            ret_value.append((slug, resource_folder_path, resource_folder_path))
+        else:
+            logger.warning(
+                f"excluding {resource_folder_path}: doesn't seem a valid dataset folder."
+            )
+    return ret_value
+
+
+def list_all_repos_datasets(
+    repo_paths: List[str], filtering_kwargs
+) -> List[Tuple[str, str, str]]:
+    """Return the list of valid (slugs, dataset_path, config_path) inside a repo_path."""
+    ret_value = []
+    for repo_path in repo_paths:
+        repo_datasets = list_repo_datasets(repo_path, filtering_kwargs)
+        ret_value += repo_datasets
+    return ret_value
