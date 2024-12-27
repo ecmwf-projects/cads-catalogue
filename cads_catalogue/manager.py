@@ -744,9 +744,9 @@ def normalize_delete_orphans(
     return delete_orphans
 
 
-def update_catalogue_resources(
+def update_catalogue_resources_single_folder(
     session: sa.orm.session.Session,
-    resources_folder_paths: List[str] | List[pathlib.Path],
+    resources_folder_path: str | pathlib.Path,
     cim_folder_path: str | pathlib.Path,
     storage_settings: config.ObjectStorageSettings,
     force: bool = False,
@@ -755,12 +755,12 @@ def update_catalogue_resources(
     override_md: dict[str, Any] = {},
 ) -> List[str]:
     """
-    Load metadata of resources from files and sync each resource in the db.
+    Load metadata of resources from files of a single input folder and sync each resource in the db.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    resources_folder_paths: paths to the root folder containing metadata files for resources
+    resources_folder_path: path to the root folder containing metadata files for resources
     storage_settings: object with settings to access the object storage
     cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
     force: if True, no skipping of dataset update based on detected changes of sources is made
@@ -773,8 +773,6 @@ def update_catalogue_resources(
     list: list of resource uids involved
     """
     involved_resource_uids = []
-    # FIXME: at the moment supported only 1 resources_folder_path
-    resources_folder_path = resources_folder_paths[0]
     # filtering resource uids
     folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
     if include:
@@ -830,6 +828,50 @@ def update_catalogue_resources(
             logger.exception(
                 "db sync for resource '%s' failed, error follows" % resource_uid
             )
+    return involved_resource_uids
+
+
+def update_catalogue_resources(
+    session: sa.orm.session.Session,
+    resources_folder_paths: List[str] | List[pathlib.Path],
+    cim_folder_path: str | pathlib.Path,
+    storage_settings: config.ObjectStorageSettings,
+    force: bool = False,
+    include: List[str] = [],
+    exclude: List[str] = [],
+    override_md: dict[str, Any] = {},
+) -> List[str]:
+    """
+    Load metadata of resources from files and sync each resource in the db.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    resources_folder_paths: paths to the root folder containing metadata files for resources
+    storage_settings: object with settings to access the object storage
+    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
+    force: if True, no skipping of dataset update based on detected changes of sources is made
+    include: list of include patterns for the resource uids
+    exclude: list of exclude patterns for the resource uids
+    override_md: dictionary of override metadata for resources
+
+    Returns
+    -------
+    list: list of resource uids involved
+    """
+    involved_resource_uids = []
+    for resources_folder_path in resources_folder_paths:
+        new_involved = update_catalogue_resources_single_folder(
+            session,
+            resources_folder_path,
+            cim_folder_path,
+            storage_settings,
+            force,
+            include,
+            exclude,
+            override_md,
+        )
+        involved_resource_uids += new_involved
     return involved_resource_uids
 
 
