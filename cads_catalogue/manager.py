@@ -1,5 +1,6 @@
 """utility module to load and store data in the catalogue database."""
 
+import collections
 import datetime
 
 # Copyright 2022, European Union.
@@ -21,9 +22,10 @@ import itertools
 import json
 import os
 import pathlib
-from typing import Any, List, Sequence
+from typing import Any, Dict, List, Sequence, Tuple
 
 import sqlalchemy as sa
+import sqlalchemy_utils
 import structlog
 import yaml
 from sqlalchemy.dialects.postgresql import insert
@@ -70,46 +72,42 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
     return ret_value.hexdigest()  # type: ignore
 
 
-def get_current_git_hashes(*folders: str | pathlib.Path) -> List[str]:
+def get_git_hashes(folder_map: dict[str, str]) -> Dict[str, str]:
     """
-    Return the list of last commit hashes of input folders.
+    Return last commit hashes of labelled folders.
 
     Parameters
     ----------
-    folders: list of folders
+    folder_map: {'folder_label': 'folder_path'}
 
     Returns
     -------
-    List of last commit hashes
+    {'folder_label': 'git_hash'}
     """
-    current_hashes = []
-    for folder in folders:
+    current_hashes = dict()
+    for folder_label, folder_path in folder_map.items():
         try:
-            current_hashes.append(utils.get_last_commit_hash(folder))
+            current_hashes[folder_label] = utils.get_last_commit_hash(folder_path)
         except Exception:  # noqa
             logger.exception(
-                "no check on commit hash for folder %r, error follows" % folder
+                f"no check on commit hash for folder '{folder_path}, error follows"
             )
-            current_hashes.append(None)
+            current_hashes[folder_label] = None
     return current_hashes
 
 
-def get_status_of_last_update(
-    session: sa.orm.session.Session, *column_names: str | None
-) -> List[str | None]:
+def get_status_of_last_update(session: sa.orm.session.Session) -> Dict[str, Any] | None:
     """
     Return last stored git hashes and other information from table catalogue_updates.
 
     Parameters
     ----------
     session: opened SQLAlchemy session
-    column_names: list of columns of table catalogue_updates to return the values
 
     Returns
     -------
     The values of input column names for the table catalogue_updates
     """
-    last_hashes: List[str | None] = [None] * len(column_names)
     last_update_record = session.scalars(
         sa.select(database.CatalogueUpdate)
         .order_by(database.CatalogueUpdate.update_time.desc())
@@ -117,10 +115,12 @@ def get_status_of_last_update(
     ).first()
     if not last_update_record:
         logger.warning("table catalogue_updates is currently empty")
-        return last_hashes
-    for i, last_hash_attr in enumerate(column_names):
-        last_hashes[i] = getattr(last_update_record, last_hash_attr)  # type: ignore
-    return last_hashes
+        return dict()
+    ret_value = dict()
+    for column in sqlalchemy_utils.get_columns(last_update_record):
+        c_name = column.name
+        ret_value[c_name] = getattr(last_update_record, c_name)
+    return ret_value
 
 
 def is_resource_to_update(session, resource_folder_paths):
@@ -504,6 +504,12 @@ def load_resource_from_folder(
     metadata: dict[str, Any] = dict()
     folder_path = str(folder_path).rstrip(os.sep)
     metadata["resource_uid"] = os.path.basename(folder_path)
+    # NOTE: folder to consider is the one containing metadata.json
+    json_folder = os.path.join(folder_path, "json-config")
+    if os.path.isdir(json_folder) and os.path.isfile(
+        os.path.join(json_folder, "metadata.json")
+    ):
+        folder_path = json_folder
     loader_functions = [
         load_resource_for_object_storage,
         load_fulltext,
@@ -684,7 +690,84 @@ def update_related_resources(session: sa.orm.session.Session):
         res1.related_resources.append(res2)
 
 
-def update_catalogue_resources(
+def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
+    """Preliminary processing for the catalogue manager."""
+    logger.info("additional input checks")
+    for repo_key, filter_key in [
+        ("cim_repo", "exclude_resources"),
+        ("licence_repo", "exclude_licences"),
+        ("message_repo", "exclude_messages"),
+        ("content_repo", "exclude_contents"),
+    ]:
+        repo_path = repo_paths[repo_key]
+        exclude = filtering_kwargs[filter_key]
+        if not os.path.isdir(repo_path) and not exclude:
+            raise ValueError(f"'{repo_path}' is not a folder")
+    for repo_key, filter_key in [
+        ("metadata_repo", "exclude_resources"),
+    ]:
+        repo_paths_list = repo_paths[repo_key]
+        exclude = filtering_kwargs[filter_key]
+        for repo_path in repo_paths_list:
+            if not os.path.isdir(repo_path) and not exclude:
+                raise ValueError(f"'{repo_path}' is not a folder")
+
+    logger.info("updating database structure")
+    database.init_database(connection_string)
+
+    if not filtering_kwargs["exclude_resources"]:
+        logger.info("checking input datasets")
+        datasets_info = list_all_repos_datasets(
+            repo_paths["metadata_repo"], filtering_kwargs
+        )
+        slugs_counter = collections.Counter([d[0] for d in datasets_info])
+        found_multiple = False
+        for slug in slugs_counter:
+            if slugs_counter[slug] > 1:
+                found_multiple = True
+                logger.error(f"Found dataset {slug} in multiple repositories")
+        if found_multiple:
+            raise ValueError(
+                "Found same dataset slugs in multiple repositories: catalogue manager cannot proceed."
+            )
+
+    logger.info("testing connection to object storage")
+    storage_conn_timeout = 15  # seconds
+    storage_settings = config.ensure_storage_settings(config.storagesettings)
+    object_storage.test_connection_with_timeout(
+        storage_conn_timeout,
+        storage_settings.object_storage_url,
+        storage_settings.storage_kws,
+    )
+
+
+def normalize_delete_orphans(
+    delete_orphans: bool,
+    include: List[str],
+    exclude: List[str],
+    exclude_resources: bool,
+    exclude_licences: bool,
+    exclude_messages: bool,
+    exclude_contents: bool,
+) -> bool:
+    """Disable delete_orphans if any filtering is active."""
+    filter_is_active = bool(
+        include
+        or exclude
+        or exclude_resources
+        or exclude_licences
+        or exclude_messages
+        or exclude_contents
+    )
+    if filter_is_active and delete_orphans:
+        logger.warning(
+            "'delete-orphans' has been disabled: include/exclude feature is active"
+        )
+        delete_orphans = False
+    return delete_orphans
+
+
+def update_catalogue_resources_single_folder(
     session: sa.orm.session.Session,
     resources_folder_path: str | pathlib.Path,
     cim_folder_path: str | pathlib.Path,
@@ -695,7 +778,7 @@ def update_catalogue_resources(
     override_md: dict[str, Any] = {},
 ) -> List[str]:
     """
-    Load metadata of resources from files and sync each resource in the db.
+    Load metadata of resources from files of a single input folder and sync each resource in the db.
 
     Parameters
     ----------
@@ -713,7 +796,6 @@ def update_catalogue_resources(
     list: list of resource uids involved
     """
     involved_resource_uids = []
-
     # filtering resource uids
     folders = set(glob.glob(os.path.join(resources_folder_path, "*/")))
     if include:
@@ -772,6 +854,50 @@ def update_catalogue_resources(
     return involved_resource_uids
 
 
+def update_catalogue_resources(
+    session: sa.orm.session.Session,
+    resources_folder_paths: List[str] | List[pathlib.Path],
+    cim_folder_path: str | pathlib.Path,
+    storage_settings: config.ObjectStorageSettings,
+    force: bool = False,
+    include: List[str] = [],
+    exclude: List[str] = [],
+    override_md: dict[str, Any] = {},
+) -> List[str]:
+    """
+    Load metadata of resources from files and sync each resource in the db.
+
+    Parameters
+    ----------
+    session: opened SQLAlchemy session
+    resources_folder_paths: paths to the root folder containing metadata files for resources
+    storage_settings: object with settings to access the object storage
+    cim_folder_path: the folder path containing CIM generated Quality Assessment layouts
+    force: if True, no skipping of dataset update based on detected changes of sources is made
+    include: list of include patterns for the resource uids
+    exclude: list of exclude patterns for the resource uids
+    override_md: dictionary of override metadata for resources
+
+    Returns
+    -------
+    list: list of resource uids involved
+    """
+    involved_resource_uids = []
+    for resources_folder_path in resources_folder_paths:
+        new_involved = update_catalogue_resources_single_folder(
+            session,
+            resources_folder_path,
+            cim_folder_path,
+            storage_settings,
+            force,
+            include,
+            exclude,
+            override_md,
+        )
+        involved_resource_uids += new_involved
+    return involved_resource_uids
+
+
 def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[str]):
     """
     Remove all datasets that not are in the list of `keep_resource_uids`.
@@ -819,3 +945,46 @@ def update_last_input_status(
     else:
         status_info["update_time"] = datetime.datetime.now()
         session.execute(sa.update(database.CatalogueUpdate).values(**status_info))
+
+
+def list_repo_datasets(
+    repo_path: str, filtering_kwargs=None
+) -> List[Tuple[str, str, str]]:
+    """Return the list of valid (slugs, dataset_path, config_path) inside a repo_path."""
+    ret_value = []
+    if filtering_kwargs is None:
+        filtering_kwargs = dict()
+    folders = set(glob.glob(os.path.join(repo_path, "*/")))
+    if filtering_kwargs.get("include"):
+        folders = set()
+        for pattern in filtering_kwargs["include"]:
+            matched = set(glob.glob(os.path.join(repo_path, f"{pattern}/")))
+            folders |= matched
+    if filtering_kwargs.get("exclude"):
+        for pattern in filtering_kwargs["exclude"]:
+            matched = set(glob.glob(os.path.join(repo_path, f"{pattern}/")))
+            folders -= matched
+
+    for resource_folder_path in folders:
+        slug = os.path.basename(resource_folder_path.rstrip(os.sep))
+        config_folder = os.path.join(resource_folder_path, "json-config")
+        if os.path.isfile(os.path.join(config_folder, "metadata.json")):
+            ret_value.append((slug, resource_folder_path, config_folder))
+        elif os.path.isfile(os.path.join(resource_folder_path, "metadata.json")):
+            ret_value.append((slug, resource_folder_path, resource_folder_path))
+        else:
+            logger.warning(
+                f"excluding {resource_folder_path}: doesn't seem a valid dataset folder."
+            )
+    return ret_value
+
+
+def list_all_repos_datasets(
+    repo_paths: List[str], filtering_kwargs
+) -> List[Tuple[str, str, str]]:
+    """Return the list of valid (slugs, dataset_path, config_path) inside a repo_path."""
+    ret_value = []
+    for repo_path in repo_paths:
+        repo_datasets = list_repo_datasets(repo_path, filtering_kwargs)
+        ret_value += repo_datasets
+    return ret_value

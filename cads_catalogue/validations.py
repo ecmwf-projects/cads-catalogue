@@ -345,6 +345,10 @@ def validate_dataset(dataset_folder: str) -> None:
     """
     resource_uid = os.path.basename(dataset_folder.rstrip(os.sep))
     logger.info(f"---starting validation of resource {resource_uid}---")
+    # for all validators, input folder is the folder where metadata.json is located
+    input_folder = os.path.join(dataset_folder, "json-config")
+    if not os.path.isfile(os.path.join(input_folder, "metadata.json")):
+        input_folder = dataset_folder
     validators = [
         validate_metadata_json,
         validate_adaptors,
@@ -356,7 +360,7 @@ def validate_dataset(dataset_folder: str) -> None:
     ]
     for validator in validators:
         try:
-            validator(dataset_folder)
+            validator(input_folder)
         except Exception:
             logger.exception(
                 f"unexpected error running {validator.__name__}. Error follows."

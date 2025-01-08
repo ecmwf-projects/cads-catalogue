@@ -136,6 +136,9 @@ def test_update_catalogue(
     _store_file = mocker.patch(
         "cads_catalogue.object_storage.store_file", return_value="an url"
     )
+    _git_repo = mocker.patch(
+        "cads_catalogue.utils.get_repo_url", return_value="a_repo_url"
+    )
     mocker.patch("cads_catalogue.object_storage.test_connection")
     folder_commit_hashes = (
         "e5658fef07333700272e36a43df0628efacb5f04",
@@ -264,7 +267,7 @@ def test_update_catalogue(
         assert session.execute(sa.text(sql)).all() == [
             (
                 "e5658fef07333700272e36a43df0628efacb5f04",
-                None,
+                {},
                 "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
                 None,
                 None,
@@ -420,7 +423,7 @@ def test_update_catalogue(
         assert session.execute(sa.text(sql)).all() == [
             (
                 folder_commit_hashes[0],
-                None,
+                {},
                 folder_commit_hashes[2],
                 folder_commit_hashes[3],
                 None,
@@ -676,7 +679,7 @@ def test_update_catalogue(
         assert session.execute(sa.text(sql)).all() == [
             (
                 folder_commit_hashes[0],
-                None,
+                {},
                 folder_commit_hashes[2],
                 folder_commit_hashes[3],
                 None,
@@ -772,7 +775,7 @@ def test_update_catalogue(
         assert session.execute(sa.text(sql)).all() == [
             (
                 folder_commit_hashes[0],
-                None,
+                {},
                 folder_commit_hashes[2],
                 folder_commit_hashes[3],
                 None,
@@ -1000,7 +1003,7 @@ def test_update_catalogue(
         assert session.execute(sa.text(sql)).all() == [
             (
                 folder_commit_hashes[0],
-                None,
+                {},
                 folder_commit_hashes[2],
                 folder_commit_hashes[3],
                 None,
@@ -1097,7 +1100,10 @@ def test_update_catalogue(
             "select catalogue_repo_commit, metadata_repo_commit, licence_repo_commit, "
             "message_repo_commit, cim_repo_commit, content_repo_commit from catalogue_updates"
         )
-        assert session.execute(sa.text(sql)).all() == [folder_commit_hashes]
+        assert session.execute(sa.text(sql)).all() == [
+            (folder_commit_hashes[0], {"a_repo_url": folder_commit_hashes[1]})
+            + folder_commit_hashes[2:]
+        ]
         sql = (
             "select r1.resource_uid, r2.resource_uid from related_resources "
             "left join resources as r1 on (parent_resource_id=r1.resource_id) "
