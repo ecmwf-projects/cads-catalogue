@@ -213,7 +213,9 @@ def update_catalogue(
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
     logger.info("start running update of the catalogue")
-
+    if not connection_string:
+        dbsettings = config.ensure_settings(config.dbsettings)
+        connection_string = dbsettings.connection_string
     repo_paths = {
         "metadata_repo": resources_folder_path,
         "cim_repo": cim_folder_path,
@@ -240,9 +242,6 @@ def update_catalogue(
         delete_orphans, **filtering_kwargs
     )
     # get db session session maker
-    if not connection_string:
-        dbsettings = config.ensure_settings(config.dbsettings)
-        connection_string = dbsettings.connection_string
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
     # compute skipping logic
