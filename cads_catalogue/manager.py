@@ -504,6 +504,12 @@ def load_resource_from_folder(
     metadata: dict[str, Any] = dict()
     folder_path = str(folder_path).rstrip(os.sep)
     metadata["resource_uid"] = os.path.basename(folder_path)
+    # NOTE: folder to consider is the one containing metadata.json
+    json_folder = os.path.join(folder_path, "json-config")
+    if os.path.isdir(json_folder) and os.path.isfile(
+        os.path.join(json_folder, "metadata.json")
+    ):
+        folder_path = json_folder
     loader_functions = [
         load_resource_for_object_storage,
         load_fulltext,
@@ -941,7 +947,9 @@ def update_last_input_status(
         session.execute(sa.update(database.CatalogueUpdate).values(**status_info))
 
 
-def list_repo_datasets(repo_path: str, filtering_kwargs=None) -> List[Tuple[str, str, str]]:
+def list_repo_datasets(
+    repo_path: str, filtering_kwargs=None
+) -> List[Tuple[str, str, str]]:
     """Return the list of valid (slugs, dataset_path, config_path) inside a repo_path."""
     ret_value = []
     if filtering_kwargs is None:
