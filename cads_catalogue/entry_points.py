@@ -297,14 +297,16 @@ def update_catalogue(
                 )
 
         # refresh relationships between dataset
-        logger.info("db update of relationships between datasets")
-        manager.update_related_resources(session)
+        if "licences" in to_process or "datasets" in to_process:
+            logger.info("db update of relationships between datasets")
+            manager.update_related_resources(session)
 
         # store information of current input status
-        logger.info(
-            "db update of inputs' status (git commit hashes and override metadata)"
-        )
-        manager.update_last_input_status(session, new_catalogue_update_md)
+        if to_process:
+            logger.info(
+                "db update of inputs' status (git commit hashes and override metadata)"
+            )
+            manager.update_last_input_status(session, new_catalogue_update_md)
         logger.info("end of update of the catalogue")
 
 
