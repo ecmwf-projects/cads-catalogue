@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import ChainMap as _ChainMap
 import datetime
 import hashlib
 import html.parser
@@ -21,19 +22,40 @@ import json
 import mimetypes
 import multiprocessing as mp
 import pathlib
+import re as _re
 import subprocess
 import urllib.parse
-from string import Template
+import string
 from typing import Any
 
 from sqlalchemy import inspect
 
+_sentinel_dict = {}
 
-class CADSTemplate(Template):
+class CADSTemplate(string.Template):
     """template using only brace brackets for variables."""
 
     idpattern = "nothing^"  # so force to use curly braces
-    braceidpattern = Template.idpattern
+    braceidpattern = r'(?a:[_a-z][_a-z0-9]*)'
+
+    def substitute(self, mapping=_sentinel_dict, /, **kws):
+        # note: adjusted from the method in the standard library
+        if mapping is _sentinel_dict:
+            mapping = kws
+        elif kws:
+            mapping = _ChainMap(kws, mapping)
+        # Helper function for .sub()
+        def convert(mo):
+            # check the most common path first
+            named = mo.group('braced')
+            if mo.group('braced') is not None:
+                # could raise KeyError
+                return str(mapping[named])
+            # other cases
+            if mo.group('escaped') is not None or mo.group('invalid') is not None:
+                return mo.group()
+            raise ValueError('Unrecognized named group in pattern', self.pattern)
+        return self.pattern.sub(convert, self.template)
 
 
 def list_render(
@@ -51,7 +73,7 @@ def list_render(
     for item in input_list:
         output_item = item
         if isinstance(item, str):
-            output_item = template_class(item).safe_substitute(context)
+            output_item = template_class(item).substitute(context)
         elif isinstance(item, dict):
             output_item = dict_render(item, context, template_class)
         elif isinstance(item, list):
@@ -75,7 +97,7 @@ def dict_render(
     for key, value in input_dict.items():
         output_dict[key] = value
         if isinstance(value, str):
-            output_dict[key] = template_class(value).safe_substitute(context)
+            output_dict[key] = template_class(value).substitute(context)
         elif isinstance(value, dict):
             output_dict[key] = dict_render(value, context, template_class)
         elif isinstance(value, list):

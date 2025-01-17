@@ -16,6 +16,56 @@ TEST_CIM_RESOURCES_DATA_PATH = os.path.abspath(
 )
 
 
+def test_cadstemplate() -> None:
+    # case no use brackets -> no replacing, no raise
+    t = utils.CADSTemplate('x is $x')
+    assert t.substitute({'x': 1}) == 'x is $x'
+    assert t.substitute({'y': 1}) == 'x is $x'
+
+    # case use brackets -> do replace, raise in case
+    t = utils.CADSTemplate('x is ${x}')
+    assert t.substitute({'x': 1}) == 'x is 1'
+    with pytest.raises(KeyError):
+        t.substitute({'y': 1})
+
+    # case escaped without brackets -> no replacing, no raise
+    t = utils.CADSTemplate('x is $$x')
+    assert t.substitute({'x': 1}) == 'x is $$x'
+    assert t.substitute({'y': 1}) == 'x is $$x'  # and no raise
+
+    # case escaped with brackets -> no replacing, no raise
+    t = utils.CADSTemplate('x is $${x}')
+    assert t.substitute({'x': 1}) == 'x is $${x}'
+    assert t.substitute({'y': 1}) == 'x is $${x}'  # and no raise
+
+
+def test_dict_render() -> None:
+    input_dict = {
+        'replacing_x': 'x is ${x}',
+        'no_brackets': 'x is $x',
+        'escape_no_brackets': 'x is $$x',
+        'escape_with_brackets': 'x is $${x}',
+    }
+    input_list = ['x is ${x}', 'x is $x', 'x is $$x', 'x is $${x}']
+    out_dict = {
+        'replacing_x': 'x is 1',
+        'no_brackets': 'x is $x',
+        'escape_no_brackets': 'x is $$x',
+        'escape_with_brackets': 'x is $${x}'
+    }
+    out_list = ['x is 1', 'x is $x', 'x is $$x', 'x is $${x}']
+    assert utils.dict_render(input_dict, {'x': 1, 'y': 2}) == out_dict
+    assert utils.list_render(input_list, {'x': 1, 'y': 2}) == out_list
+    # complex dict
+    input_dict2 = input_dict.copy()
+    input_dict2['dict_inside'] = input_dict
+    input_dict2['list_inside'] = input_list
+    out_dict2 = out_dict.copy()
+    out_dict2['dict_inside'] = out_dict
+    out_dict2['list_inside'] = out_list
+    assert utils.dict_render(input_dict2, {'x': 1, 'y': 2}) == out_dict2
+
+
 def test_file2hash() -> None:
     test_file_path = os.path.join(
         TEST_RESOURCES_DATA_PATH, "cams-global-reanalysis-eac4", "constraints.json"

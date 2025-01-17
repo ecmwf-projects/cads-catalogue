@@ -4,6 +4,7 @@ import unittest.mock
 from operator import itemgetter
 from typing import Any
 
+import pytest
 import pytest_mock
 import sqlalchemy as sa
 
@@ -376,7 +377,7 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
                             {
                                 "id": "page-content",
                                 "type": "html",
-                                "content": "<p>this is a content of a html block</p>\n<p>${apiSnippet}</p>",
+                                "content": "<p>this is a content of a html block</p>\n<p>CDS API snippet</p>",
                             }
                         ],
                     }
@@ -384,10 +385,18 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
             }
         },
     }
-
+    with pytest.raises(KeyError):
+        effective_md_content = contents.transform_layout(
+            initial_md_content, storage_settings
+        )
+    context = {
+        'default': {'apiSnippet': "default API snippet"},
+        'cds': {'apiSnippet': "CDS API snippet"},
+        'ads': {'apiSnippet': "ADS API snippet"},
+    }
     effective_md_content = contents.transform_layout(
-        initial_md_content, storage_settings
-    )
+            initial_md_content, storage_settings, context
+        )
     expected_md_content = initial_md_content.copy()
     expected_md_content["layout"] = "an url"
 
