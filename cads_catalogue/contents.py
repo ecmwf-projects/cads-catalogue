@@ -202,7 +202,10 @@ def transform_layout(
     site_context = global_context.get("default", dict())
     site_context.update(global_context.get(site, dict()))
     layout_data = utils.dict_render(layout_raw_data, site_context)
-
+    images_storage_subpath = f"contents/{content['id']}"
+    layout_data = layout_manager.transform_image_blocks(
+        layout_data, layout_file_path, images_storage_subpath, storage_settings
+    )
     logger.debug(f"output layout_data: {layout_data}")
     subpath = os.path.join("contents", site, ctype, slug)
     content["layout"] = layout_manager.store_layout_by_data(

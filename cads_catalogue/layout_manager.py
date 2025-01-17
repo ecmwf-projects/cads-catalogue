@@ -35,7 +35,7 @@ def manage_image_section(
     folder_path: str | pathlib.Path,
     section: dict[str, Any],
     images_stored: dict[str, str],
-    resource: dict[str, Any],
+    image_storage_subpath: str,
     storage_settings: config.ObjectStorageSettings | Any,
     disable_upload: bool = False,
 ):
@@ -47,7 +47,7 @@ def manage_image_section(
     folder_path: folder path where to find layout.json
     section: section of layout.json data
     images_stored: dictionary of image urls already stored
-    resource: metadata of loaded resource
+    image_storage_subpath: subpath where to storage images
     storage_settings: object with settings to access the object storage
     disable_upload: disable upload (for testing, default False)
     """
@@ -72,12 +72,11 @@ def manage_image_section(
                 if os.path.isfile(image_abs_path):
                     if image_abs_path not in images_stored and not disable_upload:
                         # process upload to object storage
-                        subpath = f"resources/{resource['resource_uid']}"
                         image_rel_url = object_storage.store_file(
                             image_abs_path,
                             storage_settings.object_storage_url,
                             bucket_name=storage_settings.catalogue_bucket,
-                            subpath=subpath,
+                            subpath=image_storage_subpath,
                             **storage_settings.storage_kws,
                         )
                         # update cache of the upload urls
@@ -99,7 +98,7 @@ def manage_image_section(
                     folder_path,
                     block,
                     images_stored,
-                    resource,
+                    image_storage_subpath,
                     storage_settings,
                     disable_upload=disable_upload,
                 )
@@ -109,7 +108,7 @@ def manage_image_section(
 def transform_image_blocks(
     layout_data: dict[str, Any],
     folder_path: str | pathlib.Path,
-    resource: dict[str, Any],
+    image_storage_subpath: str,
     storage_settings: config.ObjectStorageSettings | Any,
     disable_upload: bool = False,
 ) -> dict[str, Any]:
@@ -119,7 +118,7 @@ def transform_image_blocks(
     ----------
     layout_data: layout.json input content
     folder_path: folder path where to find layout.json
-    resource: metadata of loaded resource
+    image_storage_subpath: subpath for storage upload of images
     storage_settings: object with settings to access the object storage
     disable_upload: disable upload (for testing/validations, default False)
 
@@ -138,7 +137,7 @@ def transform_image_blocks(
             folder_path,
             section,
             images_stored,
-            resource,
+            image_storage_subpath,
             storage_settings,
             disable_upload=disable_upload,
         )
@@ -149,7 +148,7 @@ def transform_image_blocks(
             folder_path,
             aside_section,
             images_stored,
-            resource,
+            image_storage_subpath,
             storage_settings,
             disable_upload=disable_upload,
         )
@@ -631,8 +630,9 @@ def transform_layout(
     layout_data = transform_cim_blocks(
         layout_data, cim_layout_path, resource["qa_flag"]
     )
+    image_storage_subpath = f"resources/{resource['resource_uid']}"
     layout_data = transform_image_blocks(
-        layout_data, resource_folder_path, resource, storage_settings
+        layout_data, resource_folder_path, image_storage_subpath, storage_settings
     )
     layout_data = transform_licence_required_blocks(
         session, layout_data, storage_settings
