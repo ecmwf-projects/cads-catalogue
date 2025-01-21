@@ -62,7 +62,7 @@ def manage_image_section(
         for j, image_dict in enumerate(image_dict_list):
             # TODO: better to not use relative paths, look only inside local folder
             image_rel_path = image_dict.get("url")
-            if block.get("type") == "thumb-markdown" and image_rel_path:
+            if image_rel_path:
                 if utils.is_url(image_rel_path):
                     # nothing to do, the url is already uploaded somewhere
                     continue
@@ -93,7 +93,7 @@ def manage_image_section(
                         )
                 else:
                     raise ValueError(f"image {image_rel_path} not found")
-            elif block.get("type") in ("section", "accordion"):
+            else:
                 blocks[i] = manage_image_section(
                     folder_path,
                     block,
@@ -231,7 +231,7 @@ def manage_required_licence_section(
             blocks.insert(i + 1 + 2 * replacements, new_blocks[1])
             blocks.insert(i + 2 + 2 * replacements, new_blocks[2])
             replacements += 1
-        elif block.get("type") in ("section", "accordion"):
+        else:
             blocks[i + 2 * replacements] = manage_required_licence_section(
                 all_licences, block, doc_storage_url
             )
@@ -351,7 +351,7 @@ def manage_licence_acceptance_section(
                     new_block[attr] = attr_value
             del blocks[i]
             blocks.insert(i, new_block)
-        elif block.get("type") in ("section", "accordion"):
+        else:
             blocks[i] = manage_licence_acceptance_section(
                 all_licences, block, doc_storage_url
             )
@@ -497,7 +497,7 @@ def manage_html_block_in_section(section, layout_folder_path):
                     raise ValueError(
                         f"not found referred {content_source} in html block {block_id}"
                     )
-        elif block.get("type") in ("section", "accordion"):
+        else:
             blocks[i] = manage_html_block_in_section(block, layout_folder_path)
     return new_section
 
