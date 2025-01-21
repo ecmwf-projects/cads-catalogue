@@ -204,7 +204,7 @@ def transform_layout(
     layout_data = utils.dict_render(layout_raw_data, site_context)
     images_storage_subpath = f"contents/{content['slug']}"
     layout_data = layout_manager.transform_image_blocks(
-        layout_data, layout_file_path, images_storage_subpath, storage_settings
+        layout_data, layout_folder_path, images_storage_subpath, storage_settings
     )
     logger.debug(f"output layout_data: {layout_data}")
     subpath = os.path.join("contents", site, ctype, slug)
