@@ -109,7 +109,7 @@ def content_sync(
 
 def load_content_folder(
     content_folder: str | pathlib.Path, global_context: dict[str, Any] | None = None
-) -> List[dict[str, Any]]:
+) -> List[dict[str, Any]] | None:
     """
     Parse folder and returns a list of metadata dictionaries, each one for a content.
 
@@ -131,7 +131,14 @@ def load_content_folder(
     for site in data_raw["site"][:]:
         site_context = global_context.get("default", dict())
         site_context.update(global_context.get(site, dict()))
-        data = utils.dict_render(data_raw, site_context)
+        try:
+            data = utils.dict_render(data_raw, site_context)
+        except KeyError:
+            logger.exception(
+                f"rendering {metadata_file_path} failed: missing variable. "
+                f"Content in {content_folder} is not loaded"
+            )
+            return None
         metadata = {
             "site": site,
             "type": data["resource_type"],
@@ -201,8 +208,14 @@ def transform_layout(
     )
     site_context = global_context.get("default", dict())
     site_context.update(global_context.get(site, dict()))
-    layout_data = utils.dict_render(layout_raw_data, site_context)
-
+    try:
+        layout_data = utils.dict_render(layout_raw_data, site_context)
+    except KeyError:
+        logger.exception(
+            f"rendering {layout_file_path} failed: missing variable. "
+            f"{ctype} '{slug}' for site {site} is not loaded"
+        )
+        raise
     logger.debug(f"output layout_data: {layout_data}")
     subpath = os.path.join("contents", site, ctype, slug)
     content["layout"] = layout_manager.store_layout_by_data(
@@ -270,7 +283,8 @@ def load_contents(
                 "failed parsing content in %s, error follows" % content_folder
             )
             continue
-        loaded_contents += contents_md
+        if contents_md:
+            loaded_contents += contents_md
     return loaded_contents
 
 
@@ -305,7 +319,14 @@ def update_catalogue_contents(
     for content in contents[:]:
         site, ctype, slug = content["site"], content["type"], content["slug"]
         involved_content_props.append((site, ctype, slug))
-        content = transform_layout(content, storage_settings, global_context)
+        try:
+            content = transform_layout(content, storage_settings, global_context)
+        except KeyError:
+            # error already logged inside transform_layout
+            continue
+        except Exception:  # noqa
+            logger.exception(f"Processing content '{slug}' fails, error follows")
+            continue
         try:
             with session.begin_nested():
                 content_sync(session, content, storage_settings)
