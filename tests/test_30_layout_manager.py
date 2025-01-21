@@ -243,11 +243,11 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     }
     section = {"id": "overview", "blocks": [no_image_block, image_block]}
     images_stored: dict[str, str] = dict()
-
+    image_storage_subpath = f"resources/{resource['resource_uid']}"
     # not found overview/overview.png
     with pytest.raises(ValueError):
         layout_manager.manage_image_section(
-            str(tmpdir), section, images_stored, resource, oss
+            str(tmpdir), section, images_stored, image_storage_subpath, oss
         )
     # url is already uploaded: no change
     image_block_already_url = {
@@ -261,7 +261,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     }
     section = {"id": "overview", "blocks": [no_image_block, image_block_already_url]}
     new_section = layout_manager.manage_image_section(
-        str(tmpdir), section, images_stored, resource, oss
+        str(tmpdir), section, images_stored, image_storage_subpath, oss
     )
     assert new_section == section
 
@@ -277,7 +277,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     # 1 image block
     section = {"id": "overview", "blocks": [no_image_block, image_block]}
     new_section = layout_manager.manage_image_section(
-        str(tmpdir), section, images_stored, resource, oss
+        str(tmpdir), section, images_stored, image_storage_subpath, oss
     )
     assert new_section == {
         "id": "overview",
@@ -291,14 +291,14 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     # case section without replace to do
     section = {"id": "overview", "blocks": [no_image_block, no_image_block]}
     new_section = layout_manager.manage_image_section(
-        str(tmpdir), section, images_stored, resource, oss
+        str(tmpdir), section, images_stored, image_storage_subpath, oss
     )
     assert new_section == section
 
     # case section with more separeted image blocks
     section = {"id": "overview", "blocks": [image_block, no_image_block, image_block]}
     new_section = layout_manager.manage_image_section(
-        str(tmpdir), section, images_stored, resource, oss
+        str(tmpdir), section, images_stored, image_storage_subpath, oss
     )
     assert new_section == {
         "id": "overview",
@@ -327,7 +327,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
         ],
     }
     new_section = layout_manager.manage_image_section(
-        str(tmpdir), section, images_stored, resource, oss
+        str(tmpdir), section, images_stored, image_storage_subpath, oss
     )
     assert new_section == {
         "id": "overview",
@@ -357,7 +357,7 @@ def test_manage_image_section(tmpdir, mocker: pytest_mock.MockerFixture) -> None
     # case section with a block with multiple images
     section = {"id": "overview", "blocks": [no_image_block, multi_images_block]}
     new_section = layout_manager.manage_image_section(
-        str(tmpdir), section, images_stored, resource, oss
+        str(tmpdir), section, images_stored, image_storage_subpath, oss
     )
     assert new_section == {
         "id": "overview",
@@ -376,11 +376,11 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     mocker.patch.object(object_storage, "store_file", return_value="an url")
     layout_path = os.path.join(str(tmpdir), "layout.json")
     resource = {"resource_uid": "a-dataset"}
-
+    image_storage_subpath = f"resources/{resource['resource_uid']}"
     # missing blocks with images
     layout_data = create_layout_for_test(layout_path)
     new_layout_data = layout_manager.transform_image_blocks(
-        layout_data, str(tmpdir), resource, oss
+        layout_data, str(tmpdir), image_storage_subpath, oss
     )
     assert new_layout_data == layout_data
 
@@ -398,7 +398,9 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     sections = [{"id": "overview", "blocks": [no_image_block, image_block]}]
     layout_data = create_layout_for_test(layout_path, sections)
     with pytest.raises(ValueError):
-        layout_manager.transform_image_blocks(layout_data, str(tmpdir), resource, oss)
+        layout_manager.transform_image_blocks(
+            layout_data, str(tmpdir), image_storage_subpath, oss
+        )
 
     # create image overview/overview.png and repeat the test
     overview_path = os.path.join(str(tmpdir), "overview")
@@ -407,7 +409,7 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     with open(overview_file_path, "w") as fp:
         fp.write("hello! I am an image")
     new_layout_data = layout_manager.transform_image_blocks(
-        layout_data, str(tmpdir), resource, oss
+        layout_data, str(tmpdir), image_storage_subpath, oss
     )
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
@@ -446,7 +448,7 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     ]
     layout_data = create_layout_for_test(layout_path, sections)
     new_layout_data = layout_manager.transform_image_blocks(
-        layout_data, str(tmpdir), resource, oss
+        layout_data, str(tmpdir), image_storage_subpath, oss
     )
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
@@ -502,7 +504,7 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     layout_data = create_layout_for_test(layout_path, aside=aside)
 
     new_layout_data = layout_manager.transform_image_blocks(
-        layout_data, str(tmpdir), resource, oss
+        layout_data, str(tmpdir), image_storage_subpath, oss
     )
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
@@ -531,7 +533,7 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     aside = {"blocks": [no_image_block, image_block, no_image_block, image_block]}
     layout_data = create_layout_for_test(layout_path, aside=aside)
     new_layout_data = layout_manager.transform_image_blocks(
-        layout_data, str(tmpdir), resource, oss
+        layout_data, str(tmpdir), image_storage_subpath, oss
     )
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
@@ -580,7 +582,7 @@ def test_transform_image_blocks(tmpdir, mocker: pytest_mock.MockerFixture) -> No
     }
     layout_data = create_layout_for_test(layout_path, sections=sections, aside=aside)
     new_layout_data = layout_manager.transform_image_blocks(
-        layout_data, str(tmpdir), resource, oss
+        layout_data, str(tmpdir), image_storage_subpath, oss
     )
     assert new_layout_data == {
         "uid": "cams-global-reanalysis-eac4",
