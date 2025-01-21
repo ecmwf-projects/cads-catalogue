@@ -1,0 +1,17 @@
+default:
+  apiSnippet: |
+    import something
+    this_is_a_default_snippet
+  global_prop: 33
+cds:
+  siteSlug: CDS
+  siteName: Climate Data Store
+  apiSnippet: |
+    import cds_stuff
+    this_is_cds_snippet
+ads:
+  siteSlug: ADS2
+  siteName: ADS Data Store
+  apiSnippet: |
+    import ads_stuff
+    this_is_ads_snippet

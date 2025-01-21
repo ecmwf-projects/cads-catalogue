@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import ChainMap as _ChainMap
 import datetime
 import hashlib
 import html.parser
@@ -22,21 +21,22 @@ import json
 import mimetypes
 import multiprocessing as mp
 import pathlib
-import re as _re
+import string
 import subprocess
 import urllib.parse
-import string
-from typing import Any
+from collections import ChainMap as _ChainMap
+from typing import Any, Dict
 
 from sqlalchemy import inspect
 
-_sentinel_dict = {}
+_sentinel_dict: Dict[str, str] = {}
+
 
 class CADSTemplate(string.Template):
     """template using only brace brackets for variables."""
 
     idpattern = "nothing^"  # so force to use curly braces
-    braceidpattern = r'(?a:[_a-z][_a-z0-9]*)'
+    braceidpattern = r"(?a:[_a-z][_a-z0-9]*)"
 
     def substitute(self, mapping=_sentinel_dict, /, **kws):
         # note: adjusted from the method in the standard library
@@ -44,17 +44,19 @@ class CADSTemplate(string.Template):
             mapping = kws
         elif kws:
             mapping = _ChainMap(kws, mapping)
+
         # Helper function for .sub()
         def convert(mo):
             # check the most common path first
-            named = mo.group('braced')
-            if mo.group('braced') is not None:
+            named = mo.group("braced")
+            if mo.group("braced") is not None:
                 # could raise KeyError
                 return str(mapping[named])
             # other cases
-            if mo.group('escaped') is not None or mo.group('invalid') is not None:
+            if mo.group("escaped") is not None or mo.group("invalid") is not None:
                 return mo.group()
-            raise ValueError('Unrecognized named group in pattern', self.pattern)
+            raise ValueError("Unrecognized named group in pattern", self.pattern)
+
         return self.pattern.sub(convert, self.template)
 
 
