@@ -31,38 +31,24 @@ from cads_catalogue import config, database, object_storage, utils
 logger = structlog.get_logger(__name__)
 
 
-def manage_image_section(
+def manage_image_block(
     folder_path: str | pathlib.Path,
-    section: dict[str, Any],
+    block: dict[str, Any],
     images_stored: dict[str, str],
-    resource: dict[str, Any],
+    image_storage_subpath: str,
     storage_settings: config.ObjectStorageSettings | Any,
     disable_upload: bool = False,
-):
-    """
-    Look for thumb-markdown blocks and modify accordingly with upload to object storage.
-
-    Parameters
-    ----------
-    folder_path: folder path where to find layout.json
-    section: section of layout.json data
-    images_stored: dictionary of image urls already stored
-    resource: metadata of loaded resource
-    storage_settings: object with settings to access the object storage
-    disable_upload: disable upload (for testing, default False)
-    """
-    new_section = copy.deepcopy(section)
-    blocks = new_section.get("blocks", [])
-    for i, block in enumerate(copy.deepcopy(blocks)):
-        if "image" not in block:
-            continue
+) -> dict[str, Any]:
+    new_block = copy.deepcopy(block)
+    if "image" in new_block:
+        # processing image dictionary
         image_dict_list = block["image"]
         if isinstance(image_dict_list, dict):
             image_dict_list = [image_dict_list]
         for j, image_dict in enumerate(image_dict_list):
             # TODO: better to not use relative paths, look only inside local folder
             image_rel_path = image_dict.get("url")
-            if block.get("type") == "thumb-markdown" and image_rel_path:
+            if image_rel_path:
                 if utils.is_url(image_rel_path):
                     # nothing to do, the url is already uploaded somewhere
                     continue
@@ -72,12 +58,11 @@ def manage_image_section(
                 if os.path.isfile(image_abs_path):
                     if image_abs_path not in images_stored and not disable_upload:
                         # process upload to object storage
-                        subpath = f"resources/{resource['resource_uid']}"
                         image_rel_url = object_storage.store_file(
                             image_abs_path,
                             storage_settings.object_storage_url,
                             bucket_name=storage_settings.catalogue_bucket,
-                            subpath=subpath,
+                            subpath=image_storage_subpath,
                             **storage_settings.storage_kws,
                         )
                         # update cache of the upload urls
@@ -85,31 +70,65 @@ def manage_image_section(
                             storage_settings.document_storage_url, image_rel_url
                         )
                     if isinstance(block["image"], dict):
-                        blocks[i]["image"]["url"] = images_stored.get(
+                        new_block["image"]["url"] = images_stored.get(
                             image_abs_path, ""
                         )
                     else:
-                        blocks[i]["image"][j]["url"] = images_stored.get(
+                        new_block["image"][j]["url"] = images_stored.get(
                             image_abs_path, ""
                         )
                 else:
                     raise ValueError(f"image {image_rel_path} not found")
-            elif block.get("type") in ("section", "accordion"):
-                blocks[i] = manage_image_section(
-                    folder_path,
-                    block,
-                    images_stored,
-                    resource,
-                    storage_settings,
-                    disable_upload=disable_upload,
-                )
+    for k, sub_block in enumerate(new_block.get("blocks", [])):
+        new_block["blocks"][k] = manage_image_block(
+            folder_path,
+            sub_block,
+            images_stored,
+            image_storage_subpath,
+            storage_settings,
+            disable_upload,
+        )
+    return new_block
+
+
+def manage_image_section(
+    folder_path: str | pathlib.Path,
+    section: dict[str, Any],
+    images_stored: dict[str, str],
+    image_storage_subpath: str,
+    storage_settings: config.ObjectStorageSettings | Any,
+    disable_upload: bool = False,
+) -> dict[str, Any]:
+    """
+    Look for thumb-markdown blocks and modify accordingly with upload to object storage.
+
+    Parameters
+    ----------
+    folder_path: folder path where to find layout.json
+    section: section of layout.json data
+    images_stored: dictionary of image urls already stored
+    image_storage_subpath: subpath where to storage images
+    storage_settings: object with settings to access the object storage
+    disable_upload: disable upload (for testing, default False)
+    """
+    new_section = copy.deepcopy(section)
+    blocks = new_section.get("blocks", [])
+    for i, block in enumerate(copy.deepcopy(blocks)):
+        blocks[i] = manage_image_block(
+            folder_path,
+            block,
+            images_stored,
+            image_storage_subpath,
+            storage_settings,
+            disable_upload,
+        )
     return new_section
 
 
 def transform_image_blocks(
     layout_data: dict[str, Any],
     folder_path: str | pathlib.Path,
-    resource: dict[str, Any],
+    image_storage_subpath: str,
     storage_settings: config.ObjectStorageSettings | Any,
     disable_upload: bool = False,
 ) -> dict[str, Any]:
@@ -119,7 +138,7 @@ def transform_image_blocks(
     ----------
     layout_data: layout.json input content
     folder_path: folder path where to find layout.json
-    resource: metadata of loaded resource
+    image_storage_subpath: subpath for storage upload of images
     storage_settings: object with settings to access the object storage
     disable_upload: disable upload (for testing/validations, default False)
 
@@ -138,7 +157,7 @@ def transform_image_blocks(
             folder_path,
             section,
             images_stored,
-            resource,
+            image_storage_subpath,
             storage_settings,
             disable_upload=disable_upload,
         )
@@ -149,7 +168,7 @@ def transform_image_blocks(
             folder_path,
             aside_section,
             images_stored,
-            resource,
+            image_storage_subpath,
             storage_settings,
             disable_upload=disable_upload,
         )
@@ -232,7 +251,7 @@ def manage_required_licence_section(
             blocks.insert(i + 1 + 2 * replacements, new_blocks[1])
             blocks.insert(i + 2 + 2 * replacements, new_blocks[2])
             replacements += 1
-        elif block.get("type") in ("section", "accordion"):
+        else:
             blocks[i + 2 * replacements] = manage_required_licence_section(
                 all_licences, block, doc_storage_url
             )
@@ -352,7 +371,7 @@ def manage_licence_acceptance_section(
                     new_block[attr] = attr_value
             del blocks[i]
             blocks.insert(i, new_block)
-        elif block.get("type") in ("section", "accordion"):
+        else:
             blocks[i] = manage_licence_acceptance_section(
                 all_licences, block, doc_storage_url
             )
@@ -498,7 +517,7 @@ def manage_html_block_in_section(section, layout_folder_path):
                     raise ValueError(
                         f"not found referred {content_source} in html block {block_id}"
                     )
-        elif block.get("type") in ("section", "accordion"):
+        else:
             blocks[i] = manage_html_block_in_section(block, layout_folder_path)
     return new_section
 
@@ -631,8 +650,9 @@ def transform_layout(
     layout_data = transform_cim_blocks(
         layout_data, cim_layout_path, resource["qa_flag"]
     )
+    image_storage_subpath = f"resources/{resource['resource_uid']}"
     layout_data = transform_image_blocks(
-        layout_data, resource_folder_path, resource, storage_settings
+        layout_data, resource_folder_path, image_storage_subpath, storage_settings
     )
     layout_data = transform_licence_required_blocks(
         session, layout_data, storage_settings
