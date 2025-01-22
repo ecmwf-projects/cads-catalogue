@@ -60,6 +60,11 @@ def test_load_content_folder() -> None:
                 "Variable domain: Land (biosphere)",
                 "Provider: Copernicus C3S",
             ],
+            "related_datasets": [
+                "reanalysis-era5-land",
+                "foo",
+                "satellite-sea-ice-concentration",
+            ],
             "layout": None,
             "link": "https://atlas.climate.copernicus.eu/atlas",
             "content_update": "2024-09-16T00:00:00Z",
@@ -70,6 +75,18 @@ def test_load_content_folder() -> None:
                 "file-format": "GRIB (optional conversion to netCDF)",
                 "data-type": "Gridded",
                 "horizontal-coverage": "Global",
+                "copernicus_programme": [
+                    {
+                        "id": "climate-change-service",
+                        "title": "Copernicus Climate Change Service",
+                        "link": "https://climate.copernicus.eu/",
+                    },
+                    {
+                        "id": "atmosphere-monitoring-service",
+                        "title": "Copernicus Atmosphere Monitoring Service",
+                        "link": "https://atmosphere.copernicus.eu/",
+                    },
+                ],
             },
         }
     ]
@@ -92,6 +109,7 @@ def test_load_content_folder() -> None:
             "layout": os.path.join(
                 TEST_CONTENT_ROOT_PATH, "how-to-api-templated", "layout.json"
             ),
+            "related_datasets": [],
             "content_update": "2024-09-16T02:10:22Z",
             "link": None,
             "site": "ads",
@@ -121,6 +139,11 @@ def test_load_contents() -> None:
                 "copernicus-interactive-climates-atlas",
                 "cica-overview.png",
             ),
+            "related_datasets": [
+                "reanalysis-era5-land",
+                "foo",
+                "satellite-sea-ice-concentration",
+            ],
             "keywords": [
                 "Product type: Application",
                 "Spatial coverage: Global",
@@ -140,6 +163,18 @@ def test_load_contents() -> None:
                 "file-format": "GRIB (optional conversion to netCDF)",
                 "data-type": "Gridded",
                 "horizontal-coverage": "Global",
+                "copernicus_programme": [
+                    {
+                        "id": "climate-change-service",
+                        "title": "Copernicus Climate Change Service",
+                        "link": "https://climate.copernicus.eu/",
+                    },
+                    {
+                        "id": "atmosphere-monitoring-service",
+                        "title": "Copernicus Atmosphere Monitoring Service",
+                        "link": "https://atmosphere.copernicus.eu/",
+                    },
+                ],
             },
         },
         {
@@ -149,6 +184,7 @@ def test_load_contents() -> None:
             "description": "Access the full data store catalogue, "
             "with search and availability features",
             "image": None,
+            "related_datasets": [],
             "keywords": [],
             "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
             "content_update": "2024-09-16T02:10:22Z",
@@ -165,6 +201,7 @@ def test_load_contents() -> None:
             "description": "Access the full data store catalogue, "
             "with search and availability features",
             "image": None,
+            "related_datasets": [],
             "keywords": [],
             "layout": os.path.join(TEST_CONTENT_ROOT_PATH, "how-to-api", "layout.json"),
             "content_update": "2024-09-16T02:10:22Z",
@@ -181,6 +218,7 @@ def test_load_contents() -> None:
             "description": "Access 33 items of ADS Data Store catalogue, "
             "with search and availability features",
             "image": None,
+            "related_datasets": [],
             "keywords": [],
             "layout": os.path.join(
                 TEST_CONTENT_ROOT_PATH, "how-to-api-templated", "layout.json"
