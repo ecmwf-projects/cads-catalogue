@@ -50,6 +50,7 @@ def content_sync(
     """
     content = content.copy()
     keywords = content.pop("keywords", [])
+    related_datasets = content.pop("related_datasets", [])
     site, ctype, slug = content["site"], content["type"], content["slug"]
     subpath = os.path.join("contents", site, ctype, slug)
     for field in OBJECT_STORAGE_UPLOAD_FIELDS:
@@ -67,7 +68,7 @@ def content_sync(
             **storage_settings.storage_kws,
         )
 
-    # upsert of the message
+    # upsert of the content
     db_content = session.scalars(
         sa.select(database.Content)
         .filter_by(
@@ -104,6 +105,22 @@ def content_sync(
         if not keyword_obj:
             keyword_obj = database.ContentKeyword(**kw_md)
         db_content.keywords.append(keyword_obj)
+
+    # build related datasets
+    db_content.resources = []  # type: ignore
+    for dataset_uid in set(related_datasets):
+        dataset_obj = session.scalars(
+            sa.select(database.ResourceContent)
+            .filter_by(dataset_uid=dataset_uid)
+            .limit(1)
+        ).first()
+        if not dataset_obj:
+            logger.warning(
+                f"dataset uid '{dataset_uid} not found. "
+                f"Skipping relationship with {ctype} '{slug}' for site {site}"
+            )
+            continue
+        db_content.resources.append(dataset_obj)
     return db_content
 
 
@@ -142,6 +159,7 @@ def load_content_folder(
             "content_update": data["update_date"],
             "link": data.get("link"),
             "keywords": data.get("keywords", []),
+            "related_datasets": data.get("related_datasets", []),
             "data": data.get("data"),
             "hidden": data.get("hidden", False),
             # managed below:

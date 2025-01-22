@@ -130,12 +130,20 @@ def can_skip_messages(
 
 
 def can_skip_contents(
-    new_git_hashes, last_run_status, force, filtering_kwargs, contents_config
+    new_git_hashes,
+    last_run_status,
+    force,
+    filtering_kwargs,
+    contents_config,
+    to_process,
 ):
     """Return True if catalogue manager can skip contents' processing."""
     if filtering_kwargs["exclude_contents"]:
         logger.info("update of contents skipped, detected option to exclude contents.")
         return True
+    if "datasets" in to_process:
+        logger.info("update of contents not skippable due updating of datasets.")
+        return False
     if contents_config != last_run_status.get("contents_config"):
         logger.info(
             "update of contents not skippable, detected update of contents configuration."
@@ -248,7 +256,12 @@ def skipping_engine(
             "message_repo_commit"
         ]
     if can_skip_contents(
-        new_git_hashes, last_run_status, force, filtering_kwargs, new_contents_config
+        new_git_hashes,
+        last_run_status,
+        force,
+        filtering_kwargs,
+        new_contents_config,
+        to_process,
     ):
         to_process.remove("contents")
     else:
