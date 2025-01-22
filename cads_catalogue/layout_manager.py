@@ -31,31 +31,17 @@ from cads_catalogue import config, database, object_storage, utils
 logger = structlog.get_logger(__name__)
 
 
-def manage_image_section(
+def manage_image_block(
     folder_path: str | pathlib.Path,
-    section: dict[str, Any],
+    block: dict[str, Any],
     images_stored: dict[str, str],
     image_storage_subpath: str,
     storage_settings: config.ObjectStorageSettings | Any,
     disable_upload: bool = False,
-):
-    """
-    Look for thumb-markdown blocks and modify accordingly with upload to object storage.
-
-    Parameters
-    ----------
-    folder_path: folder path where to find layout.json
-    section: section of layout.json data
-    images_stored: dictionary of image urls already stored
-    image_storage_subpath: subpath where to storage images
-    storage_settings: object with settings to access the object storage
-    disable_upload: disable upload (for testing, default False)
-    """
-    new_section = copy.deepcopy(section)
-    blocks = new_section.get("blocks", [])
-    for i, block in enumerate(copy.deepcopy(blocks)):
-        if "image" not in block:
-            continue
+) -> dict[str, Any]:
+    new_block = copy.deepcopy(block)
+    if "image" in new_block:
+        # processing image dictionary
         image_dict_list = block["image"]
         if isinstance(image_dict_list, dict):
             image_dict_list = [image_dict_list]
@@ -84,24 +70,58 @@ def manage_image_section(
                             storage_settings.document_storage_url, image_rel_url
                         )
                     if isinstance(block["image"], dict):
-                        blocks[i]["image"]["url"] = images_stored.get(
+                        new_block["image"]["url"] = images_stored.get(
                             image_abs_path, ""
                         )
                     else:
-                        blocks[i]["image"][j]["url"] = images_stored.get(
+                        new_block["image"][j]["url"] = images_stored.get(
                             image_abs_path, ""
                         )
                 else:
                     raise ValueError(f"image {image_rel_path} not found")
-            else:
-                blocks[i] = manage_image_section(
-                    folder_path,
-                    block,
-                    images_stored,
-                    image_storage_subpath,
-                    storage_settings,
-                    disable_upload=disable_upload,
-                )
+    for k, sub_block in enumerate(new_block.get("blocks", [])):
+        new_block["blocks"][k] = manage_image_block(
+            folder_path,
+            sub_block,
+            images_stored,
+            image_storage_subpath,
+            storage_settings,
+            disable_upload,
+        )
+    return new_block
+
+
+def manage_image_section(
+    folder_path: str | pathlib.Path,
+    section: dict[str, Any],
+    images_stored: dict[str, str],
+    image_storage_subpath: str,
+    storage_settings: config.ObjectStorageSettings | Any,
+    disable_upload: bool = False,
+) -> dict[str, Any]:
+    """
+    Look for thumb-markdown blocks and modify accordingly with upload to object storage.
+
+    Parameters
+    ----------
+    folder_path: folder path where to find layout.json
+    section: section of layout.json data
+    images_stored: dictionary of image urls already stored
+    image_storage_subpath: subpath where to storage images
+    storage_settings: object with settings to access the object storage
+    disable_upload: disable upload (for testing, default False)
+    """
+    new_section = copy.deepcopy(section)
+    blocks = new_section.get("blocks", [])
+    for i, block in enumerate(copy.deepcopy(blocks)):
+        blocks[i] = manage_image_block(
+            folder_path,
+            block,
+            images_stored,
+            image_storage_subpath,
+            storage_settings,
+            disable_upload,
+        )
     return new_section
 
 
