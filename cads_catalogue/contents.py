@@ -261,7 +261,9 @@ def load_contents(
             logger.warning("unknown file %r found" % content_folder)
             continue
         if not is_a_content_folder(content_folder):
-            logger.warning("%r doesn't seem a content folder. Skipping" % content_folder)
+            logger.warning(
+                "%r doesn't seem a content folder. Skipping" % content_folder
+            )
             continue
         try:
             contents_md = load_content_folder(content_folder, global_context)
