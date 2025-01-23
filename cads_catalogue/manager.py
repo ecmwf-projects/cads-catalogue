@@ -377,7 +377,7 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
 
     # base extraction and validation
     if not override_path:
-        logger.info(f"no selection of any override metadata file.")
+        logger.info("no selection of any override metadata file.")
         return ret_value
     if not os.path.exists(override_path):
         logger.error(f"override file {override_path} not found!")

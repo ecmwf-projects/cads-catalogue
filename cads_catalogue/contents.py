@@ -108,15 +108,13 @@ def content_sync(
 
     # build related datasets
     db_content.resources = []  # type: ignore
-    for dataset_uid in set(related_datasets):
+    for resource_uid in set(related_datasets):
         dataset_obj = session.scalars(
-            sa.select(database.ResourceContent)
-            .filter_by(dataset_uid=dataset_uid)
-            .limit(1)
+            sa.select(database.Resource).filter_by(resource_uid=resource_uid).limit(1)
         ).first()
         if not dataset_obj:
             logger.warning(
-                f"dataset uid '{dataset_uid} not found. "
+                f"dataset uid '{resource_uid}' not found. "
                 f"Skipping relationship with {ctype} '{slug}' for site {site}"
             )
             continue
@@ -241,10 +239,14 @@ def yaml2context(yaml_path: str | pathlib.Path | None) -> dict[str, Any]:
     :return: yaml parsed
     """
     if not yaml_path:
+        logger.info(
+            "no selection of a contents configuration file. No variable substitution in templates."
+        )
         return dict()
     if not os.path.isfile(yaml_path):
         logger.warning(f"{yaml_path} not found. No variable substitution in templates.")
         return dict()
+    logger.info(f"reading contents configuration file {yaml_path}.")
     with open(yaml_path) as fp:
         try:
             data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
