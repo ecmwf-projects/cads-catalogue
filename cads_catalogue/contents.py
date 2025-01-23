@@ -109,7 +109,7 @@ def content_sync(
 
 def load_content_folder(
     content_folder: str | pathlib.Path, global_context: dict[str, Any] | None = None
-) -> List[dict[str, Any]]:
+) -> List[dict[str, Any]] | None:
     """
     Parse folder and returns a list of metadata dictionaries, each one for a content.
 
@@ -270,12 +270,19 @@ def load_contents(
             continue
         try:
             contents_md = load_content_folder(content_folder, global_context)
-        except:  # noqa
+        except utils.CADSTemplateKeyError as err:
+            logger.error(
+                f"rendering of metadata.json failed: {err} "
+                f"Content in {content_folder} is not loaded."
+            )
+            continue
+        except Exception:  # noqa
             logger.exception(
                 "failed parsing content in %s, error follows" % content_folder
             )
             continue
-        loaded_contents += contents_md
+        if contents_md:
+            loaded_contents += contents_md
     return loaded_contents
 
 
@@ -310,7 +317,16 @@ def update_catalogue_contents(
     for content in contents[:]:
         site, ctype, slug = content["site"], content["type"], content["slug"]
         involved_content_props.append((site, ctype, slug))
-        content = transform_layout(content, storage_settings, global_context)
+        try:
+            content = transform_layout(content, storage_settings, global_context)
+        except utils.CADSTemplateKeyError as err:
+            logger.error(f"Processing layout of content '{slug}' fails: {err}")
+            continue
+        except Exception:  # noqa
+            logger.exception(
+                f"Processing layout for content {ctype} '{slug}' for site {site} fails, error follows"
+            )
+            continue
         try:
             with session.begin_nested():
                 content_sync(session, content, storage_settings)

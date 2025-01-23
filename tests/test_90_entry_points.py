@@ -590,6 +590,8 @@ def test_update_catalogue(
             TEST_CONTENTS_DATA_PATH,
             "--include",
             "reanalysis-era5-land",
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -695,7 +697,7 @@ def test_update_catalogue(
             ),
             ("how-to-api", "CDSAPI setup", "ads", "page"),
             ("how-to-api", "CDSAPI setup", "cds", "page"),
-            ("how-to-api-templated", "${siteSlug} API setup", "ads", "page"),
+            ("how-to-api-templated", "ADS API setup", "ads", "page"),
         ]
 
     # 3.bis repeat last run -------------------------------------------------------------
@@ -717,6 +719,8 @@ def test_update_catalogue(
             TEST_CONTENTS_DATA_PATH,
             "--include",
             "reanalysis-era5-land",
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -822,6 +826,8 @@ def test_update_catalogue(
             "--include",
             "reanalysis-era5-land",
             "--force",
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -891,6 +897,8 @@ def test_update_catalogue(
             TEST_CONTENTS_DATA_PATH,
             "--include",
             "not-existing-*-dataset",
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -943,6 +951,8 @@ def test_update_catalogue(
             TEST_CONTENTS_DATA_PATH,
             "--exclude",
             "reanalysis-era5-single-*",
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1041,7 +1051,7 @@ def test_update_catalogue(
             "--contents-folder-path",
             TEST_CONTENTS_DATA_PATH,
             "--contents-config-path",
-            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config2.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1122,7 +1132,7 @@ def test_update_catalogue(
         assert session.execute(sa.text(sql)).all() == [
             (
                 "ads",
-                "ADS API setup",
+                "ADS2 API setup",
                 "how-to-api-templated",
                 "page",
                 "Access 33 items of ADS Data Store catalogue, with search and availability features",
@@ -1170,7 +1180,7 @@ def test_update_catalogue(
             "--contents-folder-path",
             TEST_CONTENTS_DATA_PATH,
             "--contents-config-path",
-            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config.yaml"),
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config2.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1229,6 +1239,8 @@ def test_update_catalogue(
             "--contents-folder-path",
             TEST_CONTENTS_DATA_PATH,
             "--force",
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config2.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1303,6 +1315,8 @@ def test_update_catalogue(
             TEST_CIM_DATA_PATH,
             "--contents-folder-path",
             TEST_CONTENTS_DATA_PATH,
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config2.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1356,6 +1370,8 @@ def test_update_catalogue(
             TEST_CONTENTS_DATA_PATH,
             "--overrides-path",
             os.path.join(TESTDATA_PATH, "override2.yaml"),
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config2.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,
@@ -1432,6 +1448,8 @@ def test_update_catalogue(
             TEST_CONTENTS_DATA_PATH,
             "--overrides-path",
             os.path.join(TESTDATA_PATH, "override2.yaml"),
+            "--contents-config-path",
+            os.path.join(TEST_CONTENTS_DATA_PATH, "template_config2.yaml"),
         ],
         env={
             "OBJECT_STORAGE_URL": object_storage_url,

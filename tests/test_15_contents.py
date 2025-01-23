@@ -4,10 +4,11 @@ import unittest.mock
 from operator import itemgetter
 from typing import Any
 
+import pytest
 import pytest_mock
 import sqlalchemy as sa
 
-from cads_catalogue import config, contents, layout_manager, object_storage
+from cads_catalogue import config, contents, layout_manager, object_storage, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -376,7 +377,7 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
                             {
                                 "id": "page-content",
                                 "type": "html",
-                                "content": "<p>this is a content of a html block</p>\n<p>${apiSnippet}</p>",
+                                "content": "<p>this is a content of a html block</p>\n<p>CDS API snippet</p>",
                             }
                         ],
                     }
@@ -384,9 +385,15 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
             }
         },
     }
-
+    with pytest.raises(utils.CADSTemplateKeyError):
+        contents.transform_layout(initial_md_content, storage_settings)
+    context = {
+        "default": {"apiSnippet": "default API snippet"},
+        "cds": {"apiSnippet": "CDS API snippet"},
+        "ads": {"apiSnippet": "ADS API snippet"},
+    }
     effective_md_content = contents.transform_layout(
-        initial_md_content, storage_settings
+        initial_md_content, storage_settings, context
     )
     expected_md_content = initial_md_content.copy()
     expected_md_content["layout"] = "an url"
@@ -402,7 +409,11 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
     ]
 
 
-# def test_update_catalogue_contents(session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture):
+# def test_update_catalogue_contents(
+#         session_obj: sa.orm.sessionmaker,
+#         mocker: pytest_mock.MockerFixture,
+#         caplog,
+# ):
 #     my_settings_dict = {
 #         "object_storage_url": "object/storage/url",
 #         "storage_admin": "admin1",
@@ -415,6 +426,9 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
 #     contents_package_path = os.path.join(TESTDATA_PATH, "cads-contents-json")
 #     yaml_config = os.path.join(TEST_CONTENT_ROOT_PATH, 'template_config.yaml')
 #     with session_obj() as session:
-#         contents.update_catalogue_contents(
+#         involved = contents.update_catalogue_contents(
 #         session, contents_package_path, storage_settings, yaml_path=yaml_config
 #         )
+#     with caplog.at_level(logging.ERROR):
+#         log_msgs = [json.loads(r.msg)['event'] for r in caplog.records]
+#     caplog.clear()
