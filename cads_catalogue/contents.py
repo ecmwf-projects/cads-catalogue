@@ -202,6 +202,10 @@ def transform_layout(
     site_context = global_context.get("default", dict())
     site_context.update(global_context.get(site, dict()))
     layout_data = utils.dict_render(layout_raw_data, site_context)
+    images_storage_subpath = f"contents/{content['slug']}"
+    layout_data = layout_manager.transform_image_blocks(
+        layout_data, layout_folder_path, images_storage_subpath, storage_settings
+    )
     logger.debug(f"output layout_data: {layout_data}")
     subpath = os.path.join("contents", site, ctype, slug)
     content["layout"] = layout_manager.store_layout_by_data(
@@ -252,15 +256,17 @@ def load_contents(
     """
     loaded_contents = []
     if not os.path.isdir(contents_root_folder):
-        logger.warning("not found folder {contents_root_folder}!")
+        logger.warning(f"not found folder {contents_root_folder}!")
         return []
-    exclude_folder_names = [".git"]
     for content_folder_name in sorted(os.listdir(contents_root_folder)):
-        if content_folder_name in exclude_folder_names:
-            continue
         content_folder = os.path.join(contents_root_folder, content_folder_name)
         if not os.path.isdir(content_folder):
             logger.warning("unknown file %r found" % content_folder)
+            continue
+        if not is_a_content_folder(content_folder):
+            logger.warning(
+                "%r doesn't seem a content folder. Skipping" % content_folder
+            )
             continue
         try:
             contents_md = load_content_folder(content_folder, global_context)
@@ -346,3 +352,19 @@ def update_catalogue_contents(
             )
 
     return involved_content_props
+
+
+def is_a_content_folder(folder_path: str) -> bool:
+    """
+    Return True if `folder_path` seems a valid folder of a content resource.
+
+    Parameters
+    ----------
+    folder_path: folder path of the folder to check.
+    """
+    exclude_folder_names = [".git"]
+    if os.path.basename(folder_path) in exclude_folder_names:
+        return False
+    if os.path.isfile(os.path.join(folder_path, "metadata.json")):
+        return True
+    return False

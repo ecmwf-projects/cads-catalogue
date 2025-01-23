@@ -192,7 +192,7 @@ def validate_layout(dataset_folder):
         layout_manager.transform_image_blocks(
             layout_data,
             dataset_folder,
-            {"resource_uid": "validation"},
+            "validations",
             None,
             disable_upload=True,
         )
