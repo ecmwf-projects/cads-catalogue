@@ -32,6 +32,12 @@ from sqlalchemy import inspect
 _sentinel_dict: Dict[str, str] = {}
 
 
+class CADSTemplateKeyError(Exception):
+    """Exception raised in case missing interpolation key in CADSTemplate."""
+
+    pass
+
+
 class CADSTemplate(string.Template):
     """template using only brace brackets for variables."""
 
@@ -50,7 +56,10 @@ class CADSTemplate(string.Template):
             # check the most common path first
             named = mo.group("braced")
             if mo.group("braced") is not None:
-                # could raise KeyError
+                if named not in mapping:
+                    raise CADSTemplateKeyError(
+                        f"missing key '{named}', template cannot be rendered."
+                    )
                 return str(mapping[named])
             # other cases
             if mo.group("escaped") is not None or mo.group("invalid") is not None:

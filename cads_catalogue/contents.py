@@ -131,14 +131,7 @@ def load_content_folder(
     for site in data_raw["site"][:]:
         site_context = global_context.get("default", dict())
         site_context.update(global_context.get(site, dict()))
-        try:
-            data = utils.dict_render(data_raw, site_context)
-        except KeyError:
-            logger.exception(
-                f"rendering {metadata_file_path} failed: missing variable. "
-                f"Content in {content_folder} is not loaded"
-            )
-            return None
+        data = utils.dict_render(data_raw, site_context)
         metadata = {
             "site": site,
             "type": data["resource_type"],
@@ -278,7 +271,13 @@ def load_contents(
             continue
         try:
             contents_md = load_content_folder(content_folder, global_context)
-        except:  # noqa
+        except utils.CADSTemplateKeyError as err:
+            logger.error(
+                f"rendering of metadata.json failed: {err} "
+                f"Content in {content_folder} is not loaded."
+            )
+            continue
+        except Exception:  # noqa
             logger.exception(
                 "failed parsing content in %s, error follows" % content_folder
             )
@@ -321,11 +320,13 @@ def update_catalogue_contents(
         involved_content_props.append((site, ctype, slug))
         try:
             content = transform_layout(content, storage_settings, global_context)
-        except KeyError:
-            # error already logged inside transform_layout
+        except utils.CADSTemplateKeyError as err:
+            logger.error(f"Processing layout of content '{slug}' fails: {err}")
             continue
         except Exception:  # noqa
-            logger.exception(f"Processing content '{slug}' fails, error follows")
+            logger.exception(
+                f"Processing layout for content {ctype} '{slug}' for site {site} fails, error follows"
+            )
             continue
         try:
             with session.begin_nested():

@@ -26,7 +26,7 @@ def test_cadstemplate() -> None:
     # case use brackets -> do replace, raise in case
     t = utils.CADSTemplate("x is ${x}")
     assert t.substitute({"x": 1}) == "x is 1"
-    with pytest.raises(KeyError):
+    with pytest.raises(utils.CADSTemplateKeyError):
         t.substitute({"y": 1})
 
     # case escaped without brackets -> no replacing, no raise

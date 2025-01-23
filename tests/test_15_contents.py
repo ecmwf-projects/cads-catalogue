@@ -8,7 +8,7 @@ import pytest
 import pytest_mock
 import sqlalchemy as sa
 
-from cads_catalogue import config, contents, layout_manager, object_storage
+from cads_catalogue import config, contents, layout_manager, object_storage, utils
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 TESTDATA_PATH = os.path.join(THIS_PATH, "data")
@@ -385,10 +385,8 @@ def test_transform_layout(mocker: pytest_mock.MockerFixture):
             }
         },
     }
-    with pytest.raises(KeyError):
-        effective_md_content = contents.transform_layout(
-            initial_md_content, storage_settings
-        )
+    with pytest.raises(utils.CADSTemplateKeyError):
+        contents.transform_layout(initial_md_content, storage_settings)
     context = {
         "default": {"apiSnippet": "default API snippet"},
         "cds": {"apiSnippet": "CDS API snippet"},
