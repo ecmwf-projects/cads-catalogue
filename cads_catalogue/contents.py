@@ -201,14 +201,7 @@ def transform_layout(
     )
     site_context = global_context.get("default", dict())
     site_context.update(global_context.get(site, dict()))
-    try:
-        layout_data = utils.dict_render(layout_raw_data, site_context)
-    except KeyError:
-        logger.exception(
-            f"rendering {layout_file_path} failed: missing variable. "
-            f"{ctype} '{slug}' for site {site} is not loaded"
-        )
-        raise
+    layout_data = utils.dict_render(layout_raw_data, site_context)
     logger.debug(f"output layout_data: {layout_data}")
     subpath = os.path.join("contents", site, ctype, slug)
     content["layout"] = layout_manager.store_layout_by_data(
