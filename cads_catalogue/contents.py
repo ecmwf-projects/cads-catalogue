@@ -50,6 +50,7 @@ def content_sync(
     """
     content = content.copy()
     keywords = content.pop("keywords", [])
+    related_datasets = content.pop("related_datasets", [])
     site, ctype, slug = content["site"], content["type"], content["slug"]
     subpath = os.path.join("contents", site, ctype, slug)
     for field in OBJECT_STORAGE_UPLOAD_FIELDS:
@@ -67,7 +68,7 @@ def content_sync(
             **storage_settings.storage_kws,
         )
 
-    # upsert of the message
+    # upsert of the content
     db_content = session.scalars(
         sa.select(database.Content)
         .filter_by(
@@ -104,6 +105,20 @@ def content_sync(
         if not keyword_obj:
             keyword_obj = database.ContentKeyword(**kw_md)
         db_content.keywords.append(keyword_obj)
+
+    # build related datasets
+    db_content.resources = []  # type: ignore
+    for resource_uid in set(related_datasets):
+        dataset_obj = session.scalars(
+            sa.select(database.Resource).filter_by(resource_uid=resource_uid).limit(1)
+        ).first()
+        if not dataset_obj:
+            logger.warning(
+                f"dataset uid '{resource_uid}' not found. "
+                f"Skipping relationship with {ctype} '{slug}' for site {site}"
+            )
+            continue
+        db_content.resources.append(dataset_obj)
     return db_content
 
 
@@ -142,6 +157,7 @@ def load_content_folder(
             "content_update": data["update_date"],
             "link": data.get("link"),
             "keywords": data.get("keywords", []),
+            "related_datasets": data.get("related_datasets", []),
             "data": data.get("data"),
             "hidden": data.get("hidden", False),
             # managed below:
@@ -223,10 +239,14 @@ def yaml2context(yaml_path: str | pathlib.Path | None) -> dict[str, Any]:
     :return: yaml parsed
     """
     if not yaml_path:
+        logger.info(
+            "no selection of a contents configuration file. No variable substitution in templates."
+        )
         return dict()
     if not os.path.isfile(yaml_path):
         logger.warning(f"{yaml_path} not found. No variable substitution in templates.")
         return dict()
+    logger.info(f"reading contents configuration file {yaml_path}.")
     with open(yaml_path) as fp:
         try:
             data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)

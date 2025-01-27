@@ -296,7 +296,7 @@ def update_catalogue(
                     session, keep_resource_uids=involved_resource_uids
                 )
 
-        # refresh relationships between dataset
+        # refresh relationships between datasets
         if "licences" in to_process or "datasets" in to_process:
             logger.info("db update of relationships between datasets")
             manager.update_related_resources(session)

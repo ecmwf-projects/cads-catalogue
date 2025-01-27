@@ -94,6 +94,26 @@ class Content(BaseModel):
         "ContentKeyword", secondary="contents_keywords_m2m", back_populates="contents"
     )
 
+    resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
+        "Resource",
+        secondary="resources_contents",
+        back_populates="contents",
+        uselist=True,
+    )
+
+
+class ResourceContent(BaseModel):
+    """many-to-many ORM model for resources-contents."""
+
+    __tablename__ = "resources_contents"
+
+    resource_id = sa.Column(
+        sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
+    )
+    content_id = sa.Column(
+        sa.Integer, sa.ForeignKey("contents.content_id"), primary_key=True
+    )
+
 
 class ContentKeyword(BaseModel):
     """ContentKeyword ORM model."""
@@ -356,6 +376,13 @@ class Resource(BaseModel):
     )
     keywords: sa.orm.Mapped[List["Keyword"]] = sa.orm.relationship(
         "Keyword", secondary="resources_keywords", back_populates="resources"
+    )
+
+    contents: sa.orm.Mapped[List["Content"]] = sa.orm.relationship(
+        "Content",
+        secondary="resources_contents",
+        back_populates="resources",
+        uselist=True,
     )
 
     __table_args__ = (

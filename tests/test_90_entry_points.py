@@ -747,11 +747,12 @@ def test_update_catalogue(
     # check load of messages is run (git hash not changed but a resource is processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
-    # check load of contents is not run (folder hash not changed)
-    _update_catalogue_contents.assert_not_called()
+    # check load of contents is run (git hash not changed but a resource is processed)
+    _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
-    # check object storage not called
-    _store_file.assert_not_called()
+    # check object storage called for contents
+    _store_file.call_count == 4
+    _store_file.reset_mock()
 
     # check db content
     with session_obj() as session:
@@ -925,11 +926,11 @@ def test_update_catalogue(
     # check load of messages is run (resources are processed)
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
-    # check load of contents is not run (git hash stable)
-    _update_catalogue_contents.assert_not_called()
+    # check load of contents  is run (resources are processed)
+    _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
-    # check object storage not called
-    _store_file.assert_not_called()
+    # check object storage is run (by contents)
+    _store_file._store_file.call_count == 4
     _store_file.reset_mock()
 
     # 6. excluding only one dataset -----------------------------------------------------
@@ -980,14 +981,15 @@ def test_update_catalogue(
     _update_catalogue_messages.assert_called_once()
     _update_catalogue_messages.reset_mock()
     # check load of contents is not run (git hash stable)
-    _update_catalogue_contents.assert_not_called()
+    _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 30
+    assert _store_file.call_count == 34
     #     # num.datasets overview.png * 2 = 12
     #     # num.datasets layout.json = 6
     #     # num.datasets form.json = 6
     #     # num.datasets constraints.json = 6
+    #     # num.contents = 4
     _store_file.reset_mock()
 
     # check db content

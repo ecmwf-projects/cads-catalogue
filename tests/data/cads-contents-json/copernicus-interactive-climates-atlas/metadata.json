@@ -17,11 +17,28 @@
     "Variable domain: Land (biosphere)",
     "Provider: Copernicus C3S"
   ],
+  "related_datasets": [
+    "reanalysis-era5-land",
+    "foo",
+    "satellite-sea-ice-concentration"
+  ],
   "update_date": "2024-09-16T00:00:00Z",
   "image": "./cica-overview.png",
   "data": {
     "file-format": "GRIB (optional conversion to netCDF)",
     "data-type": "Gridded",
-    "horizontal-coverage": "Global"
+    "horizontal-coverage": "Global",
+    "copernicus_programme": [
+      {
+        "id": "climate-change-service",
+        "title": "Copernicus Climate Change Service",
+        "link": "https://climate.copernicus.eu/"
+      },
+      {
+        "id": "atmosphere-monitoring-service",
+        "title": "Copernicus Atmosphere Monitoring Service",
+        "link": "https://atmosphere.copernicus.eu/"
+      }
+    ]
   }
 }
