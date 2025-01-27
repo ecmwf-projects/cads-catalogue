@@ -74,6 +74,7 @@ def get_last_commit_factory(expected_values):
 
 
 def test_update_catalogue(
+    tmpdir,
     caplog: pytest.LogCaptureFixture,
     postgresql: Connection[str],
     mocker: pytest_mock.MockerFixture,
@@ -88,6 +89,14 @@ def test_update_catalogue(
     licence_path = os.path.join(
         TESTDATA_PATH, "cads-licences/licence-to-use-copernicus-products.pdf"
     )
+    resource_config_path = os.path.join(str(tmpdir), "resource_config.yml")
+    resource_config_data = f"""repositories:
+    - label: gitlab-cads-forms-json
+      clone_url: git@github.com:ecmwf-projects/cads-forms-json.git
+      destination_path: {TEST_RESOURCES_DATA_PATH}
+      """
+    with open(resource_config_path, "w") as fp:
+        fp.write(resource_config_data)
     object_storage_url = "http://myobject-storage:myport/"
     doc_storage_url = "http://mypublic-storage/"
     bucket_name = "my_bucket"
@@ -136,9 +145,6 @@ def test_update_catalogue(
     _store_file = mocker.patch(
         "cads_catalogue.object_storage.store_file", return_value="an url"
     )
-    _git_repo = mocker.patch(
-        "cads_catalogue.utils.get_repo_url", return_value="a_repo_url"
-    )
     mocker.patch("cads_catalogue.object_storage.test_connection")
     folder_commit_hashes = (
         "e5658fef07333700272e36a43df0628efacb5f04",
@@ -168,8 +174,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -297,8 +303,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -350,8 +356,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -578,8 +584,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -707,8 +713,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -814,8 +820,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -886,8 +892,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -940,8 +946,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -1042,8 +1048,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -1113,7 +1119,14 @@ def test_update_catalogue(
             "message_repo_commit, cim_repo_commit, content_repo_commit from catalogue_updates"
         )
         assert session.execute(sa.text(sql)).all() == [
-            (folder_commit_hashes[0], {"a_repo_url": folder_commit_hashes[1]})
+            (
+                folder_commit_hashes[0],
+                {
+                    "git@github.com:ecmwf-projects/cads-forms-json.git": folder_commit_hashes[
+                        1
+                    ]
+                },
+            )
             + folder_commit_hashes[2:]
         ]
         sql = (
@@ -1171,8 +1184,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -1230,8 +1243,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -1307,8 +1320,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -1360,8 +1373,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",
@@ -1438,8 +1451,8 @@ def test_update_catalogue(
             "update-catalogue",
             "--connection-string",
             connection_string,
-            "--resources-folder-path",
-            TEST_RESOURCES_DATA_PATH,
+            "--resources-config-path",
+            resource_config_path,
             "--messages-folder-path",
             TEST_MESSAGES_DATA_PATH,
             "--licences-folder-path",

@@ -76,6 +76,61 @@ def test_parse_override_md() -> None:
     assert manager.parse_override_md(overrides_path) == expected
 
 
+def test_parse_resources_config_path(tmpdir):
+    # not existing file
+    config_path = os.path.join(str(tmpdir), "config")
+    with pytest.raises(ValueError):
+        manager.parse_resources_config_path(config_path)
+    # existing but empty
+    with open(config_path, "w") as fp:
+        fp.write("")
+    with pytest.raises(ValueError):
+        manager.parse_resources_config_path(config_path)
+    # existing but not yaml
+    with open(config_path, "w") as fp:
+        fp.write(
+            '{"uid": "cams-solar-radiation-timeseries",\n"title": "CAMS solar rad"}'
+        )
+    with pytest.raises(ValueError):
+        manager.parse_resources_config_path(config_path)
+    # existing but all folders not found
+    data = f"""repositories:
+- label: bitbucket-test-datasets-potatoes
+clone_url: ssh://git@git.ecmwf.int/cds/test-forms-potato.git
+destination_path: {os.path.join(TESTDATA_PATH, "cads-forms-json-potatoes")}
+- label: gitlab-cads-forms-json
+clone_url: git@github.com:ecmwf-projects/cads-forms-apples.git
+destination_path: {os.path.join(TESTDATA_PATH, "cads-forms-json-apples")}
+    """
+    with open(config_path, "w") as fp:
+        fp.write(data)
+    with pytest.raises(Exception):
+        manager.parse_resources_config_path(config_path)
+    # right file
+    data = f"""repositories:
+  - label: an existing folder for test
+    clone_url: ssh://git@git.ecmwf.int/cds/test-forms-json.git
+    destination_path: {os.path.join(TESTDATA_PATH, "cads-forms-cim-json")}
+  - label: gitlab-cads-forms-json
+    clone_url: git@github.com:ecmwf-projects/cads-forms-json.git
+    destination_path: {os.path.join(TESTDATA_PATH, "cads-forms-json")}
+    """
+    with open(config_path, "w") as fp:
+        fp.write(data)
+    expected = [
+        {
+            "destination_path": os.path.join(TESTDATA_PATH, "cads-forms-cim-json"),
+            "clone_url": "ssh://git@git.ecmwf.int/cds/test-forms-json.git",
+        },
+        {
+            "destination_path": os.path.join(TESTDATA_PATH, "cads-forms-json"),
+            "clone_url": "git@github.com:ecmwf-projects/cads-forms-json.git",
+        },
+    ]
+    effective = manager.parse_resources_config_path(config_path)
+    assert effective == expected
+
+
 def test_load_resource_from_folder() -> None:
     resource_folder_path = os.path.join(
         TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
