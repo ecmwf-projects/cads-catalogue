@@ -362,6 +362,36 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     return metadata
 
 
+def parse_resources_config_path(resources_config_path: str | pathlib.Path):
+    """Parse yaml file containing metadata of cloned datasets repositories."""
+    ret_value = []
+    if not resources_config_path or not os.path.isfile(resources_config_path):
+        raise ValueError("config path for resources missing, it is required")
+    with open(resources_config_path) as fp:
+        data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+    if not data or not data.get("repositories"):
+        raise ValueError(
+            f"config file {resources_config_path} empty or not valid, it is required!"
+        )
+    for repo_info in data["repositories"]:
+        destination_path = repo_info["destination_path"]
+        if not os.path.isdir(destination_path):
+            logger.warning(
+                f"folder {destination_path} configured in {resources_config_path} but not cloned!"
+            )
+            continue
+        md = {
+            "destination_path": repo_info["destination_path"],
+            "clone_url": repo_info["clone_url"],
+        }
+        ret_value.append(md)
+    if not ret_value:
+        raise ValueError(
+            f"not cloned any repository from config file {resources_config_path}!"
+        )
+    return ret_value
+
+
 def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any]:
     """Parse the input override file and return metadata extracted.
 
@@ -707,9 +737,9 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
     for repo_key, filter_key in [
         ("metadata_repo", "exclude_resources"),
     ]:
-        repo_paths_list = repo_paths[repo_key]
+        repo_md_list = repo_paths[repo_key]
         exclude = filtering_kwargs[filter_key]
-        for repo_path in repo_paths_list:
+        for repo_md in repo_md_list:
             if not os.path.isdir(repo_path) and not exclude:
                 raise ValueError(f"'{repo_path}' is not a folder")
 

@@ -21,7 +21,6 @@ import cads_common.logging
 import sqlalchemy as sa
 import structlog
 import typer
-from typing_extensions import Annotated
 
 from cads_catalogue import (
     config,
@@ -171,9 +170,10 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 @app.command()
 def update_catalogue(
     overrides_path: Optional[str] = None,
-    resources_folder_path: Annotated[List[str], typer.Option()] = [
-        os.path.join(PACKAGE_DIR, "cads-forms-json")
-    ],
+    resources_config_path: str = os.path.join(PACKAGE_DIR, "resources_config.yaml"),
+    # resources_folder_path: Annotated[List[str], typer.Option()] = [
+    #    os.path.join(PACKAGE_DIR, "cads-forms-json")
+    # ],
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
     cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),
@@ -194,7 +194,7 @@ def update_catalogue(
     Parameters
     ----------
     :param overrides_path: path of the file yaml containing overriding metadata
-    :param resources_folder_path: folder containing metadata files for resources (i.e. cads-forms-json)
+    :param resources_config_path: path of the file yaml containing list of folders to be used for resources
     :param messages_folder_path: folder containing metadata files for system messages (i.e. cads-messages)
     :param licences_folder_path: folder containing metadata files for licences (i.e. cads-licences)
     :param cim_folder_path: str = folder containing CIM Quality Assessment layouts (i.e. cads-forms-cim-json)
@@ -216,8 +216,9 @@ def update_catalogue(
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
+    resources_folders_md = manager.parse_resources_config_path(resources_config_path)
     repo_paths = {
-        "metadata_repo": resources_folder_path,
+        "metadata_repo": resources_folders_md,
         "cim_repo": cim_folder_path,
         "message_repo": messages_folder_path,
         "licence_repo": licences_folder_path,

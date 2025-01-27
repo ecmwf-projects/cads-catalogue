@@ -224,6 +224,7 @@ def get_repo_url(git_folder: str | pathlib.Path):
         repo_url = urlobj.path.split("@", 1)[1]
     else:
         # remote_url like 'https://user@github.com/ecmwf-projects/cads-catalogue.git'
+        #                or 'ssh://git@git.ecmwf.int/cds/test-forms-potato.git'
         repo_url = f"{urlobj.hostname}:{urlobj.path.lstrip('/')}"
     return repo_url
 
