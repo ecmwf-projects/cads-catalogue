@@ -170,10 +170,9 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 @app.command()
 def update_catalogue(
     overrides_path: Optional[str] = None,
-    resources_config_path: str = os.path.join(PACKAGE_DIR, "resources_config.yaml"),
-    # resources_folder_path: Annotated[List[str], typer.Option()] = [
-    #    os.path.join(PACKAGE_DIR, "cads-forms-json")
-    # ],
+    resources_config_path: str = os.path.join(
+        PACKAGE_DIR, "catalogue-config", "resources_config.yaml"
+    ),
     messages_folder_path: str = os.path.join(PACKAGE_DIR, "cads-messages"),
     licences_folder_path: str = os.path.join(PACKAGE_DIR, "cads-licences"),
     cim_folder_path: str = os.path.join(PACKAGE_DIR, "cads-forms-cim-json"),
@@ -261,9 +260,12 @@ def update_catalogue(
         if "datasets" in to_process:
             logger.info("db updating of datasets")
             force_datasets = force or "licences" in to_process
+            resources_folder_paths = [
+                r["destination_path"] for r in resources_folders_md
+            ]
             involved_resource_uids = manager.update_catalogue_resources(
                 session,
-                resources_folder_path,
+                resources_folder_paths,
                 cim_folder_path,
                 storage_settings,
                 force=force_datasets,

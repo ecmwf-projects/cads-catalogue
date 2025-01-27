@@ -368,7 +368,13 @@ def parse_resources_config_path(resources_config_path: str | pathlib.Path):
     if not resources_config_path or not os.path.isfile(resources_config_path):
         raise ValueError("config path for resources missing, it is required")
     with open(resources_config_path) as fp:
-        data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+        try:
+            data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+        except Exception:
+            logger.exception(
+                f"config file {resources_config_path} doesn't seem a valid yaml. Error follows."
+            )
+            raise
     if not data or not data.get("repositories"):
         raise ValueError(
             f"config file {resources_config_path} empty or not valid, it is required!"
@@ -740,7 +746,7 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
         repo_md_list = repo_paths[repo_key]
         exclude = filtering_kwargs[filter_key]
         for repo_md in repo_md_list:
-            if not os.path.isdir(repo_path) and not exclude:
+            if not os.path.isdir(repo_md["destination_path"]) and not exclude:
                 raise ValueError(f"'{repo_path}' is not a folder")
 
     logger.info("updating database structure")
@@ -748,9 +754,8 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
 
     if not filtering_kwargs["exclude_resources"]:
         logger.info("checking input datasets")
-        datasets_info = list_all_repos_datasets(
-            repo_paths["metadata_repo"], filtering_kwargs
-        )
+        resources_folders = [r["destination_path"] for r in repo_paths["metadata_repo"]]
+        datasets_info = list_all_repos_datasets(resources_folders, filtering_kwargs)
         slugs_counter = collections.Counter([d[0] for d in datasets_info])
         found_multiple = False
         for slug in slugs_counter:
