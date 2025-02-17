@@ -85,6 +85,7 @@ class Content(BaseModel):
     image = sa.Column(sa.String)
     layout = sa.Column(sa.String)
     link = sa.Column(sa.String)
+    priority = sa.Column(sa.Integer, nullable=False, default=0)
     publication_date = sa.Column(sa.TIMESTAMP, nullable=False)
     site = sa.Column(sa.String, index=True, nullable=False)
     title = sa.Column(sa.String, nullable=False)

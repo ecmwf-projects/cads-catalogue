@@ -153,6 +153,7 @@ def load_content_folder(
             "slug": data["id"],
             "title": data["title"],
             "description": data["abstract"],
+            "priority": data.get("priority", 0),
             "publication_date": data["publication_date"],
             "content_update": data["update_date"],
             "link": data.get("link"),
