@@ -67,6 +67,7 @@ def test_load_content_folder() -> None:
                 "satellite-sea-ice-concentration",
             ],
             "layout": None,
+            "priority": 1,
             "link": "https://atlas.climate.copernicus.eu/atlas",
             "content_update": "2024-09-16T00:00:00Z",
             "site": "cds",
@@ -110,6 +111,7 @@ def test_load_content_folder() -> None:
             "layout": os.path.join(
                 TEST_CONTENT_ROOT_PATH, "how-to-api-templated", "layout.json"
             ),
+            "priority": 0,
             "related_datasets": [],
             "content_update": "2024-09-16T02:10:22Z",
             "link": None,
@@ -132,6 +134,7 @@ def test_load_contents() -> None:
             "slug": "copernicus-interactive-climates-atlas",
             "publication_date": "2024-09-13T00:00:00Z",
             "hidden": False,
+            "priority": 1,
             "description": "The Copernicus Interactive Climate Atlas provides graphical "
             "information about recent past trends and future changes "
             "(for different scenarios and global warming levels)",
@@ -182,6 +185,7 @@ def test_load_contents() -> None:
             "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
             "hidden": True,
+            "priority": 0,
             "description": "Access the full data store catalogue, "
             "with search and availability features",
             "image": None,
@@ -199,6 +203,7 @@ def test_load_contents() -> None:
             "slug": "how-to-api",
             "publication_date": "2024-09-13T10:01:50Z",
             "hidden": True,
+            "priority": 0,
             "description": "Access the full data store catalogue, "
             "with search and availability features",
             "image": None,
@@ -216,6 +221,7 @@ def test_load_contents() -> None:
             "slug": "how-to-api-templated",
             "publication_date": "2024-09-13T10:01:50Z",
             "hidden": False,
+            "priority": 0,
             "description": "Access 33 items of ADS Data Store catalogue, "
             "with search and availability features",
             "image": None,
