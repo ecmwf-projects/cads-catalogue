@@ -216,7 +216,7 @@ def clone_update_catalogue(
         "exclude_licences": exclude_licences,
     }
     repos_info = repos.parse_repos_config(repo_config_path, filtering_kwargs)
-    repos_info_cloned = repos.clone_repositories(repos_info)
+    repos_info_cloned = repos.clone_repositories(repos_info, root_path=PACKAGE_DIR)
     resources_folder_paths = [
         r["clone_path"] for r in repos_info_cloned["cads-forms-json"]
     ]
