@@ -9,6 +9,7 @@ channels:
 dependencies:
 - alembic
 - boto3
+- gitpython
 - psycopg2
 - python-frontmatter
 - sqlalchemy>=2.0.9

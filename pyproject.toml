@@ -17,6 +17,7 @@ dependencies = [
   "alembic",
   "boto3",
   "cads-common@git+https://github.com/ecmwf-projects/cads-common.git",
+  "gitpython",
   "python-frontmatter",
   "sqlalchemy>=2.0.9",
   "sqlalchemy_utils",
