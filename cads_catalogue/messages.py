@@ -24,7 +24,6 @@ import structlog
 
 import cads_catalogue
 
-THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 logger = structlog.get_logger(__name__)
 
 
