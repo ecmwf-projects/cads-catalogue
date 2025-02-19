@@ -72,30 +72,6 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
     return ret_value.hexdigest()  # type: ignore
 
 
-def get_git_hashes(folder_map: dict[str, str]) -> Dict[str, str]:
-    """
-    Return last commit hashes of labelled folders.
-
-    Parameters
-    ----------
-    folder_map: {'folder_label': 'folder_path'}
-
-    Returns
-    -------
-    {'folder_label': 'git_hash'}
-    """
-    current_hashes = dict()
-    for folder_label, folder_path in folder_map.items():
-        try:
-            current_hashes[folder_label] = utils.get_last_commit_hash(folder_path)
-        except Exception:  # noqa
-            logger.exception(
-                f"no check on commit hash for folder '{folder_path}, error follows"
-            )
-            current_hashes[folder_label] = None
-    return current_hashes
-
-
 def get_status_of_last_update(session: sa.orm.session.Session) -> Dict[str, Any] | None:
     """
     Return last stored git hashes and other information from table catalogue_updates.

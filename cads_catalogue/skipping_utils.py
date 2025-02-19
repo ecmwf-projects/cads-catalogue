@@ -18,7 +18,7 @@ import os.path
 
 import structlog
 
-from cads_catalogue import contents, manager, utils
+from cads_catalogue import contents, manager, repos
 
 THIS_PATH = os.path.abspath(os.path.dirname(__file__))
 CATALOGUE_DIR = os.path.abspath(os.path.join(THIS_PATH, ".."))
@@ -191,17 +191,17 @@ def skipping_engine(
     folders_map = {
         # db column: folder path
         "catalogue_repo_commit": CATALOGUE_DIR,
-        # "metadata_repo_commit": repo_paths["metadata_repo"],
+        # "metadata_repo_commit": repo_paths["metadata_repo"], # is a list
         "cim_repo_commit": repo_paths["cim_repo"],
         "message_repo_commit": repo_paths["message_repo"],
         "licence_repo_commit": repo_paths["licence_repo"],
         "content_repo_commit": repo_paths["content_repo"],
     }
-    new_git_hashes = manager.get_git_hashes(folders_map)
+    new_git_hashes = repos.get_git_hashes(folders_map)
     new_git_hashes["metadata_repo_commit"] = dict()
     for md_repo_path in repo_paths["metadata_repo"]:
-        new_git_hashes["metadata_repo_commit"][utils.get_repo_url(md_repo_path)] = (
-            utils.get_last_commit_hash(md_repo_path)
+        new_git_hashes["metadata_repo_commit"][repos.get_repo_url(md_repo_path)] = (
+            repos.get_last_commit_hash(md_repo_path)
         )
     new_catalogue_update_md = {
         "override_md": new_override_md,

@@ -22,7 +22,6 @@ import mimetypes
 import multiprocessing as mp
 import pathlib
 import string
-import subprocess
 import urllib.parse
 from collections import ChainMap as _ChainMap
 from typing import Any, Dict
@@ -194,38 +193,6 @@ def compare_resources_with_dumped_file(
             if isinstance(value, datetime.date):
                 value = value.isoformat()
             assert value == expected_resource[key], key
-
-
-def get_last_commit_hash(git_folder: str | pathlib.Path):
-    """Return the hash of the last commit done on the repo of the input folder."""
-    cmd = 'git log -n 1 --pretty=format:"%H"'
-    proc = subprocess.Popen(
-        cmd, cwd=git_folder, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out, err = proc.communicate()
-    if proc.returncode != 0:
-        raise ValueError(err.decode("utf-8"))
-    return out.decode("ascii").strip()
-
-
-def get_repo_url(git_folder: str | pathlib.Path):
-    """Return something like 'repo_host:repo_path' of an url of a git remote origin."""
-    cmd = "git config --get remote.origin.url"
-    proc = subprocess.Popen(
-        cmd, cwd=git_folder, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    out, err = proc.communicate()
-    if proc.returncode != 0:
-        raise ValueError(err.decode("utf-8"))
-    remote_url = out.decode("ascii").strip()
-    urlobj = urllib.parse.urlparse(remote_url)
-    if not urlobj.scheme:
-        # remote_url like 'git@github.com:ecmwf-projects/cads-catalogue.git'
-        repo_url = urlobj.path.split("@", 1)[1]
-    else:
-        # remote_url like 'https://user@github.com/ecmwf-projects/cads-catalogue.git'
-        repo_url = f"{urlobj.hostname}:{urlobj.path.lstrip('/')}"
-    return repo_url
 
 
 def guess_type(file_name, default="application/octet-stream"):

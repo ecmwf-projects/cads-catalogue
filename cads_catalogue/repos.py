@@ -14,22 +14,14 @@
 # limitations under the License.
 
 import os
+import pathlib
 import tempfile
 import urllib.parse
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 import git
 import structlog
 import yaml
-
-THIS_PATH = os.path.abspath(os.path.dirname(__file__))
-CATALOGUE_DIR = os.path.abspath(os.path.join(THIS_PATH, ".."))
-PACKAGE_DIR = os.path.abspath(
-    os.path.join(
-        CATALOGUE_DIR,
-        "..",
-    )
-)
 
 logger = structlog.get_logger(__name__)
 
@@ -54,6 +46,50 @@ def add_pat_to_url(url: str) -> str:
                     return url
                 return url_obj._replace(netloc=f"{pat}@{url_obj.netloc}").geturl()
     return url
+
+
+def get_last_commit_hash(git_folder: str | pathlib.Path):
+    """Return the hash of the last commit done on the repo of the input folder."""
+    repo = git.Repo(git_folder)
+    return repo.head.object.hexsha
+
+
+def get_repo_url(git_folder: str | pathlib.Path):
+    """Return something like 'repo_host:repo_path' of an url of a git remote origin."""
+    repo = git.Repo(git_folder)
+    remote_url = repo.remotes.origin.url
+    urlobj = urllib.parse.urlparse(remote_url)
+    if not urlobj.scheme:
+        # remote_url like 'git@github.com:ecmwf-projects/cads-catalogue.git'
+        repo_url = urlobj.path.split("@", 1)[1]
+    else:
+        # remote_url like 'https://user@github.com/ecmwf-projects/cads-catalogue.git'
+        repo_url = f"{urlobj.hostname}:{urlobj.path.lstrip('/')}"
+    return repo_url
+
+
+def get_git_hashes(folder_map: dict[str, str]) -> Dict[str, str]:
+    """
+    Return last commit hashes of labelled folders.
+
+    Parameters
+    ----------
+    folder_map: {'folder_label': 'folder_path'}
+
+    Returns
+    -------
+    {'folder_label': 'git_hash'}
+    """
+    current_hashes = dict()
+    for folder_label, folder_path in folder_map.items():
+        try:
+            current_hashes[folder_label] = get_last_commit_hash(folder_path)
+        except Exception:  # noqa
+            logger.exception(
+                f"no check on commit hash for folder '{folder_path}, error follows"
+            )
+            current_hashes[folder_label] = None
+    return current_hashes
 
 
 def parse_repos_config(
@@ -131,7 +167,7 @@ def clone_repository(
     if repo_branch:
         multi_options += (f"--branch {repo_branch}",)
     repo_url = add_pat_to_url(repo_url)
-    repo = git.Repo.clone_from(repo_url, repo_path, multi_options=multi_options)
+    repo = git.Repo.clone_from(repo_url, repo_path, multi_options=list(multi_options))
     if delete_remote:
         repo.delete_remote(repo.remote())
     try:
@@ -158,7 +194,7 @@ def clone_repositories(
     :param repos_info: repositories to clone as returned by parse_repos_config
     :param root_path: folder path where to include all cloned repositories
     """
-    repos_info_cloned = dict()
+    repos_info_cloned: dict[str, List[dict[str, str]]] = dict()
     for repo_category in repos_info:
         repos_info_cloned[repo_category] = []
         for repo_md in repos_info[repo_category]:
