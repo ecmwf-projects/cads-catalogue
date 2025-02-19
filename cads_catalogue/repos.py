@@ -97,9 +97,6 @@ def parse_repos_config(
                     f"config file of repositories {repo_config_path} not valid: "
                     f"not found any repository for section {repo_category}"
                 )
-            # if len(data[repo_category]) > 1 and repo_category != "cads-forms-json":
-            #     raise ValueError(f"config file of repositories {repo_config_path} not valid: "
-            #                      f"multiple repositories found in section {repo_category}")
             for repo_md in data[repo_category]:
                 repo_item = {
                     "url": repo_md["url"],
@@ -115,6 +112,7 @@ def clone_repository(
     repo_path: Optional[str] = None,
     multi_options: tuple[str, ...] = ("--depth=1", "--recurse-submodules"),
     delete_remote: bool = False,
+    root_path: Optional[str] = None,
 ) -> str:
     """
     Clone a git repository `repo_url` on folder `repo_path`.
@@ -124,11 +122,12 @@ def clone_repository(
     :param repo_path: destination folder
     :param multi_options: options for cloning
     :param delete_remote: if True, delete given git remote
+    :param root_path: if `repo_path` not specified, create temp dir inside this folder
     :return: path of cloned repository
     """
     repo_name = os.path.splitext(os.path.basename(repo_url))[0]
     if not repo_path:
-        repo_path = tempfile.mkdtemp(prefix=f"{repo_name}_", dir=PACKAGE_DIR)
+        repo_path = tempfile.mkdtemp(prefix=f"{repo_name}_", dir=root_path)
     if repo_branch:
         multi_options += (f"--branch {repo_branch}",)
     repo_url = add_pat_to_url(repo_url)
@@ -137,37 +136,47 @@ def clone_repository(
         repo.delete_remote(repo.remote())
     try:
         reference_tag = repo.active_branch.name
+        logger.info(
+            f"cloned repo {repo_name!r} branch {reference_tag!r} in path {repo_path!r}"
+        )
     except TypeError:
         reference_tag = next(
             (tag for tag in repo.tags if tag.commit == repo.head.commit)
         ).name
-    logger.info(
-        f"cloned repo {repo_name!r} branch or tag {reference_tag!r} in path {repo_path!r}"
-    )
+        logger.info(
+            f"cloned repo {repo_name!r} tag {reference_tag!r} in path {repo_path!r}"
+        )
     return repo_path
 
 
-def clone_repositories(repos_info: dict[str, Any]) -> dict[str, Any]:
+def clone_repositories(
+    repos_info: dict[str, Any], root_path: Optional[str] = None
+) -> dict[str, Any]:
     """
     Clone a set of repositories in local filesystem.
 
     :param repos_info: repositories to clone as returned by parse_repos_config
+    :param root_path: folder path where to include all cloned repositories
     """
     repos_info_cloned = dict()
     for repo_category in repos_info:
+        repos_info_cloned[repo_category] = []
         for repo_md in repos_info[repo_category]:
-            repos_info_cloned[repo_category] = []
             repo_url = repo_md["url"]
             repo_branch = repo_md["branch"]
             try:
-                clone_path = clone_repository(repo_url, repo_branch)
+                clone_path = clone_repository(
+                    repo_url, repo_branch, root_path=root_path
+                )
                 repos_info_cloned[repo_category].append(
                     {"url": repo_url, "branch": repo_branch, "clone_path": clone_path}
                 )
             except git.GitCommandError as error:
                 if "ould not find remote branch" in error.stderr.lower():  # bleah!
                     # branch not found is tolerated
-                    logger.warning(f"not found remote branch {repo_branch}")
+                    logger.warning(
+                        f"clone of {repo_url} failed, not found remote branch '{repo_branch}'"
+                    )
                 else:
                     logger.exception(f"clone of {repo_url} failed, error follows")
                     raise
@@ -175,6 +184,13 @@ def clone_repositories(repos_info: dict[str, Any]) -> dict[str, Any]:
                 logger.exception(f"clone of {repo_url} failed, error follows")
                 raise
     for repo_category in repos_info_cloned:
-        if len(repos_info[repo_category]) > 1 and repo_category != "cads-forms-json":
-            raise ValueError(f"more than 1 source for {repo_category} is not supported")
+        if (
+            len(repos_info_cloned[repo_category]) > 1
+            and repo_category != "cads-forms-json"
+        ):
+            raise ValueError(
+                f"repo configuration error: more than 1 source for {repo_category} is not supported"
+            )
+        if not len(repos_info_cloned[repo_category]):
+            raise ValueError(f"no repository for {repo_category} has been cloned")
     return repos_info_cloned
