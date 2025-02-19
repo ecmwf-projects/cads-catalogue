@@ -2,15 +2,16 @@ default_branch: prod
 
 cads-forms-json:
 - url: https://git.ecmwf.int/scm/cds/test-forms-potato.git
-  branch: broken
+  branch: test
 - url: https://git.ecmwf.int/scm/cds/test-forms-apple.git
-  branch: broken
+  branch: dev
 
 cads-forms-cim-json:
   - url: https://github.com/ecmwf-projects/cads-forms-cim-json.git
 
 cads-messages:
 - url: https://github.com/ecmwf-projects/cads-messages.git
+  branch: preprod
 
 cads-licences:
 - url: https://github.com/ecmwf-projects/cads-licences.git
