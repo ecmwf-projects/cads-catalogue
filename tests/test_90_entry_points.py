@@ -18,6 +18,7 @@ from cads_catalogue import (
     licence_manager,
     manager,
     messages,
+    repos,
     utils,
 )
 
@@ -137,7 +138,7 @@ def test_update_catalogue(
         "cads_catalogue.object_storage.store_file", return_value="an url"
     )
     _git_repo = mocker.patch(
-        "cads_catalogue.utils.get_repo_url", return_value="a_repo_url"
+        "cads_catalogue.repos.get_repo_url", return_value="a_repo_url"
     )
     mocker.patch("cads_catalogue.object_storage.test_connection")
     folder_commit_hashes = (
@@ -149,7 +150,7 @@ def test_update_catalogue(
         "a0ae2002dec8b4b8b0ba8f2b5223722a71d84b8d",
     )
     mocker.patch.object(
-        utils, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
+        repos, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
     )
     mocker.patch.object(alembic.config, "main")
     _create_database = mocker.spy(sqlalchemy_utils, "create_database")

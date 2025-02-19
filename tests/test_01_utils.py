@@ -1,10 +1,8 @@
 import os.path
-import subprocess
 import time
 from typing import Any, Dict
 
 import pytest
-import pytest_mock
 
 from cads_catalogue import utils
 
@@ -100,16 +98,6 @@ def test_folders2hash() -> None:
         utils.folders2hash([test_file_path_1, test_file_path_2]).hexdigest()
         == "b7875c9c1af9e7e8d8a03046b7d7f867"
     )
-
-
-def test_get_last_commit_hash(mocker: pytest_mock.MockerFixture) -> None:
-    spy1 = mocker.spy(subprocess, "Popen")
-    ret_value = utils.get_last_commit_hash(THIS_PATH)
-    assert isinstance(ret_value, str)
-    assert len(ret_value) == 40
-    assert spy1.mock_calls[0].args == ('git log -n 1 --pretty=format:"%H"',)
-    with pytest.raises(FileNotFoundError):
-        utils.get_last_commit_hash("/not/exists")
 
 
 def test_normalize_abstract():
