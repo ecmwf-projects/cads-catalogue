@@ -31,6 +31,7 @@ from cads_catalogue import (
     maintenance,
     manager,
     messages,
+    repos,
     skipping_utils,
     validations,
 )
@@ -169,6 +170,72 @@ def init_db(connection_string: Optional[str] = None, force: bool = False) -> Non
 
 
 @app.command()
+def clone_update_catalogue(
+    repo_config_path: str,
+    overrides_path: Optional[str] = None,
+    contents_config_path: Optional[str] = None,
+    connection_string: Optional[str] = None,
+    force: bool = False,
+    delete_orphans: bool = True,
+    include: List[str] = [],
+    exclude: List[str] = [],
+    exclude_resources: bool = False,
+    exclude_licences: bool = False,
+    exclude_messages: bool = False,
+    exclude_contents: bool = False,
+) -> None:
+    """Clone source repositories and update the database with the catalogue data.
+
+    Parameters
+    ----------
+    :param repo_config_path: path of the file yaml containing source repositories to clone
+    :param overrides_path: path of the file yaml containing overriding metadata
+    :param contents_config_path = path of the file yaml containing template variables for contents
+    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param force: if True, run update regardless input folders has no changes from last update (default False)
+    :param delete_orphans: if True, delete resources/licences not involved. False if using include/exclude
+    :param include: if specified, pattern for resource uids to include in the update
+    :param exclude: if specified, pattern for resource uids to exclude from the update
+    :param exclude_resources: if True, do not consider input resources (default False)
+    :param exclude_licences: if True, do not consider input licences (default False)
+    :param exclude_messages: if True, do not consider input messages (default False)
+    :param exclude_contents: if True, do not consider input contents (default False)
+    """
+    cads_common.logging.structlog_configure()
+    cads_common.logging.logging_configure()
+    config_paths = {
+        "contents_config_path": contents_config_path,
+        "overrides_path": overrides_path,
+    }
+    filtering_kwargs: Dict[str, Any] = {
+        "include": include,
+        "exclude": exclude,
+        "exclude_resources": exclude_resources,
+        "exclude_messages": exclude_messages,
+        "exclude_contents": exclude_contents,
+        "exclude_licences": exclude_licences,
+    }
+    repos_info = repos.parse_repos_config(repo_config_path, filtering_kwargs)
+    repos_info_cloned = repos.clone_repositories(repos_info)
+    resources_folder_paths = [
+        r["clone_path"] for r in repos_info_cloned["cads-forms-json"]
+    ]
+
+    update_catalogue(
+        connection_string=connection_string,
+        force=force,
+        delete_orphans=delete_orphans,
+        resources_folder_path=resources_folder_paths,
+        messages_folder_path=repos_info_cloned["cads-messages"][0]["clone_path"],
+        licences_folder_path=repos_info_cloned["cads-licences"][0]["clone_path"],
+        cim_folder_path=repos_info_cloned["cads-forms-cim-json"][0]["clone_path"],
+        contents_folder_path=repos_info_cloned["cads-contents-json"][0]["clone_path"],
+        **config_paths,  # type: ignore
+        **filtering_kwargs,  # type: ignore
+    )
+
+
+@app.command()
 def update_catalogue(
     overrides_path: Optional[str] = None,
     resources_folder_path: Annotated[List[str], typer.Option()] = [
@@ -217,7 +284,7 @@ def update_catalogue(
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
     repo_paths = {
-        "metadata_repo": resources_folder_path,
+        "metadata_repo": resources_folder_path,  # it's a list
         "cim_repo": cim_folder_path,
         "message_repo": messages_folder_path,
         "licence_repo": licences_folder_path,
