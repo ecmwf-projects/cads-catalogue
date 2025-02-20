@@ -88,6 +88,12 @@ def test_parse_repos_config():
                 "branch": "prod",
             }
         ],
+        "cads-configuration": [
+            {
+                "url": "https://github.com/ecmwf-projects/cads-configuration",
+                "branch": "main",
+            },
+        ],
     }
     assert effective_conf == expected_conf
 

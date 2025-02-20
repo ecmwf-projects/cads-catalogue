@@ -93,7 +93,7 @@ def get_git_hashes(folder_map: dict[str, str]) -> Dict[str, str]:
 
 
 def parse_repos_config(
-    repo_config_path: str, filtering_kwargs: dict[str, Any]
+    repo_config_path: str, filtering_kwargs: Optional[dict[str, Any]] = None
 ) -> dict[str, Any]:
     """Parse file containing information of repositories to clone.
 
@@ -102,7 +102,8 @@ def parse_repos_config(
     :return: dictionary of information parsed
     """
     ret_value: dict[str, Any] = dict()
-
+    if not filtering_kwargs:
+        filtering_kwargs = dict()
     # base extraction and validation
     if not repo_config_path or not os.path.exists(repo_config_path):
         raise ValueError("config file of repositories to clone not found!")
@@ -116,6 +117,10 @@ def parse_repos_config(
             )
     if data is None:
         raise ValueError(f"config file of repositories {repo_config_path} is empty")
+
+    # note: multiple repositories in the file are supported for all sections,
+    # (not only 'cads-forms-json'), due that some remote branches may not exist.
+    # After all the clones, actual multiple repositories must be checked.
 
     # actual parsing of file sections
     default_branch = data["default_branch"]
@@ -139,6 +144,17 @@ def parse_repos_config(
                     "branch": repo_md.get("branch", default_branch),
                 }
                 ret_value[repo_category].append(repo_item)
+    # consider section "cads-configuration" optional
+    repo_category = "cads-configuration"
+    if repo_category not in data or not len(data[repo_category]):
+        return ret_value
+    ret_value[repo_category] = []
+    for repo_md in data[repo_category]:
+        repo_item = {
+            "url": repo_md["url"],
+            "branch": repo_md.get("branch", default_branch),
+        }
+        ret_value[repo_category].append(repo_item)
     return ret_value
 
 

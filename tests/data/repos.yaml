@@ -7,7 +7,7 @@ cads-forms-json:
   branch: dev
 
 cads-forms-cim-json:
-  - url: https://github.com/ecmwf-projects/cads-forms-cim-json.git
+- url: https://github.com/ecmwf-projects/cads-forms-cim-json.git
 
 cads-messages:
 - url: https://github.com/ecmwf-projects/cads-messages.git
@@ -18,3 +18,7 @@ cads-licences:
 
 cads-contents-json:
 - url: https://github.com/ecmwf-projects/cads-contents-json.git
+
+cads-configuration:
+- url: https://github.com/ecmwf-projects/cads-configuration
+  branch: main
