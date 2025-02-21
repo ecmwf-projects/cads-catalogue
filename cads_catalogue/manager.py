@@ -72,30 +72,6 @@ def compute_config_hash(resource: dict[str, Any]) -> str:
     return ret_value.hexdigest()  # type: ignore
 
 
-def get_git_hashes(folder_map: dict[str, str]) -> Dict[str, str]:
-    """
-    Return last commit hashes of labelled folders.
-
-    Parameters
-    ----------
-    folder_map: {'folder_label': 'folder_path'}
-
-    Returns
-    -------
-    {'folder_label': 'git_hash'}
-    """
-    current_hashes = dict()
-    for folder_label, folder_path in folder_map.items():
-        try:
-            current_hashes[folder_label] = utils.get_last_commit_hash(folder_path)
-        except Exception:  # noqa
-            logger.exception(
-                f"no check on commit hash for folder '{folder_path}, error follows"
-            )
-            current_hashes[folder_label] = None
-    return current_hashes
-
-
 def get_status_of_last_update(session: sa.orm.session.Session) -> Dict[str, Any] | None:
     """
     Return last stored git hashes and other information from table catalogue_updates.
@@ -694,14 +670,16 @@ def update_related_resources(session: sa.orm.session.Session):
 def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
     """Preliminary processing for the catalogue manager."""
     logger.info("additional input checks")
-    for repo_key, filter_key in [
-        ("cim_repo", "exclude_resources"),
-        ("licence_repo", "exclude_licences"),
-        ("message_repo", "exclude_messages"),
-        ("content_repo", "exclude_contents"),
+    for repo_key, filter_key, category in [
+        ("cim_repo", "exclude_resources", "resources"),
+        ("licence_repo", "exclude_licences", "licences"),
+        ("message_repo", "exclude_messages", "messages"),
+        ("content_repo", "exclude_contents", "contents"),
     ]:
         repo_path = repo_paths[repo_key]
         exclude = filtering_kwargs[filter_key]
+        if not repo_path and not exclude:
+            raise ValueError(f"missing required input folder for {category}")
         if not os.path.isdir(repo_path) and not exclude:
             raise ValueError(f"'{repo_path}' is not a folder")
     for repo_key, filter_key in [
@@ -709,7 +687,11 @@ def prerun_processing(repo_paths, connection_string, filtering_kwargs) -> None:
     ]:
         repo_paths_list = repo_paths[repo_key]
         exclude = filtering_kwargs[filter_key]
+        if not repo_paths_list and not exclude:
+            raise ValueError("missing required input folder for resources")
         for repo_path in repo_paths_list:
+            if not repo_path and not exclude:
+                raise ValueError("missing required input folder for resources")
             if not os.path.isdir(repo_path) and not exclude:
                 raise ValueError(f"'{repo_path}' is not a folder")
 

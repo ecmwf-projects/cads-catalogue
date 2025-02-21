@@ -1,0 +1,24 @@
+default_branch: prod
+
+cads-forms-json:
+- url: https://git.ecmwf.int/scm/cds/test-forms-potato.git
+  branch: test
+- url: https://git.ecmwf.int/scm/cds/test-forms-apple.git
+  branch: dev
+
+cads-forms-cim-json:
+- url: https://github.com/ecmwf-projects/cads-forms-cim-json.git
+
+cads-messages:
+- url: https://github.com/ecmwf-projects/cads-messages.git
+  branch: preprod
+
+cads-licences:
+- url: https://github.com/ecmwf-projects/cads-licences.git
+
+cads-contents-json:
+- url: https://github.com/ecmwf-projects/cads-contents-json.git
+
+cads-configuration:
+- url: https://github.com/ecmwf-projects/cads-configuration
+  branch: main
