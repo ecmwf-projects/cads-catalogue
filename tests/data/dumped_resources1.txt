@@ -11,6 +11,7 @@
         "adaptor_properties_hash": null,
         "disabled_reason": null,
         "sources_hash": null,
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
@@ -71,6 +72,7 @@
         "adaptor_properties_hash": null,
         "disabled_reason": null,
         "sources_hash": null,
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,

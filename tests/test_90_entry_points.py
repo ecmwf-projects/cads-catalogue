@@ -191,7 +191,6 @@ def test_update_catalogue(
             "CATALOGUE_BUCKET": bucket_name,
         },
     )
-
     # check no errors
     assert result.exit_code == 0
     # check db is created
@@ -1221,7 +1220,9 @@ def test_update_catalogue(
     with session_obj() as session:
         session.execute(
             sa.text(
-                "update resources set title='a new title' where resource_uid='reanalysis-era5-land'"
+                "update resources set title='a new title', "
+                'sanity_check=\'{"name": "my-name", "tags": ["tag1", "tag2"]}\' '
+                "where resource_uid='reanalysis-era5-land'"
             )
         )
         session.commit()

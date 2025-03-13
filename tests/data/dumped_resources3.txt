@@ -11,6 +11,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "d438ae8e43fd3d28f86506224392d4d5",
         "sources_hash": "e88f2c04649d3f7e312cdaaa1fef4d7b",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
