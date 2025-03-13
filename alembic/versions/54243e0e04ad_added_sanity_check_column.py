@@ -5,13 +5,15 @@ Revises: 1f965dd6fb7b
 Create Date: 2025-03-13 11:22:32.844110
 
 """
-from alembic import op
+
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql as dialect_postgresql
 
+from alembic import op
+
 # revision identifiers, used by Alembic.
-revision = '54243e0e04ad'
-down_revision = '1f965dd6fb7b'
+revision = "54243e0e04ad"
+down_revision = "1f965dd6fb7b"
 branch_labels = None
 depends_on = None
 
