@@ -1486,3 +1486,126 @@ def test_update_catalogue(
     # check object storage not called
     _store_file.assert_not_called()
     _store_file.reset_mock()
+
+
+def test_update_sanity_check(
+    caplog: pytest.LogCaptureFixture,
+    postgresql: Connection[str],
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    # just prepare filling the database
+    connection_string = (
+        f"postgresql://{postgresql.info.user}:"
+        f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
+    )
+    sqlalchemy_utils.drop_database(connection_string)
+    engine = sa.create_engine(connection_string)
+    session_obj = sa.orm.sessionmaker(engine)
+    object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://mypublic-storage/"
+    bucket_name = "my_bucket"
+    object_storage_kws: dict[str, Any] = {
+        "aws_access_key_id": "storage_user",
+        "aws_secret_access_key": "storage_password",
+    }
+    _store_file = mocker.patch(
+        "cads_catalogue.object_storage.store_file", return_value="an url"
+    )
+    _git_repo = mocker.patch(
+        "cads_catalogue.repos.get_repo_url", return_value="a_repo_url"
+    )
+    mocker.patch("cads_catalogue.object_storage.test_connection")
+    folder_commit_hashes = (
+        "e5658fef07333700272e36a43df0628efacb5f04",
+        "5f662d202e4084dd569567bab0957c8a56f79c0f",
+        "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+        "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69",
+        "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b",
+        "a0ae2002dec8b4b8b0ba8f2b5223722a71d84b8d",
+    )
+    mocker.patch.object(
+        repos, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
+    )
+    mocker.patch.object(alembic.config, "main")
+
+    runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+
+    # now running the test
+    report_path = os.path.join(TESTDATA_PATH, "reports.json")
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-sanity-check",
+            report_path,
+            "--connection-string",
+            connection_string,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db content
+    expected_db = [
+        ("cams-global-reanalysis-eac4", None),
+        ("cams-global-reanalysis-eac4-monthly", None),
+        (
+            "derived-near-surface-meteorological-variables",
+            [{"req_id": "e3004ca8-a2be-4f07-afde-3e0894c77d83", "success": True}],
+        ),
+        (
+            "reanalysis-era5-land",
+            [{"req_id": "9c9b619f-1af7-4765-aadb-cc10f88cfdfa", "success": True}],
+        ),
+        (
+            "reanalysis-era5-land-monthly-means",
+            [{"req_id": "3bc938b2-bb60-44af-9e2e-636dc6ccbd59", "success": True}],
+        ),
+        (
+            "reanalysis-era5-pressure-levels",
+            [{"req_id": "dfd58e1d-f116-4cf5-8e39-2efc852b5b2d", "success": True}],
+        ),
+        (
+            "reanalysis-era5-single-levels",
+            [{"req_id": "e8ef9ae6-dc9f-4408-aff6-b41587dbff3b", "success": True}],
+        ),
+        (
+            "satellite-surface-radiation-budget",
+            [{"req_id": "3ce3df09-9730-4912-997e-a0040cd85960", "success": True}],
+        ),
+    ]
+    with session_obj() as session:
+        effective_db = session.execute(
+            sa.select(
+                database.Resource.resource_uid, database.Resource.sanity_check
+            ).order_by(database.Resource.resource_uid)
+        ).all()
+        assert effective_db == expected_db
