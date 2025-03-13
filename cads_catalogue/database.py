@@ -288,6 +288,7 @@ class Resource(BaseModel):
     related_resources_keywords: List[str] = sa.Column(
         dialect_postgresql.ARRAY(sa.String)
     )
+    sanity_check = sa.Column(dialect_postgresql.JSONB)
 
     # geo extent
     geo_extent: Any = sa.Column(dialect_postgresql.JSONB)
