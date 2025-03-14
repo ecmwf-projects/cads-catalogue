@@ -31,8 +31,8 @@ name = "cads-catalogue"
 readme = "README.md"
 
 [project.scripts]
-cads-catalogue = "cads_catalogue.entry_points:main"
 alembic-cli = "cads_catalogue.alembic_cli:main"
+cads-catalogue = "cads_catalogue.entry_points:main"
 
 [tool.coverage.run]
 branch = true

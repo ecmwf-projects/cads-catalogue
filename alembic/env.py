@@ -21,7 +21,6 @@ import alembic.context
 import cads_catalogue
 
 
-
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
