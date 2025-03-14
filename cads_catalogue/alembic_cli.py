@@ -2,19 +2,10 @@
 
 import os
 
+import cads_catalogue
 from alembic.config import CommandLine, Config
 
 alembic_ini_path = os.path.abspath(os.path.join(__file__, "..", "..", "alembic.ini"))
-
-
-def get_alembic_config_args():
-    config_args = {  # type: ignore
-        "DB_USER": os.getenv("CATALOGUE_DB_USER", ""),
-        "DB_PASS": os.getenv("CATALOGUE_DB_PASSWORD", ""),
-        "DB_HOST": os.getenv("CATALOGUE_DB_HOST", ""),
-        "DB_NAME": os.getenv("CATALOGUE_DB_NAME", ""),
-    }
-    return config_args
 
 
 class MyCommandLine(CommandLine):
@@ -27,8 +18,9 @@ class MyCommandLine(CommandLine):
                 file_=options.config,
                 ini_section=options.name,
                 cmd_opts=options,
-                config_args=get_alembic_config_args(),
             )
+            url = cads_catalogue.config.ensure_settings().connection_string
+            cfg.set_main_option("sqlalchemy.url", url)
             self.run_cmd(cfg, options)
 
 

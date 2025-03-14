@@ -34,7 +34,7 @@ def run_migrations_offline() -> None:
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    url = cads_catalogue.config.ensure_settings().connection_string
+    url = alembic.context.config.get_main_option("sqlalchemy.url")
     alembic.context.configure(
         url=url,
         target_metadata=cads_catalogue.database.BaseModel.metadata,
@@ -53,8 +53,8 @@ def run_migrations_online() -> None:
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    url = cads_catalogue.config.ensure_settings().connection_string
-    engine = sa.create_engine(url, poolclass=sa.pool.NullPool)
+    url = alembic.context.config.get_main_option("sqlalchemy.url")
+    engine = sa.create_engine(url, poolclass=sa.pool.NullPool)  # type: ignore
     with engine.connect() as connection:
         alembic.context.configure(
             connection=connection, target_metadata=cads_catalogue.database.metadata
