@@ -19,7 +19,8 @@ class MyCommandLine(CommandLine):
                 ini_section=options.name,
                 cmd_opts=options,
             )
-            url = cads_catalogue.config.ensure_settings().connection_string
+            url = cads_catalogue.config.ensure_settings().connection_string.replace("%", "%%")
+            # passwords with special chars are urlencoded, but '%' must be escaped in ini files
             cfg.set_main_option("sqlalchemy.url", url)
             self.run_cmd(cfg, options)
 

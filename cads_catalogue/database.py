@@ -480,11 +480,8 @@ def init_database(connection_string: str, force: bool = False) -> sa.engine.Engi
     """
     engine = sa.create_engine(connection_string)
     alembic_cfg = alembic.config.Config(alembic_cli.alembic_ini_path)
-    for option in ["drivername", "username", "password", "host", "port", "database"]:
-        value = getattr(engine.url, option)
-        if value is None:
-            value = ""
-        alembic_cfg.set_main_option(option, str(value))
+    # passwords with special chars are urlencoded, but '%' must be escaped in ini files
+    alembic_cfg.set_main_option("sqlalchemy.url", connection_string.replace("%", "%%"))
     if not sqlalchemy_utils.database_exists(engine.url):
         sqlalchemy_utils.create_database(engine.url)
         # cleanup and create the schema
