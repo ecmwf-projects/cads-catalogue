@@ -27,7 +27,7 @@ class MyCommandLine(CommandLine):
             self.run_cmd(cfg, options)
 
 
-def main():
+def main() -> None:
     cli = MyCommandLine(prog="alembic-cli")
     config_in_parser = [p for p in cli.parser._actions if p.dest == "config"][0]
     config_in_parser.default = alembic_ini_path
