@@ -28,7 +28,7 @@ Before pushing to GitHub, run the following commands:
 1. Run the static type checker: `make type-check`
 1. Build the documentation (see [Sphinx tutorial](https://www.sphinx-doc.org/en/master/tutorial/)): `make docs-build`
 
-### Instructions for create a new database version
+### Instructions for creating a new database version
 
 The package `cads-catalogue` comes with its 'catalogue' database.
 In case of database structure upgrade, developers must follow these steps:
