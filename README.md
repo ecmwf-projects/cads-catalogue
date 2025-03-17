@@ -56,18 +56,19 @@ automatically computed by the environment and not read from any ini file.
 All the database releases where you can migrate up and down must be defined by files contained inside
 the folder [/alembic/versions](/alembic/versions). All these files are in a version queue: each file has
 link to its revision hash (variable 'revision', the prefix of the file name) and to the next older one
-(variable 'down_revision'), and contains code to step up and down that database version.
+(variable 'down_revision'), and contains code to step up and down that database version.\
 Some useful commands are listed below.
-To migrate to the newest version, type:
-`alembic-cli upgrade head`
-To upgrade to a specific version hash, for example 8ccbe515155c, type:
-`alembic-cli upgrade 8ccbe515155c`
-To downgrade to a specific version hash, for example 8ccbe515155c, type:
-`alembic-cli downgrade 8ccbe515155c`
-To get the current version hash of the database, type:
-`alembic-cli current`
 
-All other details are the same of the standard alembic migration tool,
+- To migrate to the newest version, type:\
+  `alembic-cli upgrade head`
+- To upgrade to a specific version hash, for example 8ccbe515155c, type:\
+  `alembic-cli upgrade 8ccbe515155c`
+- To downgrade to a specific version hash, for example 8ccbe515155c, type:\
+  `alembic-cli downgrade 8ccbe515155c`
+- To get the current version hash of the database, type:\
+  `alembic-cli current`
+
+Other details are the same of the standard alembic migration tool,
 see the [Alembic tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
 
 ## License
