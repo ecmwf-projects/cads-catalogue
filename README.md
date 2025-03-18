@@ -28,7 +28,7 @@ Before pushing to GitHub, run the following commands:
 1. Run the static type checker: `make type-check`
 1. Build the documentation (see [Sphinx tutorial](https://www.sphinx-doc.org/en/master/tutorial/)): `make docs-build`
 
-### Instructions for database updating
+### Instructions for creating a new database version
 
 The package `cads-catalogue` comes with its 'catalogue' database.
 In case of database structure upgrade, developers must follow these steps:
@@ -46,7 +46,30 @@ In case of database structure upgrade, developers must follow these steps:
    Similarly, do the same with the `downgrade` function.
 1. Commit and push the modifications and the new file.
 
-For details about the alembic migration tool, see the [Alembic tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
+### Instructions for moving between different database versions
+
+The package comes with its own 'alembic-cli' script in order to move between different
+database versions. This script is a slight modified version of the 'alembic' script, overriding
+default config path used ([/alembic.ini](/alembic.ini)) and the sqlalchemy.url used, that is
+automatically computed by the environment and not read from any ini file.
+
+All the database releases where you can migrate up and down must be defined by files contained inside
+the folder [/alembic/versions](/alembic/versions). All these files are in a version queue: each file has
+link to its revision hash (variable 'revision', the prefix of the file name) and to the next older one
+(variable 'down_revision'), and contains code to step up and down that database version.\
+Some useful commands are listed below.
+
+- To migrate to the newest version, type:\
+  `alembic-cli upgrade head`
+- To upgrade to a specific version hash, for example 8ccbe515155c, type:\
+  `alembic-cli upgrade 8ccbe515155c`
+- To downgrade to a specific version hash, for example 8ccbe515155c, type:\
+  `alembic-cli downgrade 8ccbe515155c`
+- To get the current version hash of the database, type:\
+  `alembic-cli current`
+
+Other details are the same of the standard alembic migration tool,
+see the [Alembic tutorial](https://alembic.sqlalchemy.org/en/latest/tutorial.html).
 
 ## License
 

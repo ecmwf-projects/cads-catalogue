@@ -20,8 +20,6 @@ import sqlalchemy as sa
 import alembic.context
 import cads_catalogue
 
-config = alembic.context.config
-
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -36,11 +34,7 @@ def run_migrations_offline() -> None:
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    url_props = dict()
-    for prop in ["drivername", "username", "password", "host", "port", "database"]:
-        url_props[prop] = config.get_main_option(prop)
-    url_props["port"] = url_props["port"] and int(url_props["port"]) or None  # type: ignore
-    url = sa.engine.URL.create(**url_props)  # type: ignore
+    url = alembic.context.config.get_main_option("sqlalchemy.url")
     alembic.context.configure(
         url=url,
         target_metadata=cads_catalogue.database.BaseModel.metadata,
@@ -59,12 +53,8 @@ def run_migrations_online() -> None:
     """
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    url_props = dict()
-    for prop in ["drivername", "username", "password", "host", "port", "database"]:
-        url_props[prop] = config.get_main_option(prop)
-    url_props["port"] = url_props["port"] and int(url_props["port"]) or None  # type: ignore
-    url = sa.engine.URL.create(**url_props)  # type: ignore
-    engine = sa.create_engine(url, poolclass=sa.pool.NullPool)
+    url = alembic.context.config.get_main_option("sqlalchemy.url")
+    engine = sa.create_engine(url, poolclass=sa.pool.NullPool)  # type: ignore
     with engine.connect() as connection:
         alembic.context.configure(
             connection=connection, target_metadata=cads_catalogue.database.metadata
