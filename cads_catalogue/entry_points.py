@@ -423,7 +423,8 @@ def update_sanity_check(report_path: str, connection_string: Optional[str] = Non
             {
                 "req_id": report.request_uid,
                 "success": not report.tracebacks,
-                # "timestamp": TODO
+                "started_at": report.started_at.isoformat(),
+                "finished_at": report.finished_at.isoformat(),
             }
         )
     engine = sa.create_engine(connection_string)
