@@ -405,7 +405,9 @@ def update_sanity_check(report_path: str, connection_string: Optional[str] = Non
     :param report_path: path of the json report containing outcomes of sanity check
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
-    import cads_e2e_tests  # here because cads-e2e-tests not wanted in retrieve-api
+    # import here because cads-e2e-tests not wanted in retrieve-api
+    import cads_e2e_tests  # type: ignore
+
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
     logger.info("start running update of the catalogue")
@@ -433,7 +435,7 @@ def update_sanity_check(report_path: str, connection_string: Optional[str] = Non
         all_datasets = session.scalars(sa.select(database.Resource)).all()
         for dataset in all_datasets:
             if dataset.resource_uid in dashboard_dict:
-                dataset.sanity_check = dashboard_dict.pop(dataset.resource_uid)
+                dataset.sanity_check = dashboard_dict.pop(dataset.resource_uid)  # type: ignore
                 session.add(dataset)
     for dataset_uid in dashboard_dict:
         logger.error(
