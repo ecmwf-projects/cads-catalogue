@@ -19,7 +19,6 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 import cads_common.logging
-import cads_e2e_tests
 import sqlalchemy as sa
 import structlog
 import typer
@@ -406,6 +405,7 @@ def update_sanity_check(report_path: str, connection_string: Optional[str] = Non
     :param report_path: path of the json report containing outcomes of sanity check
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     """
+    import cads_e2e_tests  # here because cads-e2e-tests not wanted in retrieve-api
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
     logger.info("start running update of the catalogue")
