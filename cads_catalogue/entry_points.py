@@ -15,9 +15,11 @@
 # limitations under the License.
 
 import os.path
+from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 import cads_common.logging
+import cads_e2e_tests
 import sqlalchemy as sa
 import structlog
 import typer
@@ -393,6 +395,52 @@ def update_catalogue(
             )
             manager.update_last_input_status(session, new_catalogue_update_md)
         logger.info("end of update of the catalogue")
+
+
+@app.command()
+def update_sanity_check(report_path: str, connection_string: Optional[str] = None):
+    """Update database from sanity check report file.
+
+    Parameters
+    ----------
+    :param report_path: path of the json report containing outcomes of sanity check
+    :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    """
+    cads_common.logging.structlog_configure()
+    cads_common.logging.logging_configure()
+    logger.info("start running update of the catalogue")
+    if not connection_string:
+        dbsettings = config.ensure_settings(config.dbsettings)
+        connection_string = dbsettings.connection_string
+    if not os.path.isfile(report_path):
+        logger.error(f"{report_path} not found! No update of sanity check information.")
+        return
+    with open(report_path) as fp:
+        reports = cads_e2e_tests.load_reports(fp)
+    dashboard_dict = defaultdict(list)
+    for report in reports:
+        dashboard_dict[report.request.collection_id].append(
+            {
+                "req_id": report.request_uid,
+                "success": not report.tracebacks,
+                "started_at": report.started_at.isoformat(),
+                "finished_at": report.finished_at.isoformat(),
+            }
+        )
+    engine = sa.create_engine(connection_string)
+    session_obj = sa.orm.sessionmaker(engine)
+    with session_obj.begin() as session:
+        all_datasets = session.scalars(sa.select(database.Resource)).all()
+        for dataset in all_datasets:
+            if dataset.resource_uid in dashboard_dict:
+                dataset.sanity_check = dashboard_dict.pop(dataset.resource_uid)
+                session.add(dataset)
+    for dataset_uid in dashboard_dict:
+        logger.error(
+            f"dataset {dataset_uid} in sanity check report was "
+            f"not found in the catalogue database!"
+        )
+    logger.info("db update of sanity check information completed.")
 
 
 def main() -> None:

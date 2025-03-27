@@ -11,6 +11,7 @@
         "adaptor": "import cacholote\nimport cdsapi\n\n\n@cacholote.cacheable\ndef adaptor(request, config, metadata):\n\n    # parse input options\n    collection_id = config.pop(\"collection_id\", None)\n    if not collection_id:\n        raise ValueError(f\"collection_id is required in request\")\n\n    # retrieve data\n    client = cdsapi.Client(config[\"url\"], config[\"key\"])\n    result_path = client.retrieve(collection_id, request).download()\n    return open(result_path, \"rb\")\n",
         "adaptor_properties_hash": "a69f15381443885890129f8ffb2c9f46",
         "sources_hash": "48a771d06e98670e3aa8fff982c05d8a",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": null,
         "begin_date": "2003-01-01",
@@ -910,6 +911,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "1cede861e0c4ff7c58318d5bba2961f1",
         "sources_hash": "19848060eb1e485b587e22ac28e8141e",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": null,
         "begin_date": "2003-01-01",
@@ -1439,6 +1441,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "ecf1911da4bb67042825eeee574fea9d",
         "sources_hash": "a1208340405b01afb52f50a5423a87cb",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
@@ -1495,6 +1498,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "d438ae8e43fd3d28f86506224392d4d5",
         "sources_hash": "e88f2c04649d3f7e312cdaaa1fef4d7b",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
@@ -1555,6 +1559,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "8fc5de7036d57c7035ab6cdd175f216a",
         "sources_hash": "40b9faaa0719118373b8d9303b0f9875",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
@@ -1611,6 +1616,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "c67aaecc321198b58082d0d2a2ac8e86",
         "sources_hash": "9c313d4668a1544424097d928b1c1a55",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
@@ -1667,6 +1673,7 @@
         "adaptor": null,
         "adaptor_properties_hash": "b4c9a477d4185b5dbc6127f51c58f1aa",
         "sources_hash": "04709d4d341b23ea755b29c77d3d5815",
+        "sanity_check": null,
         "related_resources_keywords": [],
         "geo_extent": {
             "bboxE": 360,
