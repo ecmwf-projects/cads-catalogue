@@ -284,7 +284,7 @@ class Resource(BaseModel):
     api_enforce_constraints = sa.Column(sa.Boolean, default=False)
     disabled_reason = sa.Column(sa.String)
     sources_hash = sa.Column(sa.String)
-    related_resources_keywords: List[str] = sa.Column(
+    related_resources_keywords: List[str] = sa.Column(  # type: ignore
         dialect_postgresql.ARRAY(sa.String)
     )
     sanity_check = sa.Column(dialect_postgresql.JSONB)
