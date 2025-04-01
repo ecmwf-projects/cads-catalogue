@@ -182,21 +182,21 @@ def clone_repository(
         repo_path = tempfile.mkdtemp(prefix=f"{repo_name}_", dir=root_path)
     if repo_branch:
         multi_options += (f"--branch {repo_branch}",)
-    repo_url = add_pat_to_url(repo_url)
-    repo = git.Repo.clone_from(repo_url, repo_path, multi_options=list(multi_options))
+    repo_url_complete = add_pat_to_url(repo_url)
+    repo = git.Repo.clone_from(repo_url_complete, repo_path, multi_options=list(multi_options))
     if delete_remote:
         repo.delete_remote(repo.remote())
     try:
         reference_tag = repo.active_branch.name
         logger.info(
-            f"cloned repo {repo_name!r} branch {reference_tag!r} in path {repo_path!r}"
+            f"cloned repo {repo_name!r} branch {reference_tag!r} from remote {repo_url!r} in path {repo_path!r}"
         )
     except TypeError:
         reference_tag = next(
             (tag for tag in repo.tags if tag.commit == repo.head.commit)
         ).name
         logger.info(
-            f"cloned repo {repo_name!r} tag {reference_tag!r} in path {repo_path!r}"
+            f"cloned repo {repo_name!r} tag {reference_tag!r} from remote {repo_url!r} in path {repo_path!r}"
         )
     return repo_path
 
