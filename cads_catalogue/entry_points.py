@@ -16,6 +16,7 @@
 
 import os.path
 from collections import defaultdict
+from operator import itemgetter
 from typing import Any, Dict, List, Optional
 
 import cads_common.logging
@@ -45,6 +46,7 @@ PACKAGE_DIR = os.path.abspath(
         "..",
     )
 )
+DEFAULT_RETAIN_SANITY_CHECKS = 10
 app = typer.Typer()
 logger = structlog.get_logger(__name__)
 
@@ -397,20 +399,25 @@ def update_catalogue(
 
 
 @app.command()
-def update_sanity_check(report_path: str, connection_string: Optional[str] = None):
+def update_sanity_check(
+    report_path: str,
+    connection_string: Optional[str] = None,
+    retain_only: int = DEFAULT_RETAIN_SANITY_CHECKS,
+):
     """Update database from sanity check report file.
 
     Parameters
     ----------
     :param report_path: path of the json report containing outcomes of sanity check
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
+    :param retain_only: number of most recent sanity check info to retain (use negative number for no limit)
     """
     # import here because cads-e2e-tests not wanted in retrieve-api
     import cads_e2e_tests  # type: ignore
 
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
-    logger.info("start running update of the catalogue")
+    logger.info("start running db update of sanity check information.")
     if not connection_string:
         dbsettings = config.ensure_settings(config.dbsettings)
         connection_string = dbsettings.connection_string
@@ -419,7 +426,7 @@ def update_sanity_check(report_path: str, connection_string: Optional[str] = Non
         return
     with open(report_path) as fp:
         reports = cads_e2e_tests.load_reports(fp)
-    dashboard_dict = defaultdict(list)
+    dashboard_dict: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
     for report in reports:
         dashboard_dict[report.request.collection_id].append(
             {
@@ -435,11 +442,24 @@ def update_sanity_check(report_path: str, connection_string: Optional[str] = Non
         all_datasets = session.scalars(sa.select(database.Resource)).all()
         for dataset in all_datasets:
             if dataset.resource_uid in dashboard_dict:
-                dataset.sanity_check = dashboard_dict.pop(dataset.resource_uid)  # type: ignore
+                additional_sanity_checks = dashboard_dict.pop(dataset.resource_uid)
+                old_sanity_check = dataset.sanity_check or []
+                new_sanity_check = old_sanity_check + additional_sanity_checks
+                # note: sorting works with string if datetimes use isoformat!
+                new_sanity_check = sorted(
+                    new_sanity_check, key=itemgetter("started_at"), reverse=True
+                )
+                if retain_only > 0:
+                    new_sanity_check = new_sanity_check[:retain_only]
+                dataset.sanity_check = new_sanity_check
                 session.add(dataset)
+            else:
+                logger.warning(
+                    f"dataset {dataset.resource_uid} not included in this sanity check report"
+                )
     for dataset_uid in dashboard_dict:
         logger.error(
-            f"dataset {dataset_uid} in sanity check report was "
+            f"dataset uid {dataset_uid!r} in sanity check report was "
             f"not found in the catalogue database!"
         )
     logger.info("db update of sanity check information completed.")

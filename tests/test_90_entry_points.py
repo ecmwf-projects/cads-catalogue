@@ -1,7 +1,7 @@
 import datetime
 import os.path
 import unittest.mock
-from typing import Any
+from typing import Any, Dict, List, Tuple
 
 import pytest
 import pytest_mock
@@ -1488,238 +1488,298 @@ def test_update_catalogue(
     _store_file.reset_mock()
 
 
-# def test_update_sanity_check(
-#     caplog: pytest.LogCaptureFixture,
-#     postgresql: Connection[str],
-#     mocker: pytest_mock.MockerFixture,
-# ) -> None:
-#     # just prepare filling the database
-#     connection_string = (
-#         f"postgresql://{postgresql.info.user}:"
-#         f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
-#     )
-#     sqlalchemy_utils.drop_database(connection_string)
-#     engine = sa.create_engine(connection_string)
-#     session_obj = sa.orm.sessionmaker(engine)
-#     object_storage_url = "http://myobject-storage:myport/"
-#     doc_storage_url = "http://mypublic-storage/"
-#     bucket_name = "my_bucket"
-#     object_storage_kws: dict[str, Any] = {
-#         "aws_access_key_id": "storage_user",
-#         "aws_secret_access_key": "storage_password",
-#     }
-#     _store_file = mocker.patch(
-#         "cads_catalogue.object_storage.store_file", return_value="an url"
-#     )
-#     _git_repo = mocker.patch(
-#         "cads_catalogue.repos.get_repo_url", return_value="a_repo_url"
-#     )
-#     mocker.patch("cads_catalogue.object_storage.test_connection")
-#     folder_commit_hashes = (
-#         "e5658fef07333700272e36a43df0628efacb5f04",
-#         "5f662d202e4084dd569567bab0957c8a56f79c0f",
-#         "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
-#         "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69",
-#         "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b",
-#         "a0ae2002dec8b4b8b0ba8f2b5223722a71d84b8d",
-#     )
-#     mocker.patch.object(
-#         repos, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
-#     )
-#     mocker.patch.object(alembic.config, "main")
-#
-#     runner.invoke(
-#         entry_points.app,
-#         [
-#             "update-catalogue",
-#             "--connection-string",
-#             connection_string,
-#             "--resources-folder-path",
-#             TEST_RESOURCES_DATA_PATH,
-#             "--messages-folder-path",
-#             TEST_MESSAGES_DATA_PATH,
-#             "--licences-folder-path",
-#             TEST_LICENCES_DATA_PATH,
-#             "--cim-folder-path",
-#             TEST_CIM_DATA_PATH,
-#             "--contents-folder-path",
-#             TEST_CONTENTS_DATA_PATH,
-#         ],
-#         env={
-#             "OBJECT_STORAGE_URL": object_storage_url,
-#             "DOCUMENT_STORAGE_URL": doc_storage_url,
-#             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
-#             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
-#             "CATALOGUE_BUCKET": bucket_name,
-#         },
-#     )
-#
-#     # now running the test
-#     report_path = os.path.join(TESTDATA_PATH, "reports.json")
-#     result = runner.invoke(
-#         entry_points.app,
-#         [
-#             "update-sanity-check",
-#             report_path,
-#             "--connection-string",
-#             connection_string,
-#         ],
-#         env={
-#             "OBJECT_STORAGE_URL": object_storage_url,
-#             "DOCUMENT_STORAGE_URL": doc_storage_url,
-#             "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
-#             "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
-#             "CATALOGUE_BUCKET": bucket_name,
-#         },
-#     )
-#     assert result.exit_code == 0
-#     # check db content
-#     expected_db = [
-#         ("cams-global-reanalysis-eac4", None),
-#         ("cams-global-reanalysis-eac4-monthly", None),
-#         (
-#             "derived-near-surface-meteorological-variables",
-#             [
-#                 {
-#                     "req_id": "c2a8db72-2e07-48e1-9367-3917fe543a52",
-#                     "success": True,
-#                     "started_at": "2025-03-19T18:43:29.388729",
-#                     "finished_at": "2025-03-19T18:43:53.651144",
-#                 },
-#                 {
-#                     "req_id": "f6fb3372-23f0-49b4-afe7-f8bd2341aa88",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:17:33.336182",
-#                     "finished_at": "2025-03-19T19:17:40.393194",
-#                 },
-#                 {
-#                     "req_id": "747cd1ec-f74a-469f-90db-a5f123365389",
-#                     "success": True,
-#                     "started_at": "2025-03-19T20:22:04.386113",
-#                     "finished_at": "2025-03-19T20:22:21.805289",
-#                 },
-#             ],
-#         ),
-#         (
-#             "reanalysis-era5-land",
-#             [
-#                 {
-#                     "req_id": "8b2e4f80-4f87-4be6-a15d-1bee49cd00bf",
-#                     "success": True,
-#                     "started_at": "2025-03-19T17:00:46.054276",
-#                     "finished_at": "2025-03-19T17:01:23.561730",
-#                 },
-#                 {
-#                     "req_id": "a2dd89b2-671d-46c5-adfd-67f88fd89bd2",
-#                     "success": True,
-#                     "started_at": "2025-03-19T18:53:35.274381",
-#                     "finished_at": "2025-03-19T18:53:47.088402",
-#                 },
-#                 {
-#                     "req_id": "ad316f3e-b74c-4c32-8c79-5b37ad485a67",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:39:19.873201",
-#                     "finished_at": "2025-03-19T19:39:37.786999",
-#                 },
-#             ],
-#         ),
-#         (
-#             "reanalysis-era5-land-monthly-means",
-#             [
-#                 {
-#                     "req_id": "2345813e-6214-49b6-b3c7-19d19390db03",
-#                     "success": True,
-#                     "started_at": "2025-03-19T17:02:06.425665",
-#                     "finished_at": "2025-03-19T17:02:14.207866",
-#                 },
-#                 {
-#                     "req_id": "700fac07-824e-4884-87a3-88607aa3990c",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:00:48.990793",
-#                     "finished_at": "2025-03-19T19:00:56.784068",
-#                 },
-#                 {
-#                     "req_id": "679d9ed1-6750-4760-bd48-2c33911d8d13",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:51:36.502811",
-#                     "finished_at": "2025-03-19T19:51:44.828018",
-#                 },
-#             ],
-#         ),
-#         (
-#             "reanalysis-era5-pressure-levels",
-#             [
-#                 {
-#                     "req_id": "dc985723-f993-400d-bcba-f0481c05853b",
-#                     "success": True,
-#                     "started_at": "2025-03-19T17:00:46.025830",
-#                     "finished_at": "2025-03-19T17:02:05.591700",
-#                 },
-#                 {
-#                     "req_id": "d3a93e9d-4140-43ac-8ac9-2bbf8f71aeb2",
-#                     "success": True,
-#                     "started_at": "2025-03-19T18:53:47.089215",
-#                     "finished_at": "2025-03-19T18:53:53.507117",
-#                 },
-#                 {
-#                     "req_id": "f74112b7-8bca-41e8-bc3d-4251e1c1b68d",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:39:37.789617",
-#                     "finished_at": "2025-03-19T19:39:56.825807",
-#                 },
-#             ],
-#         ),
-#         (
-#             "reanalysis-era5-single-levels",
-#             [
-#                 {
-#                     "req_id": "eeb76ad4-6996-4ecb-a656-066e80aad563",
-#                     "success": True,
-#                     "started_at": "2025-03-19T17:00:46.057012",
-#                     "finished_at": "2025-03-19T17:02:06.406081",
-#                 },
-#                 {
-#                     "req_id": "92c27e00-80ee-4da7-aedd-31488ac42043",
-#                     "success": True,
-#                     "started_at": "2025-03-19T18:53:53.507966",
-#                     "finished_at": "2025-03-19T18:54:03.414561",
-#                 },
-#                 {
-#                     "req_id": "f3b5914b-49fa-46f7-a6bd-d89fddffdbbb",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:39:56.828625",
-#                     "finished_at": "2025-03-19T19:40:15.106225",
-#                 },
-#             ],
-#         ),
-#         (
-#             "satellite-surface-radiation-budget",
-#             [
-#                 {
-#                     "req_id": "8dd93631-90ab-430b-b88a-f993b08853f5",
-#                     "success": True,
-#                     "started_at": "2025-03-19T18:30:50.014885",
-#                     "finished_at": "2025-03-19T18:30:58.115110",
-#                 },
-#                 {
-#                     "req_id": "97d99926-6d5d-4e12-8e36-2eabfa60336c",
-#                     "success": True,
-#                     "started_at": "2025-03-19T19:08:29.676061",
-#                     "finished_at": "2025-03-19T19:08:39.442759",
-#                 },
-#                 {
-#                     "req_id": "fd602e81-b6bd-40a1-bf8d-0e1935af939b",
-#                     "success": True,
-#                     "started_at": "2025-03-19T20:05:01.792501",
-#                     "finished_at": "2025-03-19T20:05:15.315782",
-#                 },
-#             ],
-#         ),
-#     ]
-#     with session_obj() as session:
-#         effective_db = session.execute(
-#             sa.select(
-#                 database.Resource.resource_uid, database.Resource.sanity_check
-#             ).order_by(database.Resource.resource_uid)
-#         ).all()
-#         assert effective_db == expected_db
+def test_update_sanity_check(
+    caplog: pytest.LogCaptureFixture,
+    postgresql: Connection[str],
+    mocker: pytest_mock.MockerFixture,
+) -> None:
+    # just prepare filling the database
+    connection_string = (
+        f"postgresql://{postgresql.info.user}:"
+        f"@{postgresql.info.host}:{postgresql.info.port}/{postgresql.info.dbname}"
+    )
+    sqlalchemy_utils.drop_database(connection_string)
+    engine = sa.create_engine(connection_string)
+    session_obj = sa.orm.sessionmaker(engine)
+    object_storage_url = "http://myobject-storage:myport/"
+    doc_storage_url = "http://mypublic-storage/"
+    bucket_name = "my_bucket"
+    object_storage_kws: dict[str, Any] = {
+        "aws_access_key_id": "storage_user",
+        "aws_secret_access_key": "storage_password",
+    }
+    _store_file = mocker.patch(
+        "cads_catalogue.object_storage.store_file", return_value="an url"
+    )
+    _git_repo = mocker.patch(
+        "cads_catalogue.repos.get_repo_url", return_value="a_repo_url"
+    )
+    mocker.patch("cads_catalogue.object_storage.test_connection")
+    folder_commit_hashes = (
+        "e5658fef07333700272e36a43df0628efacb5f04",
+        "5f662d202e4084dd569567bab0957c8a56f79c0f",
+        "f0591ec408b59d32a46a5d08b9786641dffe5c7e",
+        "ebdb3b017a14a42fb75ea7b44992f3f178aa0d69",
+        "3ae7a244a0f480e90fbcd3eb5e37742614fa3e9b",
+        "a0ae2002dec8b4b8b0ba8f2b5223722a71d84b8d",
+    )
+    mocker.patch.object(
+        repos, "get_last_commit_hash", new=get_last_commit_factory(folder_commit_hashes)
+    )
+    mocker.patch.object(alembic.config, "main")
+
+    runner.invoke(
+        entry_points.app,
+        [
+            "update-catalogue",
+            "--connection-string",
+            connection_string,
+            "--resources-folder-path",
+            TEST_RESOURCES_DATA_PATH,
+            "--messages-folder-path",
+            TEST_MESSAGES_DATA_PATH,
+            "--licences-folder-path",
+            TEST_LICENCES_DATA_PATH,
+            "--cim-folder-path",
+            TEST_CIM_DATA_PATH,
+            "--contents-folder-path",
+            TEST_CONTENTS_DATA_PATH,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+
+    # running the test with default retain
+    report_path = os.path.join(TESTDATA_PATH, "reports.json")
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-sanity-check",
+            report_path,
+            "--connection-string",
+            connection_string,
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    # check db content
+    expected_db: List[Tuple[str, List[Dict[str, Any]] | None]] = [
+        ("cams-global-reanalysis-eac4", None),
+        ("cams-global-reanalysis-eac4-monthly", None),
+        (
+            "derived-near-surface-meteorological-variables",
+            [
+                {
+                    "req_id": "747cd1ec-f74a-469f-90db-a5f123365389",
+                    "success": True,
+                    "started_at": "2025-03-19T20:22:04.386113",
+                    "finished_at": "2025-03-19T20:22:21.805289",
+                },
+                {
+                    "req_id": "f6fb3372-23f0-49b4-afe7-f8bd2341aa88",
+                    "success": True,
+                    "started_at": "2025-03-19T19:17:33.336182",
+                    "finished_at": "2025-03-19T19:17:40.393194",
+                },
+                {
+                    "req_id": "c2a8db72-2e07-48e1-9367-3917fe543a52",
+                    "success": True,
+                    "started_at": "2025-03-19T18:43:29.388729",
+                    "finished_at": "2025-03-19T18:43:53.651144",
+                },
+            ],
+        ),
+        (
+            "reanalysis-era5-land",
+            [
+                {
+                    "req_id": "ad316f3e-b74c-4c32-8c79-5b37ad485a67",
+                    "success": True,
+                    "started_at": "2025-03-19T19:39:19.873201",
+                    "finished_at": "2025-03-19T19:39:37.786999",
+                },
+                {
+                    "req_id": "a2dd89b2-671d-46c5-adfd-67f88fd89bd2",
+                    "success": True,
+                    "started_at": "2025-03-19T18:53:35.274381",
+                    "finished_at": "2025-03-19T18:53:47.088402",
+                },
+                {
+                    "req_id": "8b2e4f80-4f87-4be6-a15d-1bee49cd00bf",
+                    "success": True,
+                    "started_at": "2025-03-19T17:00:46.054276",
+                    "finished_at": "2025-03-19T17:01:23.561730",
+                },
+            ],
+        ),
+        (
+            "reanalysis-era5-land-monthly-means",
+            [
+                {
+                    "req_id": "679d9ed1-6750-4760-bd48-2c33911d8d13",
+                    "success": True,
+                    "started_at": "2025-03-19T19:51:36.502811",
+                    "finished_at": "2025-03-19T19:51:44.828018",
+                },
+                {
+                    "req_id": "700fac07-824e-4884-87a3-88607aa3990c",
+                    "success": True,
+                    "started_at": "2025-03-19T19:00:48.990793",
+                    "finished_at": "2025-03-19T19:00:56.784068",
+                },
+                {
+                    "req_id": "2345813e-6214-49b6-b3c7-19d19390db03",
+                    "success": True,
+                    "started_at": "2025-03-19T17:02:06.425665",
+                    "finished_at": "2025-03-19T17:02:14.207866",
+                },
+            ],
+        ),
+        (
+            "reanalysis-era5-pressure-levels",
+            [
+                {
+                    "req_id": "f74112b7-8bca-41e8-bc3d-4251e1c1b68d",
+                    "success": True,
+                    "started_at": "2025-03-19T19:39:37.789617",
+                    "finished_at": "2025-03-19T19:39:56.825807",
+                },
+                {
+                    "req_id": "d3a93e9d-4140-43ac-8ac9-2bbf8f71aeb2",
+                    "success": True,
+                    "started_at": "2025-03-19T18:53:47.089215",
+                    "finished_at": "2025-03-19T18:53:53.507117",
+                },
+                {
+                    "req_id": "dc985723-f993-400d-bcba-f0481c05853b",
+                    "success": True,
+                    "started_at": "2025-03-19T17:00:46.025830",
+                    "finished_at": "2025-03-19T17:02:05.591700",
+                },
+            ],
+        ),
+        (
+            "reanalysis-era5-single-levels",
+            [
+                {
+                    "req_id": "f3b5914b-49fa-46f7-a6bd-d89fddffdbbb",
+                    "success": True,
+                    "started_at": "2025-03-19T19:39:56.828625",
+                    "finished_at": "2025-03-19T19:40:15.106225",
+                },
+                {
+                    "req_id": "92c27e00-80ee-4da7-aedd-31488ac42043",
+                    "success": True,
+                    "started_at": "2025-03-19T18:53:53.507966",
+                    "finished_at": "2025-03-19T18:54:03.414561",
+                },
+                {
+                    "req_id": "eeb76ad4-6996-4ecb-a656-066e80aad563",
+                    "success": True,
+                    "started_at": "2025-03-19T17:00:46.057012",
+                    "finished_at": "2025-03-19T17:02:06.406081",
+                },
+            ],
+        ),
+        (
+            "satellite-surface-radiation-budget",
+            [
+                {
+                    "req_id": "fd602e81-b6bd-40a1-bf8d-0e1935af939b",
+                    "success": True,
+                    "started_at": "2025-03-19T20:05:01.792501",
+                    "finished_at": "2025-03-19T20:05:15.315782",
+                },
+                {
+                    "req_id": "97d99926-6d5d-4e12-8e36-2eabfa60336c",
+                    "success": True,
+                    "started_at": "2025-03-19T19:08:29.676061",
+                    "finished_at": "2025-03-19T19:08:39.442759",
+                },
+                {
+                    "req_id": "8dd93631-90ab-430b-b88a-f993b08853f5",
+                    "success": True,
+                    "started_at": "2025-03-19T18:30:50.014885",
+                    "finished_at": "2025-03-19T18:30:58.115110",
+                },
+            ],
+        ),
+    ]
+    with session_obj() as session:
+        effective_db = session.execute(
+            sa.select(
+                database.Resource.resource_uid, database.Resource.sanity_check
+            ).order_by(database.Resource.resource_uid)
+        ).all()
+        assert effective_db == expected_db
+
+    # running the test with retain=1
+    expected_2 = expected_db[:2] + [(d[0], d[1][:1]) for d in expected_db[2:]]  # type: ignore
+    report_path = os.path.join(TESTDATA_PATH, "reports.json")
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-sanity-check",
+            report_path,
+            "--connection-string",
+            connection_string,
+            "--retain-only",
+            "1",
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    with session_obj() as session:
+        effective_db = session.execute(
+            sa.select(
+                database.Resource.resource_uid, database.Resource.sanity_check
+            ).order_by(database.Resource.resource_uid)
+        ).all()
+        assert effective_db == expected_2
+
+    # running the test with retain=-1
+    expected_3 = expected_db[:2] + [(d[0], [d[1][0]] + d[1]) for d in expected_db[2:]]  # type: ignore
+    report_path = os.path.join(TESTDATA_PATH, "reports.json")
+    result = runner.invoke(
+        entry_points.app,
+        [
+            "update-sanity-check",
+            report_path,
+            "--connection-string",
+            connection_string,
+            "--retain-only",
+            "-1",
+        ],
+        env={
+            "OBJECT_STORAGE_URL": object_storage_url,
+            "DOCUMENT_STORAGE_URL": doc_storage_url,
+            "STORAGE_ADMIN": object_storage_kws["aws_access_key_id"],
+            "STORAGE_PASSWORD": object_storage_kws["aws_secret_access_key"],
+            "CATALOGUE_BUCKET": bucket_name,
+        },
+    )
+    assert result.exit_code == 0
+    with session_obj() as session:
+        effective_db = session.execute(
+            sa.select(
+                database.Resource.resource_uid, database.Resource.sanity_check
+            ).order_by(database.Resource.resource_uid)
+        ).all()
+        assert effective_db == expected_3
