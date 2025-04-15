@@ -1007,7 +1007,7 @@ def update_dataset_sanity_check(session_obj, dataset_uid, report, retain_only):
             )
             return
         old_sanity_check = dataset_obj.sanity_check or []
-        new_sanity_check = old_sanity_check.append(current_sanity_check)
+        new_sanity_check = old_sanity_check + [current_sanity_check]
         # note: sorting works with string if datetimes use isoformat!
         new_sanity_check = sorted(
             new_sanity_check, key=itemgetter("started_at"), reverse=True
@@ -1054,8 +1054,8 @@ def update_sanity_checks_by_file(session_obj, report_path, retain_only):
 
 def run_sanity_check(session_obj, retain_only, **kwargs):
     """Run e2e sanity checks and store outcomes."""
-    if "requests_path" in kwargs and kwargs["requests_path"] is not None:
-        requests_path = kwargs.pop("requests_path")
+    requests_path = kwargs.pop("requests_path", None)
+    if requests_path is not None:
         with open(requests_path, "r") as fp:
             kwargs["requests"] = cads_e2e_tests.models.load_requests(fp)
     else:
