@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/schemas/sanity_check_item",
+  "title": "CADS catalogue API",
+  "description": "Description of the CADS catalogue API for obtaining the list of datasets",
+  "type": "object",
+  "properties": {
+    "req_id": {
+      "description": "The request uid of the test",
+      "type": "string"
+    },
+    "success": {
+      "description": "True if the test is successful",
+      "type": "boolean"
+    },
+    "started_at": {
+      "description": "ISO format of the date and time of the start of the test",
+      "type": "string"
+    },
+    "finished_at": {
+      "description": "ISO format of the date and time of the end of the test",
+      "type": "string"
+    }
+  },
+  "required": ["req_id", "success", "started_at", "finished_at"]
+}
