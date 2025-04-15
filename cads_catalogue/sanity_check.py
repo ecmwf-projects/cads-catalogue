@@ -35,7 +35,7 @@ except ImportError:
     #  cads-e2e-tests not wanted in retrieve-api, it cannot process sanity checks
     pass
 
-SCHEMA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "schemas")
+SCHEMA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "schemas")
 
 ref_mapping = {}
 for schema_def in ("sanity_check", "sanity_check_item"):
