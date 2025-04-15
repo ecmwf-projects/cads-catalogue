@@ -33,6 +33,7 @@ from cads_catalogue import (
     manager,
     messages,
     repos,
+    sanity_check,
     skipping_utils,
     validations,
 )
@@ -474,7 +475,7 @@ def run_sanity_check(
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
     logger.info("start running sanity check.")
-    manager.run_sanity_check(
+    sanity_check.run_sanity_check(
         session_obj,
         retain_only,
         url=url,
@@ -520,7 +521,7 @@ def update_sanity_check(
         return
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
-    manager.update_sanity_checks_by_file(session_obj, report_path, retain_only)
+    sanity_check.update_sanity_checks_by_file(session_obj, report_path, retain_only)
     logger.info("db update of sanity check information completed.")
 
 

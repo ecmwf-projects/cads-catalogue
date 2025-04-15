@@ -25,6 +25,7 @@ dependencies:
   - boto3-stubs
   - pytest-postgresql
   - sqlalchemy[mypy]
+  - types-jsonschema
   - types-Markdown
   - types-PyYAML
   - types-sqlalchemy-utils

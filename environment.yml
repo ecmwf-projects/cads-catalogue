@@ -10,6 +10,7 @@ dependencies:
 - alembic
 - boto3
 - gitpython
+- jsonschema
 - psycopg2
 - python-frontmatter
 - sqlalchemy>=2.0.9
