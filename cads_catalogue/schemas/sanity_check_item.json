@@ -7,7 +7,8 @@
   "properties": {
     "req_id": {
       "description": "The request uid of the test",
-      "type": "string"
+      "type": "string",
+      "format": "uuid"
     },
     "success": {
       "description": "True if the test is successful",
@@ -15,11 +16,13 @@
     },
     "started_at": {
       "description": "ISO format of the date and time of the start of the test",
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     },
     "finished_at": {
       "description": "ISO format of the date and time of the end of the test",
-      "type": "string"
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": ["req_id", "success", "started_at", "finished_at"]

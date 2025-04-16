@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import json
 import os
 from collections import defaultdict
@@ -25,7 +26,7 @@ import sqlalchemy as sa
 import structlog
 import typer
 
-from cads_catalogue import database
+from cads_catalogue import database, utils
 
 logger = structlog.get_logger(__name__)
 
@@ -36,6 +37,8 @@ except ImportError:
     pass
 
 SCHEMA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "schemas")
+
+format_checking = jsonschema.FormatChecker(formats=["date", "date-time", "uuid"])
 
 ref_mapping = {}
 for schema_def in ("sanity_check", "sanity_check_item"):
@@ -52,10 +55,12 @@ SanityCheckItemValidator = jsonschema.validators.validator_for(
 sanity_check_validator = SanityCheckValidator(
     schema=ref_mapping["/schemas/sanity_check"],
     resolver=jsonschema.RefResolver("", {}, store=ref_mapping),
+    format_checker=format_checking,
 )
 sanity_check_item_validator = SanityCheckItemValidator(
     schema=ref_mapping["/schemas/sanity_check_item"],
     resolver=jsonschema.RefResolver("", {}, store=ref_mapping),
+    format_checker=format_checking,
 )
 
 
@@ -77,6 +82,17 @@ def echo_passed_vs_failed(reports: list[cads_e2e_tests.Report]) -> None:
             typer.secho(f"PASSED: {passed} ({passed_perc:.1f}%)", fg=typer.colors.GREEN)
 
 
+def sanitize_datetimes(sanity_check):
+    """Return a sanity_check item with iso dates with timezone."""
+    # in the long run this function will become legacy
+    ret_value = sanity_check.copy()
+    for key in ("started_at", "finished_at"):
+        time_obj = datetime.datetime.fromisoformat(sanity_check[key])
+        if time_obj.tzinfo is None:
+            ret_value[key] = time_obj.replace(tzinfo=datetime.timezone.utc).isoformat()
+    return ret_value
+
+
 def report2sanity_check(report: cads_e2e_tests.Report) -> dict[str, Any]:
     """Return a sanity check information from a cads-e2e-tests's report."""
     sanity_check = {
@@ -85,6 +101,7 @@ def report2sanity_check(report: cads_e2e_tests.Report) -> dict[str, Any]:
         "started_at": report.started_at.isoformat(),
         "finished_at": report.finished_at.isoformat(),
     }
+    sanity_check = sanitize_datetimes(sanity_check)
     sanity_check_item_validator.validate(
         sanity_check, ref_mapping["/schemas/sanity_check_item"]
     )
@@ -110,7 +127,9 @@ def update_dataset_sanity_check(
             )
             return
         old_sanity_check = dataset_obj.sanity_check or []
-        new_sanity_check = old_sanity_check + [current_sanity_check]
+        new_sanity_check = [sanitize_datetimes(s) for s in old_sanity_check] + [
+            current_sanity_check
+        ]
         # note: sorting works with string if datetimes use isoformat!
         new_sanity_check = sorted(
             new_sanity_check, key=itemgetter("started_at"), reverse=True
@@ -141,9 +160,8 @@ def update_sanity_checks_by_file(
                 additional_sanity_checks = dashboard_dict.pop(dataset.resource_uid)
                 old_sanity_check = dataset.sanity_check or []
                 new_sanity_check = old_sanity_check + additional_sanity_checks
-                # note: sorting works with string if datetimes use isoformat!
-                new_sanity_check = sorted(
-                    new_sanity_check, key=itemgetter("started_at"), reverse=True
+                new_sanity_check = utils.sorted_by_isoformats(
+                    new_sanity_check, time_key="started_at", reverse=True
                 )
                 if retain_only > 0:
                     new_sanity_check = new_sanity_check[:retain_only]
