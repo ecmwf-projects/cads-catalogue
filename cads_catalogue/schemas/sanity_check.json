@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "/schemas/sanity_check",
+  "type": "array",
+  "description": "list of sanity check outcomes on a dataset",
+  "items": {
+    "type": "object",
+    "allOf": [
+      {
+        "$ref": "/schemas/sanity_check_item"
+      }
+    ]
+  },
+  "uniqueItems": true
+}

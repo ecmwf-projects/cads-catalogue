@@ -10,8 +10,10 @@ dependencies:
 - alembic
 - boto3
 - gitpython
+- jsonschema
 - psycopg2
 - python-frontmatter
+- rfc3339-validator
 - sqlalchemy>=2.0.9
 - sqlalchemy-utils
 - structlog

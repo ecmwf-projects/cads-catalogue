@@ -15,14 +15,13 @@
 # limitations under the License.
 
 import os.path
-from collections import defaultdict
-from operator import itemgetter
 from typing import Any, Dict, List, Optional
 
 import cads_common.logging
 import sqlalchemy as sa
 import structlog
 import typer
+from typer import Option
 from typing_extensions import Annotated
 
 from cads_catalogue import (
@@ -34,6 +33,7 @@ from cads_catalogue import (
     manager,
     messages,
     repos,
+    sanity_check,
     skipping_utils,
     validations,
 )
@@ -399,12 +399,110 @@ def update_catalogue(
 
 
 @app.command()
+def run_sanity_check(
+    connection_string: Annotated[
+        Optional[str], Option(help="db connection string")
+    ] = None,
+    retain_only: Annotated[
+        int, typer.Option(help="max number of outcomes to store")
+    ] = DEFAULT_RETAIN_SANITY_CHECKS,
+    url: Annotated[Optional[str], Option(help="API url")] = None,  # noqa: UP007
+    key: Annotated[list[str], Option(help="API key(s)")] = [],
+    requests_path: Annotated[
+        Optional[str],  # noqa: UP007
+        Option(
+            help="Path to the YAML file with requests to test",
+            show_default="random requests",
+        ),
+    ] = None,
+    invalidate_cache: Annotated[
+        bool,
+        Option(help="Whether to invalidate the cache"),
+    ] = True,
+    n_jobs: Annotated[
+        int,
+        Option(help="Number of concurrent requests"),
+    ] = 1,
+    verbose: Annotated[
+        int,
+        Option(help="The verbosity level of joblib"),
+    ] = 10,
+    log_level: Annotated[
+        str,
+        Option(help="Set the root logger level to the specified level"),
+    ] = "INFO",
+    regex_pattern: Annotated[
+        str,
+        Option(help="Regex pattern used to filter collection IDs"),
+    ] = r"^(?!test-|provider-).*(?<!-complete)$",
+    download: Annotated[
+        bool,
+        Option(help="Whether to download the results"),
+    ] = True,
+    cache_key: Annotated[
+        str,
+        Option(help="Key used to invalidate the cache"),
+    ] = "_no_cache",
+    n_repeats: Annotated[
+        int,
+        Option(
+            help="Number of times to repeat each request (random requests are regenerated)"
+        ),
+    ] = 1,
+    cyclic: Annotated[
+        bool,
+        Option(
+            help="Whether to repeat requests cyclically ([1, 2, 1, 2]) or not ([1, 1, 2, 2])"
+        ),
+    ] = True,
+    randomise: Annotated[
+        bool,
+        Option(help="Whether to randomise the order of the requests"),
+    ] = False,
+    max_runtime: Annotated[
+        float | None,
+        Option(help="Maximum time (in seconds) each request is allowed to run"),
+    ] = None,
+    datapi_maximum_tries: Annotated[
+        int,
+        Option(help="Maximum number of retries"),
+    ] = 1,
+) -> None:
+    """Run e2e sanity checks and store outcomes."""
+    if not connection_string:
+        dbsettings = config.ensure_settings(config.dbsettings)
+        connection_string = dbsettings.connection_string
+    engine = sa.create_engine(connection_string)
+    session_obj = sa.orm.sessionmaker(engine)
+    logger.info("start running sanity check.")
+    sanity_check.run_sanity_check(
+        session_obj,
+        retain_only,
+        url=url,
+        keys=key,
+        requests_path=requests_path,
+        cache_key=cache_key if invalidate_cache else None,
+        n_jobs=n_jobs,
+        verbose=verbose,
+        regex_pattern=regex_pattern,
+        download=download,
+        n_repeats=n_repeats,
+        cyclic=cyclic,
+        randomise=randomise,
+        max_runtime=max_runtime,
+        log_level=log_level,
+        maximum_tries=datapi_maximum_tries,
+    )
+    logger.info("sanity check process completed.")
+
+
+@app.command()
 def update_sanity_check(
     report_path: str,
     connection_string: Optional[str] = None,
     retain_only: int = DEFAULT_RETAIN_SANITY_CHECKS,
-):
-    """Update database from sanity check report file.
+) -> None:
+    """Update database from a sanity check report file.
 
     Parameters
     ----------
@@ -412,9 +510,6 @@ def update_sanity_check(
     :param connection_string: something like 'postgresql://user:password@netloc:port/dbname'
     :param retain_only: number of most recent sanity check info to retain (use negative number for no limit)
     """
-    # import here because cads-e2e-tests not wanted in retrieve-api
-    import cads_e2e_tests  # type: ignore
-
     cads_common.logging.structlog_configure()
     cads_common.logging.logging_configure()
     logger.info("start running db update of sanity check information.")
@@ -424,44 +519,9 @@ def update_sanity_check(
     if not os.path.isfile(report_path):
         logger.error(f"{report_path} not found! No update of sanity check information.")
         return
-    with open(report_path) as fp:
-        reports = cads_e2e_tests.load_reports(fp)
-    dashboard_dict: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
-    for report in reports:
-        dashboard_dict[report.request.collection_id].append(
-            {
-                "req_id": report.request_uid,
-                "success": not report.tracebacks,
-                "started_at": report.started_at.isoformat(),
-                "finished_at": report.finished_at.isoformat(),
-            }
-        )
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
-    with session_obj.begin() as session:
-        all_datasets = session.scalars(sa.select(database.Resource)).all()
-        for dataset in all_datasets:
-            if dataset.resource_uid in dashboard_dict:
-                additional_sanity_checks = dashboard_dict.pop(dataset.resource_uid)
-                old_sanity_check = dataset.sanity_check or []
-                new_sanity_check = old_sanity_check + additional_sanity_checks
-                # note: sorting works with string if datetimes use isoformat!
-                new_sanity_check = sorted(
-                    new_sanity_check, key=itemgetter("started_at"), reverse=True
-                )
-                if retain_only > 0:
-                    new_sanity_check = new_sanity_check[:retain_only]
-                dataset.sanity_check = new_sanity_check
-                session.add(dataset)
-            else:
-                logger.warning(
-                    f"dataset {dataset.resource_uid} not included in this sanity check report"
-                )
-    for dataset_uid in dashboard_dict:
-        logger.error(
-            f"dataset uid {dataset_uid!r} in sanity check report was "
-            f"not found in the catalogue database!"
-        )
+    sanity_check.update_sanity_checks_by_file(session_obj, report_path, retain_only)
     logger.info("db update of sanity check information completed.")
 
 

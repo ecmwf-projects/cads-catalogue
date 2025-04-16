@@ -279,3 +279,32 @@ def superscript_text(text: str) -> str:
     super_s = "ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾQᴿˢᵀᵁⱽᵂˣʸᶻᵃᵇᶜᵈᵉᶠᵍʰᶦʲᵏˡᵐⁿᵒᵖ۹ʳˢᵗᵘᵛʷˣʸᶻ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾"
     res = text.maketrans("".join(normal), "".join(super_s))
     return text.translate(res)
+
+
+def sorted_by_isoformats(
+    thelist: list[Any],
+    time_attr: str | None = None,
+    time_key: str | None = None,
+    reverse: bool = False,
+) -> list[Any]:
+    """Return thelist sorted by an isoformatted datetimes attribute or key."""
+
+    def isodate_sort_key(date_str) -> datetime.datetime:
+        date_obj = datetime.datetime.fromisoformat(date_str)
+        if date_obj.tzinfo is None:
+            date_obj = date_obj.replace(tzinfo=datetime.timezone.utc)
+        return date_obj
+
+    if time_attr and time_key:
+        ValueError("cannot specify both time_attr and time_key")
+    if time_attr:
+        return sorted(
+            thelist,
+            key=lambda i: isodate_sort_key(getattr(i, time_attr)),
+            reverse=reverse,
+        )
+    if time_key:
+        return sorted(
+            thelist, key=lambda i: isodate_sort_key(i[time_key]), reverse=reverse
+        )
+    raise ValueError("must specify one between time_attr and time_key")
