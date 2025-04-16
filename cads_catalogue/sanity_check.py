@@ -183,7 +183,7 @@ def run_sanity_check(session_obj: sa.orm.sessionmaker, retain_only: int, **kwarg
     requests_path: str | None = kwargs.pop("requests_path", None)
     if requests_path is not None:
         with open(requests_path, "r") as fp:
-            kwargs["requests"] = cads_e2e_tests.models.load_requests(fp)
+            kwargs["requests"] = cads_e2e_tests.load_requests(fp)
     else:
         kwargs["requests"] = None
     reports = []
