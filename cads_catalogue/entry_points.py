@@ -47,6 +47,8 @@ PACKAGE_DIR = os.path.abspath(
     )
 )
 DEFAULT_RETAIN_SANITY_CHECKS = 10
+
+
 app = typer.Typer()
 logger = structlog.get_logger(__name__)
 
@@ -72,33 +74,39 @@ def validate_licences(licences_folder_path: str) -> None:
 
 
 @app.command()
-def validate_dataset(resource_folder_path: str) -> None:
+def validate_dataset(
+    resource_folder_path: str,
+    loglevel: validations.ValidationLogLevel = validations.ValidationLogLevel.info,
+) -> None:
     """
     Validate a dataset folder for the catalogue manager.
 
     Parameters
     ----------
     resource_folder_path: dataset folder path
+    loglevel: minimum log level to show on screen
     """
-    cads_common.logging.logging_configure(format="%(levelname)-7s %(message)s")
     if not os.path.isdir(resource_folder_path):
         raise ValueError("%r is not a folder" % resource_folder_path)
-    validations.validate_dataset(resource_folder_path)
+    validations.validate_dataset(resource_folder_path, loglevel=loglevel.value)
 
 
 @app.command()
-def validate_datasets(resources_folder_path: str) -> None:
+def validate_datasets(
+    resources_folder_path: str,
+    loglevel: validations.ValidationLogLevel = validations.ValidationLogLevel.info,
+) -> None:
     """
     Explore and report subfolders to validate contents as valid datasets for the catalogue manager.
 
     Parameters
     ----------
     resources_folder_path: the root folder where to search dataset subfolders in
+    loglevel: minimum log level to show on screen
     """
-    cads_common.logging.logging_configure(format="%(levelname)-7s %(message)s")
     if not os.path.isdir(resources_folder_path):
         raise ValueError("%r is not a folder" % resources_folder_path)
-    validations.validate_datasets(resources_folder_path)
+    validations.validate_datasets(resources_folder_path, loglevel=loglevel.value)
 
 
 @app.command()
