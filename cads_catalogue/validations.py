@@ -15,15 +15,48 @@
 # limitations under the License.
 
 import datetime
+import enum
 import glob
 import json
 import logging
 import os
 from typing import Any
 
+import cads_common.logging
+
 from cads_catalogue import layout_manager, utils
 
 logger = logging.getLogger(__name__)
+
+
+class ValidationLogLevel(str, enum.Enum):
+    """Log level string."""
+
+    info = "info"
+    warning = "warning"
+    error = "error"
+
+
+def is_parsable_as_date(value, pattern="%Y-%m-%d", allow_none=True):
+    """Return true only if a value is parsable as a valid date."""
+    if allow_none and value is None:
+        return True
+    try:
+        datetime.datetime.strptime(value, pattern)
+    except:  # noqa
+        return False
+    return True
+
+
+def is_parsable_as_bool(value):
+    """Return true only if a value is parsable as a valid boolean."""
+    if isinstance(value, bool):
+        return True
+    try:
+        utils.str2bool(value)
+    except:  # noqa
+        return False
+    return True
 
 
 def check_values(input_obj, values_to_exclude=[]):
@@ -160,16 +193,17 @@ def validate_constraints(dataset_folder):
     """Validate constraints.json of a dataset."""
     file_name = "constraints.json"
     data = validate_base_json(dataset_folder, file_name)
-    if not data:
+    if not data:  # file not existing or not parsable
         return
     check_values(data, values_to_exclude=[None])
+    return data
 
 
 def validate_form(dataset_folder):
     """Validate form.json of a dataset."""
     file_name = "form.json"
     data = validate_base_json(dataset_folder, file_name)
-    if not data:
+    if not data:  # file not existing or not parsable
         return
     # validators_map = {
     #     # widget type: validator function,
@@ -185,7 +219,7 @@ def validate_layout(dataset_folder):
     """Validate layout.json of a dataset."""
     file_name = "layout.json"
     layout_data = validate_base_json(dataset_folder, file_name)
-    if not os.path.isfile(os.path.join(dataset_folder, file_name)):
+    if not layout_data:  # file not existing or not parsable
         return
     # validate for images
     try:
@@ -203,14 +237,14 @@ def validate_layout(dataset_folder):
 def validate_mapping(dataset_folder):
     """Validate mapping.json of a dataset."""
     file_name = "mapping.json"
-    validate_base_json(dataset_folder, file_name, required=False)
+    return validate_base_json(dataset_folder, file_name, required=False)
 
 
 def validate_metadata_json(dataset_folder):
     """Validate metadata.json of a dataset."""
     file_name = "metadata.json"
     data = validate_base_json(dataset_folder, file_name)
-    if not os.path.isfile(os.path.join(dataset_folder, file_name)):
+    if not data:  # file not existing or not parsable
         return
     metadata = dict()
     required_fields = ["abstract", "resource_type", "title"]
@@ -228,9 +262,10 @@ def validate_metadata_json(dataset_folder):
         "contactemail",
         "data_type",
         "description",
+        "disabled_reason",
         "doi",
         "ds_contactemail",
-        "ds_responsible_individual",
+        # "ds_responsible_individual",  # usually present, but not stored/showed anywhere
         "ds_responsible_organisation",
         "ds_responsible_organisation_role",
         "end_date",
@@ -238,16 +273,18 @@ def validate_metadata_json(dataset_folder):
         "format_version",
         "high_priority_terms",
         "hidden",
-        "inspire_theme",
+        # "inspire_theme",  # usually present, but not stored/showed anywhere
         "keywords",
         "licences",
         "lineage",
+        "popularity",
         "portal",
         "publication_date",
+        "qa_flag",
         "qos_tags",
         "related_resources_keywords",
         "representative_fraction",
-        "responsible_individual",
+        # "responsible_individual", # usually present, but not stored/showed anywhere
         "responsible_organisation",
         "responsible_organisation_role",
         "responsible_organisation_website",
@@ -256,38 +293,36 @@ def validate_metadata_json(dataset_folder):
         "update_date",
         "use_limitation",
     ]
+    # suggest to insert a value for missing/None fields:
     for optional_field in optional_fields:
         if optional_field not in data or data.get(optional_field) is None:
-            if optional_field in ("publication_date", "resource_update"):
-                logger.warning(
-                    f"optional field not found or empty: '{optional_field}', "
-                    f"strongly suggested to include a value"
-                )
-            else:
-                logger.info(
-                    f"optional field not found or empty: '{optional_field}', "
-                    f"consider to include a value"
-                )
+            logger.info(
+                f"optional field not found or empty: '{optional_field}', "
+                f"consider to include a value"
+            )
 
+    # notify extra fields not stored
     extra_fields = sorted(
         set(data.keys()) - set(required_fields).union(set(optional_fields))
     )
     for extra_field in extra_fields:
         logger.warning(f"field currently ignored: '{extra_field}'")
 
-    date_fields = ["begin_date", "end_date", "publication_date"]
+    # check date fields
+    date_fields = ["begin_date", "publication_date", "update_date"]
     for date_field in date_fields:
         value = data.get(date_field)
-        if value:
-            try:
-                datetime.datetime.strptime(value, "%Y-%m-%d")
-            except:  # noqa
-                if date_field == "end_date" and value == "now":
-                    continue
-                logger.error(
-                    f"value '{value}' not parsable as a valid date: use format YYYY-MM-DD"
-                )
+        if not is_parsable_as_date(value):
+            logger.error(
+                f"value '{value}' not parsable as a valid {date_field}: use format YYYY-MM-DD"
+            )
+    end_date = data.get("end_date")
+    if not is_parsable_as_date(end_date) and end_date != "now":
+        logger.error(
+            f"value '{value}' not parsable as a valid end_date: use format YYYY-MM-DD"
+        )
 
+    # validate description
     try:
         for key, value in data.get("description", dict()).items():
             _ = {
@@ -296,8 +331,9 @@ def validate_metadata_json(dataset_folder):
                 "value": value,
             }
     except:  # noqa
-        logger.exception("field description not compliant")
+        logger.exception("field 'description' not compliant")
 
+    # validate bbox
     bboxes = ("bboxN", "bboxS", "bboxE", "bboxW")
     if not [data.get(box) for box in bboxes] == [None] * 4:
         try:
@@ -308,13 +344,13 @@ def validate_metadata_json(dataset_folder):
         except (TypeError, ValueError):
             logger.exception("bbox not compliant")
 
-    if "hidden" in data:
-        if not isinstance(data["hidden"], bool):
-            try:
-                utils.str2bool(data["hidden"])
-            except:  # noqa
-                logger.exception("field 'hidden' not compliant")
+    # validate booleans
+    boolean_fields = ["api_enforce_constraints", "hidden", "qa_flag"]
+    for bool_field in boolean_fields:
+        if bool_field in data and not is_parsable_as_bool(data[bool_field]):
+            logger.exception(f"field '{bool_field}' not compliant")
 
+    # validate keywords
     keywords = data.get("keywords")
     kw_args = []
     if keywords:
@@ -326,16 +362,35 @@ def validate_metadata_json(dataset_folder):
     # at least 1 "Product type" must be present in keywords
     if "Product type" not in kw_args:
         logger.warning("'Product type' not present among the keywords")
+
+    # validate list of strings
+    for field in ["licences", "qos_tags", "related_resources_keywords"]:
+        field_value = data.get(field)
+        if field_value and not isinstance(field_value, (list, tuple)):
+            logger.exception(f"field '{field}' must be parsable as a list of strings")
+
+    # validate strings
+    string_fields = ["disabled_reason", "high_priority_terms"]
+    for string_field in string_fields:
+        string_value = data.get(string_field) or ""
+        if not isinstance(string_value, str):
+            logger.exception(f"field '{string_field}' must be a string")
+
+    # validate popularity
+    try:
+        int(data.get("popularity", 1))
+    except (ValueError, TypeError):
+        logger.exception("field 'popularity' must be an integer")
     return metadata
 
 
 def validate_variables(dataset_folder):
     """Validate variables.json of a dataset."""
     file_name = "variables.json"
-    validate_base_json(dataset_folder, file_name, required=False)
+    return validate_base_json(dataset_folder, file_name, required=False)
 
 
-def validate_dataset(dataset_folder: str) -> None:
+def validate_dataset(dataset_folder: str, loglevel: str | None = "info") -> None:
     """
     Validate a dataset folder for the catalogue manager.
 
@@ -343,8 +398,14 @@ def validate_dataset(dataset_folder: str) -> None:
     ----------
     dataset_folder: dataset folder path
     """
+    if loglevel is None:
+        cads_common.logging.logging_configure(format="%(levelname)-7s %(message)s")
+    else:
+        cads_common.logging.logging_configure(
+            format="%(levelname)-7s %(message)s", level=loglevel.upper()
+        )
     resource_uid = os.path.basename(dataset_folder.rstrip(os.sep))
-    logger.info(f"---starting validation of resource {resource_uid}---")
+    print(f"---starting validation of resource {resource_uid}---")
     # for all validators, input folder is the folder where metadata.json is located
     input_folder = os.path.join(dataset_folder, "json-config")
     if not os.path.isfile(os.path.join(input_folder, "metadata.json")):
@@ -365,25 +426,28 @@ def validate_dataset(dataset_folder: str) -> None:
             logger.exception(
                 f"unexpected error running {validator.__name__}. Error follows."
             )
-    logger.info(f"---end validation of folder {dataset_folder}---")
+    print()
 
 
-def validate_datasets(datasets_folder: str) -> None:
+def validate_datasets(datasets_folder: str, loglevel: str = "info") -> None:
     """
     Explore and report subfolders to validate contents as valid datasets for the catalogue manager.
 
     Parameters
     ----------
     datasets_folder: the root folder where to search dataset subfolders in
+    loglevel: minimum log level to show on screen
     """
+    cads_common.logging.logging_configure(
+        format="%(levelname)-7s %(message)s", level=loglevel.upper()
+    )
     exclude_folders = (".git",)
-    logger.info(f"----starting validations of root folder {datasets_folder}----")
+    print(f"----starting validations of root folder {datasets_folder}----")
     # load metadata of each resource from files and sync each resource in the db
     for dataset_folder in sorted(glob.glob(os.path.join(datasets_folder, "*/"))):
         resource_uid = os.path.basename(dataset_folder.rstrip(os.sep))
         if resource_uid in exclude_folders:
             logger.debug(f"excluding folder {resource_uid}")
             continue
-        validate_dataset(dataset_folder)
-        print()
-    logger.info("----end of validations----")
+        validate_dataset(dataset_folder, loglevel=None)
+    print("----end of validations----")
