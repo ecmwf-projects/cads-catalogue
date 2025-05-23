@@ -296,14 +296,17 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
             metadata["hidden"]: bool = utils.str2bool(data["hidden"])  # type: ignore
     else:
         metadata["hidden"] = False  # type: ignore
-    metadata["high_priority_terms"] = data.get("high_priority_terms", "")
+    metadata["high_priority_terms"] = data.get("high_priority_terms", "") or ""
+    # metadata["inspire_theme"] = data.get(
+    #     "inspire_theme", "Meteorological geographical features"
+    # )
     metadata["keywords"] = data.get("keywords", [])
 
     # NOTE: licence_uids is for relationship, not a db field
-    metadata["licence_uids"] = data.get("licences", [])
+    metadata["licence_uids"] = data.get("licences", []) or []
 
     metadata["lineage"] = data.get("lineage")
-    metadata["popularity"] = data.get("popularity", 1)
+    metadata["popularity"] = int(data.get("popularity", 1))
     default_public_date = "2017-01-01"
     metadata["publication_date"] = data.get("publication_date")
     if not metadata["publication_date"]:
@@ -312,8 +315,10 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
         )
         metadata["publication_date"] = default_public_date
     metadata["qa_flag"] = data.get("qa_flag", True)
-    metadata["qos_tags"] = data.get("qos_tags", [])
-    metadata["related_resources_keywords"] = data.get("related_resources_keywords", [])
+    metadata["qos_tags"] = data.get("qos_tags", []) or []
+    metadata["related_resources_keywords"] = (
+        data.get("related_resources_keywords", []) or []
+    )
 
     metadata["representative_fraction"] = data.get("representative_fraction")
     metadata["responsible_organisation"] = data.get("responsible_organisation")
