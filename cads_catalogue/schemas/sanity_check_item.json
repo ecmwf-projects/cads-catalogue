@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "/schemas/sanity_check_item",
-  "title": "CADS catalogue API",
-  "description": "Description of the CADS catalogue API for obtaining the list of datasets",
+  "title": "Sanity check outcome on a dataset",
+  "description": "Details about the outcome of a single sanity check on a dataset",
   "type": "object",
   "properties": {
     "req_id": {
