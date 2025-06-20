@@ -471,7 +471,7 @@ def run_sanity_check(
         float | None,
         Option(help="Maximum time (in seconds) each request is allowed to run"),
     ] = None,
-    datapi_maximum_tries: Annotated[
+    client_maximum_tries: Annotated[
         int,
         Option(help="Maximum number of retries"),
     ] = 1,
@@ -499,7 +499,7 @@ def run_sanity_check(
         randomise=randomise,
         max_runtime=max_runtime,
         log_level=log_level,
-        maximum_tries=datapi_maximum_tries,
+        maximum_tries=client_maximum_tries,
     )
     logger.info("sanity check process completed.")
 
