@@ -104,9 +104,7 @@ def report2sanity_check(report: cads_e2e_tests.Report) -> dict[str, Any]:
         "finished_at": report.finished_at.isoformat(),
     }
     sanity_check = sanitize_datetimes(sanity_check)
-    sanity_check_item_validator.validate(
-        sanity_check, ref_mapping["/schemas/sanity_check_item"]
-    )
+    sanity_check_item_validator.validate(sanity_check)
     return sanity_check
 
 
@@ -138,9 +136,7 @@ def update_dataset_sanity_check(
         )
         if retain_only > 0:
             new_sanity_check = new_sanity_check[:retain_only]
-        sanity_check_validator.validate(
-            new_sanity_check, ref_mapping["/schemas/sanity_check"]
-        )
+        sanity_check_validator.validate(new_sanity_check)
         dataset_obj.sanity_check = new_sanity_check
         session.add(dataset_obj)
     logger.info(f"sanity check information updated for {dataset_uid!r}.")
