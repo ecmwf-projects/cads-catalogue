@@ -29,7 +29,7 @@ from cads_catalogue import layout_manager, utils
 logger = logging.getLogger(__name__)
 
 
-class ValidationLogLevel(str, enum.Enum):
+class ValidationLogLevel(enum.Enum):
     """Log level string."""
 
     info = "info"
@@ -363,7 +363,7 @@ def validate_metadata_json(dataset_folder):
     if "Product type" not in kw_args:
         logger.warning("'Product type' not present among the keywords")
 
-    # validate list of strings
+    # validate field that is a list of strings
     for field in ["licences", "qos_tags", "related_resources_keywords"]:
         field_value = data.get(field)
         if field_value and not isinstance(field_value, (list, tuple)):
