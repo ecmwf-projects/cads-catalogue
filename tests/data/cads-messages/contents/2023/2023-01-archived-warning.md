@@ -1,6 +1,7 @@
 ---
 date: 2023-01-11T11:27:13Z
 live: false
+show_date: false
 severity: warning
 entries: reanalysis-era5-xxx,satellite-surface-radiation-budget
 ---

@@ -231,6 +231,7 @@ class Message(BaseModel):
     content = sa.Column(sa.String)
     is_global = sa.Column(sa.Boolean)
     live = sa.Column(sa.Boolean)
+    show_date = sa.Column(sa.Boolean, default=True)
 
     resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
         "Resource",

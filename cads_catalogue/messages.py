@@ -110,6 +110,7 @@ def md2message_record(msg_path, msg_uid, **record_attrs) -> dict[str, Any]:
         "summary": md_obj.get("summary"),
         "severity": md_obj.get("severity", "info"),
         "live": md_obj.get("live", "false"),
+        "show_date": md_obj.get("show_date", "true"),
         "content": md_obj.content.strip(),
         # this is not a db field
         "entries": [e.strip() for e in md_obj.get("entries", "").split(",")],
