@@ -366,11 +366,11 @@ class Resource(BaseModel):
         result = session.query(exists_query).scalar()
         return result
 
-    @has_adaptor_costing.expression
-    def has_adaptor_costing(cls):
+    @has_adaptor_costing.expression  # type: ignore[no-redef]
+    def has_adaptor_costing(self):
         return sa.exists().where(
             sa.and_(
-                ResourceData.resource_uid == cls.resource_uid,
+                ResourceData.resource_uid == self.resource_uid,
                 ResourceData.adaptor_configuration.op("?")("costing"),
             )
         )
