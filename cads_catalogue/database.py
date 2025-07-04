@@ -377,7 +377,7 @@ class Resource(BaseModel):
 
     # relationship attributes
     resource_data = sa.orm.relationship(
-        ResourceData, uselist=False, back_populates="resource", lazy="select"
+        ResourceData, uselist=False, back_populates="resource", lazy="noload"
     )
 
     licences: sa.orm.Mapped[List["Licence"]] = sa.orm.relationship(
