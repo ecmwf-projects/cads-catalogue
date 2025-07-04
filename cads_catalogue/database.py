@@ -351,6 +351,30 @@ class Resource(BaseModel):
             persisted=True,
         ),
     )
+
+    @sa.ext.hybrid.hybrid_property
+    def has_adaptor_costing(self):
+        """Verificy is costing is defined in adaptor json."""
+        session = sa.orm.object_session(self)
+        exists_query = sa.exists().where(
+            sa.and_(
+                ResourceData.resource_uid == self.resource_uid,
+                ResourceData.adaptor_configuration.op("?")("costing"),
+            )
+        )
+
+        result = session.query(exists_query).scalar()
+        return result
+
+    @has_adaptor_costing.expression
+    def has_adaptor_costing(cls):
+        return sa.exists().where(
+            sa.and_(
+                ResourceData.resource_uid == cls.resource_uid,
+                ResourceData.adaptor_configuration.op("?")("costing"),
+            )
+        )
+
     # relationship attributes
     resource_data = sa.orm.relationship(
         ResourceData, uselist=False, back_populates="resource", lazy="select"
