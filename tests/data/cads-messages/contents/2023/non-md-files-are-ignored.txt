@@ -1,6 +1,7 @@
 ---
 date: 2023-01-26T11:27:13Z
 live: false
+show_date: true
 summary: this file should be ignored
 severity: warning
 entries: satellite-surface-radiation-budget
