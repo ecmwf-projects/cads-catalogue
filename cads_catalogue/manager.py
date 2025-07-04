@@ -905,8 +905,15 @@ def remove_datasets(session: sa.orm.session.Session, keep_resource_uids: List[st
         dataset_to_delete.licences = []
         dataset_to_delete.messages = []
         dataset_to_delete.related_resources = []
-        if dataset_to_delete.resource_data:
-            session.delete(dataset_to_delete.resource_data)
+
+        resource_data = session.scalars(
+            sa.select(database.ResourceData).filter(
+                database.ResourceData.resource_uid == dataset_to_delete.resource_uid
+            )
+        ).first()
+        if resource_data:
+            session.delete(resource_data)
+
         session.delete(dataset_to_delete)
         logger.info("removed resource '%s'" % dataset_to_delete.resource_uid)
 
