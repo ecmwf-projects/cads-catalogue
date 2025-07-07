@@ -96,7 +96,7 @@ def test_load_messages() -> None:
             "entries": [],
             "is_global": True,
             "live": True,
-            "show_date": True,
+            "show_date": False,
             "message_uid": "sites/cds/2023/Jan/2023-01-example-warning-active.md",
             "site": "cds",
             "severity": "warning",
