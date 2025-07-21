@@ -485,7 +485,7 @@ def load_sanity_check_conf(folder_path: str | pathlib.Path) -> dict[str, Any]:
         return metadata
     with open(sanity_check_conf_file_path) as fp:
         try:
-            data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
+            data = yaml.safe_load(fp.read())
         except Exception:  # noqa
             logger.exception(
                 f"sanity check conf file {sanity_check_conf_file_path} is not a valid YAML"
