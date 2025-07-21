@@ -181,9 +181,22 @@ def run_sanity_check(session_obj: sa.orm.sessionmaker, retain_only: int, **kwarg
     requests_path: str | None = kwargs.pop("requests_path", None)
     if requests_path is not None:
         with open(requests_path, "r") as fp:
-            kwargs["requests"] = cads_e2e_tests.load_requests(fp)
+            cli_requests = cads_e2e_tests.load_requests(fp)
     else:
-        kwargs["requests"] = None
+        cli_requests = []
+    requests_conf = []
+    with session_obj.begin() as session:
+        all_datasets = session.scalars(sa.select(database.Resource)).all()
+        for dataset in all_datasets:
+            request_uid = dataset.resource_uid
+            cli_requests_confs = [
+                r for r in cli_requests if r["collection_id"] == request_uid
+            ]
+            if cli_requests_confs:
+                requests_conf.append(cli_requests_confs[0])
+            elif dataset.sanity_check_conf:
+                requests_conf.append(dataset.sanity_check_conf[0])
+    kwargs["requests"] = requests_conf
     reports = []
     for report in cads_e2e_tests.reports_generator(**kwargs):
         reports.append(report)
