@@ -487,7 +487,9 @@ def load_sanity_check_conf(folder_path: str | pathlib.Path) -> dict[str, Any]:
         try:
             data = yaml.load(fp.read(), Loader=yaml.loader.BaseLoader)
         except Exception:  # noqa
-            logger.exception(f"sanity check conf file {sanity_check_conf_file_path} is not a valid YAML")
+            logger.exception(
+                f"sanity check conf file {sanity_check_conf_file_path} is not a valid YAML"
+            )
             return metadata
     if data is None:
         logger.warning(f"sanity check conf file {sanity_check_conf_file_path} is empty")
@@ -495,8 +497,9 @@ def load_sanity_check_conf(folder_path: str | pathlib.Path) -> dict[str, Any]:
     try:
         assert data[0]["collection_id"] == os.path.basename(folder_path)
     except (IndexError, KeyError, AssertionError):
-        logger.exception(f"sanity check conf file {sanity_check_conf_file_path} has not valid format")
-        import pdb; pdb.set_trace()
+        logger.exception(
+            f"sanity check conf file {sanity_check_conf_file_path} has not valid format"
+        )
         return metadata
     metadata["sanity_check_conf"] = data
     return metadata
