@@ -1617,6 +1617,7 @@ def test_load_resource_from_folder() -> None:
         "portal": "c3s",
         "qa_flag": True,
         "qos_tags": ["tag1", "tag2", "tag3"],
+        "sanity_check_conf": None,
         "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",

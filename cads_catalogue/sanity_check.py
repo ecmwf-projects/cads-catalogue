@@ -47,23 +47,25 @@ for schema_def in ("sanity_check", "sanity_check_item"):
     with open(os.path.join(SCHEMA_PATH, f"{schema_def}.json")) as fp:
         ref_mapping[f"/schemas/{schema_def}"] = json.load(fp)
 
-SanityCheckValidator = jsonschema.validators.validator_for(
-    ref_mapping["/schemas/sanity_check"]
-)
-SanityCheckItemValidator = jsonschema.validators.validator_for(
-    ref_mapping["/schemas/sanity_check_item"]
-)
+resolver = jsonschema.RefResolver("", {}, store=ref_mapping)
 
-sanity_check_validator = SanityCheckValidator(
-    schema=ref_mapping["/schemas/sanity_check"],
-    resolver=jsonschema.RefResolver("", {}, store=ref_mapping),
-    format_checker=format_checking,
-)
-sanity_check_item_validator = SanityCheckItemValidator(
-    schema=ref_mapping["/schemas/sanity_check_item"],
-    resolver=jsonschema.RefResolver("", {}, store=ref_mapping),
-    format_checker=format_checking,
-)
+
+def sanity_check_validate(json_data):
+    return jsonschema.validate(
+        instance=json_data,
+        schema=ref_mapping["/schemas/sanity_check"],
+        resolver=resolver,
+        format_checker=format_checking,
+    )
+
+
+def sanity_check_item_validate(json_data):
+    return jsonschema.validate(
+        instance=json_data,
+        schema=ref_mapping["/schemas/sanity_check_item"],
+        resolver=resolver,
+        format_checker=format_checking,
+    )
 
 
 def echo_passed_vs_failed(reports: list[cads_e2e_tests.Report]) -> None:
@@ -104,7 +106,7 @@ def report2sanity_check(report: cads_e2e_tests.Report) -> dict[str, Any]:
         "finished_at": report.finished_at.isoformat(),
     }
     sanity_check = sanitize_datetimes(sanity_check)
-    sanity_check_item_validator.validate(sanity_check)
+    sanity_check_item_validate(sanity_check)
     return sanity_check
 
 
@@ -136,7 +138,7 @@ def update_dataset_sanity_check(
         )
         if retain_only > 0:
             new_sanity_check = new_sanity_check[:retain_only]
-        sanity_check_validator.validate(new_sanity_check)
+        sanity_check_validate(new_sanity_check)
         dataset_obj.sanity_check = new_sanity_check
         session.add(dataset_obj)
     logger.info(f"sanity check information updated for {dataset_uid!r}.")
@@ -178,14 +180,16 @@ def update_sanity_checks_by_file(
 
 def run_sanity_check(session_obj: sa.orm.sessionmaker, retain_only: int, **kwargs):
     """Run e2e sanity checks and store outcomes."""
-    requests_path: str | None = kwargs.pop("requests_path", None)
-    if requests_path is not None:
-        with open(requests_path, "r") as fp:
-            kwargs["requests"] = cads_e2e_tests.load_requests(fp)
-    else:
-        kwargs["requests"] = None
+    requests_pool = []
+    with session_obj.begin() as session:
+        all_datasets = session.scalars(sa.select(database.Resource)).all()
+        for dataset in all_datasets:
+            if dataset.sanity_check_conf:
+                requests_pool += dataset.sanity_check_conf
     reports = []
-    for report in cads_e2e_tests.reports_generator(**kwargs):
+    for report in cads_e2e_tests.reports_generator(
+        requests_pool=requests_pool, **kwargs
+    ):
         reports.append(report)
         dataset_uid = report.request.collection_id
         if not dataset_uid:
