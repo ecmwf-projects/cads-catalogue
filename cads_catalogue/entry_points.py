@@ -416,13 +416,6 @@ def run_sanity_check(
     ] = DEFAULT_RETAIN_SANITY_CHECKS,
     url: Annotated[Optional[str], Option(help="API url")] = None,  # noqa: UP007
     key: Annotated[list[str], Option(help="API key(s)")] = [],
-    requests_path: Annotated[
-        Optional[str],  # noqa: UP007
-        Option(
-            help="Path to the YAML file with requests to test",
-            show_default="random requests",
-        ),
-    ] = None,
     invalidate_cache: Annotated[
         bool,
         Option(help="Whether to invalidate the cache"),
@@ -482,7 +475,6 @@ def run_sanity_check(
         retain_only,
         url=url,
         keys=key,
-        requests_path=requests_path,
         cache_key=cache_key if invalidate_cache else None,
         n_jobs=n_jobs,
         verbose=verbose,

@@ -19,7 +19,6 @@ from __future__ import annotations
 import datetime
 import json
 import os
-import random
 from collections import defaultdict
 from operator import itemgetter
 from typing import Any, Dict, List
@@ -179,25 +178,13 @@ def update_sanity_checks_by_file(
 
 def run_sanity_check(session_obj: sa.orm.sessionmaker, retain_only: int, **kwargs):
     """Run e2e sanity checks and store outcomes."""
-    requests_path: str | None = kwargs.pop("requests_path", None)
-    if requests_path is not None:
-        with open(requests_path, "r") as fp:
-            cli_requests = cads_e2e_tests.load_requests(fp)
-    else:
-        cli_requests = []
     requests_conf = []
     with session_obj.begin() as session:
         all_datasets = session.scalars(sa.select(database.Resource)).all()
         for dataset in all_datasets:
-            request_uid = dataset.resource_uid
-            cli_requests_confs = [
-                r for r in cli_requests if r.collection_id == request_uid
-            ]
-            if cli_requests_confs:
-                requests_conf.append(random.choice(cli_requests_confs))
-            elif dataset.sanity_check_conf:
-                requests_conf.append(random.choice(dataset.sanity_check_conf))
-    kwargs["requests"] = requests_conf
+            if dataset.sanity_check_conf:
+                requests_conf += dataset.sanity_check_conf
+    kwargs["requests_conf"] = requests_conf
     reports = []
     for report in cads_e2e_tests.reports_generator(**kwargs):
         reports.append(report)
