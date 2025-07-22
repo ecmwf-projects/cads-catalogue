@@ -471,6 +471,7 @@ def run_sanity_check(
         regex_pattern=regex_pattern,
         download=download,
         n_repeats=1,
+        randomise=False,
         max_runtime=max_runtime,
         log_level=log_level,
         maximum_tries=client_maximum_tries,
