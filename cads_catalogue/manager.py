@@ -495,7 +495,8 @@ def load_sanity_check_conf(folder_path: str | pathlib.Path) -> dict[str, Any]:
         logger.warning(f"sanity check conf file {sanity_check_conf_file_path} is empty")
         return metadata
     try:
-        assert data[0]["collection_id"] == os.path.basename(folder_path)
+        for request in data:
+            assert request["collection_id"] == os.path.basename(folder_path)
     except (IndexError, KeyError, AssertionError):
         logger.exception(
             f"sanity check conf file {sanity_check_conf_file_path} has not valid format"

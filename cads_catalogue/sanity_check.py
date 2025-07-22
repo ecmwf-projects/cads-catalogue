@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 import os
+import random
 from collections import defaultdict
 from operator import itemgetter
 from typing import Any, Dict, List
@@ -193,9 +194,9 @@ def run_sanity_check(session_obj: sa.orm.sessionmaker, retain_only: int, **kwarg
                 r for r in cli_requests if r.collection_id == request_uid
             ]
             if cli_requests_confs:
-                requests_conf.append(cli_requests_confs[0])
+                requests_conf.append(random.choice(cli_requests_confs))
             elif dataset.sanity_check_conf:
-                requests_conf.append(dataset.sanity_check_conf[0])
+                requests_conf.append(random.choice(dataset.sanity_check_conf))
     kwargs["requests"] = requests_conf
     reports = []
     for report in cads_e2e_tests.reports_generator(**kwargs):

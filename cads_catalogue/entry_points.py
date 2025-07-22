@@ -451,12 +451,6 @@ def run_sanity_check(
         str,
         Option(help="Key used to invalidate the cache"),
     ] = "_no_cache",
-    n_repeats: Annotated[
-        int,
-        Option(
-            help="Number of times to repeat each request (random requests are regenerated)"
-        ),
-    ] = 1,
     cyclic: Annotated[
         bool,
         Option(
@@ -494,7 +488,7 @@ def run_sanity_check(
         verbose=verbose,
         regex_pattern=regex_pattern,
         download=download,
-        n_repeats=n_repeats,
+        n_repeats=1,
         cyclic=cyclic,
         randomise=randomise,
         max_runtime=max_runtime,
