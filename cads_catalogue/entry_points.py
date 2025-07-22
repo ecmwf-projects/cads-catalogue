@@ -444,16 +444,6 @@ def run_sanity_check(
         str,
         Option(help="Key used to invalidate the cache"),
     ] = "_no_cache",
-    cyclic: Annotated[
-        bool,
-        Option(
-            help="Whether to repeat requests cyclically ([1, 2, 1, 2]) or not ([1, 1, 2, 2])"
-        ),
-    ] = True,
-    randomise: Annotated[
-        bool,
-        Option(help="Whether to randomise the order of the requests"),
-    ] = False,
     max_runtime: Annotated[
         float | None,
         Option(help="Maximum time (in seconds) each request is allowed to run"),
@@ -481,8 +471,6 @@ def run_sanity_check(
         regex_pattern=regex_pattern,
         download=download,
         n_repeats=1,
-        cyclic=cyclic,
-        randomise=randomise,
         max_runtime=max_runtime,
         log_level=log_level,
         maximum_tries=client_maximum_tries,

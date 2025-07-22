@@ -180,15 +180,16 @@ def update_sanity_checks_by_file(
 
 def run_sanity_check(session_obj: sa.orm.sessionmaker, retain_only: int, **kwargs):
     """Run e2e sanity checks and store outcomes."""
-    requests_conf = []
+    requests_pool = []
     with session_obj.begin() as session:
         all_datasets = session.scalars(sa.select(database.Resource)).all()
         for dataset in all_datasets:
             if dataset.sanity_check_conf:
-                requests_conf += dataset.sanity_check_conf
-    kwargs["requests_conf"] = requests_conf
+                requests_pool += dataset.sanity_check_conf
     reports = []
-    for report in cads_e2e_tests.reports_generator(**kwargs):
+    for report in cads_e2e_tests.reports_generator(
+        requests_pool=requests_pool, **kwargs
+    ):
         reports.append(report)
         dataset_uid = report.request.collection_id
         if not dataset_uid:
