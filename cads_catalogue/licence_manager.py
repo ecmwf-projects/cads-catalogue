@@ -151,11 +151,13 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
         )
 
     try:
-        download_filename = json_data["download_filename"]
-        if not utils.is_url(download_filename):
-            download_filename = os.path.abspath(
-                os.path.join(licences_folder, download_filename)
+        download_filename = (
+            json_data["download_filename"]
+            if utils.is_url(json_data["download_filename"])
+            else os.path.abspath(
+                os.path.join(licences_folder, json_data["download_filename"])
             )
+        )
 
         licence_md = {
             "licence_uid": json_data["licence_uid"],
