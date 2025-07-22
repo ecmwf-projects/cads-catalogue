@@ -11,6 +11,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": "48a771d06e98670e3aa8fff982c05d8a",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": null,
@@ -911,6 +913,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": "19848060eb1e485b587e22ac28e8141e",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": null,
@@ -1441,6 +1445,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": "a1208340405b01afb52f50a5423a87cb",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {
@@ -1495,9 +1501,9 @@
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_properties_hash": "d438ae8e43fd3d28f86506224392d4d5",
-        "api_enforce_constraints": false,
-        "disabled_reason": "A reason",
-        "sources_hash": "b7875c9c1af9e7e8d8a03046b7d7f867",
+        "sources_hash": "e88f2c04649d3f7e312cdaaa1fef4d7b",
+        "sanity_check": {"name": "my-name", "tags": ["tag1", "tag2"]},
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": {
             "name": "my-name",
@@ -1565,6 +1571,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": "40b9faaa0719118373b8d9303b0f9875",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {
@@ -1622,6 +1630,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": "9c313d4668a1544424097d928b1c1a55",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {
@@ -1676,9 +1686,31 @@
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_properties_hash": "084d41397226a25b0c3b281948d46cc5",
-        "api_enforce_constraints": false,
-        "disabled_reason": null,
-        "sources_hash": "c7da1c85e5c7d32fe46754eaea1bf18c",
+        "sources_hash": "4653b89428b6943c6f1c4c750cd50824",
+        "sanity_check": null,
+        "sanity_check_conf": [
+            {
+                "checks": {
+                    "size": 2076588,
+                    "time": 60,
+                    "checksum": "01683b3d69dec4c7221e524e3f6697dd",
+                    "extension": ".grib",
+                    "content_type": "application/x-grib",
+                    "content_length": 2076588
+                },
+                "settings": {
+                    "randomise": false,
+                    "max_runtime": 60.0
+                },
+                "parameters": {
+                    "date": "2012-12-01",
+                    "time": "12:00",
+                    "variable": "2t",
+                    "product_type": "reanalysis"
+                },
+                "collection_id": "reanalysis-era5-single-levels"
+            }
+        ],
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {
@@ -1736,6 +1768,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": "04709d4d341b23ea755b29c77d3d5815",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {

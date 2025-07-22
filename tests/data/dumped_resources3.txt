@@ -8,9 +8,9 @@
         "previewimage": "an url",
         "adaptor": null,
         "adaptor_properties_hash": "d438ae8e43fd3d28f86506224392d4d5",
-        "api_enforce_constraints": true,
-        "disabled_reason": null,
-        "sources_hash": "b7875c9c1af9e7e8d8a03046b7d7f867",
+        "sources_hash": "e88f2c04649d3f7e312cdaaa1fef4d7b",
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {

@@ -289,6 +289,7 @@ class Resource(BaseModel):
         dialect_postgresql.ARRAY(sa.String)
     )
     sanity_check = sa.Column(dialect_postgresql.JSONB)
+    sanity_check_conf = sa.Column(dialect_postgresql.JSONB)
 
     # geo extent
     geo_extent: Any = sa.Column(dialect_postgresql.JSONB)

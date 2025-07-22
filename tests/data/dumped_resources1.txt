@@ -11,6 +11,8 @@
         "api_enforce_constraints": true,
         "disabled_reason": null,
         "sources_hash": null,
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {
@@ -72,6 +74,8 @@
         "api_enforce_constraints": false,
         "disabled_reason": null,
         "sources_hash": null,
+        "sanity_check": null,
+        "sanity_check_conf": null,
         "related_resources_keywords": [],
         "sanity_check": null,
         "geo_extent": {
