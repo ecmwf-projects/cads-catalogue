@@ -111,7 +111,7 @@ def test_update_catalogue(
             "licence_uid": "eumetsat-cm-saf",
             "revision": 1,
             "title": "EUMETSAT CM SAF products licence",
-            "download_filename": "an url",
+            "download_filename": "https://www.spdx.org/licenses/eumetsat.html",
             "portal": None,
             "scope": "dataset",
         },
@@ -212,7 +212,9 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_not_called()
     _update_catalogue_contents.reset_mock()
     # check object storage calls
-    assert _store_file.call_count == 8  # num.licences * 2 = 8
+    assert (
+        _store_file.call_count == 7
+    )  # num.licences * 2 - 1 (a download_filename is an external url) = 7
 
     # store of pdf of licence
     assert (licence_path, object_storage_url) in [
@@ -858,8 +860,8 @@ def test_update_catalogue(
     # check load of contents is run (it's forced)
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
-    # check object storage called for 1 dataset, 4 licences and 4 contents (5 + 4*2 + 4)
-    assert _store_file.call_count == 17
+    # check object storage called for 1 dataset, 4 licences and 4 contents (5 + 4*2 + 4) - 1 (external URL)
+    assert _store_file.call_count == 16
     _store_file.reset_mock()
 
     # check db changes are reset
@@ -1275,7 +1277,7 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 52
+    assert _store_file.call_count == 51
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
@@ -1406,7 +1408,7 @@ def test_update_catalogue(
     _update_catalogue_contents.assert_called_once()
     _update_catalogue_contents.reset_mock()
     # check object storage called
-    assert _store_file.call_count == 52
+    assert _store_file.call_count == 51
     #     # num.licences * 2 = 8
     #     # num.datasets overview.png * 2 = 16
     #     # num.datasets layout.json = 8
