@@ -7,7 +7,7 @@
   "properties": {
     "req_id": {
       "description": "The request uid of the test",
-      "type": "string",
+      "type": ["string", "null"],
       "format": "uuid"
     },
     "success": {
