@@ -1,3 +1,4 @@
+import multiprocessing as mp
 import os
 from typing import Any
 
@@ -7,6 +8,12 @@ from pytest_postgresql import factories
 from sqlalchemy.orm import sessionmaker
 
 from cads_catalogue import database
+
+try:  # macOS / Windows ⇒ spawn by default
+    mp.set_start_method("fork")  # Linux already uses fork
+except RuntimeError:
+    # start-method already set – safe to ignore when tests are run twice
+    pass
 
 postgresql_proc2 = factories.postgresql_proc(password="my@strange@password")
 postgresql2 = factories.postgresql("postgresql_proc2")
