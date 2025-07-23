@@ -467,6 +467,45 @@ def load_resource_variables(folder_path: str | pathlib.Path) -> dict[str, Any]:
     return metadata
 
 
+def load_sanity_check_conf(folder_path: str | pathlib.Path) -> dict[str, Any]:
+    """Load a resource's configuration for sanity check.
+
+    Parameters
+    ----------
+    folder_path: root folder path where to collect metadata of a resource
+
+    Returns
+    -------
+    dict: dictionary of metadata collected
+    """
+    metadata: dict[str, Any] = dict()
+    metadata["sanity_check_conf"] = None
+    sanity_check_conf_file_path = os.path.join(folder_path, "requests.yaml")
+    if not os.path.isfile(sanity_check_conf_file_path):
+        return metadata
+    with open(sanity_check_conf_file_path) as fp:
+        try:
+            data = yaml.safe_load(fp.read())
+        except Exception:  # noqa
+            logger.exception(
+                f"sanity check conf file {sanity_check_conf_file_path} is not a valid YAML"
+            )
+            return metadata
+    if data is None:
+        logger.warning(f"sanity check conf file {sanity_check_conf_file_path} is empty")
+        return metadata
+    try:
+        for request in data:
+            assert request["collection_id"] == os.path.basename(folder_path)
+    except (IndexError, KeyError, AssertionError):
+        logger.exception(
+            f"sanity check conf file {sanity_check_conf_file_path} has not valid format"
+        )
+        return metadata
+    metadata["sanity_check_conf"] = data
+    return metadata
+
+
 def load_resource_from_folder(
     folder_path: str | pathlib.Path, override_md: dict[str, Any] | None = None
 ) -> dict[str, Any]:
@@ -499,6 +538,7 @@ def load_resource_from_folder(
         load_resource_documentation,
         load_resource_metadata_file,
         load_resource_variables,
+        load_sanity_check_conf,
     ]
     for loader_function in loader_functions:
         metadata.update(loader_function(folder_path))
