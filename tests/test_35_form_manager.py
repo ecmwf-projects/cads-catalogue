@@ -54,6 +54,7 @@ def test_build_licence_block(session_obj: sa.orm.sessionmaker):
                     "id": "CCI-data-policy-for-satellite-surface-radiation-budget",
                     "label": "CCI product licence",
                     "revision": 4,
+                    "spdx_identifier": None,
                 },
                 {
                     "attachment_url": urllib.parse.urljoin(
@@ -65,6 +66,7 @@ def test_build_licence_block(session_obj: sa.orm.sessionmaker):
                     "id": "data-protection-privacy-statement",
                     "label": "Data protection and privacy statement",
                     "revision": 24,
+                    "spdx_identifier": None,
                 },
                 {
                     "attachment_url": urllib.parse.urljoin(
@@ -76,6 +78,7 @@ def test_build_licence_block(session_obj: sa.orm.sessionmaker):
                     "id": "eumetsat-cm-saf",
                     "label": "EUMETSAT CM SAF products licence",
                     "revision": 1,
+                    "spdx_identifier": "eumetsat",
                 },
                 {
                     "attachment_url": urllib.parse.urljoin(
@@ -87,6 +90,7 @@ def test_build_licence_block(session_obj: sa.orm.sessionmaker):
                     "id": "licence-to-use-copernicus-products",
                     "label": "Licence to use Copernicus Products",
                     "revision": 12,
+                    "spdx_identifier": None,
                 },
             ]
         },
@@ -155,6 +159,7 @@ def test_transform_licences_blocks(session_obj: sa.orm.sessionmaker):
                         "id": "CCI-data-policy-for-satellite-surface-radiation-budget",
                         "label": "CCI product licence",
                         "revision": 4,
+                        "spdx_identifier": None,
                     },
                 ]
             },
@@ -234,6 +239,7 @@ def test_transform_form(
                         "id": "CCI-data-policy-for-satellite-surface-radiation-budget",
                         "label": "CCI product licence",
                         "revision": 4,
+                        "spdx_identifier": None,
                     },
                     {
                         "attachment_url": urllib.parse.urljoin(
@@ -245,6 +251,7 @@ def test_transform_form(
                         "id": "licence-to-use-copernicus-products",
                         "label": "Licence to use Copernicus Products",
                         "revision": 12,
+                        "spdx_identifier": None,
                     },
                 ]
             },

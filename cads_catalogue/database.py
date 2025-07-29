@@ -440,6 +440,7 @@ class Licence(BaseModel):
         back_populates="licences",
         uselist=True,
     )
+    spdx_identifier = sa.Column(sa.String)
 
     __table_args__ = (
         sa.schema.UniqueConstraint(

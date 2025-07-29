@@ -137,14 +137,16 @@
                     "revision": 12,
                     "label": "Licence to use Copernicus Products",
                     "contents_url": "https://document/storage/url/mycatalogue_bucket/licences/licence-to-use-copernicus-products/test_storage_path.md",
-                    "attachment_url": "https://document/storage/url/mycatalogue_bucket/licences/licence-to-use-copernicus-products/test_storage_path.pdf"
+                    "attachment_url": "https://document/storage/url/mycatalogue_bucket/licences/licence-to-use-copernicus-products/test_storage_path.pdf",
+                    "spdx_identifier": null
                   },
                   {
                     "id": "eumetsat-cm-saf",
                     "revision": 1,
                     "label": "EUMETSAT CM SAF products licence",
                     "contents_url": "https://document/storage/url/mycatalogue_bucket/licences/eumetsat-cm-saf/test_storage_path.md",
-                    "attachment_url": "https://document/storage/url/mycatalogue_bucket/licences/eumetsat-cm-saf/test_storage_path.pdf"
+                    "attachment_url": "https://document/storage/url/mycatalogue_bucket/licences/eumetsat-cm-saf/test_storage_path.pdf",
+                    "spdx_identifier": "eumetsat"
                   }
                 ]
               }

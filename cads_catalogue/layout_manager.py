@@ -202,7 +202,7 @@ def build_required_licence_blocks(
             "type": "button",
             "id": f"{licence.licence_uid}-licences-download",
             "parent": f"{licence.licence_uid}-licences",
-            "title": "Download PDF",
+            "title": "Access licence" if licence.spdx_identifier else "Download PDF",
             "action": "download",
             "contents-url": urllib.parse.urljoin(
                 doc_storage_url, licence.download_filename
@@ -325,6 +325,7 @@ def build_licence_acceptance_block(
             "attachment_url": urllib.parse.urljoin(
                 doc_storage_url, licence_obj.download_filename
             ),
+            "spdx_identifier": licence_obj.spdx_identifier,
         }
         licence_blocks.append(licence_block)
     new_block = {
