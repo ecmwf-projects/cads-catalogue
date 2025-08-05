@@ -69,6 +69,7 @@ def test_licence_sync(
         "scope": "dataset",
         "md_filename": "an url",
         "portal": None,
+        "spdx_identifier": None,
     }
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch(
@@ -112,6 +113,7 @@ def test_licence_sync(
         "scope": "dataset",
         "md_filename": "an url",
         "portal": None,
+        "spdx_identifier": None,
     }
     licences = [updated_licence]
     with session_obj() as session:
@@ -143,6 +145,7 @@ def test_load_licences_from_folder() -> None:
             "title": "CCI product licence",
             "scope": "dataset",
             "portal": None,
+            "spdx_identifier": None,
         },
         {
             "download_filename": os.path.join(
@@ -157,11 +160,10 @@ def test_load_licences_from_folder() -> None:
             "title": "Data protection and privacy statement",
             "scope": "portal",
             "portal": "c3s",
+            "spdx_identifier": None,
         },
         {
-            "download_filename": os.path.join(
-                licences_folder_path, "eumetsat-cm-saf.pdf"
-            ),
+            "download_filename": "https://www.spdx.org/licenses/eumetsat.html",
             "licence_uid": "eumetsat-cm-saf",
             "revision": 1,
             "title": "EUMETSAT CM SAF products licence",
@@ -171,6 +173,7 @@ def test_load_licences_from_folder() -> None:
                 "eumetsat-cm-safv1.md",
             ),
             "portal": None,
+            "spdx_identifier": "eumetsat",
         },
         {
             "download_filename": os.path.join(
@@ -185,6 +188,7 @@ def test_load_licences_from_folder() -> None:
                 "licence-to-use-copernicus-productsv12.md",
             ),
             "portal": None,
+            "spdx_identifier": None,
         },
     ]
     licences = sorted(

@@ -62,6 +62,7 @@ def build_licence_block(req_licences: List[database.Licence], doc_storage_url: s
             "attachment_url": urllib.parse.urljoin(
                 doc_storage_url, req_licence.download_filename
             ),
+            "spdx_identifier": req_licence.spdx_identifier,
         }
         licences_block.append(licence_block)
 
