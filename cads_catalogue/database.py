@@ -330,7 +330,7 @@ class Resource(BaseModel):
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
     variables: Any = sa.Column(dialect_postgresql.JSONB)
-    content_size = sa.Column(sa.Integer)
+    content_size = sa.Column(sa.Float)
 
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
