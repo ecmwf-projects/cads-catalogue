@@ -275,6 +275,7 @@ def validate_metadata_json(dataset_folder):
         "hidden",
         # "inspire_theme",  # usually present, but not stored/showed anywhere
         "keywords",
+        "facets",
         "licences",
         "lineage",
         "popularity",
@@ -350,18 +351,26 @@ def validate_metadata_json(dataset_folder):
         if bool_field in data and not is_parsable_as_bool(data[bool_field]):
             logger.exception(f"field '{bool_field}' not compliant")
 
-    # validate keywords
-    keywords = data.get("keywords")
-    kw_args = []
-    if keywords:
-        for keyword in keywords:
-            if len(keyword.split(":")) != 2:
-                logger.error(f"keyword {keyword} not compliant")
+    # validate facets
+    # Assumes that if facets is not present, keywords is used the old way representing facets
+    facets = data.get("facets") or data.get("keywords")
+    facet_args = []
+    if facets:
+        for facet in facets:
+            if len(facet.split(":")) != 2:
+                logger.error(f"facet {facet} not compliant")
             else:
-                kw_args.append(keyword.split(":")[0])
-    # at least 1 "Product type" must be present in keywords
-    if "Product type" not in kw_args:
-        logger.warning("'Product type' not present among the keywords")
+                facet_args.append(facet.split(":")[0])
+    # at least 1 "Product type" must be present in facets
+    if "Product type" not in facet_args:
+        logger.warning("'Product type' not present among the facets")
+
+    # validate keywords as list of urls if facets is present in metadata
+    keywords = data.get("keywords")
+    if keywords and data.get("facets"):
+        for keyword_url in keywords:
+            if not utils.is_url(keyword_url):
+                logger.error(f"keyword_url {keyword_url} is not an url")
 
     # validate field that is a list of strings
     for field in ["licences", "qos_tags", "related_resources_keywords"]:
