@@ -38,7 +38,7 @@
   ],
   "publication_date": "2019-07-12",
   "update_date": "2023-02-17",
-  "facets": [
+  "keywords": [
     "Product type: Reanalysis",
     "Spatial coverage: Global",
     "Temporal coverage: Past",
@@ -47,7 +47,6 @@
     "Variable domain: Land (biosphere)",
     "Provider: Copernicus C3S"
   ],
-  "keywords": [],
   "popularity": 500,
   "qos_tags": ["tag1", "tag2", "tag3"],
   "api_enforce_constraints": true,
