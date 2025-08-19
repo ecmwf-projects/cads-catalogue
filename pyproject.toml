@@ -86,6 +86,7 @@ convention = "numpy"
 packages = ["cads_catalogue"]
 
 [tool.setuptools_scm]
+fallback_version = "999"
 write_to = "cads_catalogue/version.py"
 write_to_template = '''
 # Do not change! Do not track in version control!

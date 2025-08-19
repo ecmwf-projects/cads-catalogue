@@ -234,7 +234,7 @@ def transform_layout(
 
 def yaml2context(yaml_path: str | pathlib.Path | None) -> dict[str, Any]:
     """
-    load yaml used for rendering templates.
+    Load yaml used for rendering templates.
 
     :param yaml_path: yaml path
     :return: yaml parsed
