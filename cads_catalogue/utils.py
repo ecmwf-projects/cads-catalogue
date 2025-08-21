@@ -72,7 +72,7 @@ def list_render(
     input_list: list[Any], context: dict[str, Any], template_class=CADSTemplate
 ) -> list[Any]:
     """
-    render values of an input list according to values defined in a context dictionary.
+    Render values of an input list according to values defined in a context dictionary.
 
     :param input_list: list with values to be rendered
     :param context: dictionary with values to be used for rendering
@@ -96,7 +96,7 @@ def dict_render(
     input_dict, context: dict[str, Any], template_class=CADSTemplate
 ) -> dict[str, Any]:
     """
-    render values of an input dictionary according to values defined in a context dictionary.
+    Render values of an input dictionary according to values defined in a context dictionary.
 
     :param input_dict: dictionary with values to be rendered
     :param context: dictionary with values to be used for rendering
