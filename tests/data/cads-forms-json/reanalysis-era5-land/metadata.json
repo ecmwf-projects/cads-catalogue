@@ -47,7 +47,7 @@
     "Variable domain: Land (biosphere)",
     "Provider: Copernicus C3S"
   ],
-  "keywords": [],
+  "keywords_urls": [],
   "popularity": 500,
   "qos_tags": ["tag1", "tag2", "tag3"],
   "api_enforce_constraints": true,

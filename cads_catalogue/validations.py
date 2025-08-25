@@ -276,6 +276,7 @@ def validate_metadata_json(dataset_folder):
         # "inspire_theme",  # usually present, but not stored/showed anywhere
         "keywords",
         "facets",
+        "keywords_urls",
         "licences",
         "lineage",
         "popularity",
@@ -353,7 +354,7 @@ def validate_metadata_json(dataset_folder):
 
     # validate facets
     # Assumes that if facets is not present, keywords is used the old way representing facets
-    facets = data.get("facets") or data.get("keywords")
+    facets = data.get("keywords") or data.get("facets")
     facet_args = []
     if facets:
         for facet in facets:
@@ -366,9 +367,9 @@ def validate_metadata_json(dataset_folder):
         logger.warning("'Product type' not present among the facets")
 
     # validate keywords as list of urls if facets is present in metadata
-    keywords = data.get("keywords")
-    if keywords and data.get("facets"):
-        for keyword_url in keywords:
+    keywords_urls = data.get("keywords_urls")
+    if keywords_urls and data.get("facets"):
+        for keyword_url in keywords_urls:
             if not utils.is_url(keyword_url):
                 logger.error(f"keyword_url {keyword_url} is not an url")
 

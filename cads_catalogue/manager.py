@@ -301,9 +301,13 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     #     "inspire_theme", "Meteorological geographical features"
     # )
 
-    # Assumes that if facets is not present, keywords is used the old way representing facets
-    metadata["facets"] = data.get("facets") or data.get("keywords", [])
-    metadata["keywords_urls"] = data.get("keywords", []) if data.get("facets") else []
+    # Assumes that if keywords is still present, it is used the legacy way representing facets
+    if data.get("keywords"):
+        metadata["facets"] = data.get("keywords")
+        metadata["keywords_urls"] = []
+    else:
+        metadata["facets"] = data.get("facets", [])
+        metadata["keywords_urls"] = data.get("keywords_urls", [])
 
     # NOTE: licence_uids is for relationship, not a db field
     metadata["licence_uids"] = data.get("licences", []) or []
