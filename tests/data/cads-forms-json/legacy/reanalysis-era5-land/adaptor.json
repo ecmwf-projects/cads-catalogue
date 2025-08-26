@@ -1,0 +1,142 @@
+{
+    "entry_point": "cads_adaptors:MarsCdsAdaptor",
+    "format_conversion": {
+        "netcdf.zip": {
+            "always_zip": [
+                true
+            ],
+            "zip_compression_kwargs": {
+                "compression": "ZIP_DEFLATED"
+            },
+            "system_call": [
+                "/opt/ecmwf/eccodes/bin/grib_to_netcdf",
+                "-S",
+                "param",
+                "-o",
+                "{{outfile}}",
+                "{{infile}}"
+            ]
+        },
+        "netcdf4": {
+            "system_call": [
+                "cfgrib",
+                "to_netcdf",
+                "-o",
+                "{{outfile}}",
+                "{{infile}}"
+            ]
+        }
+    },
+    "embargo": {
+        "days": 5,
+        "hours": 0
+    },
+    "mapping": {
+        "selection_limit": 1000,
+        "selection_limit_ignore": [
+            "area",
+            "grid"
+        ],
+        "remap": {
+            "format": {
+                "netcdf_3": "netcdf",
+                "zipped_netcdf_3": "netcdf.zip"
+            },
+            "month": {
+                "february": "02",
+                "october": "10",
+                "august": "08",
+                "november": "11",
+                "march": "03",
+                "may": "05",
+                "september": "09",
+                "january": "01",
+                "april": "04",
+                "december": "12",
+                "june": "06",
+                "july": "07"
+            },
+            "variable": {
+                "evaporation_from_bare_soil": "228101",
+                "surface_runoff": "8",
+                "soil_temperature_level_4": "236",
+                "evaporation_from_open_water_surfaces_excluding_oceans": "228102",
+                "temperature_of_snow_layer": "238",
+                "snow_cover": "260038",
+                "lake_bottom_temperature": "228010",
+                "total_precipitation": "228",
+                "leaf_area_index_low_vegetation": "66",
+                "lake_mix_layer_depth": "228009",
+                "snowmelt": "45",
+                "surface_net_solar_radiation": "176",
+                "snowfall": "144",
+                "surface_sensible_heat_flux": "146",
+                "snow_density": "33",
+                "forecast_albedo": "243",
+                "surface_pressure": "134",
+                "evaporation_from_vegetation_transpiration": "228103",
+                "volumetric_soil_water_layer_4": "42",
+                "lake_ice_depth": "228014",
+                "lake_shape_factor": "228012",
+                "surface_latent_heat_flux": "147",
+                "snow_depth": "3066",
+                "potential_evaporation": "228251",
+                "leaf_area_index_high_vegetation": "67",
+                "lake_mix_layer_temperature": "228008",
+                "runoff": "205",
+                "10m_u_component_of_wind": "165",
+                "soil_temperature_level_3": "183",
+                "2m_dewpoint_temperature": "168",
+                "surface_net_thermal_radiation": "177",
+                "2m_temperature": "167",
+                "snow_albedo": "32",
+                "surface_solar_radiation_downwards": "169",
+                "snow_evaporation": "44",
+                "surface_thermal_radiation_downwards": "175",
+                "skin_temperature": "235",
+                "total_evaporation": "182",
+                "lake_total_layer_temperature": "228011",
+                "10m_v_component_of_wind": "166",
+                "soil_temperature_level_1": "139",
+                "volumetric_soil_water_layer_3": "41",
+                "sub_surface_runoff": "9",
+                "lake_ice_temperature": "228013",
+                "skin_reservoir_content": "198",
+                "evaporation_from_the_top_of_canopy": "228100",
+                "volumetric_soil_water_layer_1": "39",
+                "snow_depth_water_equivalent": "141",
+                "volumetric_soil_water_layer_2": "40",
+                "soil_temperature_level_2": "170"
+            },
+            "expect": {},
+            "number": {},
+            "levtype": {},
+            "class": {},
+            "product_type": {},
+            "time": {},
+            "year": {},
+            "day": {}
+        },
+        "force": {
+            "expect": [
+                "any"
+            ],
+            "number": [
+                "all"
+            ],
+            "levtype": [
+                "sfc"
+            ],
+            "class": [
+                "l5"
+            ],
+            "product_type": [
+                "reanalysis"
+            ]
+        },
+        "options": {
+            "wants_dates": true
+        },
+        "rename": {}
+    }
+}
