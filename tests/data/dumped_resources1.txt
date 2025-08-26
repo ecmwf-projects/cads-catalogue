@@ -23,7 +23,7 @@
         "begin_date": "1950-01-01",
         "end_date": "2023-02-11",
         "publication_date": "2019-07-12",
-        "record_update": "2025-08-08 13:08:44.078424+02:00",
+        "record_update": "2025-08-26 12:29:31.563255+03:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.",
         "citation": null,
@@ -49,6 +49,7 @@
             "tag2",
             "tag3"
         ],
+        "keywords_urls": [],
         "title": "ERA5-Land hourly data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",
@@ -86,7 +87,7 @@
         "begin_date": "1950-01-01",
         "end_date": "2022-12-01",
         "publication_date": "2019-06-23",
-        "record_update": "2025-08-08 13:08:44.101210+02:00",
+        "record_update": "2025-08-26 12:29:31.585450+03:00",
         "resource_update": "2023-02-17",
         "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.",
         "citation": null,
@@ -108,6 +109,9 @@
         "portal": "c3s",
         "qa_flag": true,
         "qos_tags": [],
+        "keywords_urls": [
+            "http://purl.oclc.org/NET/ssnx/cf/cf-feature"
+        ],
         "title": "ERA5-Land monthly averaged data from 1950 to present",
         "topic": "climatologyMeteorologyAtmosphere",
         "type": "dataset",

@@ -166,9 +166,7 @@ def test_message_sync(session_obj: sa.orm.sessionmaker) -> None:
         "summary": "example of expired critical content message",
     }
     prt_message = {
-        "content": "# main message content\n"
-        " \n"
-        "Wider **markdown syntax** allowed here.",
+        "content": "# main message content\n \nWider **markdown syntax** allowed here.",
         "date": datetime.datetime(2023, 1, 15, 11, 27, 13),
         "entries": [],
         "is_global": True,

@@ -6,7 +6,6 @@
   "responsible_organisation_role": "pointOfContact",
   "contactemail": "https://support.ecmwf.int",
   "use_limitation": "Content accessible through the CDS may only be used under the terms of the licenses attributed to each particular resource.",
-  "publication_date": "2019-06-23",
   "ds_responsible_organization_role": null,
   "ds_responsible_individual": "CDS",
   "ds_responsible_organisation_website": null,
@@ -14,7 +13,7 @@
   "ds_responsible_organisation": "ECMWF",
   "ds_contactemail": "https://support.ecmwf.int",
   "ds_responsible_organisation_role": "publisher",
-  "inspire_theme": "Land conditions",
+  "inspire_theme": "land conditions",
   "data_type": "grid",
   "unit_measure": "dd",
   "representative_fraction": 0.25,
@@ -24,17 +23,22 @@
   "bboxS": -89,
   "bboxE": 360,
   "begin_date": "1950-01-01",
-  "end_date": "2022-12-01",
-  "file_format": "grib",
+  "end_date": "2023-02-11",
+  "file_format": [
+    "grib",
+    "netcdf"
+  ],
   "format_version": null,
+  "high_priority_terms": "reanalysis ERA5 land",
   "lineage": "EC Copernicus program",
   "resource_type": "dataset",
-  "doi": "10.24381/cds.68d2bb30",
+  "doi": "10.24381/cds.e2161bac",
   "licences": [
     "licence-to-use-copernicus-products"
   ],
+  "publication_date": "2019-07-12",
   "update_date": "2023-02-17",
-  "facets": [
+  "keywords": [
     "Product type: Reanalysis",
     "Spatial coverage: Global",
     "Temporal coverage: Past",
@@ -43,9 +47,9 @@
     "Variable domain: Land (biosphere)",
     "Provider: Copernicus C3S"
   ],
-  "keywords_urls": [
-    "http://purl.oclc.org/NET/ssnx/cf/cf-feature"
-  ],
-  "title": "ERA5-Land monthly averaged data from 1950 to present",
+  "popularity": 500,
+  "qos_tags": ["tag1", "tag2", "tag3"],
+  "api_enforce_constraints": true,
+  "title": "ERA5-Land hourly data from 1950 to present",
   "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past."
 }

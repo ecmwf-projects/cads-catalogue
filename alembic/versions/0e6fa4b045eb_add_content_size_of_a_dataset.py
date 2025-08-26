@@ -1,8 +1,8 @@
 """add content_size of a dataset.
 
-Revision ID: 869ed4e2a8cc
-Revises: efce9b3eb861
-Create Date: 2025-08-08 15:03:45.276260
+Revision ID: 0e6fa4b045eb
+Revises: a41235042d55
+Create Date: 2025-08-26 14:36:06.698272
 
 """
 
@@ -11,8 +11,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "869ed4e2a8cc"
-down_revision = "efce9b3eb861"
+revision = "0e6fa4b045eb"
+down_revision = "a41235042d55"
 branch_labels = None
 depends_on = None
 

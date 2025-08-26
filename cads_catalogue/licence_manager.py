@@ -127,9 +127,9 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
     with open(json_filepath) as fp:
         try:
             json_data = json.load(fp)
-            assert isinstance(
-                json_data, dict
-            ), f"json file {json_filepath} must be a dictionary"
+            assert isinstance(json_data, dict), (
+                f"json file {json_filepath} must be a dictionary"
+            )
         except Exception:  # noqa
             logger.exception(
                 "licence file %r not compliant, error follows" % json_filepath
@@ -178,16 +178,16 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
             "portal",
         ), "scope must be 'dataset' or 'portal'"
         if licence_md["scope"] == "portal":
-            assert licence_md[
-                "portal"
-            ], "when scope is 'portal', key 'portal' is required"
+            assert licence_md["portal"], (
+                "when scope is 'portal', key 'portal' is required"
+            )
         if not utils.is_url(licence_md["download_filename"]):
-            assert os.path.isfile(
-                licence_md["download_filename"]
-            ), f"file {licence_md['download_filename']} not found"
-        assert os.path.isfile(
-            licence_md["md_filename"]
-        ), f"file {licence_md['md_filename']} not found"
+            assert os.path.isfile(licence_md["download_filename"]), (
+                f"file {licence_md['download_filename']} not found"
+            )
+        assert os.path.isfile(licence_md["md_filename"]), (
+            f"file {licence_md['md_filename']} not found"
+        )
     except Exception:  # noqa
         logger.exception(
             "licence file %r is not compliant, error follows" % json_filepath

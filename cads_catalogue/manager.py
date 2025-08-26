@@ -300,7 +300,14 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     # metadata["inspire_theme"] = data.get(
     #     "inspire_theme", "Meteorological geographical features"
     # )
-    metadata["keywords"] = data.get("keywords", [])
+
+    # Assumes that if keywords is still present, it is used the legacy way representing facets
+    if data.get("keywords"):
+        metadata["facets"] = data.get("keywords")
+        metadata["keywords_urls"] = []
+    else:
+        metadata["facets"] = data.get("facets", [])
+        metadata["keywords_urls"] = data.get("keywords_urls", [])
 
     # NOTE: licence_uids is for relationship, not a db field
     metadata["licence_uids"] = data.get("licences", []) or []
@@ -568,7 +575,7 @@ def resource_sync(
     """
     dataset = resource.copy()
     licence_uids = dataset.pop("licence_uids", [])
-    keywords = dataset.pop("keywords", [])
+    facets = dataset.pop("facets", [])
 
     db_licences = dict()
     for licence_uid in licence_uids:
@@ -621,21 +628,21 @@ def resource_sync(
     for licence_uid in licence_uids:
         dataset_obj.licences.append(db_licences[licence_uid])
 
-    # build again related keywords
-    dataset_obj.keywords = []  # type: ignore
-    for keyword in set(keywords):
-        category_name, category_value = [r.strip() for r in keyword.split(":")]
-        kw_md = {
+    # build again related facets
+    dataset_obj.facets = []  # type: ignore
+    for facet in set(facets):
+        category_name, category_value = [r.strip() for r in facet.split(":")]
+        facet_md = {
             "category_name": category_name,
             "category_value": category_value,
-            "keyword_name": keyword,
+            "facet_name": facet,
         }
-        keyword_obj = session.scalars(
-            sa.select(database.Keyword).filter_by(**kw_md).limit(1)
+        facet_obj = session.scalars(
+            sa.select(database.Facet).filter_by(**facet_md).limit(1)
         ).first()
-        if not keyword_obj:
-            keyword_obj = database.Keyword(**kw_md)
-        dataset_obj.keywords.append(keyword_obj)
+        if not facet_obj:
+            facet_obj = database.Facet(**facet_md)
+        dataset_obj.facets.append(facet_obj)
 
     return dataset_obj
 
@@ -671,11 +678,11 @@ def find_related_resources(
             and res2.resource_uid != only_involving_uid
         ):
             continue
-        res1_keywords = set([r.keyword_name for r in res1.keywords])
-        res2_keywords = set([r.keyword_name for r in res2.keywords])
+        res1_facets = set([r.facet_name for r in res1.facets])
+        res2_facets = set([r.facet_name for r in res2.facets])
         if (
-            res1_keywords.issubset(res2_keywords)
-            and len(res1_keywords) > 0
+            res1_facets.issubset(res2_facets)
+            and len(res1_facets) > 0
             # Never create references to hidden resources
             and not res2.hidden
         ):
