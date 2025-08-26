@@ -1631,6 +1631,7 @@ def test_load_resource_from_folder(folder: str) -> None:
         "use_limitation": "Content accessible through the CDS may only be used under the terms"
         " of the licenses attributed to each particular resource.",
         "variables": [],
+        "content_size": None,
     }
     assert resource == expected_resource
 

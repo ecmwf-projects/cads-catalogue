@@ -347,6 +347,7 @@ def load_resource_metadata_file(folder_path: str | pathlib.Path) -> dict[str, An
     metadata["type"] = data.get("resource_type")
     metadata["unit_measure"] = data.get("unit_measure")
     metadata["use_limitation"] = data.get("use_limitation")
+    metadata["content_size"] = data.get("content_size")
     return metadata
 
 
@@ -408,6 +409,7 @@ def parse_override_md(override_path: str | pathlib.Path | None) -> dict[str, Any
         "topic",
         "unit_measure",
         "use_limitation",
+        "content_size",
     )
     supported_keys_bool = (
         "api_enforce_constraints",

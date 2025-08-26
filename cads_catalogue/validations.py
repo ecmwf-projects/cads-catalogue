@@ -294,6 +294,7 @@ def validate_metadata_json(dataset_folder):
         "unit_measure",
         "update_date",
         "use_limitation",
+        "content_size",
     ]
     # suggest to insert a value for missing/None fields:
     for optional_field in optional_fields:
@@ -391,6 +392,13 @@ def validate_metadata_json(dataset_folder):
         int(data.get("popularity", 1))
     except (ValueError, TypeError):
         logger.exception("field 'popularity' must be an integer")
+
+    # validate content_size
+    try:
+        float(data.get("content_size", 0))
+    except (ValueError, TypeError):
+        logger.exception("field 'content_size' must be a float")
+
     return metadata
 
 
