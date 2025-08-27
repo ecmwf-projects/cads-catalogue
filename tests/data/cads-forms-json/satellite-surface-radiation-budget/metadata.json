@@ -47,5 +47,6 @@
   "title": "Surface radiation budget from 1982 to present derived from satellite observations",
   "abstract": "",
   "description": {},
-  "content_size": 100
+  "content_size": 100,
+  "update_frequency": "threeTimesAYear"
 }

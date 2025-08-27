@@ -1632,6 +1632,7 @@ def test_load_resource_from_folder(folder: str) -> None:
         " of the licenses attributed to each particular resource.",
         "variables": [],
         "content_size": None,
+        "update_frequency": None,
     }
     assert resource == expected_resource
 

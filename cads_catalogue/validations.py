@@ -295,6 +295,7 @@ def validate_metadata_json(dataset_folder):
         "update_date",
         "use_limitation",
         "content_size",
+        "update_frequency",
     ]
     # suggest to insert a value for missing/None fields:
     for optional_field in optional_fields:

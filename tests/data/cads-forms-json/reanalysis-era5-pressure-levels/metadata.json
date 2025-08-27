@@ -44,5 +44,6 @@
   ],
   "title": "ERA5 hourly data on pressure levels from 1959 to present",
   "abstract": "ERA5 is the fifth generation ECMWF reanalysis for the global climate and weather for the past 4 to 7 decades.\nCurrently data is available from 1950, with Climate Data Store entries for 1950-1978 (preliminary back extension) and from 1959 onwards (final release plus timely updates, this page).\nERA5 replaces the ERA-Interim reanalysis.",
-  "content_size": 100
+  "content_size": 100,
+  "update_frequency": "triennial"
 }

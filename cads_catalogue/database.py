@@ -328,6 +328,7 @@ class Resource(BaseModel):
     type = sa.Column(sa.String, nullable=False)
     unit_measure = sa.Column(sa.String)
     use_limitation = sa.Column(sa.String)
+    update_frequency = sa.Column(sa.String)
     variables: Any = sa.Column(dialect_postgresql.JSONB)
     content_size = sa.Column(sa.Float)
 
