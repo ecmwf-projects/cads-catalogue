@@ -2,7 +2,8 @@
   "licence_uid": "eumetsat-cm-saf",
   "revision": 1,
   "title": "EUMETSAT CM SAF products licence",
-  "download_filename": "eumetsat-cm-saf.pdf",
+  "download_filename": "https://www.spdx.org/licenses/eumetsat.html",
   "scope": "dataset",
-  "md_filename": "eumetsat-cm-safv1.md"
+  "md_filename": "eumetsat-cm-safv1.md",
+  "spdx_identifier": "eumetsat"
 }

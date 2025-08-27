@@ -26,7 +26,7 @@ from typing import Any, List
 import sqlalchemy as sa
 import structlog
 
-from cads_catalogue import config, database, object_storage
+from cads_catalogue import config, database, object_storage, utils
 
 logger = structlog.get_logger(__name__)
 
@@ -78,6 +78,8 @@ def licence_sync(
 
     for column_name in ["download_filename", "md_filename"]:
         file_path = getattr(db_licence, column_name)
+        if column_name == "download_filename" and utils.is_url(file_path):
+            continue
         subpath = os.path.join("licences", licence_uid)
         storage_kws = storage_settings.storage_kws
         file_url = object_storage.store_file(
@@ -112,7 +114,7 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
         "md_filename",
         "scope",
     }
-    optional_keys = {"portal"}
+    optional_keys = {"portal", "spdx_identifier"}
 
     if not os.path.isfile(json_filepath):
         return None
@@ -125,9 +127,9 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
     with open(json_filepath) as fp:
         try:
             json_data = json.load(fp)
-            assert isinstance(
-                json_data, dict
-            ), f"json file {json_filepath} must be a dictionary"
+            assert isinstance(json_data, dict), (
+                f"json file {json_filepath} must be a dictionary"
+            )
         except Exception:  # noqa
             logger.exception(
                 "licence file %r not compliant, error follows" % json_filepath
@@ -149,13 +151,19 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
         )
 
     try:
+        download_filename = (
+            json_data["download_filename"]
+            if utils.is_url(json_data["download_filename"])
+            else os.path.abspath(
+                os.path.join(licences_folder, json_data["download_filename"])
+            )
+        )
+
         licence_md = {
             "licence_uid": json_data["licence_uid"],
             "revision": int(json_data["revision"]),
             "title": json_data["title"],
-            "download_filename": os.path.abspath(
-                os.path.join(licences_folder, json_data["download_filename"])
-            ),
+            "download_filename": download_filename,
             "md_filename": os.path.abspath(
                 os.path.join(licences_folder, json_data["md_filename"])
             ),
@@ -164,20 +172,22 @@ def load_licence_md(json_filepath: str) -> dict[str, Any] | None:
         for key in licence_md:
             assert licence_md[key], "%r is required" % key
         licence_md["portal"] = json_data.get("portal")
+        licence_md["spdx_identifier"] = json_data.get("spdx_identifier")
         assert licence_md["scope"] in (
             "dataset",
             "portal",
         ), "scope must be 'dataset' or 'portal'"
         if licence_md["scope"] == "portal":
-            assert licence_md[
-                "portal"
-            ], "when scope is 'portal', key 'portal' is required"
-        assert os.path.isfile(
-            licence_md["download_filename"]
-        ), f"file {licence_md['download_filename']} not found"
-        assert os.path.isfile(
-            licence_md["md_filename"]
-        ), f"file {licence_md['md_filename']} not found"
+            assert licence_md["portal"], (
+                "when scope is 'portal', key 'portal' is required"
+            )
+        if not utils.is_url(licence_md["download_filename"]):
+            assert os.path.isfile(licence_md["download_filename"]), (
+                f"file {licence_md['download_filename']} not found"
+            )
+        assert os.path.isfile(licence_md["md_filename"]), (
+            f"file {licence_md['md_filename']} not found"
+        )
     except Exception:  # noqa
         logger.exception(
             "licence file %r is not compliant, error follows" % json_filepath

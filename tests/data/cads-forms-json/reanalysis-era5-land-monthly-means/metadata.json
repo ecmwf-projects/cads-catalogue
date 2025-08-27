@@ -34,7 +34,7 @@
     "licence-to-use-copernicus-products"
   ],
   "update_date": "2023-02-17",
-  "keywords": [
+  "facets": [
     "Product type: Reanalysis",
     "Spatial coverage: Global",
     "Temporal coverage: Past",
@@ -42,6 +42,9 @@
     "Variable domain: Land (physics)",
     "Variable domain: Land (biosphere)",
     "Provider: Copernicus C3S"
+  ],
+  "keywords_urls": [
+    "http://purl.oclc.org/NET/ssnx/cf/cf-feature"
   ],
   "title": "ERA5-Land monthly averaged data from 1950 to present",
   "abstract": "ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past."

@@ -76,18 +76,23 @@ def test_parse_override_md() -> None:
     assert manager.parse_override_md(overrides_path) == expected
 
 
-def test_load_resource_from_folder() -> None:
-    resource_folder_path = os.path.join(
-        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
-    )
+@pytest.mark.parametrize(
+    "folder",
+    [
+        "cads-forms-json",
+        "cads-forms-json/legacy",
+    ],
+)
+def test_load_resource_from_folder(folder: str) -> None:
+    resource_folder_path = os.path.join(TESTDATA_PATH, folder, "reanalysis-era5-land")
     resource = manager.load_resource_from_folder(resource_folder_path)
     expected_resource: dict[str, Any] = {
         "resource_uid": "reanalysis-era5-land",
         "constraints": os.path.join(
-            TESTDATA_PATH, "cads-forms-json/reanalysis-era5-land/constraints.json"
+            TESTDATA_PATH, folder, "reanalysis-era5-land/constraints.json"
         ),
         "previewimage": os.path.join(
-            TESTDATA_PATH, "cads-forms-json/reanalysis-era5-land/overview.png"
+            TESTDATA_PATH, folder, "reanalysis-era5-land/overview.png"
         ),
         "fulltext": None,
         "adaptor_configuration": {
@@ -1594,7 +1599,7 @@ def test_load_resource_from_folder() -> None:
         "geo_extent": {"bboxN": 89, "bboxS": -89, "bboxE": 360, "bboxW": 0},
         "hidden": False,
         "high_priority_terms": "reanalysis ERA5 land",
-        "keywords": [
+        "facets": [
             "Product type: Reanalysis",
             "Spatial coverage: Global",
             "Temporal coverage: Past",
@@ -1603,6 +1608,7 @@ def test_load_resource_from_folder() -> None:
             "Variable domain: Land (biosphere)",
             "Provider: Copernicus C3S",
         ],
+        "keywords_urls": [],
         "licence_uids": ["licence-to-use-copernicus-products"],
         "lineage": "EC Copernicus program",
         "mapping": None,
@@ -1625,6 +1631,7 @@ def test_load_resource_from_folder() -> None:
         "use_limitation": "Content accessible through the CDS may only be used under the terms"
         " of the licenses attributed to each particular resource.",
         "variables": [],
+        "content_size": None,
         "update_frequency": None,
     }
     assert resource == expected_resource
@@ -1637,8 +1644,15 @@ def test_load_resource_from_folder() -> None:
     assert resource == expected_resource2
 
 
+@pytest.mark.parametrize(
+    "folder",
+    [
+        "cads-forms-json",
+        "cads-forms-json/legacy",
+    ],
+)
 def test_resource_sync(
-    session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture
+    session_obj: sa.orm.sessionmaker, mocker: pytest_mock.MockerFixture, folder: str
 ) -> None:
     my_settings_dict = {
         "object_storage_url": "object/storage/url",
@@ -1649,9 +1663,7 @@ def test_resource_sync(
     }
     storage_settings = config.ObjectStorageSettings(**my_settings_dict)
     patch = mocker.patch.object(object_storage, "store_file", return_value="an url")
-    resource_folder_path = os.path.join(
-        TESTDATA_PATH, "cads-forms-json", "reanalysis-era5-land"
-    )
+    resource_folder_path = os.path.join(TESTDATA_PATH, folder, "reanalysis-era5-land")
     resource = manager.load_resource_from_folder(resource_folder_path)
     # start without any licence in the db ----------------------------------------------------
     with session_obj() as session:
@@ -1685,7 +1697,7 @@ def test_resource_sync(
         manager.resource_sync(session, resource, storage_settings)
         session.commit()
         assert (
-            len(session.scalars(sa.select(database.Resource).limit(1)).first().keywords)
+            len(session.scalars(sa.select(database.Resource).limit(1)).first().facets)
             == 7
         )
 
@@ -1727,9 +1739,7 @@ def test_resource_sync(
         manager.update_related_resources(session)
         session.commit()
         all_db_resources = session.scalars(sa.select(database.Resource)).all()
-        assert (
-            len(all_db_resources[0].keywords) == len(all_db_resources[1].keywords) == 7
-        )
+        assert len(all_db_resources[0].facets) == len(all_db_resources[1].facets) == 7
 
     with session_obj() as session:
         all_db_resources = session.scalars(sa.select(database.Resource)).all()
@@ -1758,9 +1768,9 @@ def test_resource_sync(
         ).all() == [(1, 2), (2, 1)]
         assert session.execute(
             sa.text(
-                "select resource_id, keyword_id "
-                "from resources_keywords "
-                "order by resource_id, keyword_id"
+                "select resource_id, facet_id "
+                "from resources_facets "
+                "order by resource_id, facet_id"
             )
         ).all() == [
             (1, 1),
@@ -1779,7 +1789,7 @@ def test_resource_sync(
             (2, 7),
         ]
     # modify second dataset  --------------------------------------------------------------------
-    resource2["keywords"] = [
+    resource2["facets"] = [
         #  "Product type: Reanalysis",  # removed
         "Spatial coverage: Global",
         "Temporal coverage: Past",
@@ -1898,29 +1908,29 @@ def test_find_related_resources():
         resource_id=1,
         resource_uid="res1",
         related_resources_keywords=[],
-        keywords=[
-            database.Keyword(keyword_id=1, keyword_name="aaa"),
-            database.Keyword(keyword_id=2, keyword_name="bbb"),
+        facets=[
+            database.Facet(facet_id=1, facet_name="aaa"),
+            database.Facet(facet_id=2, facet_name="bbb"),
         ],
     )
     res2 = database.Resource(
         resource_id=2,
         resource_uid="res2",
         related_resources_keywords=[],
-        keywords=[
-            database.Keyword(keyword_id=1, keyword_name="aaa"),
-            database.Keyword(keyword_id=2, keyword_name="bbb"),
-            database.Keyword(keyword_id=2, keyword_name="ccc"),
+        facets=[
+            database.Facet(facet_id=1, facet_name="aaa"),
+            database.Facet(facet_id=2, facet_name="bbb"),
+            database.Facet(facet_id=2, facet_name="ccc"),
         ],
     )
     res3 = database.Resource(
         resource_id=1,
         resource_uid="res3",
         related_resources_keywords=[],
-        keywords=[
-            database.Keyword(keyword_id=1, keyword_name="aaa"),
-            database.Keyword(keyword_id=2, keyword_name="bbb"),
-            database.Keyword(keyword_id=2, keyword_name="ddd"),
+        facets=[
+            database.Facet(facet_id=1, facet_name="aaa"),
+            database.Facet(facet_id=2, facet_name="bbb"),
+            database.Facet(facet_id=2, facet_name="ddd"),
         ],
     )
     related = manager.find_related_resources([res1, res2])

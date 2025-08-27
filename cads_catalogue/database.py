@@ -168,17 +168,15 @@ related_resources = sa.Table(
 )
 
 
-class ResourceKeyword(BaseModel):
-    """many-to-may ORM model for resources-keywords."""
+class ResourceFacet(BaseModel):
+    """many-to-many ORM model for resources-facets."""
 
-    __tablename__ = "resources_keywords"
+    __tablename__ = "resources_facets"
 
     resource_id = sa.Column(
         sa.Integer, sa.ForeignKey("resources.resource_id"), primary_key=True
     )
-    keyword_id = sa.Column(
-        sa.Integer, sa.ForeignKey("keywords.keyword_id"), primary_key=True
-    )
+    facet_id = sa.Column(sa.Integer, sa.ForeignKey("facets.facet_id"), primary_key=True)
 
 
 class ResourceMessage(BaseModel):
@@ -194,20 +192,20 @@ class ResourceMessage(BaseModel):
     )
 
 
-class Keyword(BaseModel):
-    """Keyword ORM model."""
+class Facet(BaseModel):
+    """Facet ORM model."""
 
-    __tablename__ = "keywords"
+    __tablename__ = "facets"
 
-    keyword_id = sa.Column(sa.Integer, primary_key=True)
+    facet_id = sa.Column(sa.Integer, primary_key=True)
     category_name = sa.Column(sa.String)
     category_value = sa.Column(sa.String)
-    keyword_name = sa.Column(sa.String)
+    facet_name = sa.Column(sa.String)
 
     resources: sa.orm.Mapped[List["Resource"]] = sa.orm.relationship(
         "Resource",
-        secondary="resources_keywords",
-        back_populates="keywords",
+        secondary="resources_facets",
+        back_populates="facets",
         uselist=True,
     )
 
@@ -324,6 +322,7 @@ class Resource(BaseModel):
     portal = sa.Column(sa.String, index=True)
     qa_flag = sa.Column(sa.Boolean)
     qos_tags = sa.Column(dialect_postgresql.ARRAY(sa.String))
+    keywords_urls: List[Any] = sa.Column(dialect_postgresql.ARRAY(sa.String))
     title = sa.Column(sa.String)
     topic = sa.Column(sa.String)
     type = sa.Column(sa.String, nullable=False)
@@ -331,6 +330,7 @@ class Resource(BaseModel):
     use_limitation = sa.Column(sa.String)
     update_frequency = sa.Column(sa.String)
     variables: Any = sa.Column(dialect_postgresql.JSONB)
+    content_size = sa.Column(sa.Float)
 
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
@@ -402,8 +402,8 @@ class Resource(BaseModel):
         backref=sa.orm.backref("back_related_resources"),
         uselist=True,
     )
-    keywords: sa.orm.Mapped[List["Keyword"]] = sa.orm.relationship(
-        "Keyword", secondary="resources_keywords", back_populates="resources"
+    facets: sa.orm.Mapped[List["Facet"]] = sa.orm.relationship(
+        "Facet", secondary="resources_facets", back_populates="resources"
     )
 
     contents: sa.orm.Mapped[List["Content"]] = sa.orm.relationship(
@@ -441,6 +441,7 @@ class Licence(BaseModel):
         back_populates="licences",
         uselist=True,
     )
+    spdx_identifier = sa.Column(sa.String)
 
     __table_args__ = (
         sa.schema.UniqueConstraint(
