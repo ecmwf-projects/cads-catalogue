@@ -680,6 +680,9 @@ def find_related_resources(
             and res2.resource_uid != only_involving_uid
         ):
             continue
+        # avoid cross-portal relationships
+        if str(res1.portal) != str(res2.portal):
+            continue
         res1_facets = set([r.facet_name for r in res1.facets])
         res2_facets = set([r.facet_name for r in res2.facets])
         if (
