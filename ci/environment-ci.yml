@@ -21,6 +21,7 @@ dependencies:
 - psycopg
 - pytest-mock
 - pyyaml
+- sqlalchemy-utils<0.42.0  # see https://github.com/kvesteri/sqlalchemy-utils/issues/791
 - pip:
   - boto3-stubs
   - pytest-postgresql
