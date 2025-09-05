@@ -13,7 +13,7 @@ jobs:
       - ubuntu-latest
     steps:
     - name: Pull request to update packages
-      uses: ecmwf-projects/cads-build-farm/.github/workflow/update-downstream-packages@main
+      uses: ecmwf-projects/cads-build-farm/.github/workflows/update-downstream-packages@main
       with:
         package-ref: "CADS_CATALOGUE_REF"
         repositories: |
