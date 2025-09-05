@@ -1,0 +1,27 @@
+name: Update packages that depends on cads-catalogue
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+
+jobs:
+  build_docker_image:
+    runs-on:
+      - ubuntu-latest
+    steps:
+    - name: compute semantic version
+      uses: ecmwf-projects/cads-build-farm/.github/actions/git-version@main
+      id: version
+
+    - name: Pull request to update packages
+      uses: ecmwf-projects/cads-build-farm/.github/actions/update-package@main
+      with:
+        package-ref: "CADS_CATALOGUE_REF"
+        enviromentMode: stable
+        helm-pat: ${{ secrets.DSS_HELM_PAT }}
+        version: ${{ steps.version.outputs.version }}
+        repositories: |
+          ecmwf-projects/cads-catalogue-api-service
