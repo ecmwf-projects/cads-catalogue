@@ -9,12 +9,10 @@ on:
 
 jobs:
   update-downstream-packages:
-    runs-on:
-      - ubuntu-latest
-    steps:
-    - name: Pull request to update packages
-      uses: ecmwf-projects/cads-build-farm/.github/workflows/update-downstream-packages@main
-      with:
-        package-ref: "CADS_CATALOGUE_REF"
-        repositories: |
-          ecmwf-projects/cads-catalogue-api-service
+    name: Pull request to update packages
+    uses: ecmwf-projects/cads-build-farm/.github/workflows/update-downstream-packages@main
+    with:
+      package-ref: "CADS_CATALOGUE_REF"
+      repositories: |
+        ecmwf-projects/cads-catalogue-api-service
+    secrets: inherit
