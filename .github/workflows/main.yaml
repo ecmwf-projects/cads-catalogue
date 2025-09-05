@@ -8,16 +8,12 @@ on:
 
 
 jobs:
-  build_docker_image:
+  update-downstream-packages:
     runs-on:
       - ubuntu-latest
     steps:
-    - name: compute semantic version
-      uses: ecmwf-projects/cads-build-farm/.github/actions/git-version@main
-      id: version
-
     - name: Pull request to update packages
-      uses: ecmwf-projects/cads-build-farm/.github/actions/update-package@main
+      uses: ecmwf-projects/cads-build-farm/.github/workflow/update-downstream-packages@main
       with:
         package-ref: "CADS_CATALOGUE_REF"
         enviromentMode: stable
