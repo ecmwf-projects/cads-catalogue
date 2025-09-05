@@ -1863,21 +1863,38 @@ def test_find_related_resources():
         return [[r.resource_uid for r in t] for t in raw_related]
 
     res1 = database.Resource(
-        resource_id=1, resource_uid="res1", related_resources_keywords=["aaa"]
+        resource_id=1,
+        resource_uid="res1",
+        related_resources_keywords=["aaa"],
+        portal="a",
     )
     res2 = database.Resource(
-        resource_id=2, resource_uid="res2", related_resources_keywords=["aaa", "bbb"]
+        resource_id=2,
+        resource_uid="res2",
+        related_resources_keywords=["aaa", "bbb"],
+        portal="a",
     )
     res3 = database.Resource(
-        resource_id=3, resource_uid="res3", related_resources_keywords=["ccc"]
+        resource_id=3,
+        resource_uid="res3",
+        related_resources_keywords=["ccc"],
+        portal="a",
     )
     res4 = database.Resource(
         resource_id=4,
         resource_uid="res4",
         related_resources_keywords=["aaa"],
         hidden=True,
+        portal="a",
     )
-    related = manager.find_related_resources([res1, res2, res3, res4])
+    res5 = database.Resource(
+        resource_id=5,
+        resource_uid="res5",
+        related_resources_keywords=["aaa"],
+        portal="b",
+    )
+
+    related = manager.find_related_resources([res1, res2, res3, res4, res5])
 
     assert _to_testable_structure(related) == [
         ["res1", "res2"],
