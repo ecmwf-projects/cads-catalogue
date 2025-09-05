@@ -16,8 +16,5 @@ jobs:
       uses: ecmwf-projects/cads-build-farm/.github/workflow/update-downstream-packages@main
       with:
         package-ref: "CADS_CATALOGUE_REF"
-        enviromentMode: stable
-        helm-pat: ${{ secrets.DSS_HELM_PAT }}
-        version: ${{ steps.version.outputs.version }}
         repositories: |
           ecmwf-projects/cads-catalogue-api-service
