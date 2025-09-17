@@ -253,6 +253,7 @@ class ResourceData(BaseModel):
     constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
     form_data: Any = sa.Column(dialect_postgresql.JSONB)
     mapping: Any = sa.Column(dialect_postgresql.JSONB)
+    fair_data: Any = sa.Column(dialect_postgresql.JSONB, nullable=True)
 
     resource_uid = sa.Column(
         sa.String, sa.ForeignKey("resources.resource_uid"), nullable=False
@@ -331,6 +332,9 @@ class Resource(BaseModel):
     update_frequency = sa.Column(sa.String)
     variables: Any = sa.Column(dialect_postgresql.JSONB)
     content_size = sa.Column(sa.Float)
+
+    # FAIR
+    fair_timestamp = sa.Column(sa.DateTime(timezone=True), default=None, nullable=True)
 
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
