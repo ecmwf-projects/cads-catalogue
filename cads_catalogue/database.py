@@ -17,12 +17,12 @@
 import datetime
 from typing import Any, List
 
+import alembic.command
+import alembic.config
 import sqlalchemy as sa
 import sqlalchemy_utils
 from sqlalchemy.dialects import postgresql as dialect_postgresql  # needed for mypy
 
-import alembic.command
-import alembic.config
 from cads_catalogue import alembic_cli, config
 
 metadata = sa.MetaData()
