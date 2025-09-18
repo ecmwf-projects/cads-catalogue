@@ -527,8 +527,9 @@ def fair_checker(
     engine = sa.create_engine(connection_string)
     session_obj = sa.orm.sessionmaker(engine)
     logger.info("start FAIR checker on all resources in the catalogue.")
-    fair.update_fair_score(session_obj, fair_checker_host)
-    logger.info("FAIR checker process completed.")
+    with session_obj() as session:
+        fair.update_fair_score(session, fair_checker_host)
+        logger.info("FAIR checker process completed.")
 
 
 def main() -> None:

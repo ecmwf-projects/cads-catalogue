@@ -30,16 +30,13 @@ def test_fair_integration(
         )
         session.add(res1)
         session.commit()
-        session.close()
 
     # New independent session
-    session_obj = sa.orm.sessionmaker(engine)
     mocker.patch("cads_catalogue.fair.call_fair_checker", return_value={"foo": "bar"})
 
     with session_obj() as session:
         update_fair_score(session, "localhost:5000")
 
-        session.query(database.Resource).all()
         res1 = session.query(database.Resource).one()
         res1_data = session.query(database.ResourceData).one()
 

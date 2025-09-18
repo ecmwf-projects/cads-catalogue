@@ -72,7 +72,7 @@ def update_fair_score(session: sa.orm.Session, fair_checker_host: str) -> None:
     """
     resources = session.query(database.Resource).all()
     for resource in resources:
-        site_base = portal.get_site_url(resource.portal)
+        site_base = portal.get_site_url(resource.portal) if resource.portal else None
         if not site_base:
             logger.warning(
                 "Cannot determine site base URL for portal",
@@ -81,6 +81,7 @@ def update_fair_score(session: sa.orm.Session, fair_checker_host: str) -> None:
             )
             continue
         dataset_uid = resource.resource_uid
+        assert dataset_uid is not None
         try:
             result = call_fair_checker(fair_checker_host, site_base, dataset_uid)
         except requests.RequestException as e:
