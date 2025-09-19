@@ -49,15 +49,16 @@ def call_fair_checker(fair_checker_host: str, site_base: str, dataset_uid: str) 
         "metric_version": "metrics_v0.8",
     }
 
+    logger.info("Retrieving FAIR report for resource", dataset_uid=dataset_uid)
     response = requests.post(
-        f"http://${fair_checker_host}/fuji/api/v1/evaluate",
+        f"http://{fair_checker_host}/fuji/api/v1/evaluate",
         headers={
             "accept": "application/json",
             "Content-Type": "application/json",
         },
         json=payload,
         auth=(FAIR_CHEKER_USERNAME, FAIR_CHEKER_PASSWORD),
-        timeout=10,
+        timeout=60,
     )
     response.raise_for_status()
     return response.json()
