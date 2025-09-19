@@ -28,6 +28,7 @@ from cads_catalogue import (
     config,
     contents,
     database,
+    fair,
     licence_manager,
     maintenance,
     manager,
@@ -506,6 +507,29 @@ def update_sanity_check(
     session_obj = sa.orm.sessionmaker(engine)
     sanity_check.update_sanity_checks_by_file(session_obj, report_path, retain_only)
     logger.info("db update of sanity check information completed.")
+
+
+@app.command()
+def fair_checker(
+    fair_checker_host: str,
+) -> None:
+    """Run FAIR checker on all resources in the catalogue.
+
+    Evaluate FAIR score of every entry in the catalogue.
+    Command is compatible with the F-UJI FAIR checker API.
+
+    Parameters
+    ----------
+    :param fair_checker_service_url: host (optionally with port) of the FAIR checker service
+    """
+    dbsettings = config.ensure_settings(config.dbsettings)
+    connection_string = dbsettings.connection_string
+    engine = sa.create_engine(connection_string)
+    session_obj = sa.orm.sessionmaker(engine)
+    logger.info("start FAIR checker on all resources in the catalogue.")
+    with session_obj() as session:
+        fair.update_fair_score(session, fair_checker_host)
+        logger.info("FAIR checker process completed.")
 
 
 def main() -> None:

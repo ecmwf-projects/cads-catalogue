@@ -901,7 +901,8 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'12':83B,318B '2003':304B '3':327B '4':15B '4d':337B '4d-var':336B 'abl':192B 'account':343B 'accur':294B 'across':33B 'air':74B 'allow':129B,168B,211B 'although':277B,306B 'alway':252B 'analysi':113B,308B 'around':240B 'assimil':61B,189B,279B,339B,356B 'atmospher':12B,24B,48B,111B,209B,223B 'avail':94B,231B,302B 'back':137B,164B 'base':49B,63B 'benefit':181B 'best':104B 'bias':195B 'call':59B,112B 'cam':2A,6A 'cams-global-reanalysis-eac4':1A 'centr':72B,77B 'chang':272B 'chemistri':56B 'chunk':311B 'collect':158B 'combin':27B,91B 'complet':39B 'composit':13B,25B 'consid':310B 'consist':41B 'constraint':147B 'conveni':261B 'coverag':218B 'data':29B,60B,204B,207B,217B,283B,313B 'dataset':42B,135B,264B 'decad':141B 'direct':228B 'drastic':273B 'eac4':5A,9A,10B,299B,323B 'ecmwf':11B,20B,86B 'estim':105B,194B,213B,235B,295B,325B 'everi':79B,326B 'evolut':353B 'exact':346B 'forecast':76B,89B,119B,151B 'format':256B 'fourth':18B 'generat':19B 'global':3A,7A,21B,38B 'globe':242B 'go':162B,322B 'good':202B 'good-qual':201B 'grid':238B 'hole':284B 'hour':82B,84B,319B,328B 'improv':118B,173B 'ingest':171B 'initi':286B 'issu':121B,149B 'law':52B 'lead':291B 'less':293B 'locat':215B 'long':250B 'low':220B 'made':332B 'make':257B 'mani':81B 'method':66B,340B 'model':28B,45B,210B,352B 'much':287B 'network':289B 'new':103B 'newli':93B 'numer':69B 'observ':31B,95B,159B,178B,197B,229B,269B,350B 'one':321B 'onward':305B 'optim':98B 'origin':177B 'output':246B 'period':251B 'physic':54B 'point':239B 'pollut':224B 'poor':206B 'popular':263B 'possibl':333B 'predict':71B 'previous':88B 'principl':58B 'procedur':309B 'produc':101B 'product':187B 'provid':324B 'provis':132B,233B 'qualiti':75B,183B,203B 'reanalysi':4A,8A,14B,22B,26B,122B,142B,186B,258B 'reason':298B 'regular':245B 'resolv':282B 'sift':200B 'span':136B 'sparser':288B 'state':108B 'system':190B,270B,280B 'take':342B 'time':150B,156B,166B,247B,275B,347B 'updat':117B 'use':43B,67B,253B 'var':338B 'version':174B 'way':99B,127B 'weather':70B 'window':316B,357B 'within':354B 'work':123B,266B 'world':35B 'worldwid':329B",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     },
     {
         "resource_id": 3,
@@ -1435,7 +1436,8 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'12':87B,325B '2003':310B '3':334B '4':19B '4d':344B '4d-var':343B 'abl':197B 'account':350B 'accur':300B 'across':37B 'air':78B 'allow':133B,172B,216B 'although':283B 'alway':257B 'analysi':117B,315B 'around':245B 'assimil':65B,194B,285B,346B,363B 'atmospher':16B,28B,52B,115B,214B,228B 'avail':98B,236B,308B 'averag':12A 'back':141B,168B 'base':53B,67B 'benefit':185B 'best':108B 'bias':200B 'call':63B,116B 'cam':2A,7A 'cams-global-reanalysis-eac4-monthly':1A 'centr':76B,81B 'chang':278B 'chemistri':60B 'chunk':318B 'collect':162B 'combin':31B,95B 'complet':43B 'composit':17B,29B 'consid':317B 'consist':45B 'constraint':151B 'conveni':266B 'coverag':223B 'data':33B,64B,209B,212B,222B,289B,320B 'dataset':46B,139B,269B 'decad':145B 'direct':233B 'drastic':279B 'eac4':5A,10A,14B,305B,330B 'ecmwf':15B,24B,90B 'estim':109B,199B,218B,240B,301B,332B 'everi':83B,333B 'evolut':360B 'exact':353B 'field':13A 'forecast':80B,93B,123B,155B 'format':261B 'fourth':22B 'generat':23B 'global':3A,8A,25B,42B 'globe':247B 'go':166B,329B 'good':207B 'good-qual':206B 'grid':243B 'hole':290B 'hour':86B,88B,326B,335B 'improv':122B,177B 'ingest':175B 'initi':292B 'issu':125B,153B 'law':56B 'lead':297B 'less':299B 'locat':220B 'long':255B 'low':225B 'made':339B 'make':262B 'mani':85B 'method':70B,347B 'model':32B,49B,215B,359B 'month':6A,11A 'much':293B 'n':192B,273B,312B 'nalthough':313B 'network':295B 'new':107B 'newli':97B 'nthe':193B,274B 'numer':73B 'observ':35B,99B,163B,182B,202B,234B,275B,357B 'one':328B 'onward':311B 'optim':102B 'origin':181B 'output':251B 'period':256B 'physic':58B 'point':244B 'pollut':229B 'poor':211B 'popular':268B 'possibl':340B 'predict':75B 'previous':92B 'principl':62B 'procedur':316B 'produc':105B 'product':191B 'provid':331B 'provis':136B,238B 'qualiti':79B,187B,208B 'reanalysi':4A,9A,18B,26B,30B,126B,146B,190B,263B 'reason':304B 'regular':250B 'resolv':288B 'sift':205B 'span':140B 'sparser':294B 'state':112B 'system':195B,276B,286B 'take':349B 'time':154B,160B,170B,252B,281B,354B 'updat':121B 'use':47B,71B,258B 'var':345B 'version':178B 'way':103B,131B 'weather':74B 'window':323B,364B 'within':361B 'work':127B,271B 'world':39B 'worldwid':336B",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     },
     {
         "resource_id": 5,
@@ -1496,7 +1498,8 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'1979':12A '2019':14A 'atmospher':50B 'bias':18A,25B 'bias-correct':17A,24B 'centr':42B 'correct':19A,26B 'dataset':22B,63B 'deriv':2A,15A,34B 'derived-near-surface-meteorological-vari':1A 'ecmwf':49B 'era5':52B 'european':41B 'fifth':37B 'forc':62B 'forecast':48B 'generat':38B 'hydrolog':68B 'intend':55B 'land':65B 'medium':45B 'medium-rang':44B 'meteorolog':5A,9A,32B,61B 'model':69B 'near':3A,7A,30B 'near-surfac':29B 'provid':23B 'rang':46B 'reanalys':51B 'reanalysi':20A 'reconstruct':27B 'surfac':4A,8A,31B,66B 'use':58B 'variabl':6A,10A,33B 'weather':47B",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     },
     {
         "resource_id": 1,
@@ -1567,7 +1570,8 @@
         "high_priority_terms": "ERA5 reanalysis temperature",
         "popularity": 200,
         "search_field": "'abstract':8B 'era5':3A,9 'land':4A 'reanalysi':2A,10 'reanalysis-era5-land':1A 'temperatur':11 'titl':6A",
-        "fts": "'era5':1 'reanalysi':2 'temperatur':3"
+        "fts": "'era5':1 'reanalysi':2 'temperatur':3",
+        "fair_timestamp": null
     },
     {
         "resource_id": 6,
@@ -1630,7 +1634,8 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'1950':14A 'accur':95B 'across':68B 'averag':11A 'back':90B 'biospher':110C 'c3s':112C 'climat':59B,99B,103C 'combin':62B 'compar':41B 'complet':74B 'compon':54B 'condit':113C 'consist':26B,76B 'copernicus':111C 'data':12A,64B,85B 'dataset':23B,77B 'decad':36B,89B 'descript':96B 'ecmwf':57B 'enhanc':39B 'era5':3A,8A,18B,43B,45B,58B,107C 'era5-land':7A,17B,44B 'evolut':30B 'global':73B 'goe':87B 'hydrolog':108C 'land':4A,9A,19B,32B,46B,53B,106C 'law':80B 'mean':6A,116C 'model':63B 'month':5A,10A,115C 'observ':66B 'past':102B,105C 'physic':82B,109C 'present':16A 'produc':49B,84B 'provid':24B,93B 'reanalysi':2A,22B,60B,61B,83B,104C 'reanalysis-era5-land-monthly-means':1A 'replay':51B 'resolut':40B 'sever':35B,88B 'time':92B 'use':78B 'variabl':33B,114C 'view':27B 'world':70B",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     },
     {
         "resource_id": 7,
@@ -1691,7 +1696,8 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'-1978':49B '1950':41B,48B '1959':13A,55B '4':32B '7':34B 'avail':39B 'back':51B 'climat':26B,43B 'current':36B 'data':8A,37B,44B 'decad':35B 'ecmwf':21B 'entri':46B 'era':68B 'era-interim':67B 'era5':3A,6A,16B,64B 'extens':52B 'fifth':19B 'final':57B 'generat':20B 'global':25B 'hour':7A 'interim':69B 'level':5A,11A 'onward':56B 'page':63B 'past':31B 'plus':59B 'preliminari':50B 'present':15A 'pressur':4A,10A 'reanalysi':2A,22B,70B 'reanalysis-era5-pressure-levels':1A 'releas':58B 'replac':65B 'store':45B 'time':60B 'updat':61B 'weather':28B",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     },
     {
         "resource_id": 9,
@@ -1774,7 +1780,8 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'-1978':49B '1950':41B,48B '1959':13A,55B '4':32B '7':34B 'avail':39B 'back':51B 'climat':26B,43B 'current':36B 'data':8A,37B,44B 'decad':35B 'ecmwf':21B 'entri':46B 'era':68B 'era-interim':67B 'era5':3A,6A,16B,64B 'extens':52B 'fifth':19B 'final':57B 'generat':20B 'global':25B 'hour':7A 'interim':69B 'level':5A,11A 'onward':56B 'page':63B 'past':31B 'plus':59B 'preliminari':50B 'present':15A 'reanalysi':2A,22B,70B 'reanalysis-era5-single-levels':1A 'releas':58B 'replac':65B 'singl':4A,10A 'store':45B 'time':60B 'updat':61B 'weather':28B",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     },
     {
         "resource_id": 8,
@@ -1835,6 +1842,7 @@
         "high_priority_terms": "",
         "popularity": 1,
         "search_field": "'1982':10A 'budget':5A,8A 'deriv':13A 'observ':16A 'present':12A 'radiat':4A,7A 'satellit':2A,15A 'satellite-surface-radiation-budget':1A 'surfac':3A,6A",
-        "fts": ""
+        "fts": "",
+        "fair_timestamp": null
     }
 ]

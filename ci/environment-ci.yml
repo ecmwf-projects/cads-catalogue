@@ -22,6 +22,7 @@ dependencies:
 - pytest-mock
 - pyyaml
 - sqlalchemy-utils<0.42.0  # see https://github.com/kvesteri/sqlalchemy-utils/issues/791
+- types-requests
 - pip:
   - boto3-stubs
   - pytest-postgresql

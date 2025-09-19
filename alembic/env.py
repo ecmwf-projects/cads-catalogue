@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import alembic.context
 import cads_common.logging
 import sqlalchemy as sa
 
-import alembic.context
 import cads_catalogue
 
 

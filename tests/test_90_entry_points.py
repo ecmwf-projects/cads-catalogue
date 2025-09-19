@@ -3,6 +3,7 @@ import os.path
 import unittest.mock
 from typing import Any, Dict, List, Tuple
 
+import alembic.config
 import pytest
 import pytest_mock
 import sqlalchemy as sa
@@ -10,7 +11,6 @@ import sqlalchemy_utils
 from psycopg import Connection
 from typer.testing import CliRunner
 
-import alembic.config
 from cads_catalogue import (
     contents,
     database,
