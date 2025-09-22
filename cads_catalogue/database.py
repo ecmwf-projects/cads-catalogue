@@ -360,7 +360,7 @@ class Resource(BaseModel):
 
     @sa.ext.hybrid.hybrid_property
     def has_adaptor_costing(self):
-        """Verificy is costing is defined in adaptor json."""
+        """Verify if costing is defined in adaptor json."""
         session = sa.orm.object_session(self)
         exists_query = sa.exists().where(
             sa.and_(
@@ -379,6 +379,45 @@ class Resource(BaseModel):
                 ResourceData.resource_uid == self.resource_uid,
                 ResourceData.adaptor_configuration.op("?")("costing"),
             )
+        )
+
+    @sa.ext.hybrid.hybrid_property
+    def fair_score(self):
+        """Return the FAIR score from the fair_data column.
+
+        Data will be looked-up on fair_data.summary.score_total.FAIR
+        """
+        from sqlalchemy.orm import object_session
+
+        session = object_session(self)
+        if session is None:
+            return None
+
+        result = (
+            session.query(
+                ResourceData.fair_data.op("#>")(sa.text("'{summary,score_total,FAIR}'"))
+            )
+            .filter(ResourceData.resource_uid == self.resource_uid)
+            .scalar()
+        )
+
+        # Convert to integer, or None if not found
+        if result is not None:
+            try:
+                return int(result)
+            except (ValueError, TypeError):
+                return None
+        return None
+
+    @fair_score.expression  # type: ignore[no-redef]
+    def fair_score(cls):
+        return sa.cast(
+            sa.select(
+                ResourceData.fair_data.op("#>")(sa.text("'{summary,score_total,FAIR}'"))
+            )
+            .where(ResourceData.resource_uid == cls.resource_uid)
+            .scalar_subquery(),
+            sa.Integer,
         )
 
     # relationship attributes
