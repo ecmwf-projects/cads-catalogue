@@ -395,7 +395,9 @@ class Resource(BaseModel):
 
         result = (
             session.query(
-                ResourceData.fair_data.op("#>")(sa.text("'{summary,score_total,FAIR}'"))
+                ResourceData.fair_data.op("#>")(
+                    sa.text("'{summary,score_percent,FAIR}'")
+                )
             )
             .filter(ResourceData.resource_uid == self.resource_uid)
             .scalar()
@@ -413,7 +415,9 @@ class Resource(BaseModel):
     def fair_score(cls):
         return sa.cast(
             sa.select(
-                ResourceData.fair_data.op("#>")(sa.text("'{summary,score_total,FAIR}'"))
+                ResourceData.fair_data.op("#>")(
+                    sa.text("'{summary,score_percent,FAIR}'")
+                )
             )
             .where(ResourceData.resource_uid == cls.resource_uid)
             .scalar_subquery(),
