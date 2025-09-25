@@ -62,6 +62,7 @@
         "high_priority_terms": "reanalysis ERA5 land",
         "popularity": 500,
         "search_field": "'1950':11A 'accur':92B 'across':65B 'back':87B 'climat':56B,96B 'combin':59B 'compar':38B 'complet':71B 'compon':51B 'consist':23B,73B 'data':9A,61B,82B 'dataset':20B,74B 'decad':33B,86B 'descript':93B 'ecmwf':54B 'enhanc':36B 'era5':3A,6A,15B,40B,42B,55B,101 'era5-land':5A,14B,41B 'evolut':27B 'global':70B 'goe':84B 'hour':8A 'land':4A,7A,16B,29B,43B,50B,102 'law':77B 'model':60B 'observ':63B 'past':99B 'physic':79B 'present':13A 'produc':46B,81B 'provid':21B,90B 'reanalysi':2A,19B,57B,58B,80B,100 'reanalysis-era5-land':1A 'replay':48B 'resolut':37B 'sever':32B,85B 'time':89B 'use':75B 'variabl':30B 'view':24B 'world':67B",
-        "fts": "'era5':2 'land':3 'reanalysi':1"
+        "fts": "'era5':2 'land':3 'reanalysi':1",
+        "fair_timestamp": null
     }
 ]

@@ -3,8 +3,9 @@
 import os
 from typing import Optional, Sequence
 
-import cads_catalogue
 from alembic.config import CommandLine, Config
+
+import cads_catalogue
 
 alembic_ini_path = os.path.abspath(os.path.join(__file__, "..", "..", "alembic.ini"))
 

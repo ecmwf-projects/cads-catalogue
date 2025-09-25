@@ -17,12 +17,12 @@
 import datetime
 from typing import Any, List
 
+import alembic.command
+import alembic.config
 import sqlalchemy as sa
 import sqlalchemy_utils
 from sqlalchemy.dialects import postgresql as dialect_postgresql  # needed for mypy
 
-import alembic.command
-import alembic.config
 from cads_catalogue import alembic_cli, config
 
 metadata = sa.MetaData()
@@ -253,6 +253,7 @@ class ResourceData(BaseModel):
     constraints_data: Any = sa.Column(dialect_postgresql.JSONB)
     form_data: Any = sa.Column(dialect_postgresql.JSONB)
     mapping: Any = sa.Column(dialect_postgresql.JSONB)
+    fair_data: Any = sa.Column(dialect_postgresql.JSONB, nullable=True)
 
     resource_uid = sa.Column(
         sa.String, sa.ForeignKey("resources.resource_uid"), nullable=False
@@ -332,6 +333,9 @@ class Resource(BaseModel):
     variables: Any = sa.Column(dialect_postgresql.JSONB)
     content_size = sa.Column(sa.Float)
 
+    # FAIR
+    fair_timestamp = sa.Column(sa.DateTime(timezone=True), default=None, nullable=True)
+
     # fulltextsearch-related
     fulltext = sa.Column(sa.String)
     high_priority_terms = sa.Column(sa.String)
@@ -356,7 +360,7 @@ class Resource(BaseModel):
 
     @sa.ext.hybrid.hybrid_property
     def has_adaptor_costing(self):
-        """Verificy is costing is defined in adaptor json."""
+        """Verify if costing is defined in adaptor json."""
         session = sa.orm.object_session(self)
         exists_query = sa.exists().where(
             sa.and_(
@@ -375,6 +379,49 @@ class Resource(BaseModel):
                 ResourceData.resource_uid == self.resource_uid,
                 ResourceData.adaptor_configuration.op("?")("costing"),
             )
+        )
+
+    @sa.ext.hybrid.hybrid_property
+    def fair_score(self):
+        """Return the FAIR score from the fair_data column.
+
+        Data will be looked-up on fair_data.summary.score_total.FAIR
+        """
+        from sqlalchemy.orm import object_session
+
+        session = object_session(self)
+        if session is None:
+            return None
+
+        result = (
+            session.query(
+                ResourceData.fair_data.op("#>")(
+                    sa.text("'{summary,score_percent,FAIR}'")
+                )
+            )
+            .filter(ResourceData.resource_uid == self.resource_uid)
+            .scalar()
+        )
+
+        # Convert to integer, or None if not found
+        if result is not None:
+            try:
+                return int(result)
+            except (ValueError, TypeError):
+                return None
+        return None
+
+    @fair_score.expression  # type: ignore[no-redef]
+    def fair_score(cls):
+        return sa.cast(
+            sa.select(
+                ResourceData.fair_data.op("#>")(
+                    sa.text("'{summary,score_percent,FAIR}'")
+                )
+            )
+            .where(ResourceData.resource_uid == cls.resource_uid)
+            .scalar_subquery(),
+            sa.Integer,
         )
 
     # relationship attributes
